@@ -34,11 +34,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
-import com.github.skydoves.frescomposable.FrescoImage
 import com.github.skydoves.frescomposabledemo.model.MockUtil
 import com.github.skydoves.frescomposabledemo.model.Poster
 import com.github.skydoves.frescomposabledemo.theme.DisneyComposeTheme
 import com.github.skydoves.frescomposabledemo.theme.purple500
+import com.skydoves.frescomposable.FrescoImage
 
 @Composable
 fun DisneyPosters(

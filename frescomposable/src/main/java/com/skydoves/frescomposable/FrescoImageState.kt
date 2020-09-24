@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.frescomposable
+package com.skydoves.frescomposable
 
 import androidx.compose.ui.graphics.ImageAsset
 import com.facebook.common.references.CloseableReference
