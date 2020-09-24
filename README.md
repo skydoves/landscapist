@@ -12,8 +12,6 @@
 🍂 Jetpack Compose image loading library for requesting and displaying images using <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>. <br>
 Fresco takes care of image loading and display, so you don't have to. It will load images from the network, local storage, or local resources, and display a placeholder until the image has arrived.
 </p>
-</br>
-
 <p align="center">
 <img src="https://user-images.githubusercontent.com/24237865/94184001-414d4800-fede-11ea-8801-cd0c997024df.png" width="572" height="280"/>
 </p>
