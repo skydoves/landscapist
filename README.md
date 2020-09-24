@@ -2,7 +2,10 @@
 <h1 align="center">Frescomposable</h1></br>
 
 <p align="center">
-<img src="https://user-images.githubusercontent.com/24237865/94184001-414d4800-fede-11ea-8801-cd0c997024df.png" width="572" height="280"/>
+  <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
+  <a href="https://android-arsenal.com/api?level=21"><img alt="API" src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat"/></a>
+  <a href="https://github.com/skydoves/Frescomposable/actions"><img alt="Build Status" src="https://github.com/skydoves/Frescomposable/workflows/Android%20CI/badge.svg"/></a>
+  <a href="https://github.com/skydoves"><img alt="Profile" src="https://skydoves.github.io/badges/skydoves.svg"/></a> 
 </p>
 
 <p align="center">
@@ -12,10 +15,7 @@ Fresco takes care of image loading and display, so you don't have to. It will lo
 </br>
 
 <p align="center">
-  <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
-  <a href="https://android-arsenal.com/api?level=21"><img alt="API" src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat"/></a>
-  <a href="https://github.com/skydoves/Frescomposable/actions"><img alt="Build Status" src="https://github.com/skydoves/Frescomposable/workflows/Android%20CI/badge.svg"/></a>
-  <a href="https://github.com/skydoves"><img alt="Profile" src="https://skydoves.github.io/badges/skydoves.svg"/></a> 
+<img src="https://user-images.githubusercontent.com/24237865/94184001-414d4800-fede-11ea-8801-cd0c997024df.png" width="572" height="280"/>
 </p>
 
 ## Including in your project
