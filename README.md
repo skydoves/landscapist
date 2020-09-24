@@ -1,6 +1,6 @@
 
-<h1 align="center">Frescompose</h1></br>
-<p align="center">  
+<h1 align="center">Frescomposable</h1></br>
+<p align="center">
 🍂 Jetpack Compose image loading library for requesting and displaying images using <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>. <br><br>
 Fresco takes care of image loading and display, so you don't have to. It will load images from the network, local storage, or local resources, and display a placeholder until the image has arrived.
 </p>
@@ -25,7 +25,7 @@ allprojects {
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:frescompose:1.0.0"
+    implementation "com.github.skydoves:frescomposable:1.0.0"
 }
 ```
 
@@ -125,7 +125,7 @@ FrescoImage(
 ```
 
 ## Find this repository useful? :heart:
-Support it by joining __[stargazers](https://github.com/skydoves/Frescompose/stargazers)__ for this repository. :star: <br>
+Support it by joining __[stargazers](https://github.com/skydoves/Frescomposable/stargazers)__ for this repository. :star: <br>
 And __[follow](https://github.com/skydoves)__ me for my next creations! 🤩
 
 # License

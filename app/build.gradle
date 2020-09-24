@@ -54,7 +54,7 @@ dependencies {
   implementation "androidx.compose.runtime:runtime-livedata:$versions.composeVersion"
   implementation "androidx.ui:ui-tooling:$versions.composeVersion"
 
-  // frescompose
+  // frescomposable
   implementation project(":frescomposable")
 }
 
