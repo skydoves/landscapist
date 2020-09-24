@@ -1,7 +1,7 @@
 
 <h1 align="center">Frescomposable</h1></br>
 <p align="center">
-🍂 Jetpack Compose image loading library for requesting and displaying images using <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>. <br><br>
+🍂 Jetpack Compose image loading library for requesting and displaying images using <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>. <br>
 Fresco takes care of image loading and display, so you don't have to. It will load images from the network, local storage, or local resources, and display a placeholder until the image has arrived.
 </p>
 </br>
@@ -52,14 +52,19 @@ class App : Application() {
 }
 ```
 
+<img src="https://user-images.githubusercontent.com/24237865/94174887-d8ab9e80-fed0-11ea-9f21-a6ed2b899339.gif" align="right" width="32%"/>
+
 ## Usage
 We can simply request and load images using a `FrescoImage` composable function.
 ```kotlin
 FrescoImage(
   imageUrl = stringImageUrl,
-  contentScale = ContentScale.Crop, // Crop, Fit, Inside, FillHeight, FillWidth, None
-  placeHolder = imageResource(R.drawable.placeholder), // shows a placeholder imageAssert when loading.
-  error = imageResource(R.drawable.error) // shows an error imageAssert when the request failed.
+  // Crop, Fit, Inside, FillHeight, FillWidth, None
+  contentScale = ContentScale.Crop,
+  // shows a placeholder imageAssert when loading.
+  placeHolder = imageResource(R.drawable.placeholder),
+  // shows an error imageAssert when the request failed.
+  error = imageResource(R.drawable.error)
 )
 ```
 We can customize our requests using an [ImageRequest](https://frescolib.org/docs/image-requests.html) that consists only of a URI, we can use the helper method ImageRequest.fromURI.
@@ -78,6 +83,9 @@ FrescoImage(
   imageRequest = imageRequest,
   contentScale = ContentScale.Crop)
 ```
+
+<img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="32%"/>
+
 ### Composable loading, success, failure
 We can create our own composable functions following requesting states.<br>
 Here is an example that shows a progress indicator when loading an image,<br>
