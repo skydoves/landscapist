@@ -15,6 +15,7 @@ Fresco takes care of image loading and display, so you don't have to. It will lo
 
 ## Including in your project
 ### Gradle 
+[![Jitpack](https://jitpack.io/v/skydoves/Frescomposable.svg)](https://jitpack.io/#skydoves/Frescomposable)
 Add below codes to your **root** `build.gradle` file (not your module build.gradle file).
 ```gradle
 allprojects {
