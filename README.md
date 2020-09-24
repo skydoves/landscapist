@@ -15,6 +15,7 @@ Fresco takes care of image loading and display, so you don't have to. It will lo
 
 ## Including in your project
 ### Gradle 
+[![Jitpack](https://jitpack.io/v/skydoves/Frescomposable.svg)](https://jitpack.io/#skydoves/Frescomposable) <br>
 Add below codes to your **root** `build.gradle` file (not your module build.gradle file).
 ```gradle
 allprojects {
@@ -32,8 +33,9 @@ dependencies {
 
 ## Initialize
 We should initialize `Fresco` using [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in our `Application` class.<br>
-And we will fetch images from the network, recommend using `OkHttpImagePipelineConfigFactory`.<br>
-We can set caching, networking, and thread pool strategies. And we can reference related methods in [here](https://fresco.buzhidao.net/javadoc/reference/com/facebook/imagepipeline/core/ImagePipelineConfig.Builder.html).
+If we need to fetch images from the network, recommend using `OkHttpImagePipelineConfigFactory`.<br>
+By using an `ImagePipelineConfig`, we can customize caching, networking, and thread pool strategies.<br>
+[Here](https://fresco.buzhidao.net/javadoc/reference/com/facebook/imagepipeline/core/ImagePipelineConfig.Builder.html). are more references related to the pipeline config.
 ```kotlin
 class App : Application() {
 
@@ -56,7 +58,7 @@ class App : Application() {
 <img src="https://user-images.githubusercontent.com/24237865/94174887-d8ab9e80-fed0-11ea-9f21-a6ed2b899339.gif" align="right" width="32%"/>
 
 ## Usage
-We can simply request and load images using a `FrescoImage` composable function.
+We can request and load images simply using a `FrescoImage` composable function.
 ```kotlin
 FrescoImage(
   imageUrl = stringImageUrl,
