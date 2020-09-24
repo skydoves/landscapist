@@ -1,5 +1,10 @@
 
 <h1 align="center">Frescomposable</h1></br>
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/24237865/94184001-414d4800-fede-11ea-8801-cd0c997024df.png" width="572" height="280"/>
+</p>
+
 <p align="center">
 🍂 Jetpack Compose image loading library for requesting and displaying images using <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>. <br>
 Fresco takes care of image loading and display, so you don't have to. It will load images from the network, local storage, or local resources, and display a placeholder until the image has arrived.
@@ -14,8 +19,8 @@ Fresco takes care of image loading and display, so you don't have to. It will lo
 </p>
 
 ## Including in your project
+[![Jitpack](https://jitpack.io/v/skydoves/Frescomposable.svg)](https://jitpack.io/#skydoves/Frescomposable)
 ### Gradle 
-[![Jitpack](https://jitpack.io/v/skydoves/Frescomposable.svg)](https://jitpack.io/#skydoves/Frescomposable) <br>
 Add below codes to your **root** `build.gradle` file (not your module build.gradle file).
 ```gradle
 allprojects {
@@ -64,9 +69,9 @@ FrescoImage(
   imageUrl = stringImageUrl,
   // Crop, Fit, Inside, FillHeight, FillWidth, None
   contentScale = ContentScale.Crop,
-  // shows a placeholder imageAssert when loading.
+  // shows a placeholder imageAsset when loading.
   placeHolder = imageResource(R.drawable.placeholder),
-  // shows an error imageAssert when the request failed.
+  // shows an error imageAsset when the request failed.
   error = imageResource(R.drawable.error)
 )
 ```
