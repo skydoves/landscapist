@@ -1,0 +1,67 @@
+plugins {
+  id 'com.android.library'
+  id 'kotlin-android'
+  id 'org.jetbrains.dokka'
+}
+
+apply from: '../dependencies.gradle'
+apply from: '../publish.gradle'
+
+android {
+  compileSdkVersion versions.compileSdk
+  defaultConfig {
+    minSdkVersion versions.minSdk
+    targetSdkVersion versions.compileSdk
+    versionCode versions.versionCode
+    versionName versions.versionName
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+  composeOptions {
+    kotlinCompilerVersion versions.kotlin
+    kotlinCompilerExtensionVersion versions.composeVersion
+  }
+  kotlinOptions {
+    jvmTarget = '1.8'
+    freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
+    useIR = true
+  }
+  buildFeatures {
+    compose true
+  }
+}
+
+kotlin {
+  explicitApiWarning()
+}
+
+dependencies {
+  // androidx jetpack
+  implementation "androidx.core:core-ktx:$versions.coreKtxVersion"
+
+  // compose
+  implementation "androidx.compose.ui:ui:$versions.composeVersion"
+  implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
+  implementation "androidx.compose.foundation:foundation:$versions.composeVersion"
+
+  // fresco
+  api "com.facebook.fresco:fresco:$versions.frescoVersion"
+  api "com.facebook.fresco:imagepipeline-okhttp3:$versions.frescoVersion"
+}
+
+dokkaHtml.configure {
+  dokkaSourceSets {
+    named("main") {
+      noAndroidSdkLink.set(false)
+    }
+  }
+}
+
+tasks.withType(Javadoc) {
+  excludes = ['**/*.kt']
+  options.addBooleanOption('Xdoclint:none', true)
+}
+
+apply from: '../spotless.gradle'

@@ -1,0 +1,3 @@
+rootProject.name = "FrescomposableDemo"
+include ':app'
+include ':frescomposable'

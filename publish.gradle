@@ -1,0 +1,13 @@
+apply plugin: 'com.github.panpf.bintray-publish'
+apply from: '../dependencies.gradle'
+
+publish {
+  userOrg = 'devmagician'
+  groupId = 'com.github.skydoves'
+  artifactId = 'frescomposable'
+  publishVersion = versions.versionName
+  desc = 'Jetpack Compose image library for requesting and loading images using Fresco.'
+  website = 'https://github.com/skydoves/Frescomposable'
+  issueTracker = "${website}/issues"
+  repository = "${website}.git"
+}
