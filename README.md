@@ -17,6 +17,7 @@ Fresco takes care of image loading and display, so you don't have to. It will lo
 </p>
 
 ## Including in your project
+[![Download](https://api.bintray.com/packages/devmagician/maven/frescomposable/images/download.svg) ](https://bintray.com/devmagician/maven/frescomposable/_latestVersion)
 [![Jitpack](https://jitpack.io/v/skydoves/Frescomposable.svg)](https://jitpack.io/#skydoves/Frescomposable)
 ### Gradle 
 Add below codes to your **root** `build.gradle` file (not your module build.gradle file).
