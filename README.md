@@ -39,7 +39,7 @@ dependencies {
 We should initialize `Fresco` using [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in our `Application` class.<br>
 If we need to fetch images from the network, recommend using `OkHttpImagePipelineConfigFactory`.<br>
 By using an `ImagePipelineConfig`, we can customize caching, networking, and thread pool strategies.<br>
-[Here](https://fresco.buzhidao.net/javadoc/reference/com/facebook/imagepipeline/core/ImagePipelineConfig.Builder.html). are more references related to the pipeline config.
+[Here](https://fresco.buzhidao.net/javadoc/reference/com/facebook/imagepipeline/core/ImagePipelineConfig.Builder.html) are more references related to the pipeline config.
 ```kotlin
 class App : Application() {
 
@@ -126,17 +126,20 @@ And if the request failed (e.g. network error, wrong destination), error text wi
 Also, we can customize the content image using our own composable function like below.
 ```kotlin
 FrescoImage(
-  imageUrl = imageUrl,
-  // draw a resized image.
-  success = { frescoImageState ->
-    frescoImageState.imageAsset?.let {
-      Image(
-        asset = it,
-        modifier = Modifier.width(100.dp))
-    }
-  },
-  loading = { // do something }
-)
+    imageUrl = imageUrl,
+    // draw a resized image.
+    success = { frescoImageState ->
+      frescoImageState.imageAsset?.let {
+        Image(
+          asset = it,
+          modifier = Modifier
+            .width(128.dp)
+            .height(128.dp))
+      }
+    },
+    loading = { 
+      // do something 
+    })
 ```
 
 ## Find this repository useful? :heart:
