@@ -1,10 +1,5 @@
 
 <h1 align="center">Frescomposable</h1></br>
-<p align="center">
-🍂 Jetpack Compose image loading library for requesting and displaying images using <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>. <br>
-Fresco takes care of image loading and display, so you don't have to. It will load images from the network, local storage, or local resources, and display a placeholder until the image has arrived.
-</p>
-</br>
 
 <p align="center">
   <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
@@ -13,9 +8,18 @@ Fresco takes care of image loading and display, so you don't have to. It will lo
   <a href="https://github.com/skydoves"><img alt="Profile" src="https://skydoves.github.io/badges/skydoves.svg"/></a> 
 </p>
 
+<p align="center">
+🍂 Jetpack Compose image loading library for requesting and displaying images using <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>. <br>
+Fresco takes care of image loading and display, so you don't have to. It will load images from the network, local storage, or local resources, and display a placeholder until the image has arrived.
+</p>
+<p align="center">
+<img src="https://user-images.githubusercontent.com/24237865/94184001-414d4800-fede-11ea-8801-cd0c997024df.png" width="572" height="280"/>
+</p>
+
 ## Including in your project
+[![Download](https://api.bintray.com/packages/devmagician/maven/frescomposable/images/download.svg) ](https://bintray.com/devmagician/maven/frescomposable/_latestVersion)
+[![Jitpack](https://jitpack.io/v/skydoves/Frescomposable.svg)](https://jitpack.io/#skydoves/Frescomposable)
 ### Gradle 
-[![Jitpack](https://jitpack.io/v/skydoves/Frescomposable.svg)](https://jitpack.io/#skydoves/Frescomposable) <br>
 Add below codes to your **root** `build.gradle` file (not your module build.gradle file).
 ```gradle
 allprojects {
@@ -35,7 +39,7 @@ dependencies {
 We should initialize `Fresco` using [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in our `Application` class.<br>
 If we need to fetch images from the network, recommend using `OkHttpImagePipelineConfigFactory`.<br>
 By using an `ImagePipelineConfig`, we can customize caching, networking, and thread pool strategies.<br>
-[Here](https://fresco.buzhidao.net/javadoc/reference/com/facebook/imagepipeline/core/ImagePipelineConfig.Builder.html). are more references related to the pipeline config.
+[Here](https://fresco.buzhidao.net/javadoc/reference/com/facebook/imagepipeline/core/ImagePipelineConfig.Builder.html) are more references related to the pipeline config.
 ```kotlin
 class App : Application() {
 
@@ -64,9 +68,9 @@ FrescoImage(
   imageUrl = stringImageUrl,
   // Crop, Fit, Inside, FillHeight, FillWidth, None
   contentScale = ContentScale.Crop,
-  // shows a placeholder imageAssert when loading.
+  // shows a placeholder imageAsset when loading.
   placeHolder = imageResource(R.drawable.placeholder),
-  // shows an error imageAssert when the request failed.
+  // shows an error imageAsset when the request failed.
   error = imageResource(R.drawable.error)
 )
 ```
@@ -122,17 +126,20 @@ And if the request failed (e.g. network error, wrong destination), error text wi
 Also, we can customize the content image using our own composable function like below.
 ```kotlin
 FrescoImage(
-  imageUrl = imageUrl,
-  // draw a resized image.
-  success = { frescoImageState ->
-    frescoImageState.imageAsset?.let {
-      Image(
-        asset = it,
-        modifier = Modifier.width(100.dp))
-    }
-  },
-  loading = { // do something }
-)
+    imageUrl = imageUrl,
+    // draw a resized image.
+    success = { frescoImageState ->
+      frescoImageState.imageAsset?.let {
+        Image(
+          asset = it,
+          modifier = Modifier
+            .width(128.dp)
+            .height(128.dp))
+      }
+    },
+    loading = { 
+      // do something 
+    })
 ```
 
 ## Find this repository useful? :heart:
