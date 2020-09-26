@@ -62,8 +62,8 @@ fun FrescoImage(
   modifier: Modifier = Modifier.fillMaxWidth(),
   imageRequest: ImageRequest = getDefaultImageRequest(Uri.parse(imageUrl)),
   contentScale: ContentScale = ContentScale.Crop,
-  placeHolder: ImageAsset?,
-  error: ImageAsset?
+  placeHolder: ImageAsset? = null,
+  error: ImageAsset? = null
 ) {
   FrescoImage(
     imageUrl = imageUrl,
@@ -170,7 +170,7 @@ fun FrescoImage(
  * ```
  */
 @Composable
-fun FrescoImage(
+private fun FrescoImage(
   imageUri: Uri,
   modifier: Modifier = Modifier.fillMaxWidth(),
   imageRequest: ImageRequest,
