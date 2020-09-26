@@ -124,7 +124,7 @@ fun FrescoImage(
   modifier: Modifier = Modifier.fillMaxWidth(),
   imageRequest: ImageRequest = getDefaultImageRequest(Uri.parse(imageUrl)),
   contentScale: ContentScale = ContentScale.Crop,
-  loading: @Composable (() -> Unit)? = null,
+  loading: @Composable ((imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
@@ -135,7 +135,7 @@ fun FrescoImage(
   ) { imageState ->
     when (imageState) {
       is FrescoImageState.None -> Unit
-      is FrescoImageState.Loading -> loading?.invoke()
+      is FrescoImageState.Loading -> loading?.invoke(imageState)
       is FrescoImageState.Failure -> failure?.invoke(imageState)
       is FrescoImageState.Success -> {
         success?.invoke(imageState) ?: imageState.imageAsset?.let {
@@ -182,7 +182,6 @@ private fun FrescoImage(
     var state by stateFor<FrescoImageState>(imageRequest) { FrescoImageState.None }
 
     onCommit(imageUri) {
-      state = FrescoImageState.Loading
       val datasource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest, context)
       datasource.subscribe(
         object : BaseBitmapDataSubscriber() {
@@ -195,6 +194,11 @@ private fun FrescoImage(
           override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
             image.value = null
             state = FrescoImageState.Failure(dataSource)
+          }
+
+          override fun onProgressUpdate(dataSource: DataSource<CloseableReference<CloseableImage>>) {
+            super.onProgressUpdate(dataSource)
+            state = FrescoImageState.Loading(dataSource.progress)
           }
         },
         CallerThreadExecutor.getInstance()

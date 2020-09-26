@@ -28,7 +28,7 @@ sealed class FrescoImageState {
   object None : FrescoImageState()
 
   /** Request is currently in progress. */
-  object Loading : FrescoImageState()
+  data class Loading(val progress: Float) : FrescoImageState()
 
   /** Request is completed successfully amd ready to use an [ImageAsset]. */
   data class Success(val imageAsset: ImageAsset?) : FrescoImageState()
