@@ -29,6 +29,7 @@ android {
     useIR = true
   }
   buildFeatures {
+    buildConfig false
     compose true
   }
 }
