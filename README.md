@@ -15,26 +15,15 @@
 <img src="https://user-images.githubusercontent.com/24237865/94184001-414d4800-fede-11ea-8801-cd0c997024df.png" width="572" height="280"/>
 </p>
 
-## Including in your project
-[![Download](https://api.bintray.com/packages/devmagician/maven/frescomposable/images/download.svg) ](https://bintray.com/devmagician/maven/frescomposable/_latestVersion)
-[![Jitpack](https://jitpack.io/v/skydoves/Frescomposable.svg)](https://jitpack.io/#skydoves/Frescomposable)
-### Gradle 
-Add below codes to your **root** `build.gradle` file (not your module build.gradle file).
-```gradle
-allprojects {
-    repositories {
-        jcenter()
-    }
-}
-```
 
 <img src="https://user-images.githubusercontent.com/24237865/94174887-d8ab9e80-fed0-11ea-9f21-a6ed2b899339.gif" align="right" width="32%"/>
 
 ## Glide
+[![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-glide/images/download.svg) ](https://bintray.com/devmagician/maven/landscapist-glide/_latestVersion)<br>
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation 'com.github.skydoves:landscapist-glide:1.0.0'
+    implementation "com.github.skydoves:landscapist-glide:1.0.0"
 }
 ```
 
@@ -122,10 +111,11 @@ And if the request failed (e.g. network error, wrong destination), error text wi
 ```
 
 ## Fresco
+[ ![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-fresco/images/download.svg) ](https://bintray.com/devmagician/maven/landscapist-fresco/_latestVersion)<br>
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation 'com.github.skydoves:landscapist-fresco:1.0.0'
+    implementation "com.github.skydoves:landscapist-fresco:1.0.0"
 }
 ```
 
