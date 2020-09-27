@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.frescomposabledemo.model
+package com.github.skydoves.fisherdemo.model
 
 object MockUtil {
 

@@ -9,7 +9,7 @@ apply from: '../dependencies.gradle'
 android {
   compileSdkVersion versions.compileSdk
   defaultConfig {
-    applicationId "com.github.skydoves.frescomposabledemo"
+    applicationId "com.github.skydoves.fisheredemo"
     minSdkVersion versions.minSdk
     targetSdkVersion versions.compileSdk
     versionCode versions.versionCode
@@ -54,8 +54,8 @@ dependencies {
   implementation "androidx.compose.runtime:runtime-livedata:$versions.composeVersion"
   implementation "androidx.ui:ui-tooling:$versions.composeVersion"
 
-  // frescomposable
-  implementation project(":frescomposable")
+  // fisher
+  implementation project(":fresco")
 }
 
 apply from: '../spotless.gradle'

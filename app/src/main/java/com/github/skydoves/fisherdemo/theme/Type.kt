@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.frescomposabledemo.theme
+package com.github.skydoves.fisherdemo.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.graphics.Color

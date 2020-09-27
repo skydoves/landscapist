@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.frescomposabledemo.ui
+package com.github.skydoves.fisherdemo.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -34,10 +34,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.skydoves.frescomposabledemo.R
-import com.github.skydoves.frescomposabledemo.model.MockUtil
-import com.github.skydoves.frescomposabledemo.theme.DisneyComposeTheme
-import com.github.skydoves.frescomposabledemo.theme.purple200
+import com.github.skydoves.fisherdemo.R
+import com.github.skydoves.fisherdemo.model.MockUtil
+import com.github.skydoves.fisherdemo.theme.DisneyComposeTheme
+import com.github.skydoves.fisherdemo.theme.purple200
 
 class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {

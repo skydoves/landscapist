@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.frescomposabledemo.theme
+package com.github.skydoves.fisherdemo.theme
 
-import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Shapes
+import androidx.compose.ui.unit.dp
 
-val purple200 = Color(0xFF651FFF)
-val purple500 = Color(0xFF6200EA)
-val background = Color(0xFF2B292B)
-val background800 = Color(0xFF424242)
-val background900 = Color(0xFF212121)
-val white87 = Color(0Xddffffff)
+val shapes = Shapes(
+  small = RoundedCornerShape(4.dp),
+  medium = RoundedCornerShape(4.dp),
+  large = RoundedCornerShape(0.dp)
+)

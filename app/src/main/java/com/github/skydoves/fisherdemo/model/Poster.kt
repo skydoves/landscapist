@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.frescomposabledemo.theme
+package com.github.skydoves.fisherdemo.model
 
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Shapes
-import androidx.compose.ui.unit.dp
+import android.os.Parcelable
+import androidx.compose.runtime.Immutable
+import kotlinx.android.parcel.Parcelize
 
-val shapes = Shapes(
-  small = RoundedCornerShape(4.dp),
-  medium = RoundedCornerShape(4.dp),
-  large = RoundedCornerShape(0.dp)
-)
+@Immutable
+@Parcelize
+data class Poster(
+  val name: String,
+  val release: String,
+  val playtime: String,
+  val description: String,
+  val poster: String
+) : Parcelable

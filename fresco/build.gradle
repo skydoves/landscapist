@@ -4,8 +4,8 @@ plugins {
   id 'org.jetbrains.dokka'
 }
 
+apply plugin: 'com.github.panpf.bintray-publish'
 apply from: '../dependencies.gradle'
-apply from: '../publish.gradle'
 
 android {
   compileSdkVersion versions.compileSdk
@@ -63,6 +63,17 @@ dokkaHtml.configure {
 tasks.withType(Javadoc) {
   excludes = ['**/*.kt']
   options.addBooleanOption('Xdoclint:none', true)
+}
+
+publish {
+  userOrg = 'devmagician'
+  groupId = 'com.github.skydoves'
+  artifactId = 'fisher-fresco'
+  publishVersion = versions.versionName
+  desc = 'Jetpack Compose image library for requesting and loading images using Fresco.'
+  website = 'https://github.com/skydoves/Fisher'
+  issueTracker = "${website}/issues"
+  repository = "${website}.git"
 }
 
 apply from: '../spotless.gradle'
