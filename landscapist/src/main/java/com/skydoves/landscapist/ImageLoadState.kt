@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.landscapist
+package com.skydoves.landscapist
 
 import androidx.compose.ui.graphics.ImageAsset
 

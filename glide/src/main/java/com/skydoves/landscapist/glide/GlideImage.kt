@@ -16,7 +16,7 @@
 
 @file:Suppress("unused")
 
-package com.github.skydoves.landscapist.glide
+package com.skydoves.landscapist.glide
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -35,8 +35,8 @@ import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade
 import com.bumptech.glide.request.RequestOptions
-import com.github.skydoves.landscapist.ImageLoad
-import com.github.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageLoad
+import com.skydoves.landscapist.ImageLoadState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

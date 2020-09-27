@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.landscapist.glide
+package com.skydoves.landscapist.glide
 
 import android.graphics.drawable.Drawable
 import androidx.compose.ui.graphics.ImageAsset
-import com.github.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageLoadState
 
 /** GlideImageState is a state of the glide image requesting. */
 sealed class GlideImageState {

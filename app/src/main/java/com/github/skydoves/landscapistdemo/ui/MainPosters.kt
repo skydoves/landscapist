@@ -39,11 +39,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade
 import com.bumptech.glide.request.RequestOptions
-import com.github.skydoves.landscapist.glide.GlideImage
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.purple500
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun DisneyPosters(

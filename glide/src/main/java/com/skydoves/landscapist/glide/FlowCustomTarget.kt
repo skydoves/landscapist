@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.landscapist.glide
+package com.skydoves.landscapist.glide
 
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -23,7 +23,7 @@ import androidx.compose.runtime.FrameManager
 import androidx.compose.ui.graphics.asImageAsset
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.github.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageLoadState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

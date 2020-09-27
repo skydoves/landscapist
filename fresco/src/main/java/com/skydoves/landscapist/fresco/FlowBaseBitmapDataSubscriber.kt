@@ -23,7 +23,7 @@ import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber
 import com.facebook.imagepipeline.image.CloseableImage
-import com.github.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageLoadState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

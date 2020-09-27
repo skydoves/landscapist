@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.ImageAsset
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
 import com.facebook.imagepipeline.image.CloseableImage
-import com.github.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageLoadState
 
 /** FrescoImageState is a state of the fresco image requesting. */
 sealed class FrescoImageState {
