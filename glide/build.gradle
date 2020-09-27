@@ -1,0 +1,79 @@
+plugins {
+  id 'com.android.library'
+  id 'kotlin-android'
+  id 'org.jetbrains.dokka'
+}
+
+apply plugin: 'com.github.panpf.bintray-publish'
+apply from: '../dependencies.gradle'
+
+android {
+  compileSdkVersion versions.compileSdk
+  defaultConfig {
+    minSdkVersion versions.minSdk
+    targetSdkVersion versions.compileSdk
+    versionCode versions.versionCode
+    versionName versions.versionName
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+  composeOptions {
+    kotlinCompilerVersion versions.kotlin
+    kotlinCompilerExtensionVersion versions.composeVersion
+  }
+  kotlinOptions {
+    jvmTarget = '1.8'
+    freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
+    useIR = true
+  }
+  buildFeatures {
+    buildConfig false
+    compose true
+  }
+}
+
+
+kotlin {
+  explicitApiWarning()
+}
+
+dependencies {
+  // landscapist
+  implementation project(":landscapist")
+
+  // androidx jetpack
+  implementation "androidx.core:core-ktx:$versions.coreKtxVersion"
+
+  // compose
+  implementation "androidx.compose.ui:ui:$versions.composeVersion"
+  implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
+  implementation "androidx.compose.foundation:foundation:$versions.composeVersion"
+
+  // fresco
+  api "com.github.bumptech.glide:glide:$versions.glideVersion"
+}
+
+dokkaHtml.configure {
+  dokkaSourceSets {
+    named("main") {
+      noAndroidSdkLink.set(false)
+    }
+  }
+}
+
+tasks.withType(Javadoc).all { enabled = false }
+
+publish {
+  userOrg = 'devmagician'
+  groupId = 'com.github.skydoves'
+  artifactId = 'landscapist-glide'
+  publishVersion = versions.versionName
+  desc = 'Jetpack Compose image library for requesting and loading images using Glide.'
+  website = 'https://github.com/skydoves/Landscapist'
+  issueTracker = "${website}/issues"
+  repository = "${website}.git"
+}
+
+apply from: '../spotless.gradle'

@@ -1,5 +1,5 @@
 
-<h1 align="center">Frescomposable</h1></br>
+<h1 align="center">Landscapist</h1></br>
 
 <p align="center">
   <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
@@ -9,8 +9,7 @@
 </p>
 
 <p align="center">
-🍂 Jetpack Compose image loading library for requesting and displaying images using <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>. <br>
-Fresco takes care of image loading and display, so you don't have to. It will load images from the network, local storage, or local resources, and display a placeholder until the image has arrived.
+🍂 Jetpack Compose image loading library for requesting and displaying images using <a href="https://github.com/bumptech/glide" target="_blank"> Glide</a>, <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>
 </p>
 <p align="center">
 <img src="https://user-images.githubusercontent.com/24237865/94184001-414d4800-fede-11ea-8801-cd0c997024df.png" width="572" height="280"/>
@@ -28,14 +27,109 @@ allprojects {
     }
 }
 ```
+
+<img src="https://user-images.githubusercontent.com/24237865/94174887-d8ab9e80-fed0-11ea-9f21-a6ed2b899339.gif" align="right" width="32%"/>
+
+## Glide
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:frescomposable:1.0.1"
+    implementation 'com.github.skydoves:landscapist-glide:1.0.0'
 }
 ```
 
-## Initialize
+### Usage
+We can request and load images simply using a `GlideImage` composable function.
+```kotlin
+GlideImage(
+  imageModel = imageUrl,
+  // Crop, Fit, Inside, FillHeight, FillWidth, None
+  contentScale = ContentScale.Crop,
+  // shows a placeholder imageAsset when loading.
+  placeHolder = imageResource(R.drawable.placeholder),
+  // shows an error imageAsset when the request failed.
+  error = imageResource(R.drawable.error)
+)
+```
+
+#### RequestOptions and TransitionOptions
+We can customize our request options using [RequestOptions](https://bumptech.github.io/glide/doc/options.html#requestoptions) and [TransitionOptions](https://bumptech.github.io/glide/doc/options.html#transitionoptions) for applying caching strategies, loading transformations.
+```kotlin
+GlideImage(
+  imageModel = poster.poster,
+  requestOptions = RequestOptions()
+    .override(256, 256)
+    .diskCacheStrategy(DiskCacheStrategy.ALL)
+    .centerCrop(),
+  transitionOptions = BitmapTransitionOptions.withCrossFade(), 
+  contentScale = ContentScale.Crop,
+  modifier = modifier,
+  alignment = Alignment.Center,
+  contentScale = ContentScale.Crop,
+)
+```
+
+#### RequestBuilder
+Also we can request image by passing a [RequestBuilder](https://bumptech.github.io/glide/doc/options.html#requestbuilder). RequestBuilder is the backbone of the request in Glide and is responsible for bringing your options together with your requested url or model to start a new load.
+```kotlin
+GlideImage(
+  requestBuilder =
+  Glide
+    .with(ContextAmbient.current)
+    .asBitmap()
+    .load(poster.poster)
+    .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
+    .thumbnail(0.1f)
+    .transition(withCrossFade()),
+  modifier = Modifier.constrainAs(image) {
+    centerHorizontallyTo(parent)
+    top.linkTo(parent.top)
+  }.aspectRatio(0.8f)
+)
+```
+
+<img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="32%"/>
+
+### Composable loading, success, failure
+We can create our own composable functions following requesting states.<br>
+Here is an example that shows a progress indicator when loading an image,<br>
+After complete requesting, the indicator will be gone and a content image will be shown.<br>
+And if the request failed (e.g. network error, wrong destination), error text will be shown.
+```kotlin
+ GlideImage(
+ imageModel = poster.poster,
+ modifier = modifier,
+ // shows a progress indicator when loading an image.
+ loading = {
+   ConstraintLayout(
+     modifier = Modifier.fillMaxSize()
+   ) {
+     val indicator = createRef()
+     CircularProgressIndicator(
+       modifier = Modifier.constrainAs(indicator) {
+         top.linkTo(parent.top)
+         bottom.linkTo(parent.bottom)
+        start.linkTo(parent.start)
+        end.linkTo(parent.end)
+       }
+     )
+   }
+ },
+ // shows an error text message when request failed.
+ failure = {
+   Text(text = "image request failed.")
+ })
+```
+
+## Fresco
+And add a dependency code to your **module**'s `build.gradle` file.
+```gradle
+dependencies {
+    implementation 'com.github.skydoves:landscapist-fresco:1.0.0'
+}
+```
+
+### Initialize
 We should initialize `Fresco` using [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in our `Application` class.<br>
 If we need to fetch images from the network, recommend using `OkHttpImagePipelineConfigFactory`.<br>
 By using an `ImagePipelineConfig`, we can customize caching, networking, and thread pool strategies.<br>
@@ -61,7 +155,7 @@ class App : Application() {
 
 <img src="https://user-images.githubusercontent.com/24237865/94174887-d8ab9e80-fed0-11ea-9f21-a6ed2b899339.gif" align="right" width="32%"/>
 
-## Usage
+### Usage
 We can request and load images simply using a `FrescoImage` composable function.
 ```kotlin
 FrescoImage(

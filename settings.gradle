@@ -1,3 +1,5 @@
-rootProject.name = "FrescomposableDemo"
+rootProject.name = "LandscapistDemo"
 include ':app'
-include ':frescomposable'
+include ':fresco'
+include ':landscapist'
+include ':glide'
