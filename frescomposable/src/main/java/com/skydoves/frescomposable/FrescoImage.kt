@@ -39,7 +39,6 @@ import androidx.compose.ui.platform.ContextAmbient
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
-import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber
 import com.facebook.imagepipeline.image.CloseableImage
 import com.facebook.imagepipeline.request.ImageRequest
@@ -182,7 +181,7 @@ private fun FrescoImage(
     var state by stateFor<FrescoImageState>(imageRequest) { FrescoImageState.None }
 
     onCommit(imageUri) {
-      val datasource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest, context)
+      val datasource = imagePipeline.fetchDecodedImage(imageRequest, context)
       datasource.subscribe(
         object : BaseBitmapDataSubscriber() {
           override fun onNewResultImpl(bitmap: Bitmap?) {
