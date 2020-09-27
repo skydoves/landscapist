@@ -34,11 +34,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.github.skydoves.landscapist.glide.GlideImage
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.purple500
-import com.skydoves.landscapist.fresco.FrescoImage
 
 @Composable
 fun DisneyPosters(
@@ -78,8 +80,10 @@ fun HomePoster(
       )
     ) {
       val (image, title, content, message) = createRefs()
-      FrescoImage(
-        imageUrl = poster.poster,
+      GlideImage(
+        imageModel = poster.poster,
+        requestOption = RequestOptions()
+          .diskCacheStrategy(DiskCacheStrategy.ALL),
         modifier = Modifier.constrainAs(image) {
           centerHorizontallyTo(parent)
           top.linkTo(parent.top)

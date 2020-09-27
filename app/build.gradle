@@ -25,7 +25,10 @@ android {
   }
   kotlinOptions {
     jvmTarget = '1.8'
-    freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
+    freeCompilerArgs += [
+        "-Xallow-jvm-ir-dependencies",
+        "-Xskip-prerelease-check",
+        "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"]
     useIR = true
   }
   buildFeatures {
@@ -56,6 +59,7 @@ dependencies {
 
   // landscapist
   implementation project(":fresco")
+  implementation project(":glide")
 }
 
 apply from: '../spotless.gradle'

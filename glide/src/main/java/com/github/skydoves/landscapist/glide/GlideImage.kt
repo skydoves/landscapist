@@ -16,9 +16,8 @@
 
 @file:Suppress("unused")
 
-package com.skydoves.landscapist.fresco
+package com.github.skydoves.landscapist.glide
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -30,19 +29,22 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ContextAmbient
-import com.facebook.common.executors.CallerThreadExecutor
-import com.facebook.imagepipeline.request.ImageRequest
-import com.facebook.imagepipeline.request.ImageRequestBuilder
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.github.skydoves.landscapist.ImageLoad
 import com.github.skydoves.landscapist.ImageLoadState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 /**
  * Requests loading an image with a loading placeholder and error imageAsset.
  *
  * ```
- * FrescoImage(
- *   imageUrl = stringImageUrl,
+ * GlideImage(
+ *   imageModel = imageUrl,
  *   placeHolder = imageResource(R.drawable.placeholder),
  *   error = imageResource(R.drawable.error)
  * )
@@ -50,27 +52,25 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  */
 @Composable
 @ExperimentalCoroutinesApi
-fun FrescoImage(
-  imageUrl: String?,
-  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
+fun GlideImage(
+  imageModel: Any,
+  requestOption: RequestOptions = defaultRequestOptions,
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
   placeHolder: ImageAsset? = null,
-  error: ImageAsset? = null,
-  observeLoadingProcess: Boolean = false
+  error: ImageAsset? = null
 ) {
-  FrescoImage(
-    imageUrl = imageUrl,
-    imageRequest = imageRequest,
+  GlideImage(
+    imageModel = imageModel,
+    requestOption = requestOption,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     colorFilter = colorFilter,
     alpha = alpha,
-    observeLoadingProcess = observeLoadingProcess,
     loading = {
       placeHolder?.let {
         Image(
@@ -91,7 +91,7 @@ fun FrescoImage(
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
-          alpha = alpha,
+          alpha = alpha
         )
       }
     }
@@ -99,11 +99,12 @@ fun FrescoImage(
 }
 
 /**
- * Requests loading an image and create some composables based on [FrescoImageState].
+ * Requests loading an image and create some composables based on [GlideImageState].
  *
  * ```
- * FrescoImage(
- * imageUrl = stringImageUrl,
+ * GlideImage(
+ * imageModel = imageUrl,
+ * requestOption = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL),
  * modifier = modifier,
  * loading = {
  *   ConstraintLayout(
@@ -127,30 +128,29 @@ fun FrescoImage(
  */
 @Composable
 @ExperimentalCoroutinesApi
-fun FrescoImage(
-  imageUrl: String?,
-  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
+fun GlideImage(
+  imageModel: Any,
+  requestOption: RequestOptions = defaultRequestOptions,
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  observeLoadingProcess: Boolean = false,
-  loading: @Composable ((imageState: FrescoImageState.Loading) -> Unit)? = null,
-  success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
+  loading: @Composable ((imageState: GlideImageState.Loading) -> Unit)? = null,
+  success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
+  failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
-  FrescoImage(
-    imageRequest = imageRequest,
+  GlideImage(
+    model = imageModel,
+    requestOption = requestOption,
     modifier = modifier,
-    observeLoadingProcess = observeLoadingProcess,
   ) { imageState ->
-    when (val frescoImageState = imageState.toFrescoImageState()) {
-      is FrescoImageState.None -> Unit
-      is FrescoImageState.Loading -> loading?.invoke(frescoImageState)
-      is FrescoImageState.Failure -> failure?.invoke(frescoImageState)
-      is FrescoImageState.Success -> {
-        success?.invoke(frescoImageState) ?: frescoImageState.imageAsset?.let {
+    when (val glideImageState = imageState.toGlideImageState()) {
+      is GlideImageState.None -> Unit
+      is GlideImageState.Loading -> loading?.invoke(glideImageState)
+      is GlideImageState.Failure -> failure?.invoke(glideImageState)
+      is GlideImageState.Success -> {
+        success?.invoke(glideImageState) ?: glideImageState.imageAsset?.let {
           Image(
             asset = it,
             modifier = modifier,
@@ -170,46 +170,53 @@ fun FrescoImage(
  * the current state [ImageLoadState] of the content.
  *
  * ```
- * FrescoImage(
- * imageUri = Uri.parse(stringImageUrl),
+ * GlideImage(
+ * model = imageUrl,
  * modifier = modifier,
- * imageRequest = imageRequest
+ * requestOption = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL),
  * ) { imageState ->
- *   when (val frescoImageState = imageState.toFrescoImageState()) {
- *     is FrescoImageState.None -> // do something
- *     is FrescoImageState.Loading -> // do something
- *     is FrescoImageState.Failure -> // do something
- *     is FrescoImageState.Success ->  // do something
+ *   when (val glideImageState = imageState.toGlideImageState()) {
+ *     is GlideImageState.None -> // do something
+ *     is GlideImageState.Loading -> // do something
+ *     is GlideImageState.Failure -> // do something
+ *     is GlideImageState.Success ->  // do something
  *   }
  * }
  * ```
  */
 @Composable
 @ExperimentalCoroutinesApi
-private fun FrescoImage(
-  imageRequest: ImageRequest,
+private fun GlideImage(
+  model: Any,
+  requestOption: RequestOptions = RequestOptions(),
   modifier: Modifier = Modifier.fillMaxWidth(),
-  observeLoadingProcess: Boolean = false,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = ContextAmbient.current
-  val datasource = remember { imagePipeline.fetchDecodedImage(imageRequest, context) }
+  val target = remember { FlowCustomTarget() }
+  var job: Job? = remember { null }
 
   ImageLoad(
-    imageRequest = imageRequest,
+    imageRequest = requestOption,
     executeImageRequest = {
-      val subscriber = FlowBaseBitmapDataSubscriber(observeLoadingProcess)
-      datasource.subscribe(subscriber, CallerThreadExecutor.getInstance())
-      subscriber.imageLoadStateFlow
+      job = CoroutineScope(Dispatchers.IO).launch {
+        Glide.with(context)
+          .asBitmap()
+          .load(model)
+          .apply(requestOption)
+          .into(target)
+      }
+      target.imageLoadStateFlow
     },
     disposeImageRequest = {
-      datasource.close()
+      Glide.with(context).clear(target)
+      job?.cancel()
     },
     modifier = modifier,
     content = content
   )
 }
 
-private inline val String?.defaultImageRequest: ImageRequest
-  @JvmName("defaultImageRequest")
-  get() = ImageRequestBuilder.newBuilderWithSource(Uri.parse(this)).build()
+private inline val defaultRequestOptions: RequestOptions
+  @JvmName("defaultRequestOptions")
+  get() = RequestOptions()

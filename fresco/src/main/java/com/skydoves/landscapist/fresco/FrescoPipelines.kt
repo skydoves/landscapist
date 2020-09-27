@@ -20,5 +20,5 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.core.ImagePipeline
 
 /** gets a fresco's global image pipeline. */
-inline val imagePipeline: ImagePipeline
+internal inline val imagePipeline: ImagePipeline
   @JvmName("imagePipeline") get() = Fresco.getImagePipeline()
