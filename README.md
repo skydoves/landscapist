@@ -23,7 +23,7 @@
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.0.0"
+    implementation "com.github.skydoves:landscapist-glide:1.0.1"
 }
 ```
 
@@ -115,7 +115,7 @@ And if the request failed (e.g. network error, wrong destination), error text wi
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-fresco:1.0.0"
+    implementation "com.github.skydoves:landscapist-fresco:<version>"
 }
 ```
 
