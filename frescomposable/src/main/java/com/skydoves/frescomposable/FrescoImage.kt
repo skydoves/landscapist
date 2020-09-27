@@ -28,8 +28,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.stateFor
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.WithConstraints
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.layout.ContentScale
@@ -56,17 +59,23 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
 @Composable
 fun FrescoImage(
   imageUrl: String?,
-  modifier: Modifier = Modifier.fillMaxWidth(),
   imageRequest: ImageRequest = getDefaultImageRequest(Uri.parse(imageUrl)),
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
   placeHolder: ImageAsset? = null,
   error: ImageAsset? = null
 ) {
   FrescoImage(
     imageUrl = imageUrl,
-    modifier = modifier,
     imageRequest = imageRequest,
+    modifier = modifier,
+    alignment = alignment,
     contentScale = contentScale,
+    colorFilter = colorFilter,
+    alpha = alpha,
     loading = {
       placeHolder?.let {
         Image(
@@ -118,9 +127,12 @@ fun FrescoImage(
 @Composable
 fun FrescoImage(
   imageUrl: String?,
-  modifier: Modifier = Modifier.fillMaxWidth(),
   imageRequest: ImageRequest = getDefaultImageRequest(Uri.parse(imageUrl)),
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
   loading: @Composable ((imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
@@ -139,7 +151,10 @@ fun FrescoImage(
           Image(
             asset = it,
             modifier = modifier,
-            contentScale = contentScale
+            alignment = alignment,
+            contentScale = contentScale,
+            alpha = alpha,
+            colorFilter = colorFilter
           )
         }
       }
