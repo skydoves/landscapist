@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.fisherdemo.theme
+package com.github.skydoves.landscapistdemo.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

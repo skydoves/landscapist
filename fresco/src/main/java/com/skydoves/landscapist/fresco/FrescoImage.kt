@@ -16,7 +16,7 @@
 
 @file:Suppress("unused")
 
-package com.skydoves.fisher.fresco
+package com.skydoves.landscapist.fresco
 
 import android.graphics.Bitmap
 import android.net.Uri

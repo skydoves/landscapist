@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.github.skydoves.fisherdemo">
+    package="com.github.skydoves.landscapistdemo">
 
   <uses-permission android:name="android.permission.INTERNET" />
 
@@ -10,11 +10,11 @@
       android:icon="@mipmap/ic_launcher"
       android:label="@string/app_name"
       android:roundIcon="@mipmap/ic_launcher_round"
-      android:name="com.github.skydoves.fisherdemo.App"
+      android:name="com.github.skydoves.landscapistdemo.App"
       android:supportsRtl="true"
-      android:theme="@style/Theme.Fisher.NoActionBar"
+      android:theme="@style/Landscapist.NoActionBar"
       tools:ignore="AllowBackup">
-    <activity android:name="com.github.skydoves.fisherdemo.ui.MainActivity">
+    <activity android:name="com.github.skydoves.landscapistdemo.ui.MainActivity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
 

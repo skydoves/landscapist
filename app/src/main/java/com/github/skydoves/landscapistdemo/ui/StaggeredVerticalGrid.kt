@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.fisherdemo.ui
+package com.github.skydoves.landscapistdemo.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Layout

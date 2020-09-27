@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.fisherdemo.theme
+package com.github.skydoves.landscapistdemo.model
 
-import androidx.compose.ui.graphics.Color
+import android.os.Parcelable
+import androidx.compose.runtime.Immutable
+import kotlinx.android.parcel.Parcelize
 
-val purple200 = Color(0xFF651FFF)
-val purple500 = Color(0xFF6200EA)
-val background = Color(0xFF2B292B)
-val background800 = Color(0xFF424242)
-val background900 = Color(0xFF212121)
-val white87 = Color(0Xddffffff)
+@Immutable
+@Parcelize
+data class Poster(
+  val name: String,
+  val release: String,
+  val playtime: String,
+  val description: String,
+  val poster: String
+) : Parcelable

@@ -9,7 +9,7 @@ apply from: '../dependencies.gradle'
 android {
   compileSdkVersion versions.compileSdk
   defaultConfig {
-    applicationId "com.github.skydoves.fisheredemo"
+    applicationId "com.github.skydoves.landscapistdemo"
     minSdkVersion versions.minSdk
     targetSdkVersion versions.compileSdk
     versionCode versions.versionCode
@@ -54,7 +54,7 @@ dependencies {
   implementation "androidx.compose.runtime:runtime-livedata:$versions.composeVersion"
   implementation "androidx.ui:ui-tooling:$versions.composeVersion"
 
-  // fisher
+  // landscapist
   implementation project(":fresco")
 }
 

@@ -68,10 +68,10 @@ tasks.withType(Javadoc) {
 publish {
   userOrg = 'devmagician'
   groupId = 'com.github.skydoves'
-  artifactId = 'fisher-fresco'
+  artifactId = 'landscapist-fresco'
   publishVersion = versions.versionName
   desc = 'Jetpack Compose image library for requesting and loading images using Fresco.'
-  website = 'https://github.com/skydoves/Fisher'
+  website = 'https://github.com/skydoves/Landscapist'
   issueTracker = "${website}/issues"
   repository = "${website}.git"
 }

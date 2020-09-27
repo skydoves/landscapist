@@ -16,7 +16,7 @@
 
 @file:Suppress("unused")
 
-package com.github.skydoves.fisherdemo
+package com.github.skydoves.landscapistdemo
 
 import android.app.Application
 import com.facebook.drawee.backends.pipeline.Fresco

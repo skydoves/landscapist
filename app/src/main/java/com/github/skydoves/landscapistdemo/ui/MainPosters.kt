@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.skydoves.fisherdemo.ui
+package com.github.skydoves.landscapistdemo.ui
 
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
@@ -34,11 +34,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
-import com.github.skydoves.fisherdemo.model.MockUtil
-import com.github.skydoves.fisherdemo.model.Poster
-import com.github.skydoves.fisherdemo.theme.DisneyComposeTheme
-import com.github.skydoves.fisherdemo.theme.purple500
-import com.skydoves.fisher.fresco.FrescoImage
+import com.github.skydoves.landscapistdemo.model.MockUtil
+import com.github.skydoves.landscapistdemo.model.Poster
+import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
+import com.github.skydoves.landscapistdemo.theme.purple500
+import com.skydoves.landscapist.fresco.FrescoImage
 
 @Composable
 fun DisneyPosters(
