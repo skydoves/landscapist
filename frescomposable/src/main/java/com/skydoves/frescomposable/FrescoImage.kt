@@ -173,35 +173,35 @@ private fun FrescoImage(
   imageRequest: ImageRequest,
   content: @Composable (imageState: FrescoImageState) -> Unit
 ) {
-  WithConstraints(modifier) {
-    var state by stateFor<FrescoImageState>(imageRequest) { FrescoImageState.None }
-    val datasource = imagePipeline.fetchDecodedImage(imageRequest, ContextAmbient.current)
+  var state by stateFor<FrescoImageState>(imageRequest) { FrescoImageState.None }
+  val datasource = imagePipeline.fetchDecodedImage(imageRequest, ContextAmbient.current)
 
-    onCommit(imageUri) {
-      datasource.subscribe(
-        object : BaseBitmapDataSubscriber() {
-          override fun onNewResultImpl(bitmap: Bitmap?) {
-            FrameManager.ensureStarted()
-            state = FrescoImageState.Success(bitmap?.asImageAsset())
-          }
+  onCommit(imageUri) {
+    datasource.subscribe(
+      object : BaseBitmapDataSubscriber() {
+        override fun onNewResultImpl(bitmap: Bitmap?) {
+          FrameManager.ensureStarted()
+          state = FrescoImageState.Success(bitmap?.asImageAsset())
+        }
 
-          override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
-            state = FrescoImageState.Failure(dataSource)
-          }
+        override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
+          state = FrescoImageState.Failure(dataSource)
+        }
 
-          override fun onProgressUpdate(dataSource: DataSource<CloseableReference<CloseableImage>>) {
-            super.onProgressUpdate(dataSource)
-            state = FrescoImageState.Loading(dataSource.progress)
-          }
-        },
-        CallerThreadExecutor.getInstance()
-      )
+        override fun onProgressUpdate(dataSource: DataSource<CloseableReference<CloseableImage>>) {
+          super.onProgressUpdate(dataSource)
+          state = FrescoImageState.Loading(dataSource.progress)
+        }
+      },
+      CallerThreadExecutor.getInstance()
+    )
 
-      onDispose {
-        datasource.close()
-      }
+    onDispose {
+      datasource.close()
     }
+  }
 
+  WithConstraints(modifier) {
     content(state)
   }
 }
