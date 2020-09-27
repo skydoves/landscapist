@@ -40,7 +40,7 @@ kotlin {
 
 dependencies {
   // landscapist
-  implementation project(":landscapist")
+  api project(":landscapist")
 
   // androidx jetpack
   implementation "androidx.core:core-ktx:$versions.coreKtxVersion"

@@ -41,7 +41,7 @@ kotlin {
 
 dependencies {
   // landscapist
-  implementation project(":landscapist")
+  api project(":landscapist")
 
   // androidx jetpack
   implementation "androidx.core:core-ktx:$versions.coreKtxVersion"
@@ -51,7 +51,7 @@ dependencies {
   implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
   implementation "androidx.compose.foundation:foundation:$versions.composeVersion"
 
-  // fresco
+  // glide
   api "com.github.bumptech.glide:glide:$versions.glideVersion"
 }
 

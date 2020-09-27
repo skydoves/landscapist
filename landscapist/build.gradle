@@ -3,6 +3,7 @@ plugins {
   id 'kotlin-android'
 }
 
+apply plugin: 'com.github.panpf.bintray-publish'
 apply from: '../dependencies.gradle'
 
 android {
@@ -39,5 +40,17 @@ dependencies {
 }
 
 tasks.withType(Javadoc).all { enabled = false }
+
+publish {
+  userOrg = 'devmagician'
+  groupId = 'com.github.skydoves'
+  artifactId = 'landscapist'
+  publishVersion = versions.versionName
+  desc = 'Jetpack Compose image library for requesting and loading images.'
+  website = 'https://github.com/skydoves/Landscapist'
+  issueTracker = "${website}/issues"
+  repository = "${website}.git"
+}
+
 
 apply from: '../spotless.gradle'
