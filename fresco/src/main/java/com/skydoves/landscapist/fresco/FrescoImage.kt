@@ -18,32 +18,24 @@
 
 package com.skydoves.landscapist.fresco
 
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.FrameManager
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.stateFor
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.WithConstraints
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageAsset
-import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ContextAmbient
 import com.facebook.common.executors.CallerThreadExecutor
-import com.facebook.common.references.CloseableReference
-import com.facebook.datasource.DataSource
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber
-import com.facebook.imagepipeline.image.CloseableImage
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
+import com.github.skydoves.landscapist.ImageLoad
+import com.github.skydoves.landscapist.ImageLoadState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * Requests loading an image with a loading placeholder and error imageAsset.
@@ -57,19 +49,28 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
  * ```
  */
 @Composable
+@ExperimentalCoroutinesApi
 fun FrescoImage(
   imageUrl: String?,
-  modifier: Modifier = Modifier.fillMaxWidth(),
   imageRequest: ImageRequest = getDefaultImageRequest(Uri.parse(imageUrl)),
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
   placeHolder: ImageAsset? = null,
-  error: ImageAsset? = null
+  error: ImageAsset? = null,
+  observeLoadingProcess: Boolean = false
 ) {
   FrescoImage(
     imageUrl = imageUrl,
-    modifier = modifier,
     imageRequest = imageRequest,
+    modifier = modifier,
+    alignment = alignment,
     contentScale = contentScale,
+    colorFilter = colorFilter,
+    alpha = alpha,
+    observeLoadingProcess = observeLoadingProcess,
     loading = {
       placeHolder?.let {
         Image(
@@ -119,30 +120,38 @@ fun FrescoImage(
  * ```
  */
 @Composable
+@ExperimentalCoroutinesApi
 fun FrescoImage(
   imageUrl: String?,
-  modifier: Modifier = Modifier.fillMaxWidth(),
   imageRequest: ImageRequest = getDefaultImageRequest(Uri.parse(imageUrl)),
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
+  observeLoadingProcess: Boolean = false,
   loading: @Composable ((imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
   FrescoImage(
-    imageUri = Uri.parse(imageUrl),
+    imageRequest = imageRequest,
     modifier = modifier,
-    imageRequest = imageRequest
+    observeLoadingProcess = observeLoadingProcess,
   ) { imageState ->
-    when (imageState) {
+    when (val frescoImageState = imageState.toFrescoImageState()) {
       is FrescoImageState.None -> Unit
-      is FrescoImageState.Loading -> loading?.invoke(imageState)
-      is FrescoImageState.Failure -> failure?.invoke(imageState)
+      is FrescoImageState.Loading -> loading?.invoke(frescoImageState)
+      is FrescoImageState.Failure -> failure?.invoke(frescoImageState)
       is FrescoImageState.Success -> {
-        success?.invoke(imageState) ?: imageState.imageAsset?.let {
+        success?.invoke(frescoImageState) ?: frescoImageState.imageAsset?.let {
           Image(
             asset = it,
             modifier = modifier,
-            contentScale = contentScale
+            alignment = alignment,
+            contentScale = contentScale,
+            alpha = alpha,
+            colorFilter = colorFilter
           )
         }
       }
@@ -170,48 +179,29 @@ fun FrescoImage(
  * ```
  */
 @Composable
+@ExperimentalCoroutinesApi
 private fun FrescoImage(
-  imageUri: Uri,
-  modifier: Modifier = Modifier.fillMaxWidth(),
   imageRequest: ImageRequest,
-  content: @Composable (imageState: FrescoImageState) -> Unit
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  observeLoadingProcess: Boolean = false,
+  content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
-  WithConstraints(modifier) {
-    val context = ContextAmbient.current
-    val image = remember { mutableStateOf<ImageAsset?>(null) }
-    var state by stateFor<FrescoImageState>(imageRequest) { FrescoImageState.None }
+  val context = ContextAmbient.current
+  val datasource = remember { imagePipeline.fetchDecodedImage(imageRequest, context) }
 
-    onCommit(imageUri) {
-      val datasource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest, context)
-      datasource.subscribe(
-        object : BaseBitmapDataSubscriber() {
-          override fun onNewResultImpl(bitmap: Bitmap?) {
-            FrameManager.ensureStarted()
-            image.value = bitmap?.asImageAsset()
-            state = FrescoImageState.Success(image.value)
-          }
-
-          override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
-            image.value = null
-            state = FrescoImageState.Failure(dataSource)
-          }
-
-          override fun onProgressUpdate(dataSource: DataSource<CloseableReference<CloseableImage>>) {
-            super.onProgressUpdate(dataSource)
-            state = FrescoImageState.Loading(dataSource.progress)
-          }
-        },
-        CallerThreadExecutor.getInstance()
-      )
-
-      onDispose {
-        image.value = null
-        datasource.close()
-      }
-    }
-
-    content(state)
-  }
+  ImageLoad(
+    imageRequest = imageRequest,
+    executeImageRequest = {
+      val subscriber = FlowBaseBitmapDataSubscriber(observeLoadingProcess)
+      datasource.subscribe(subscriber, CallerThreadExecutor.getInstance())
+      subscriber.imageLoadStateFlow
+    },
+    disposeImageRequest = {
+      datasource.close()
+    },
+    modifier = modifier,
+    content = content
+  )
 }
 
 /** returns a default [ImageRequest] without any options. */

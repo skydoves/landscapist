@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.ImageAsset
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
 import com.facebook.imagepipeline.image.CloseableImage
+import com.github.skydoves.landscapist.ImageLoadState
 
 /** FrescoImageState is a state of the fresco image requesting. */
 sealed class FrescoImageState {
@@ -34,6 +35,19 @@ sealed class FrescoImageState {
   data class Success(val imageAsset: ImageAsset?) : FrescoImageState()
 
   /** Request failed. */
-  data class Failure(val dataSource: DataSource<CloseableReference<CloseableImage>>) :
+  data class Failure(val dataSource: DataSource<CloseableReference<CloseableImage>>?) :
     FrescoImageState()
+}
+
+/** casts an [ImageLoadState] type to a [FrescoImageState]. */
+@Suppress("UNCHECKED_CAST")
+fun ImageLoadState.toFrescoImageState(): FrescoImageState {
+  return when (this) {
+    is ImageLoadState.None -> FrescoImageState.None
+    is ImageLoadState.Loading -> FrescoImageState.Loading(progress)
+    is ImageLoadState.Success -> FrescoImageState.Success(imageAsset)
+    is ImageLoadState.Failure -> FrescoImageState.Failure(
+      data as? DataSource<CloseableReference<CloseableImage>>
+    )
+  }
 }
