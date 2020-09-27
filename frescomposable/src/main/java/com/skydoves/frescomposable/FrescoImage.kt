@@ -25,9 +25,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.FrameManager
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.stateFor
 import androidx.compose.ui.Modifier
@@ -176,22 +174,18 @@ private fun FrescoImage(
   content: @Composable (imageState: FrescoImageState) -> Unit
 ) {
   WithConstraints(modifier) {
-    val context = ContextAmbient.current
-    val image = remember { mutableStateOf<ImageAsset?>(null) }
     var state by stateFor<FrescoImageState>(imageRequest) { FrescoImageState.None }
+    val datasource = imagePipeline.fetchDecodedImage(imageRequest, ContextAmbient.current)
 
     onCommit(imageUri) {
-      val datasource = imagePipeline.fetchDecodedImage(imageRequest, context)
       datasource.subscribe(
         object : BaseBitmapDataSubscriber() {
           override fun onNewResultImpl(bitmap: Bitmap?) {
             FrameManager.ensureStarted()
-            image.value = bitmap?.asImageAsset()
-            state = FrescoImageState.Success(image.value)
+            state = FrescoImageState.Success(bitmap?.asImageAsset())
           }
 
           override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
-            image.value = null
             state = FrescoImageState.Failure(dataSource)
           }
 
@@ -204,7 +198,6 @@ private fun FrescoImage(
       )
 
       onDispose {
-        image.value = null
         datasource.close()
       }
     }
