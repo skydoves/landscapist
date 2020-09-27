@@ -226,6 +226,23 @@ FrescoImage(
     })
 ```
 
+## Disable lint checking
+![warning-experimental](https://user-images.githubusercontent.com/24237865/94366110-cae45c00-0110-11eb-893e-b8a47d45f172.png)
+
+Landscapist uses `ExperimentalCoroutinesApi` internally. <br>
+So if you want to remove the IDE lint checking, add `@ExperimentalCoroutinesApi` annotation to your function.<br>
+And by adding below kotlin options in our `build.gradle`, we can remove all lint checkings.
+
+```gradle
+kotlinOptions {
+    freeCompilerArgs += [
+        "-Xallow-jvm-ir-dependencies",
+        "-Xskip-prerelease-check",
+        "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"]
+  }
+```
+
+
 ## Find this repository useful? :heart:
 Support it by joining __[stargazers](https://github.com/skydoves/Frescomposable/stargazers)__ for this repository. :star: <br>
 And __[follow](https://github.com/skydoves)__ me for my next creations! 🤩
