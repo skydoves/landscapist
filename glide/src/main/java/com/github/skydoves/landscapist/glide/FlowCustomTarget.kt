@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.StateFlow
  * [ImageLoadState] as a stateFlow.
  */
 @ExperimentalCoroutinesApi
-class FlowCustomTarget : CustomTarget<Bitmap>() {
+internal class FlowCustomTarget : CustomTarget<Bitmap>() {
 
   private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f))
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow

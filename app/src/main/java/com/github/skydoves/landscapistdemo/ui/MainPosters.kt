@@ -31,10 +31,13 @@ import androidx.compose.material.Surface
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade
 import com.bumptech.glide.request.RequestOptions
 import com.github.skydoves.landscapist.glide.GlideImage
 import com.github.skydoves.landscapistdemo.model.MockUtil
@@ -81,9 +84,12 @@ fun HomePoster(
     ) {
       val (image, title, content, message) = createRefs()
       GlideImage(
-        imageModel = poster.poster,
-        requestOption = RequestOptions()
-          .diskCacheStrategy(DiskCacheStrategy.ALL),
+        requestBuilder = Glide
+          .with(ContextAmbient.current)
+          .asBitmap()
+          .load(poster.poster)
+          .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
+          .transition(withCrossFade()),
         modifier = Modifier.constrainAs(image) {
           centerHorizontallyTo(parent)
           top.linkTo(parent.top)
