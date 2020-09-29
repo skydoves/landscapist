@@ -126,7 +126,7 @@ class FrescoImageTest {
   }
 
   @Test
-  fun requestSuccess_withFailureComposables() {
+  fun requestFailure_withFailureComposables() {
     val state = ArrayList<FrescoImageState>()
 
     composeTestRule.setContent {
