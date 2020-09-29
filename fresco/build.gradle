@@ -64,7 +64,6 @@ dependencies {
   androidTestImplementation "androidx.ui:ui-test:$versions.composeVersion"
   androidTestImplementation "androidx.compose.ui:ui:$versions.composeVersion"
   androidTestImplementation "androidx.test:rules:$versions.rulesVersion"
-  androidTestImplementation "com.squareup.okhttp3:mockwebserver:$versions.okHttpVersion"
 }
 
 dokkaHtml.configure {
