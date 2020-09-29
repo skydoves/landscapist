@@ -1,0 +1,16 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.skydoves.landscapist.fresco">
+
+  <uses-sdk android:targetSdkVersion="30" />
+
+  <uses-permission android:name="android.permission.INTERNET" />
+
+  <application android:name=".FrescoTestApplication">
+    <activity
+        android:name="androidx.activity.ComponentActivity"
+        android:theme="@style/Theme.FrescoTest"
+        tools:replace="android:theme" />
+  </application>
+
+</manifest>

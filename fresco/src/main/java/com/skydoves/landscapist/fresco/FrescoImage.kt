@@ -153,7 +153,6 @@ fun FrescoImage(
         success?.invoke(frescoImageState) ?: frescoImageState.imageAsset?.let {
           Image(
             asset = it,
-            modifier = modifier,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
