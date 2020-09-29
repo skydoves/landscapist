@@ -17,6 +17,11 @@ ext.versions = [
     frescoVersion  : '2.3.0',
     glideVersion   : '4.11.0',
 
+    // unit test
+    rulesVersion   : '1.2.0',
+    runnerVersion  : '1.3.0-beta01',
+    okHttpVersion  : '4.9.0',
+
     // for demo
     materialVersion: '1.3.0-alpha02',
 ]

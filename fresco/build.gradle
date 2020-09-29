@@ -14,6 +14,7 @@ android {
     targetSdkVersion versions.compileSdk
     versionCode versions.versionCode
     versionName versions.versionName
+    testInstrumentationRunner "com.skydoves.landscapist.fresco.FrescoTestRunner"
   }
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
@@ -32,6 +33,11 @@ android {
     buildConfig false
     compose true
   }
+  testOptions {
+    unitTests {
+      includeAndroidResources = true
+    }
+  }
 }
 
 kotlin {
@@ -45,14 +51,20 @@ dependencies {
   // androidx jetpack
   implementation "androidx.core:core-ktx:$versions.coreKtxVersion"
 
+  // fresco
+  api "com.facebook.fresco:fresco:$versions.frescoVersion"
+  api "com.facebook.fresco:imagepipeline-okhttp3:$versions.frescoVersion"
+
   // compose
   implementation "androidx.compose.ui:ui:$versions.composeVersion"
   implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
   implementation "androidx.compose.foundation:foundation:$versions.composeVersion"
 
-  // fresco
-  api "com.facebook.fresco:fresco:$versions.frescoVersion"
-  api "com.facebook.fresco:imagepipeline-okhttp3:$versions.frescoVersion"
+  // unit test
+  androidTestImplementation "androidx.ui:ui-test:$versions.composeVersion"
+  androidTestImplementation "androidx.compose.ui:ui:$versions.composeVersion"
+  androidTestImplementation "androidx.test:rules:$versions.rulesVersion"
+  androidTestImplementation "com.squareup.okhttp3:mockwebserver:$versions.okHttpVersion"
 }
 
 dokkaHtml.configure {
