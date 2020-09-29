@@ -165,7 +165,6 @@ fun GlideImage(
         success?.invoke(glideImageState) ?: glideImageState.imageAsset?.let {
           Image(
             asset = it,
-            modifier = modifier,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
