@@ -15,6 +15,8 @@
  */
 
 @file:Suppress("unused")
+@file:JvmName("FrescoImage")
+@file:JvmMultifileClass
 
 package com.skydoves.landscapist.fresco
 

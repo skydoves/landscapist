@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:JvmName("ImageLoad")
+@file:JvmMultifileClass
+
 package com.skydoves.landscapist
 
 import androidx.compose.foundation.layout.fillMaxWidth
