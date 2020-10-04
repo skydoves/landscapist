@@ -15,7 +15,7 @@
  */
 
 @file:Suppress("unused")
-@file:JvmName("FrescoImage")
+@file:JvmName("GlideImage")
 @file:JvmMultifileClass
 
 package com.skydoves.landscapist.glide
