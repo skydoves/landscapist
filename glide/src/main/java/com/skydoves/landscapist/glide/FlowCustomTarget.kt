@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.StateFlow
  * FlowCustomTarget is a glide bitmap custom target which collects
  * [ImageLoadState] as a stateFlow.
  */
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class FlowCustomTarget : CustomTarget<Bitmap>() {
 
   private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f))

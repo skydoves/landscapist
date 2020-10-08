@@ -37,7 +37,6 @@ import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * Requests loading an image with a loading placeholder and error imageAsset.
@@ -51,7 +50,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  * ```
  */
 @Composable
-@ExperimentalCoroutinesApi
 fun FrescoImage(
   imageUrl: String?,
   imageRequest: ImageRequest = imageUrl.defaultImageRequest,
@@ -128,7 +126,6 @@ fun FrescoImage(
  * ```
  */
 @Composable
-@ExperimentalCoroutinesApi
 fun FrescoImage(
   imageUrl: String?,
   imageRequest: ImageRequest = imageUrl.defaultImageRequest,
@@ -186,7 +183,6 @@ fun FrescoImage(
  * ```
  */
 @Composable
-@ExperimentalCoroutinesApi
 private fun FrescoImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier.fillMaxWidth(),

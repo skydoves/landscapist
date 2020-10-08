@@ -63,7 +63,6 @@ import kotlinx.coroutines.launch
  * ```
  */
 @Composable
-@ExperimentalCoroutinesApi
 fun GlideImage(
   requestBuilder: RequestBuilder<Bitmap>,
   modifier: Modifier = Modifier.fillMaxWidth(),
@@ -212,7 +211,6 @@ fun GlideImage(
  * ```
  */
 @Composable
-@ExperimentalCoroutinesApi
 fun GlideImage(
   requestBuilder: RequestBuilder<Bitmap>,
   modifier: Modifier = Modifier.fillMaxWidth(),
@@ -273,7 +271,6 @@ fun GlideImage(
  * ```
  */
 @Composable
-@ExperimentalCoroutinesApi
 private fun GlideImage(
   builder: RequestBuilder<Bitmap>,
   modifier: Modifier = Modifier.fillMaxWidth(),

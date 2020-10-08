@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.StateFlow
  * FlowBaseBitmapDataSubscriber is a fresco bitmap subscriber which collects
  * [ImageLoadState] as a stateFlow.
  */
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class FlowBaseBitmapDataSubscriber(
   private val observeLoadingProcess: Boolean
 ) : BaseBitmapDataSubscriber() {
