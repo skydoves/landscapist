@@ -15,70 +15,72 @@
  */
 
 @file:Suppress("unused")
-@file:JvmName("GlideImage")
+@file:JvmName("CoilImage")
 @file:JvmMultifileClass
 
-package com.skydoves.landscapist.glide
+package com.skydoves.landscapist.coil
 
-import android.graphics.Bitmap
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ContextAmbient
-import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestBuilder
-import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
-import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade
-import com.bumptech.glide.request.RequestOptions
+import androidx.compose.ui.platform.LifecycleOwnerAmbient
+import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.LifecycleOwner
+import coil.ImageLoader
+import coil.imageLoader
+import coil.request.Disposable
+import coil.request.ImageRequest
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * Requests loading an image with a loading placeholder and error imageAsset.
  *
  * ```
- * GlideImage(
- *   requestBuilder = Glide
- *     .with(ContextAmbient.current)
- *     .asBitmap()
- *     .load(poster.poster)
- *     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
- *     .thumbnail(0.6f)
- *     .transition(withCrossFade()),
+ * CoilImage(
+ *   imageModel = imageModel,
  *   placeHolder = imageResource(R.drawable.placeholder),
  *   error = imageResource(R.drawable.error)
  * )
  * ```
  */
 @Composable
-fun GlideImage(
-  requestBuilder: RequestBuilder<Bitmap>,
+fun CoilImage(
+  imageModel: Any,
+  context: Context = ContextAmbient.current,
+  lifecycleOwner: LifecycleOwner = LifecycleOwnerAmbient.current,
+  imageLoader: ImageLoader = context.imageLoader,
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
   placeHolder: ImageAsset? = null,
-  error: ImageAsset? = null
+  error: ImageAsset? = null,
 ) {
-  GlideImage(
-    requestBuilder = requestBuilder,
+  CoilImage(
+    imageModel = imageModel,
+    context = context,
+    lifecycleOwner = lifecycleOwner,
+    imageLoader = imageLoader,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
-    colorFilter = colorFilter,
     alpha = alpha,
+    colorFilter = colorFilter,
     loading = {
       placeHolder?.let {
         Image(
@@ -97,7 +99,7 @@ fun GlideImage(
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
-          alpha = alpha
+          alpha = alpha,
         )
       }
     }
@@ -105,11 +107,11 @@ fun GlideImage(
 }
 
 /**
- * Requests loading an image and create some composables based on [GlideImageState].
+ * Requests loading an image and create some composables based on [CoilImageState].
  *
  * ```
- * GlideImage(
- * imageModel = imageUrl,
+ * CoilImage(
+ * imageModel = imageModel,
  * modifier = modifier,
  * loading = {
  *   ConstraintLayout(
@@ -132,26 +134,26 @@ fun GlideImage(
  * ```
  */
 @Composable
-fun GlideImage(
+fun CoilImage(
   imageModel: Any,
-  requestOptions: RequestOptions = RequestOptions(),
-  transitionOptions: BitmapTransitionOptions = withCrossFade(),
+  context: Context = ContextAmbient.current,
+  lifecycleOwner: LifecycleOwner = LifecycleOwnerAmbient.current,
+  imageLoader: ImageLoader = context.imageLoader,
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  loading: @Composable ((imageState: GlideImageState.Loading) -> Unit)? = null,
-  success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
+  loading: @Composable ((imageState: CoilImageState.Loading) -> Unit)? = null,
+  success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
+  failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
-  GlideImage(
-    requestBuilder = Glide
-      .with(ContextAmbient.current)
-      .asBitmap()
-      .apply(requestOptions)
-      .transition(transitionOptions)
-      .load(imageModel),
+  CoilImage(
+    imageRequest = ImageRequest.Builder(context)
+      .data(imageModel)
+      .lifecycle(lifecycleOwner)
+      .build(),
+    imageLoader = imageLoader,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -164,17 +166,14 @@ fun GlideImage(
 }
 
 /**
- * Requests loading an image and create some composables based on [GlideImageState].
+ * Requests loading an image and create some composables based on [CoilImageState].
  *
  * ```
- * GlideImage(
- * requestBuilder = Glide
- *   .with(ContextAmbient.current)
- *   .asBitmap()
- *   .load(poster.poster)
- *   .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
- *   .thumbnail(0.6f)
- *   .transition(withCrossFade()),
+ * CoilImage(
+ * imageRequest = ImageRequest.Builder(context)
+ *      .data(imageModel)
+ *      .lifecycle(lifecycleOwner)
+ *      .build(),
  * modifier = modifier,
  * loading = {
  *   ConstraintLayout(
@@ -197,29 +196,32 @@ fun GlideImage(
  * ```
  */
 @Composable
-fun GlideImage(
-  requestBuilder: RequestBuilder<Bitmap>,
+fun CoilImage(
+  imageRequest: ImageRequest,
+  imageLoader: ImageLoader = ContextAmbient.current.imageLoader,
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  loading: @Composable ((imageState: GlideImageState.Loading) -> Unit)? = null,
-  success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
+  loading: @Composable ((imageState: CoilImageState.Loading) -> Unit)? = null,
+  success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
+  failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
-  GlideImage(
-    builder = requestBuilder,
+  CoilImage(
+    request = imageRequest,
+    imageLoader = imageLoader,
     modifier = modifier,
   ) { imageState ->
-    when (val glideImageState = imageState.toGlideImageState()) {
-      is GlideImageState.None -> Unit
-      is GlideImageState.Loading -> loading?.invoke(glideImageState)
-      is GlideImageState.Failure -> failure?.invoke(glideImageState)
-      is GlideImageState.Success -> {
-        success?.invoke(glideImageState) ?: glideImageState.imageAsset?.let {
+    when (val coilImageState = imageState.toCoilImageState()) {
+      is CoilImageState.None -> Unit
+      is CoilImageState.Loading -> loading?.invoke(coilImageState)
+      is CoilImageState.Failure -> failure?.invoke(coilImageState)
+      is CoilImageState.Success -> {
+        success?.invoke(coilImageState) ?: coilImageState.imageAsset?.let {
           Image(
             asset = it,
+            modifier = modifier,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
@@ -236,47 +238,51 @@ fun GlideImage(
  * the current state [ImageLoadState] of the content.
  *
  * ```
- * GlideImage(
- * requestBuilder = Glide
- *   .with(ContextAmbient.current)
- *   .asBitmap()
- *   .load(poster.poster)
- *   .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
- *   .thumbnail(0.6f)
- *   .transition(withCrossFade()),
+ * CoilImage(
+ * imageRequest = ImageRequest.Builder(context)
+ *      .data(imageModel)
+ *      .lifecycle(lifecycleOwner)
+ *      .build(),
  * modifier = modifier,
  * ) { imageState ->
- *   when (val glideImageState = imageState.toGlideImageState()) {
- *     is GlideImageState.None -> // do something
- *     is GlideImageState.Loading -> // do something
- *     is GlideImageState.Failure -> // do something
- *     is GlideImageState.Success ->  // do something
+ *   when (val coilImageState = imageState.toCoilImageState()) {
+ *     is CoilImageState.None -> // do something
+ *     is CoilImageState.Loading -> // do something
+ *     is CoilImageState.Failure -> // do something
+ *     is CoilImageState.Success ->  // do something
  *   }
  * }
  * ```
  */
 @Composable
-private fun GlideImage(
-  builder: RequestBuilder<Bitmap>,
+@OptIn(ExperimentalCoroutinesApi::class)
+fun CoilImage(
+  request: ImageRequest,
+  imageLoader: ImageLoader = ContextAmbient.current.imageLoader,
   modifier: Modifier = Modifier.fillMaxWidth(),
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = ContextAmbient.current
-  val target = remember { FlowCustomTarget() }
-  var job: Job? = remember { null }
+  val imageLoadStateFlow = remember { MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f)) }
+  val disposable = remember { mutableStateOf<Disposable?>(null) }
 
   ImageLoad(
-    imageRequest = builder,
+    imageRequest = request,
     executeImageRequest = {
-      job = CoroutineScope(Dispatchers.IO).launch {
-        builder.into(target)
-        builder.submit()
-      }
-      target.imageLoadStateFlow
+      disposable.value = imageLoader.enqueue(
+        request.newBuilder(context).target(
+          onSuccess = {
+            imageLoadStateFlow.value = ImageLoadState.Success(it.toBitmap().asImageAsset())
+          },
+          onError = {
+            imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageAsset())
+          }
+        ).build()
+      )
+      imageLoadStateFlow
     },
     disposeImageRequest = {
-      Glide.with(context).clear(target)
-      job?.cancel()
+      disposable.value?.dispose()
     },
     modifier = modifier,
     content = content

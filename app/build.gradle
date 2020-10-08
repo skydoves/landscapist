@@ -60,6 +60,7 @@ dependencies {
   // landscapist
   implementation project(":fresco")
   implementation project(":glide")
+  implementation project(":coil")
 }
 
 apply from: '../spotless.gradle'

@@ -75,7 +75,6 @@ fun FrescoImage(
       placeHolder?.let {
         Image(
           asset = it,
-          modifier = modifier,
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
@@ -87,7 +86,6 @@ fun FrescoImage(
       error?.let {
         Image(
           asset = it,
-          modifier = modifier,
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
