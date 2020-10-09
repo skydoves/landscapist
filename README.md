@@ -58,7 +58,6 @@ GlideImage(
   contentScale = ContentScale.Crop,
   modifier = modifier,
   alignment = Alignment.Center,
-  contentScale = ContentScale.Crop,
 )
 ```
 
@@ -112,6 +111,85 @@ And if the request failed (e.g. network error, wrong destination), error text wi
  failure = {
    Text(text = "image request failed.")
  })
+```
+
+<div class="header">
+  <img src="https://user-images.githubusercontent.com/24237865/95545538-1cf27f00-0a39-11eb-83dd-ef9b8c6a74cb.png" align="left" width="4%" alt="Fresco" />
+  <h1>Coil</h1>
+</div>
+
+[![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-coil/images/download.svg) ](https://bintray.com/devmagician/maven/landscapist-coil/_latestVersion)<br>
+And add a dependency code to your **module**'s `build.gradle` file.
+```gradle
+dependencies {
+    implementation "com.github.skydoves:landscapist-coil:<version>"
+}
+```
+
+### Usage
+We can request and load images simply using a `CoilImage` composable function.
+```kotlin
+CoilImage(
+  imageModel = imageUrl,
+  // Crop, Fit, Inside, FillHeight, FillWidth, None
+  contentScale = ContentScale.Crop,
+  // shows a placeholder imageAsset when loading.
+  placeHolder = imageResource(R.drawable.placeholder),
+  // shows an error imageAsset when the request failed.
+  error = imageResource(R.drawable.error)
+)
+```
+
+#### ImageRequest and ImageLoader
+We can customize request options using [ImageRequest](https://coil-kt.github.io/coil/image_requests/) and [ImageLoader](https://coil-kt.github.io/coil/image_loaders/) for providing all the necessary information for loading images like caching strategies and transformations.
+
+```kotlin
+CoilImage(
+  imageRequest = ImageRequest.Builder(ContextAmbient.current)
+    .data(poster.poster)
+    .crossfade(true)
+    .build(),
+  imageLoader = ImageLoader.Builder(ContextAmbient.current)
+    .availableMemoryPercentage(0.25)
+    .crossfade(true)
+    .build(),
+  contentScale = ContentScale.Crop,
+  modifier = modifier,
+  alignment = Alignment.Center,
+)
+```
+
+<img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="32%"/>
+
+### Composable loading, success, failure
+We can create our own composable functions following requesting states. Here is an example that shows a progress indicator when loading an image, After complete requesting, the indicator will be gone and a content image will be shown. And if the request failed (e.g. network error, wrong destination), error text will be shown.
+```kotlin
+CoilImage(
+  imageModel = poster.poster,
+  modifier = Modifier.constrainAs(image) {
+    centerHorizontallyTo(parent)
+    top.linkTo(parent.top)
+  }.aspectRatio(0.8f),
+  // shows a progress indicator when loading an image.
+  loading = {
+    ConstraintLayout(
+      modifier = Modifier.fillMaxSize()
+    ) {
+      val indicator = createRef()
+      CircularProgressIndicator(
+        modifier = Modifier.constrainAs(indicator) {
+          top.linkTo(parent.top)
+          bottom.linkTo(parent.bottom)
+          start.linkTo(parent.start)
+          end.linkTo(parent.end)
+        }
+      )
+    }
+  },
+  // shows an error text message when request failed.
+  failure = {
+    Text(text = "image request failed.")
+  })
 ```
 
 <div class="header">
@@ -232,22 +310,6 @@ FrescoImage(
     loading = { 
       // do something 
     })
-```
-
-## Disable lint checking
-![warning-experimental](https://user-images.githubusercontent.com/24237865/94366110-cae45c00-0110-11eb-893e-b8a47d45f172.png)
-
-Landscapist uses `ExperimentalCoroutinesApi` internally. <br>
-So if you want to remove the IDE lint checking, add `@ExperimentalCoroutinesApi` annotation to your function.<br>
-And by adding below kotlin options in our `build.gradle`, we can remove all lint checkings.
-
-```gradle
-kotlinOptions {
-    freeCompilerArgs += [
-        "-Xallow-jvm-ir-dependencies",
-        "-Xskip-prerelease-check",
-        "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"]
-  }
 ```
 
 ## Find this repository useful? :heart:
