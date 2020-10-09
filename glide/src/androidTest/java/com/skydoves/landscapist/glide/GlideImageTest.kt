@@ -16,7 +16,7 @@
 
 package com.skydoves.landscapist.glide
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -28,7 +28,6 @@ import androidx.ui.test.assertIsDisplayed
 import androidx.ui.test.assertWidthIsAtLeast
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.notNullValue
@@ -40,7 +39,6 @@ import org.junit.runners.JUnit4
 
 @LargeTest
 @RunWith(JUnit4::class)
-@ExperimentalCoroutinesApi
 class GlideImageTest {
 
   @get:Rule
