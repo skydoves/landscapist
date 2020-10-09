@@ -16,7 +16,7 @@
 
 package com.skydoves.landscapist.glide
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
