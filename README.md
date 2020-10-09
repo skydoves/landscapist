@@ -15,11 +15,15 @@
 <img src="https://user-images.githubusercontent.com/24237865/94184001-414d4800-fede-11ea-8801-cd0c997024df.png" width="572" height="280"/>
 </p>
 
+<div class="header">
+  <img src="https://user-images.githubusercontent.com/24237865/95545537-1bc15200-0a39-11eb-883d-644f564da5d3.png" align="left" width="4%" alt="Glide" />
+  <h1>Glide</h1>
+</div>
+
+[![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-glide/images/download.svg)](https://bintray.com/devmagician/maven/landscapist-glide/_latestVersion)<br>
 
 <img src="https://user-images.githubusercontent.com/24237865/94174887-d8ab9e80-fed0-11ea-9f21-a6ed2b899339.gif" align="right" width="32%"/>
 
-## Glide
-[![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-glide/images/download.svg) ](https://bintray.com/devmagician/maven/landscapist-glide/_latestVersion)<br>
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
@@ -110,8 +114,12 @@ And if the request failed (e.g. network error, wrong destination), error text wi
  })
 ```
 
-## Fresco
-[ ![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-fresco/images/download.svg) ](https://bintray.com/devmagician/maven/landscapist-fresco/_latestVersion)<br>
+<div class="header">
+  <img src="https://user-images.githubusercontent.com/24237865/95545540-1cf27f00-0a39-11eb-9e84-96b9df81364b.png" align="left" width="4%" alt="Fresco" />
+  <h1>Fresco</h1>
+</div>
+
+[![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-fresco/images/download.svg) ](https://bintray.com/devmagician/maven/landscapist-fresco/_latestVersion)<br>
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
