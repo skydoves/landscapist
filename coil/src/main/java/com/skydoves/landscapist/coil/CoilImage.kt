@@ -221,7 +221,6 @@ fun CoilImage(
         success?.invoke(coilImageState) ?: coilImageState.imageAsset?.let {
           Image(
             asset = it,
-            modifier = modifier,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,

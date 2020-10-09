@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.skydoves.landscapist.fresco
+package com.skydoves.landscapist.coil
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
@@ -28,10 +28,8 @@ import androidx.ui.test.assertIsDisplayed
 import androidx.ui.test.assertWidthIsAtLeast
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.instanceOf
-import org.hamcrest.CoreMatchers.notNullValue
-import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +37,7 @@ import org.junit.runners.JUnit4
 
 @LargeTest
 @RunWith(JUnit4::class)
-class FrescoImageTest {
+class CoilImageTest {
 
   @get:Rule
   val composeTestRule = createComposeRule()
@@ -47,17 +45,16 @@ class FrescoImageTest {
   @Test
   fun requestSuccess_withoutComposables() {
     composeTestRule.setContent {
-      FrescoImage(
-        imageUrl = IMAGE,
+      CoilImage(
+        imageModel = IMAGE,
         modifier = Modifier
           .preferredSize(128.dp, 128.dp)
-          .testTag(TAG_FRESCO),
-        contentScale = ContentScale.Crop,
-        observeLoadingProcess = false
+          .testTag(TAG_COIL),
+        contentScale = ContentScale.Crop
       )
     }
 
-    composeTestRule.onNodeWithTag(TAG_FRESCO)
+    composeTestRule.onNodeWithTag(TAG_COIL)
       .assertIsDisplayed()
       .assertWidthIsAtLeast(128.dp)
       .assertHeightIsAtLeast(128.dp)
@@ -66,13 +63,12 @@ class FrescoImageTest {
   @Test
   fun requestSuccess_withLoadingComposables() {
     composeTestRule.setContent {
-      FrescoImage(
-        imageUrl = IMAGE,
+      CoilImage(
+        imageModel = IMAGE,
         modifier = Modifier
           .preferredSize(128.dp, 128.dp)
-          .testTag(TAG_FRESCO),
+          .testTag(TAG_COIL),
         contentScale = ContentScale.Crop,
-        observeLoadingProcess = true,
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))
           composeTestRule.onNodeWithTag(TAG_PROGRESS)
@@ -81,7 +77,7 @@ class FrescoImageTest {
       )
     }
 
-    composeTestRule.onNodeWithTag(TAG_FRESCO)
+    composeTestRule.onNodeWithTag(TAG_COIL)
       .assertIsDisplayed()
       .assertWidthIsAtLeast(128.dp)
       .assertHeightIsAtLeast(128.dp)
@@ -89,19 +85,18 @@ class FrescoImageTest {
 
   @Test
   fun requestSuccess_withSuccessComposables() {
-    val state = ArrayList<FrescoImageState>()
+    val state = ArrayList<CoilImageState>()
 
     composeTestRule.setContent {
-      FrescoImage(
-        imageUrl = IMAGE,
+      CoilImage(
+        imageModel = IMAGE,
         modifier = Modifier
           .preferredSize(128.dp, 128.dp)
-          .testTag(TAG_FRESCO),
+          .testTag(TAG_COIL),
         contentScale = ContentScale.Crop,
-        observeLoadingProcess = true,
         success = {
           state.add(it)
-          assertThat(it.imageAsset, `is`(notNullValue()))
+          MatcherAssert.assertThat(it.imageAsset, CoreMatchers.`is`(CoreMatchers.notNullValue()))
         },
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))
@@ -112,29 +107,31 @@ class FrescoImageTest {
       )
     }
 
-    composeTestRule.onNodeWithTag(TAG_FRESCO)
+    composeTestRule.onNodeWithTag(TAG_COIL)
       .assertIsDisplayed()
       .assertWidthIsAtLeast(128.dp)
       .assertHeightIsAtLeast(128.dp)
 
     composeTestRule.runOnIdle {
-      assertThat(state.size, `is`(1))
-      assertThat(state[0], instanceOf(FrescoImageState.Success::class.java))
+      MatcherAssert.assertThat(state.size, CoreMatchers.`is`(1))
+      MatcherAssert.assertThat(
+        state[0],
+        CoreMatchers.instanceOf(CoilImageState.Success::class.java)
+      )
     }
   }
 
   @Test
   fun requestFailure_withFailureComposables() {
-    val state = ArrayList<FrescoImageState>()
+    val state = ArrayList<CoilImageState>()
 
     composeTestRule.setContent {
-      FrescoImage(
-        imageUrl = "",
+      CoilImage(
+        imageModel = "",
         modifier = Modifier
           .preferredSize(128.dp, 128.dp)
-          .testTag(TAG_FRESCO),
+          .testTag(TAG_COIL),
         contentScale = ContentScale.Crop,
-        observeLoadingProcess = true,
         failure = {
           Box(modifier = Modifier.testTag(TAG_ERROR))
           state.add(it)
@@ -148,8 +145,11 @@ class FrescoImageTest {
       .assertHeightIsAtLeast(128.dp)
 
     composeTestRule.runOnIdle {
-      assertThat(state.size, `is`(1))
-      assertThat(state[0], instanceOf(FrescoImageState.Failure::class.java))
+      MatcherAssert.assertThat(state.size, CoreMatchers.`is`(1))
+      MatcherAssert.assertThat(
+        state[0],
+        CoreMatchers.instanceOf(CoilImageState.Failure::class.java)
+      )
     }
   }
 }
