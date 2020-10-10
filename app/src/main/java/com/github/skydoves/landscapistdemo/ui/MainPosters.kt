@@ -94,6 +94,7 @@ fun HomePoster(
           centerHorizontallyTo(parent)
           top.linkTo(parent.top)
         }.aspectRatio(0.8f),
+        circularRevealedEnabled = true,
         loading = {
           ConstraintLayout(
             modifier = Modifier.fillMaxSize()

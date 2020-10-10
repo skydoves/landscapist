@@ -37,6 +37,8 @@ import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade
 import com.bumptech.glide.request.RequestOptions
+import com.skydoves.landscapist.CircularRevealedImage
+import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import kotlinx.coroutines.CoroutineScope
@@ -69,6 +71,8 @@ fun GlideImage(
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   placeHolder: ImageAsset? = null,
   error: ImageAsset? = null
 ) {
@@ -79,6 +83,8 @@ fun GlideImage(
     contentScale = contentScale,
     colorFilter = colorFilter,
     alpha = alpha,
+    circularRevealedEnabled = circularRevealedEnabled,
+    circularRevealedDuration = circularRevealedDuration,
     loading = {
       placeHolder?.let {
         Image(
@@ -141,6 +147,8 @@ fun GlideImage(
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   loading: @Composable ((imageState: GlideImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
@@ -157,6 +165,8 @@ fun GlideImage(
     contentScale = contentScale,
     alpha = alpha,
     colorFilter = colorFilter,
+    circularRevealedEnabled = circularRevealedEnabled,
+    circularRevealedDuration = circularRevealedDuration,
     loading = loading,
     success = success,
     failure = failure
@@ -204,6 +214,8 @@ fun GlideImage(
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   loading: @Composable ((imageState: GlideImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
@@ -218,12 +230,14 @@ fun GlideImage(
       is GlideImageState.Failure -> failure?.invoke(glideImageState)
       is GlideImageState.Success -> {
         success?.invoke(glideImageState) ?: glideImageState.imageAsset?.let {
-          Image(
+          CircularRevealedImage(
             asset = it,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
-            colorFilter = colorFilter
+            colorFilter = colorFilter,
+            circularRevealedEnabled = circularRevealedEnabled,
+            circularRevealedDuration = circularRevealedDuration
           )
         }
       }

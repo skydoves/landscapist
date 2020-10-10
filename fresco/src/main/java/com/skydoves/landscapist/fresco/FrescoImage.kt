@@ -35,6 +35,8 @@ import androidx.compose.ui.platform.ContextAmbient
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
+import com.skydoves.landscapist.CircularRevealedImage
+import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 
@@ -58,6 +60,8 @@ fun FrescoImage(
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   placeHolder: ImageAsset? = null,
   error: ImageAsset? = null,
   observeLoadingProcess: Boolean = false
@@ -70,6 +74,8 @@ fun FrescoImage(
     contentScale = contentScale,
     colorFilter = colorFilter,
     alpha = alpha,
+    circularRevealedEnabled = circularRevealedEnabled,
+    circularRevealedDuration = circularRevealedDuration,
     observeLoadingProcess = observeLoadingProcess,
     loading = {
       placeHolder?.let {
@@ -132,6 +138,8 @@ fun FrescoImage(
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   observeLoadingProcess: Boolean = false,
   loading: @Composable ((imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
@@ -148,12 +156,14 @@ fun FrescoImage(
       is FrescoImageState.Failure -> failure?.invoke(frescoImageState)
       is FrescoImageState.Success -> {
         success?.invoke(frescoImageState) ?: frescoImageState.imageAsset?.let {
-          Image(
+          CircularRevealedImage(
             asset = it,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
-            colorFilter = colorFilter
+            colorFilter = colorFilter,
+            circularRevealedEnabled = circularRevealedEnabled,
+            circularRevealedDuration = circularRevealedDuration
           )
         }
       }

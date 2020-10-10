@@ -71,4 +71,4 @@ fun CircularRevealedImage(
 }
 
 /** a definition of the default circular revealed animations duration. */
-private const val DefaultCircularRevealedDuration = 1100
+const val DefaultCircularRevealedDuration = 650

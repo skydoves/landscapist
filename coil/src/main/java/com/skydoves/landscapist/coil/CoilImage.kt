@@ -41,6 +41,8 @@ import coil.ImageLoader
 import coil.imageLoader
 import coil.request.Disposable
 import coil.request.ImageRequest
+import com.skydoves.landscapist.CircularRevealedImage
+import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -65,8 +67,10 @@ fun CoilImage(
   imageLoader: ImageLoader = context.imageLoader,
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
-  contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
+  contentScale: ContentScale = ContentScale.Crop,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   colorFilter: ColorFilter? = null,
   placeHolder: ImageAsset? = null,
   error: ImageAsset? = null,
@@ -81,6 +85,8 @@ fun CoilImage(
     contentScale = contentScale,
     alpha = alpha,
     colorFilter = colorFilter,
+    circularRevealedEnabled = circularRevealedEnabled,
+    circularRevealedDuration = circularRevealedDuration,
     loading = {
       placeHolder?.let {
         Image(
@@ -144,6 +150,8 @@ fun CoilImage(
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   loading: @Composable ((imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
@@ -159,6 +167,8 @@ fun CoilImage(
     contentScale = contentScale,
     alpha = alpha,
     colorFilter = colorFilter,
+    circularRevealedEnabled = circularRevealedEnabled,
+    circularRevealedDuration = circularRevealedDuration,
     loading = loading,
     success = success,
     failure = failure
@@ -204,6 +214,8 @@ fun CoilImage(
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   loading: @Composable ((imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
@@ -219,12 +231,14 @@ fun CoilImage(
       is CoilImageState.Failure -> failure?.invoke(coilImageState)
       is CoilImageState.Success -> {
         success?.invoke(coilImageState) ?: coilImageState.imageAsset?.let {
-          Image(
+          CircularRevealedImage(
             asset = it,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
-            colorFilter = colorFilter
+            colorFilter = colorFilter,
+            circularRevealedEnabled = circularRevealedEnabled,
+            circularRevealedDuration = circularRevealedDuration
           )
         }
       }
