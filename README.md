@@ -22,7 +22,7 @@
 
 [![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-glide/images/download.svg)](https://bintray.com/devmagician/maven/landscapist-glide/_latestVersion)<br>
 
-<img src="https://user-images.githubusercontent.com/24237865/95660921-00a03080-0b66-11eb-9d48-53801a237f51.gif" align="right" width="32%"/>
+<img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="32%"/>
 
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
@@ -233,7 +233,7 @@ class App : Application() {
 }
 ```
 
-<img src="https://user-images.githubusercontent.com/24237865/95660921-00a03080-0b66-11eb-9d48-53801a237f51.gif" align="right" width="32%"/>
+<img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="32%"/>
 
 ### Usage
 We can request and load images simply using a `FrescoImage` composable function.
