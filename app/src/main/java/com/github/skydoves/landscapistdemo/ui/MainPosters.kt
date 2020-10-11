@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.ripple.RippleIndication
@@ -42,7 +41,10 @@ import com.bumptech.glide.request.RequestOptions
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
+import com.github.skydoves.landscapistdemo.theme.background800
 import com.github.skydoves.landscapistdemo.theme.purple500
+import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
+import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
@@ -96,19 +98,10 @@ fun HomePoster(
         }.aspectRatio(0.8f),
         circularRevealedEnabled = true,
         loading = {
-          ConstraintLayout(
-            modifier = Modifier.fillMaxSize()
-          ) {
-            val indicator = createRef()
-            CircularProgressIndicator(
-              modifier = Modifier.constrainAs(indicator) {
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-              }
-            )
-          }
+          Shimmer(
+            baseColor = background800,
+            highlightColor = shimmerHighLight
+          )
         },
         failure = {
           ConstraintLayout(

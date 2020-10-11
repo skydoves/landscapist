@@ -103,7 +103,7 @@ internal class CircularRevealedPainter(
         // resize the matrix to scale by sx and sy.
         shaderMatrix.setScale(scale, scale)
 
-        // postconcats the matrix with the specified translation.
+        // post translate the matrix with the specified translation.
         shaderMatrix.postTranslate(
           (dx + 0.5f) + mDrawableRect.left,
           (dy + 0.5f) + mDrawableRect.top
