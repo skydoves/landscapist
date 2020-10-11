@@ -39,6 +39,60 @@ import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.Shimmer
+import com.skydoves.landscapist.ShimmerParams
+
+/**
+ * Requests loading an image with a loading placeholder and error imageAsset.
+ *
+ * ```
+ * FrescoImage(
+ *   imageUrl = stringImageUrl,
+ *   placeHolder = imageResource(R.drawable.placeholder),
+ *   error = imageResource(R.drawable.error)
+ * )
+ * ```
+ */
+@Composable
+fun FrescoImage(
+  imageUrl: String?,
+  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
+  contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  shimmerParams: ShimmerParams,
+  error: ImageAsset? = null,
+  observeLoadingProcess: Boolean = false
+) {
+  FrescoImage(
+    imageUrl = imageUrl,
+    imageRequest = imageRequest,
+    modifier = modifier,
+    alignment = alignment,
+    contentScale = contentScale,
+    colorFilter = colorFilter,
+    alpha = alpha,
+    circularRevealedEnabled = circularRevealedEnabled,
+    circularRevealedDuration = circularRevealedDuration,
+    observeLoadingProcess = observeLoadingProcess,
+    shimmerParams = shimmerParams,
+    failure = {
+      error?.let {
+        Image(
+          asset = it,
+          alignment = alignment,
+          contentScale = contentScale,
+          colorFilter = colorFilter,
+          alpha = alpha,
+        )
+      }
+    }
+  )
+}
 
 /**
  * Requests loading an image with a loading placeholder and error imageAsset.
@@ -100,6 +154,73 @@ fun FrescoImage(
       }
     }
   )
+}
+
+/**
+ * Requests loading an image and create some composables based on [FrescoImageState].
+ *
+ * ```
+ * FrescoImage(
+ * imageUrl = stringImageUrl,
+ * modifier = modifier,
+ * shimmerParams = ShimmerParams (
+ *  baseColor = backgroundColor,
+ *  highlightColor = highlightColor
+ * ),
+ * failure = {
+ *   Text(text = "image request failed.")
+ * })
+ * ```
+ */
+@Composable
+fun FrescoImage(
+  imageUrl: String?,
+  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
+  contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  observeLoadingProcess: Boolean = false,
+  shimmerParams: ShimmerParams,
+  success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
+  failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
+) {
+  FrescoImage(
+    imageRequest = imageRequest,
+    modifier = modifier,
+    observeLoadingProcess = observeLoadingProcess,
+  ) { imageState ->
+    when (val frescoImageState = imageState.toFrescoImageState()) {
+      is FrescoImageState.None -> Unit
+      is FrescoImageState.Loading -> {
+        Shimmer(
+          baseColor = shimmerParams.baseColor,
+          highlightColor = shimmerParams.highlightColor,
+          intensity = shimmerParams.intensity,
+          dropOff = shimmerParams.dropOff,
+          tilt = shimmerParams.tilt,
+          durationMillis = shimmerParams.durationMillis
+        )
+      }
+      is FrescoImageState.Failure -> failure?.invoke(frescoImageState)
+      is FrescoImageState.Success -> {
+        success?.invoke(frescoImageState) ?: frescoImageState.imageAsset?.let {
+          CircularRevealedImage(
+            asset = it,
+            alignment = alignment,
+            contentScale = contentScale,
+            alpha = alpha,
+            colorFilter = colorFilter,
+            circularRevealedEnabled = circularRevealedEnabled,
+            circularRevealedDuration = circularRevealedDuration
+          )
+        }
+      }
+    }
+  }
 }
 
 /**

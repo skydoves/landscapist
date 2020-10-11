@@ -45,8 +45,67 @@ import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.Shimmer
+import com.skydoves.landscapist.ShimmerParams
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+
+/**
+ * Requests loading an image with a loading placeholder and error imageAsset.
+ *
+ * ```
+ * CoilImage(
+ *   imageModel = imageModel,
+ * shimmerParams = ShimmerParams (
+ *  baseColor = backgroundColor,
+ *  highlightColor = highlightColor
+ * ),
+ *  error = imageResource(R.drawable.error)
+ * )
+ * ```
+ */
+@Composable
+fun CoilImage(
+  imageModel: Any,
+  context: Context = ContextAmbient.current,
+  lifecycleOwner: LifecycleOwner = LifecycleOwnerAmbient.current,
+  imageLoader: ImageLoader = context.imageLoader,
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
+  alpha: Float = DefaultAlpha,
+  contentScale: ContentScale = ContentScale.Crop,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  colorFilter: ColorFilter? = null,
+  shimmerParams: ShimmerParams,
+  error: ImageAsset? = null,
+) {
+  CoilImage(
+    imageModel = imageModel,
+    context = context,
+    lifecycleOwner = lifecycleOwner,
+    imageLoader = imageLoader,
+    modifier = modifier,
+    alignment = alignment,
+    contentScale = contentScale,
+    alpha = alpha,
+    colorFilter = colorFilter,
+    circularRevealedEnabled = circularRevealedEnabled,
+    circularRevealedDuration = circularRevealedDuration,
+    shimmerParams = shimmerParams,
+    failure = {
+      error?.let {
+        Image(
+          asset = it,
+          alignment = alignment,
+          contentScale = contentScale,
+          colorFilter = colorFilter,
+          alpha = alpha,
+        )
+      }
+    }
+  )
+}
 
 /**
  * Requests loading an image with a loading placeholder and error imageAsset.
@@ -119,6 +178,58 @@ fun CoilImage(
  * CoilImage(
  * imageModel = imageModel,
  * modifier = modifier,
+ * shimmerParams = ShimmerParams (
+ *  baseColor = backgroundColor,
+ *  highlightColor = highlightColor
+ * ),
+ * failure = {
+ *   Text(text = "image request failed.")
+ * })
+ * ```
+ */
+@Composable
+fun CoilImage(
+  imageModel: Any,
+  context: Context = ContextAmbient.current,
+  lifecycleOwner: LifecycleOwner = LifecycleOwnerAmbient.current,
+  imageLoader: ImageLoader = context.imageLoader,
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
+  contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  shimmerParams: ShimmerParams,
+  success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
+  failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
+) {
+  CoilImage(
+    imageRequest = ImageRequest.Builder(context)
+      .data(imageModel)
+      .lifecycle(lifecycleOwner)
+      .build(),
+    imageLoader = imageLoader,
+    modifier = modifier,
+    alignment = alignment,
+    contentScale = contentScale,
+    alpha = alpha,
+    colorFilter = colorFilter,
+    circularRevealedEnabled = circularRevealedEnabled,
+    circularRevealedDuration = circularRevealedDuration,
+    shimmerParams = shimmerParams,
+    success = success,
+    failure = failure
+  )
+}
+
+/**
+ * Requests loading an image and create some composables based on [CoilImageState].
+ *
+ * ```
+ * CoilImage(
+ * imageModel = imageModel,
+ * modifier = modifier,
  * loading = {
  *   ConstraintLayout(
  *     modifier = Modifier.fillMaxSize()
@@ -173,6 +284,75 @@ fun CoilImage(
     success = success,
     failure = failure
   )
+}
+
+/**
+ * Requests loading an image and create some composables based on [CoilImageState].
+ *
+ * ```
+ * CoilImage(
+ * imageRequest = ImageRequest.Builder(context)
+ *      .data(imageModel)
+ *      .lifecycle(lifecycleOwner)
+ *      .build(),
+ * modifier = modifier,
+ * shimmerParams = ShimmerParams (
+ *  baseColor = backgroundColor,
+ *  highlightColor = highlightColor
+ * ),
+ * failure = {
+ *   Text(text = "image request failed.")
+ * })
+ * ```
+ */
+@Composable
+fun CoilImage(
+  imageRequest: ImageRequest,
+  imageLoader: ImageLoader = ContextAmbient.current.imageLoader,
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
+  contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  shimmerParams: ShimmerParams,
+  success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
+  failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
+) {
+  CoilImage(
+    request = imageRequest,
+    imageLoader = imageLoader,
+    modifier = modifier,
+  ) { imageState ->
+    when (val coilImageState = imageState.toCoilImageState()) {
+      is CoilImageState.None -> Unit
+      is CoilImageState.Loading -> {
+        Shimmer(
+          baseColor = shimmerParams.baseColor,
+          highlightColor = shimmerParams.highlightColor,
+          intensity = shimmerParams.intensity,
+          dropOff = shimmerParams.dropOff,
+          tilt = shimmerParams.tilt,
+          durationMillis = shimmerParams.durationMillis
+        )
+      }
+      is CoilImageState.Failure -> failure?.invoke(coilImageState)
+      is CoilImageState.Success -> {
+        success?.invoke(coilImageState) ?: coilImageState.imageAsset?.let {
+          CircularRevealedImage(
+            asset = it,
+            alignment = alignment,
+            contentScale = contentScale,
+            alpha = alpha,
+            colorFilter = colorFilter,
+            circularRevealedEnabled = circularRevealedEnabled,
+            circularRevealedDuration = circularRevealedDuration
+          )
+        }
+      }
+    }
+  }
 }
 
 /**

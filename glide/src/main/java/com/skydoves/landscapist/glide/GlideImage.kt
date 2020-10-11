@@ -91,16 +91,7 @@ fun GlideImage(
     alpha = alpha,
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
-    loading = {
-      Shimmer(
-        baseColor = shimmerParams.baseColor,
-        highlightColor = shimmerParams.highlightColor,
-        intensity = shimmerParams.intensity,
-        dropOff = shimmerParams.dropOff,
-        tilt = shimmerParams.tilt,
-        durationMillis = shimmerParams.durationMillis
-      )
-    },
+    shimmerParams = shimmerParams,
     failure = {
       error?.let {
         Image(
@@ -225,16 +216,7 @@ fun GlideImage(
     colorFilter = colorFilter,
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
-    loading = {
-      Shimmer(
-        baseColor = shimmerParams.baseColor,
-        highlightColor = shimmerParams.highlightColor,
-        intensity = shimmerParams.intensity,
-        dropOff = shimmerParams.dropOff,
-        tilt = shimmerParams.tilt,
-        durationMillis = shimmerParams.durationMillis
-      )
-    },
+    shimmerParams = shimmerParams,
     success = success,
     failure = failure
   )
