@@ -22,7 +22,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ConstraintLayout
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -44,7 +43,7 @@ import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background800
 import com.github.skydoves.landscapistdemo.theme.purple500
 import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
-import com.skydoves.landscapist.Shimmer
+import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
@@ -84,7 +83,7 @@ fun HomePoster(
         indication = RippleIndication(color = purple500)
       )
     ) {
-      val (image, title, content, message) = createRefs()
+      val (image, title, content) = createRefs()
       GlideImage(
         requestBuilder = Glide
           .with(ContextAmbient.current)
@@ -97,27 +96,10 @@ fun HomePoster(
           top.linkTo(parent.top)
         }.aspectRatio(0.8f),
         circularRevealedEnabled = true,
-        loading = {
-          Shimmer(
-            baseColor = background800,
-            highlightColor = shimmerHighLight
-          )
-        },
-        failure = {
-          ConstraintLayout(
-            modifier = Modifier.fillMaxSize()
-          ) {
-            Text(
-              text = "image request failed.",
-              modifier = Modifier.constrainAs(message) {
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-              }
-            )
-          }
-        }
+        shimmerParams = ShimmerParams(
+          baseColor = background800,
+          highlightColor = shimmerHighLight
+        )
       )
       Text(
         text = poster.name,

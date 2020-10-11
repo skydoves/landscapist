@@ -41,10 +41,79 @@ import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.Shimmer
+import com.skydoves.landscapist.ShimmerParams
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+
+/**
+ * Requests loading an image with a loading placeholder and error imageAsset.
+ *
+ * ```
+ * GlideImage(
+ *   requestBuilder = Glide
+ *     .with(ContextAmbient.current)
+ *     .asBitmap()
+ *     .load(poster.poster)
+ *     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
+ *     .thumbnail(0.6f)
+ *     .transition(withCrossFade()),
+ *   circularRevealedEnabled = true,
+ *   shimmerParams = ShimmerParams (
+ *      baseColor = backgroundColor,
+ *      highlightColor = highlightColor
+ *   ),
+ *   error = imageResource(R.drawable.error)
+ * )
+ * ```
+ */
+@Composable
+fun GlideImage(
+  requestBuilder: RequestBuilder<Bitmap>,
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
+  contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  shimmerParams: ShimmerParams,
+  error: ImageAsset? = null
+) {
+  GlideImage(
+    requestBuilder = requestBuilder,
+    modifier = modifier,
+    alignment = alignment,
+    contentScale = contentScale,
+    colorFilter = colorFilter,
+    alpha = alpha,
+    circularRevealedEnabled = circularRevealedEnabled,
+    circularRevealedDuration = circularRevealedDuration,
+    loading = {
+      Shimmer(
+        baseColor = shimmerParams.baseColor,
+        highlightColor = shimmerParams.highlightColor,
+        intensity = shimmerParams.intensity,
+        dropOff = shimmerParams.dropOff,
+        tilt = shimmerParams.tilt,
+        durationMillis = shimmerParams.durationMillis
+      )
+    },
+    failure = {
+      error?.let {
+        Image(
+          asset = it,
+          alignment = alignment,
+          contentScale = contentScale,
+          colorFilter = colorFilter,
+          alpha = alpha
+        )
+      }
+    }
+  )
+}
 
 /**
  * Requests loading an image with a loading placeholder and error imageAsset.
@@ -117,6 +186,67 @@ fun GlideImage(
  * GlideImage(
  * imageModel = imageUrl,
  * modifier = modifier,
+ * shimmerParams = ShimmerParams (
+ *  baseColor = backgroundColor,
+ *  highlightColor = highlightColor
+ * ),
+ * failure = {
+ *   Text(text = "image request failed.")
+ * })
+ * ```
+ */
+@Composable
+fun GlideImage(
+  imageModel: Any,
+  requestOptions: RequestOptions = RequestOptions(),
+  transitionOptions: BitmapTransitionOptions = withCrossFade(),
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
+  contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  shimmerParams: ShimmerParams,
+  success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
+  failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
+) {
+  GlideImage(
+    requestBuilder = Glide
+      .with(ContextAmbient.current)
+      .asBitmap()
+      .apply(requestOptions)
+      .transition(transitionOptions)
+      .load(imageModel),
+    modifier = modifier,
+    alignment = alignment,
+    contentScale = contentScale,
+    alpha = alpha,
+    colorFilter = colorFilter,
+    circularRevealedEnabled = circularRevealedEnabled,
+    circularRevealedDuration = circularRevealedDuration,
+    loading = {
+      Shimmer(
+        baseColor = shimmerParams.baseColor,
+        highlightColor = shimmerParams.highlightColor,
+        intensity = shimmerParams.intensity,
+        dropOff = shimmerParams.dropOff,
+        tilt = shimmerParams.tilt,
+        durationMillis = shimmerParams.durationMillis
+      )
+    },
+    success = success,
+    failure = failure
+  )
+}
+
+/**
+ * Requests loading an image and create some composables based on [GlideImageState].
+ *
+ * ```
+ * GlideImage(
+ * imageModel = imageUrl,
+ * modifier = modifier,
  * loading = {
  *   ConstraintLayout(
  *     modifier = Modifier.fillMaxSize()
@@ -171,6 +301,76 @@ fun GlideImage(
     success = success,
     failure = failure
   )
+}
+
+/**
+ * Requests loading an image and create some composables based on [GlideImageState].
+ *
+ * ```
+ * GlideImage(
+ * requestBuilder = Glide
+ *   .with(ContextAmbient.current)
+ *   .asBitmap()
+ *   .load(poster.poster)
+ *   .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
+ *   .thumbnail(0.6f)
+ *   .transition(withCrossFade()),
+ * modifier = modifier,
+ * shimmerParams = ShimmerParams (
+ *  baseColor = backgroundColor,
+ *  highlightColor = highlightColor
+ * ),
+ * failure = {
+ *   Text(text = "image request failed.")
+ * })
+ * ```
+ */
+@Composable
+fun GlideImage(
+  requestBuilder: RequestBuilder<Bitmap>,
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
+  contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  shimmerParams: ShimmerParams,
+  success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
+  failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
+) {
+  GlideImage(
+    builder = requestBuilder,
+    modifier = modifier,
+  ) { imageState ->
+    when (val glideImageState = imageState.toGlideImageState()) {
+      is GlideImageState.None -> Unit
+      is GlideImageState.Loading -> {
+        Shimmer(
+          baseColor = shimmerParams.baseColor,
+          highlightColor = shimmerParams.highlightColor,
+          intensity = shimmerParams.intensity,
+          dropOff = shimmerParams.dropOff,
+          tilt = shimmerParams.tilt,
+          durationMillis = shimmerParams.durationMillis
+        )
+      }
+      is GlideImageState.Failure -> failure?.invoke(glideImageState)
+      is GlideImageState.Success -> {
+        success?.invoke(glideImageState) ?: glideImageState.imageAsset?.let {
+          CircularRevealedImage(
+            asset = it,
+            alignment = alignment,
+            contentScale = contentScale,
+            alpha = alpha,
+            colorFilter = colorFilter,
+            circularRevealedEnabled = circularRevealedEnabled,
+            circularRevealedDuration = circularRevealedDuration
+          )
+        }
+      }
+    }
+  }
 }
 
 /**

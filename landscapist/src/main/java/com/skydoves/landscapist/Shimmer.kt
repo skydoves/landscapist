@@ -59,10 +59,10 @@ fun Shimmer(
   modifier: Modifier = Modifier,
   baseColor: Color,
   highlightColor: Color,
-  intensity: Float = 0f,
-  dropOff: Float = 0.5f,
-  tilt: Float = 20f,
-  durationMillis: Int = 850
+  intensity: Float = DefaultShimmerIntensity,
+  dropOff: Float = DefaultShimmerDropOff,
+  tilt: Float = DefaultShimmerTilt,
+  durationMillis: Int = DefaultDurationMillis
 ) {
   val animatedProgress = animatedFloat(0f)
   onActive {
