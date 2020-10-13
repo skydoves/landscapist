@@ -199,9 +199,9 @@ CoilImage(
 <img src="https://user-images.githubusercontent.com/24237865/95812167-be3a4780-0d4f-11eb-9360-2a4a66a3fb46.gif" align="right" width="26%"/>
 
 ### Shimmer effect
-We can give a shimmering effect when loading images using a `ShimmerParams`.
+We can give a shimmering effect when loading images using a `ShimmerParams`. We can also use `ShimmerParams` in `GlideImage` and `FrescoImage`.
 ```kotlin
- GlideImage(
+ CoilImage(
  imageModel = poster.poster,
  modifier = modifier,
  // shows a shimmering effect when loading an image.
