@@ -27,7 +27,7 @@
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.0.5"
+    implementation "com.github.skydoves:landscapist-glide:1.0.6"
 }
 ```
 
@@ -195,6 +195,28 @@ CoilImage(
     Text(text = "image request failed.")
   })
 ```
+
+<img src="https://user-images.githubusercontent.com/24237865/95812167-be3a4780-0d4f-11eb-9360-2a4a66a3fb46.gif" align="right" width="22%"/>
+
+### Shimmer effect
+We can give shimmering effect when loading images using a `ShimmerParams`.
+```kotlin
+ GlideImage(
+ imageModel = poster.poster,
+ modifier = modifier,
+ // shows a shimmering effect when loading an image.
+ shimmerParams = ShimmerParams(
+        baseColor = MaterialTheme.colors.background,
+        highlightColor = shimmerHighLight,
+        durationMillis = 350,
+        dropOff = 0.65f,
+        tilt = 20f
+      ),
+ // shows an error text message when request failed.
+ failure = {
+   Text(text = "image request failed.")
+ })
+ ```
 
 <div class="header">
   <a href="https://github.com/facebook/fresco" target="_blank"> <img src="https://user-images.githubusercontent.com/24237865/95545540-1cf27f00-0a39-11eb-9e84-96b9df81364b.png" align="left" width="4%" alt="Fresco" /></a>
