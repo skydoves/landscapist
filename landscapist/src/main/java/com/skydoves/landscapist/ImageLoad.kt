@@ -21,9 +21,8 @@ package com.skydoves.landscapist
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.awaitDispose
+import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.launchInComposition
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.stateFor
 import androidx.compose.ui.Modifier
@@ -32,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -44,19 +44,15 @@ import kotlinx.coroutines.flow.flowOn
 fun <T : Any> ImageLoad(
   imageRequest: T,
   executeImageRequest: suspend () -> Flow<ImageLoadState>,
-  disposeImageRequest: () -> Unit,
   modifier: Modifier = Modifier.fillMaxWidth(),
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   var state by stateFor<ImageLoadState>(imageRequest) { ImageLoadState.None }
-  launchInComposition(imageRequest) {
+  LaunchedTask(imageRequest) {
     executeImageLoading(
       executeImageRequest
     ).collect {
       state = it
-    }
-    awaitDispose {
-      disposeImageRequest()
     }
   }
   WithConstraints(modifier) {
@@ -70,5 +66,6 @@ private suspend fun executeImageLoading(
   // execute imager loading
   emitAll(executeImageRequest())
 }.catch {
+  // emit a failure loading state
   emit(ImageLoadState.Failure(null))
-}.flowOn(Dispatchers.IO)
+}.distinctUntilChanged().flowOn(Dispatchers.IO)
