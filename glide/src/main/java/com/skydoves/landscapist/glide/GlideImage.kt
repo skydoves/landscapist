@@ -43,10 +43,8 @@ import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * Requests loading an image with a loading placeholder and error imageAsset.
@@ -452,6 +450,7 @@ fun GlideImage(
  * ```
  */
 @Composable
+@OptIn(ExperimentalCoroutinesApi::class)
 private fun GlideImage(
   builder: RequestBuilder<Bitmap>,
   modifier: Modifier = Modifier.fillMaxWidth(),
@@ -459,20 +458,19 @@ private fun GlideImage(
 ) {
   val context = ContextAmbient.current
   val target = remember { FlowCustomTarget() }
-  var job: Job? = remember { null }
 
   ImageLoad(
     imageRequest = builder,
     executeImageRequest = {
-      job = CoroutineScope(Dispatchers.IO).launch {
+      suspendCancellableCoroutine { cont ->
         builder.into(target)
         builder.submit()
+
+        cont.resume(target.imageLoadStateFlow) {
+          // clear the glide target request if cancelled.
+          Glide.with(context).clear(target)
+        }
       }
-      target.imageLoadStateFlow
-    },
-    disposeImageRequest = {
-      Glide.with(context).clear(target)
-      job?.cancel()
     },
     modifier = modifier,
     content = content

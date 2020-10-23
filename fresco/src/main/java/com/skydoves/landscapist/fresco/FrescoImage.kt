@@ -41,6 +41,8 @@ import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * Requests loading an image with a loading placeholder and error imageAsset.
@@ -312,6 +314,7 @@ fun FrescoImage(
  * ```
  */
 @Composable
+@OptIn(ExperimentalCoroutinesApi::class)
 private fun FrescoImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier.fillMaxWidth(),
@@ -324,12 +327,15 @@ private fun FrescoImage(
   ImageLoad(
     imageRequest = imageRequest,
     executeImageRequest = {
-      val subscriber = FlowBaseBitmapDataSubscriber(observeLoadingProcess)
-      datasource.subscribe(subscriber, CallerThreadExecutor.getInstance())
-      subscriber.imageLoadStateFlow
-    },
-    disposeImageRequest = {
-      datasource.close()
+      suspendCancellableCoroutine { cont ->
+        val subscriber = FlowBaseBitmapDataSubscriber(observeLoadingProcess)
+        datasource.subscribe(subscriber, CallerThreadExecutor.getInstance())
+
+        cont.resume(subscriber.imageLoadStateFlow) {
+          // close the fresco datasource request if cancelled.
+          datasource.close()
+        }
+      }
     },
     modifier = modifier,
     content = content

@@ -49,6 +49,7 @@ import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * Requests loading an image with a loading placeholder and error imageAsset.
@@ -462,20 +463,28 @@ fun CoilImage(
   ImageLoad(
     imageRequest = request,
     executeImageRequest = {
-      disposable.value = imageLoader.enqueue(
-        request.newBuilder(context).target(
-          onSuccess = {
-            imageLoadStateFlow.value = ImageLoadState.Success(it.toBitmap().asImageAsset())
-          },
-          onError = {
-            imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageAsset())
-          }
-        ).build()
-      )
-      imageLoadStateFlow
-    },
-    disposeImageRequest = {
-      disposable.value?.dispose()
+      suspendCancellableCoroutine { cont ->
+        disposable.value = imageLoader.enqueue(
+          request.newBuilder(context).target(
+            onSuccess = {
+              imageLoadStateFlow.value = ImageLoadState.Success(it.toBitmap().asImageAsset())
+
+              cont.resume(imageLoadStateFlow) {
+                // dispose the coil disposable request if cancelled.
+                disposable.value?.dispose()
+              }
+            },
+            onError = {
+              imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageAsset())
+
+              cont.resume(imageLoadStateFlow) {
+                // dispose the coil disposable request if cancelled.
+                disposable.value?.dispose()
+              }
+            }
+          ).build()
+        )
+      }
     },
     modifier = modifier,
     content = content
