@@ -468,22 +468,17 @@ fun CoilImage(
           request.newBuilder(context).target(
             onSuccess = {
               imageLoadStateFlow.value = ImageLoadState.Success(it.toBitmap().asImageAsset())
-
-              cont.resume(imageLoadStateFlow) {
-                // dispose the coil disposable request if cancelled.
-                disposable.value?.dispose()
-              }
             },
             onError = {
               imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageAsset())
-
-              cont.resume(imageLoadStateFlow) {
-                // dispose the coil disposable request if cancelled.
-                disposable.value?.dispose()
-              }
             }
           ).build()
         )
+
+        cont.resume(imageLoadStateFlow) {
+          // dispose the coil disposable request if cancelled.
+          disposable.value?.dispose()
+        }
       }
     },
     modifier = modifier,

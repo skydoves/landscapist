@@ -29,14 +29,9 @@ import androidx.compose.material.Surface
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade
-import com.bumptech.glide.request.RequestOptions
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
@@ -44,7 +39,7 @@ import com.github.skydoves.landscapistdemo.theme.background800
 import com.github.skydoves.landscapistdemo.theme.purple500
 import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
 import com.skydoves.landscapist.ShimmerParams
-import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
 fun DisneyPosters(
@@ -84,13 +79,8 @@ fun HomePoster(
       )
     ) {
       val (image, title, content) = createRefs()
-      GlideImage(
-        requestBuilder = Glide
-          .with(ContextAmbient.current)
-          .asBitmap()
-          .load(poster.poster)
-          .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
-          .transition(withCrossFade()),
+      CoilImage(
+        imageModel = poster.poster,
         modifier = Modifier.constrainAs(image) {
           centerHorizontallyTo(parent)
           top.linkTo(parent.top)
