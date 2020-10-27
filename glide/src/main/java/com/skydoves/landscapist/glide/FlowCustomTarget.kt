@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.asImageAsset
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.skydoves.landscapist.ImageLoadState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -32,7 +31,6 @@ import kotlinx.coroutines.flow.StateFlow
  * FlowCustomTarget is a glide bitmap custom target which collects
  * [ImageLoadState] as a stateFlow.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class FlowCustomTarget : CustomTarget<Bitmap>() {
 
   private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f))

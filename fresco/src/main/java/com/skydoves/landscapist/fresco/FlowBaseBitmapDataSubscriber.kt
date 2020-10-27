@@ -24,7 +24,6 @@ import com.facebook.datasource.DataSource
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber
 import com.facebook.imagepipeline.image.CloseableImage
 import com.skydoves.landscapist.ImageLoadState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -32,7 +31,6 @@ import kotlinx.coroutines.flow.StateFlow
  * FlowBaseBitmapDataSubscriber is a fresco bitmap subscriber which collects
  * [ImageLoadState] as a stateFlow.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class FlowBaseBitmapDataSubscriber(
   private val observeLoadingProcess: Boolean
 ) : BaseBitmapDataSubscriber() {
