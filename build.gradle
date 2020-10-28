@@ -9,7 +9,7 @@ buildscript {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
     classpath "com.diffplug.spotless:spotless-plugin-gradle:$versions.spotlessGradle"
     classpath "org.jetbrains.dokka:dokka-gradle-plugin:$versions.dokkaGradle"
-    classpath "com.github.panpf.bintray-publish:bintray-publish:$versions.bintrayRelease"
+    classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:$versions.bintrayPlugin"
   }
 }
 

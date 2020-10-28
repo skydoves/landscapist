@@ -8,7 +8,7 @@ ext.versions = [
     spotlessGradle   : '5.6.1',
     ktlintGradle     : '0.39.0',
     dokkaGradle      : '1.4.0',
-    bintrayRelease   : '1.0.0',
+    bintrayPlugin    : '1.8.5',
 
     kotlin           : '1.4.10',
     coreKtxVersion   : '1.5.0-alpha04',

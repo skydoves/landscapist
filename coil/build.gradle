@@ -4,7 +4,6 @@ plugins {
   id 'org.jetbrains.dokka'
 }
 
-apply plugin: 'com.github.panpf.bintray-publish'
 apply from: '../dependencies.gradle'
 
 android {
@@ -77,15 +76,12 @@ dokkaHtml.configure {
 
 tasks.withType(Javadoc).all { enabled = false }
 
-publish {
-  userOrg = 'devmagician'
-  groupId = 'com.github.skydoves'
-  artifactId = 'landscapist-coil'
-  publishVersion = versions.versionName
-  desc = 'Jetpack Compose image library for requesting and loading images using Coil.'
-  website = 'https://github.com/skydoves/Landscapist'
-  issueTracker = "${website}/issues"
-  repository = "${website}.git"
-}
+ext.repository = [
+    name       : "landscapist-coil",
+    description: "Jetpack Compose image library for requesting and loading images using Coil.",
+    websiteUrl : "https://github.com/skydoves/Landscapist",
+    scm        : 'scm:git@github.com/skydoves/Landscapist.git'
+]
 
 apply from: '../spotless.gradle'
+apply from: '../publish.gradle'
