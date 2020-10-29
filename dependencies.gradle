@@ -5,14 +5,14 @@ ext.versions = [
     versionName      : '1.0.7',
 
     gradleBuildTool  : '4.2.0-alpha13',
-    spotlessGradle   : '5.6.1',
+    spotlessGradle   : '5.7.0',
     ktlintGradle     : '0.39.0',
     dokkaGradle      : '1.4.0',
     bintrayPlugin    : '1.8.5',
 
     kotlin           : '1.4.10',
     coreKtxVersion   : '1.5.0-alpha04',
-    composeVersion   : '1.0.0-alpha05',
+    composeVersion   : '1.0.0-alpha06',
     coroutinesVersion: '1.4.0',
 
     frescoVersion    : '2.3.0',
