@@ -34,7 +34,22 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.AnimationClockAmbient
 
-/** CircularRevealedImage is an image composable for animating a clipping circle to reveal. */
+/**
+ * CircularRevealedImage is an image composable for animating a clipping circle to reveal when loading an image.
+ *
+ * @param asset an image asset for loading for the content.
+ * @param imagePainter an image painter to draw an [ImageAsset] into the provided canvas.
+ * @param modifier adjust the drawing image layout or drawing decoration of the content.
+ * @param alignment alignment parameter used to place the loaded [ImageAsset] in the
+ * given bounds defined by the width and height.
+ * @param contentScale parameter used to determine the aspect ratio scaling to be
+ * used if the bounds are a different size from the intrinsic size of the loaded [ImageAsset].
+ * @param alpha an alpha value to apply for the image when it is rendered onscreen.
+ * @param colorFilter colorFilter to apply for the image when it is rendered onscreen.
+ * @param circularRevealedEnabled a conditional value for enabling or not the circular revealing animation.
+ * @param circularRevealedDuration milli-second times from start to finish animation.
+ * @param clock an interface allows AnimationClock to be subscribed and unsubscribed.
+ */
 @Composable
 fun CircularRevealedImage(
   asset: ImageAsset,

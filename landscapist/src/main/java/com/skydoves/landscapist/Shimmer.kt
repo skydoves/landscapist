@@ -46,13 +46,13 @@ import kotlin.math.tan
 /**
  * Create a shimmering effect composable with base and highlighting colors.
  *
- * [modifier] basic modifier, must be applied fillMaxSize().
- * [baseColor] base background color of this composable.
- * [highlightColor] highlight shimmering effect color of this composable.
- * [intensity] controls the brightness of the highlight at the center.
- * [dropOff] controls the size of the fading edge of the highlight.
- * [tilt] angle at which the highlight is tilted, measured in degrees.
- * [durationMillis] animation duration of the shimmering start to end.
+ * @param modifier basic modifier, must be applied fillMaxSize().
+ * @param baseColor base background color of this composable.
+ * @param highlightColor highlight shimmering effect color of this composable.
+ * @param intensity controls the brightness of the highlight at the center.
+ * @param dropOff controls the size of the fading edge of the highlight.
+ * @param tilt angle at which the highlight is tilted, measured in degrees.
+ * @param durationMillis animation duration of the shimmering start to end.
  */
 @Composable
 fun Shimmer(

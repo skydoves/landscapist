@@ -40,6 +40,11 @@ import androidx.core.util.Pools
 /**
  * CircularRevealedPainter is a [Painter] which animates a clipping circle to reveal an image.
  * Reveal animations provide users visual continuity when we show an image.
+ *
+ * @param imageAsset an image asset for loading for the content.
+ * @param painter an image painter to draw an [ImageAsset] into the provided canvas.
+ * @param clock an interface allows AnimationClock to be subscribed and unsubscribed.
+ * @param durationMs milli-second times from start to finish animation.
  */
 internal class CircularRevealedPainter(
   private val imageAsset: ImageAsset,
