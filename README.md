@@ -20,8 +20,8 @@
   <h1>Glide</h1>
 </div>
 
-[![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-glide/images/download.svg)](https://bintray.com/devmagician/maven/landscapist-glide/_latestVersion)<br>
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)
+[![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-glide/images/download.svg)](https://bintray.com/devmagician/maven/landscapist-glide/_latestVersion)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
 
 <img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="32%"/>
 
@@ -121,8 +121,8 @@ And if the request failed (e.g. network error, wrong destination), error text wi
   <h1>Coil</h1>
 </div>
 
-[![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-coil/images/download.svg) ](https://bintray.com/devmagician/maven/landscapist-coil/_latestVersion)<br>
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)
+[![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-coil/images/download.svg) ](https://bintray.com/devmagician/maven/landscapist-coil/_latestVersion)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
@@ -225,8 +225,8 @@ We can give a shimmering effect when loading images using a `ShimmerParams`. We 
   <h1>Fresco</h1>
 </div>
 
-[![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-fresco/images/download.svg) ](https://bintray.com/devmagician/maven/landscapist-fresco/_latestVersion)<br>
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)
+[![Download](https://api.bintray.com/packages/devmagician/maven/landscapist-fresco/images/download.svg) ](https://bintray.com/devmagician/maven/landscapist-fresco/_latestVersion)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
