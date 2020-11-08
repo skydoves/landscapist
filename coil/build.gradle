@@ -8,6 +8,7 @@ apply from: '../dependencies.gradle'
 
 android {
   compileSdkVersion versions.compileSdk
+
   defaultConfig {
     minSdkVersion versions.minSdk
     targetSdkVersion versions.compileSdk
@@ -15,14 +16,17 @@ android {
     versionName versions.versionName
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
+
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
   }
+
   composeOptions {
     kotlinCompilerVersion versions.kotlin
     kotlinCompilerExtensionVersion versions.composeVersion
   }
+
   kotlinOptions {
     jvmTarget = '1.8'
     freeCompilerArgs += "-Xallow-jvm-ir-dependencies"
@@ -30,10 +34,17 @@ android {
     freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     useIR = true
   }
+
   buildFeatures {
     buildConfig false
     compose true
   }
+
+  packagingOptions {
+    excludes += "/META-INF/AL2.0"
+    excludes += "/META-INF/LGPL2.1"
+  }
+
   testOptions {
     unitTests {
       includeAndroidResources = true
@@ -42,28 +53,27 @@ android {
 }
 
 kotlin {
-  explicitApiWarning()
+  explicitApi()
 }
 
 dependencies {
-  // landscapist
   api project(":landscapist")
-
-  // androidx jetpack
-  implementation "androidx.core:core-ktx:$versions.coreKtxVersion"
-
-  // coil
   api "io.coil-kt:coil:$versions.coilVersion"
 
-  // compose
+  implementation "androidx.core:core-ktx:$versions.coreKtxVersion"
   implementation "androidx.compose.ui:ui:$versions.composeVersion"
   implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
   implementation "androidx.compose.foundation:foundation:$versions.composeVersion"
 
-  // unit test
   androidTestImplementation "androidx.ui:ui-test:$versions.composeVersion"
   androidTestImplementation "androidx.compose.ui:ui:$versions.composeVersion"
   androidTestImplementation "androidx.test:rules:$versions.rulesVersion"
+}
+
+afterEvaluate {
+  tasks.withType(org.jetbrains.dokka.gradle.DokkaTask).configureEach {
+    outputDirectory.set(rootProject.file('docs/api'))
+  }
 }
 
 dokkaHtml.configure {

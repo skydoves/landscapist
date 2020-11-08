@@ -1,26 +1,31 @@
 plugins {
   id 'com.android.library'
   id 'kotlin-android'
+  id 'org.jetbrains.dokka'
 }
 
 apply from: '../dependencies.gradle'
 
 android {
   compileSdkVersion versions.compileSdk
+
   defaultConfig {
     minSdkVersion versions.minSdk
     targetSdkVersion versions.compileSdk
     versionCode versions.versionCode
     versionName versions.versionName
   }
+
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
   }
+
   composeOptions {
     kotlinCompilerVersion versions.kotlin
     kotlinCompilerExtensionVersion versions.composeVersion
   }
+
   kotlinOptions {
     jvmTarget = '1.8'
     freeCompilerArgs += "-Xallow-jvm-ir-dependencies"
@@ -28,10 +33,15 @@ android {
     freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     useIR = true
   }
+
   buildFeatures {
     buildConfig false
     compose true
   }
+}
+
+kotlin {
+  explicitApi()
 }
 
 dependencies {
@@ -39,6 +49,20 @@ dependencies {
   implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
   implementation "androidx.compose.foundation:foundation:$versions.composeVersion"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutinesVersion"
+}
+
+afterEvaluate {
+  tasks.withType(org.jetbrains.dokka.gradle.DokkaTask).configureEach {
+    outputDirectory.set(rootProject.file('docs/api'))
+  }
+}
+
+dokkaHtml.configure {
+  dokkaSourceSets {
+    named("main") {
+      noAndroidSdkLink.set(false)
+    }
+  }
 }
 
 tasks.withType(Javadoc).all { enabled = false }
