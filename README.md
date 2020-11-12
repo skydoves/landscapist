@@ -28,7 +28,7 @@
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.0.8"
+    implementation "com.github.skydoves:landscapist-glide:1.0.9"
 }
 ```
 
