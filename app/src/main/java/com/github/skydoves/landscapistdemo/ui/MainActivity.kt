@@ -18,11 +18,11 @@ package com.github.skydoves.landscapistdemo.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable

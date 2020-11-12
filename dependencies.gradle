@@ -12,7 +12,7 @@ ext.versions = [
 
     kotlin           : '1.4.10',
     coreKtxVersion   : '1.5.0-alpha04',
-    composeVersion   : '1.0.0-alpha06',
+    composeVersion   : '1.0.0-alpha07',
     coroutinesVersion: '1.4.0',
 
     frescoVersion    : '2.3.0',
