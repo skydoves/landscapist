@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:JvmName("Shimmer")
+@file:JvmMultifileClass
+
 package com.skydoves.landscapist
 
 import android.graphics.Matrix
