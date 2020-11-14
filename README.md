@@ -220,6 +220,20 @@ We can give a shimmering effect when loading images using a `ShimmerParams`. We 
  })
  ```
 
+ ### CoilImageLoaderAmbient
+ We can provide the same instance of the `ImageLoader` in the composable hierarchy.
+ ```kotlin
+ val imageLoader = ImageLoader.Builder(context)
+    // customize the ImageLoader as needed
+    .build()
+Providers(CoilImageLoaderAmbient provides imageLoader) {
+   // This will automatically use the value of current imageLoader in the hierarchy.
+   CoilImage(
+     imageModel = ...
+   )
+ }
+ ```
+
 <div class="header">
   <a href="https://github.com/facebook/fresco" target="_blank"> <img src="https://user-images.githubusercontent.com/24237865/95545540-1cf27f00-0a39-11eb-9e84-96b9df81364b.png" align="left" width="4%" alt="Fresco" /></a>
   <h1>Fresco</h1>
