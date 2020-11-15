@@ -58,66 +58,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  *     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *     .thumbnail(0.6f)
  *     .transition(withCrossFade()),
- *   circularRevealedEnabled = true,
- *   shimmerParams = ShimmerParams (
- *      baseColor = backgroundColor,
- *      highlightColor = highlightColor
- *   ),
- *   error = imageResource(R.drawable.error)
- * )
- * ```
- */
-@Composable
-fun GlideImage(
-  imageModel: Any,
-  requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
-  modifier: Modifier = Modifier.fillMaxWidth(),
-  alignment: Alignment = Alignment.Center,
-  contentScale: ContentScale = ContentScale.Crop,
-  alpha: Float = DefaultAlpha,
-  colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
-  shimmerParams: ShimmerParams,
-  error: ImageAsset? = null
-) {
-  GlideImage(
-    imageModel = imageModel,
-    requestBuilder = requestBuilder,
-    modifier = modifier,
-    alignment = alignment,
-    contentScale = contentScale,
-    colorFilter = colorFilter,
-    alpha = alpha,
-    circularRevealedEnabled = circularRevealedEnabled,
-    circularRevealedDuration = circularRevealedDuration,
-    shimmerParams = shimmerParams,
-    failure = {
-      error?.let {
-        Image(
-          asset = it,
-          alignment = alignment,
-          contentScale = contentScale,
-          colorFilter = colorFilter,
-          alpha = alpha
-        )
-      }
-    }
-  )
-}
-
-/**
- * Requests loading an image with a loading placeholder and error imageAsset.
- *
- * ```
- * GlideImage(
- *   imageModel = imageUrl,
- *   requestBuilder = Glide
- *     .with(ContextAmbient.current)
- *     .asBitmap()
- *     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
- *     .thumbnail(0.6f)
- *     .transition(withCrossFade()),
  *   placeHolder = imageResource(R.drawable.placeholder),
  *   error = imageResource(R.drawable.error)
  * )
@@ -127,6 +67,8 @@ fun GlideImage(
 fun GlideImage(
   imageModel: Any,
   requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
+  requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
+  transitionOptions: BitmapTransitionOptions = withCrossFade(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -140,6 +82,8 @@ fun GlideImage(
   GlideImage(
     imageModel = imageModel,
     requestBuilder = requestBuilder,
+    requestOptions = requestOptions,
+    transitionOptions = transitionOptions,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -173,24 +117,30 @@ fun GlideImage(
 }
 
 /**
- * Requests loading an image and create some composables based on [GlideImageState].
+ * Requests loading an image with a loading placeholder and error imageAsset.
  *
  * ```
  * GlideImage(
- * imageModel = imageUrl,
- * modifier = modifier,
- * shimmerParams = ShimmerParams (
- *  baseColor = backgroundColor,
- *  highlightColor = highlightColor
- * ),
- * failure = {
- *   Text(text = "image request failed.")
- * })
+ *   imageModel = imageUrl,
+ *   requestBuilder = Glide
+ *     .with(ContextAmbient.current)
+ *     .asBitmap()
+ *     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
+ *     .thumbnail(0.6f)
+ *     .transition(withCrossFade()),
+ *   circularRevealedEnabled = true,
+ *   shimmerParams = ShimmerParams (
+ *      baseColor = backgroundColor,
+ *      highlightColor = highlightColor
+ *   ),
+ *   error = imageResource(R.drawable.error)
+ * )
  * ```
  */
 @Composable
 fun GlideImage(
   imageModel: Any,
+  requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
   transitionOptions: BitmapTransitionOptions = withCrossFade(),
   modifier: Modifier = Modifier.fillMaxWidth(),
@@ -201,89 +151,32 @@ fun GlideImage(
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   shimmerParams: ShimmerParams,
-  success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
+  error: ImageAsset? = null
 ) {
   GlideImage(
     imageModel = imageModel,
-    requestBuilder = Glide
-      .with(ContextAmbient.current)
-      .asBitmap()
-      .apply(requestOptions)
-      .transition(transitionOptions),
+    requestBuilder = requestBuilder,
+    requestOptions = requestOptions,
+    transitionOptions = transitionOptions,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
-    alpha = alpha,
     colorFilter = colorFilter,
+    alpha = alpha,
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
     shimmerParams = shimmerParams,
-    success = success,
-    failure = failure
-  )
-}
-
-/**
- * Requests loading an image and create some composables based on [GlideImageState].
- *
- * ```
- * GlideImage(
- * imageModel = imageUrl,
- * modifier = modifier,
- * loading = {
- *   ConstraintLayout(
- *     modifier = Modifier.fillMaxSize()
- *   ) {
- *     val indicator = createRef()
- *     CircularProgressIndicator(
- *       modifier = Modifier.constrainAs(indicator) {
- *         top.linkTo(parent.top)
- *         bottom.linkTo(parent.bottom)
- *        start.linkTo(parent.start)
- *        end.linkTo(parent.end)
- *       }
- *     )
- *   }
- * },
- * failure = {
- *   Text(text = "image request failed.")
- * })
- * ```
- */
-@Composable
-fun GlideImage(
-  imageModel: Any,
-  requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
-  transitionOptions: BitmapTransitionOptions = withCrossFade(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
-  alignment: Alignment = Alignment.Center,
-  contentScale: ContentScale = ContentScale.Crop,
-  alpha: Float = DefaultAlpha,
-  colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
-  loading: @Composable ((imageState: GlideImageState.Loading) -> Unit)? = null,
-  success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
-) {
-  GlideImage(
-    imageModel = imageModel,
-    requestBuilder = Glide
-      .with(ContextAmbient.current)
-      .asBitmap()
-      .apply(requestOptions)
-      .transition(transitionOptions),
-    modifier = modifier,
-    alignment = alignment,
-    contentScale = contentScale,
-    alpha = alpha,
-    colorFilter = colorFilter,
-    circularRevealedEnabled = circularRevealedEnabled,
-    circularRevealedDuration = circularRevealedDuration,
-    loading = loading,
-    success = success,
-    failure = failure
+    failure = {
+      error?.let {
+        Image(
+          asset = it,
+          alignment = alignment,
+          contentScale = contentScale,
+          colorFilter = colorFilter,
+          alpha = alpha
+        )
+      }
+    }
   )
 }
 
@@ -313,6 +206,8 @@ fun GlideImage(
 fun GlideImage(
   imageModel: Any,
   requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
+  requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
+  transitionOptions: BitmapTransitionOptions = withCrossFade(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -325,7 +220,10 @@ fun GlideImage(
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   GlideImage(
-    builder = requestBuilder.load(imageModel),
+    builder = requestBuilder
+      .apply(requestOptions)
+      .transition(transitionOptions)
+      .load(imageModel),
     modifier = modifier,
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
@@ -395,6 +293,8 @@ fun GlideImage(
 fun GlideImage(
   imageModel: Any,
   requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
+  requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
+  transitionOptions: BitmapTransitionOptions = withCrossFade(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -407,7 +307,10 @@ fun GlideImage(
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   GlideImage(
-    builder = requestBuilder.load(imageModel),
+    builder = requestBuilder
+      .apply(requestOptions)
+      .transition(transitionOptions)
+      .load(imageModel),
     modifier = modifier,
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
