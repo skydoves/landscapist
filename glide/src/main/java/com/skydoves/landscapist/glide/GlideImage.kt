@@ -187,7 +187,7 @@ fun GlideImage(
 @Composable
 fun GlideImage(
   imageModel: Any,
-  requestOptions: RequestOptions = RequestOptions(),
+  requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
   transitionOptions: BitmapTransitionOptions = withCrossFade(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
@@ -250,7 +250,7 @@ fun GlideImage(
 @Composable
 fun GlideImage(
   imageModel: Any,
-  requestOptions: RequestOptions = RequestOptions(),
+  requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
   transitionOptions: BitmapTransitionOptions = withCrossFade(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
