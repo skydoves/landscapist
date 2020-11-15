@@ -49,10 +49,11 @@ object GlideAmbientProvider {
 
   /** Returns the current or default [RequestBuilder] for the `GlideImage` parameter. */
   @Composable
-  fun getGlideRequestBuilder(): RequestBuilder<Bitmap> {
+  fun getGlideRequestBuilder(imageModel: Any): RequestBuilder<Bitmap> {
     return GlideRequestBuilderAmbient.current
       ?: Glide
         .with(ContextAmbient.current)
         .asBitmap()
+        .load(imageModel)
   }
 }

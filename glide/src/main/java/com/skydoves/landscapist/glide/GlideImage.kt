@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-@file:Suppress("unused")
-@file:JvmName("GlideImage")
 @file:JvmMultifileClass
+@file:JvmName("GlideImage")
+@file:Suppress("unused")
 
 package com.skydoves.landscapist.glide
 
@@ -70,7 +70,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 @Composable
 fun GlideImage(
   imageModel: Any,
-  requestBuilder: RequestBuilder<Bitmap>,
+  requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -126,7 +126,7 @@ fun GlideImage(
 @Composable
 fun GlideImage(
   imageModel: Any,
-  requestBuilder: RequestBuilder<Bitmap>,
+  requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -312,7 +312,7 @@ fun GlideImage(
 @Composable
 fun GlideImage(
   imageModel: Any,
-  requestBuilder: RequestBuilder<Bitmap>,
+  requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -394,7 +394,7 @@ fun GlideImage(
 @Composable
 fun GlideImage(
   imageModel: Any,
-  requestBuilder: RequestBuilder<Bitmap>,
+  requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
