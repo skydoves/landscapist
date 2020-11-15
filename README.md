@@ -373,6 +373,27 @@ FrescoImage(
     })
 ```
 
+#### FrescoImageRequestAmbient
+We can provide the same instance of the `ImageRequest` in the composable hierarchy.
+```kotlin
+// customize the ImageRequest as needed
+val imageRequest = ImageRequestBuilder
+  .newBuilderWithSource(uri)
+  .setImageDecodeOptions(decodeOptions)
+  .setLocalThumbnailPreviewsEnabled(true)
+  .setLowestPermittedRequestLevel(RequestLevel.FULL_FETCH)
+  .setProgressiveRenderingEnabled(false)
+  .setResizeOptions(ResizeOptions(width, height))
+  .build()
+
+Providers(FrescoImageRequestAmbient provides imageRequest) {
+  // This will automatically use the value of current ImageRequest in the hierarchy.
+  FrescoImage(
+    imageurl = ...
+  )
+}
+```
+
 ## Find this repository useful? :heart:
 Support it by joining __[stargazers](https://github.com/skydoves/Landscapist/stargazers)__ for this repository. :star: <br>
 And __[follow](https://github.com/skydoves)__ me for my next creations! 🤩
