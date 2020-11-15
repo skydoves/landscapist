@@ -51,10 +51,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  *
  * ```
  * GlideImage(
+ *   imageModel = imageUrl,
  *   requestBuilder = Glide
  *     .with(ContextAmbient.current)
  *     .asBitmap()
- *     .load(poster.poster)
  *     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *     .thumbnail(0.6f)
  *     .transition(withCrossFade()),
@@ -69,6 +69,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  */
 @Composable
 fun GlideImage(
+  imageModel: Any,
   requestBuilder: RequestBuilder<Bitmap>,
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
@@ -81,6 +82,7 @@ fun GlideImage(
   error: ImageAsset? = null
 ) {
   GlideImage(
+    imageModel = imageModel,
     requestBuilder = requestBuilder,
     modifier = modifier,
     alignment = alignment,
@@ -109,10 +111,10 @@ fun GlideImage(
  *
  * ```
  * GlideImage(
+ *   imageModel = imageUrl,
  *   requestBuilder = Glide
  *     .with(ContextAmbient.current)
  *     .asBitmap()
- *     .load(poster.poster)
  *     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *     .thumbnail(0.6f)
  *     .transition(withCrossFade()),
@@ -123,6 +125,7 @@ fun GlideImage(
  */
 @Composable
 fun GlideImage(
+  imageModel: Any,
   requestBuilder: RequestBuilder<Bitmap>,
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
@@ -135,6 +138,7 @@ fun GlideImage(
   error: ImageAsset? = null
 ) {
   GlideImage(
+    imageModel = imageModel,
     requestBuilder = requestBuilder,
     modifier = modifier,
     alignment = alignment,
@@ -201,12 +205,12 @@ fun GlideImage(
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   GlideImage(
+    imageModel = imageModel,
     requestBuilder = Glide
       .with(ContextAmbient.current)
       .asBitmap()
       .apply(requestOptions)
-      .transition(transitionOptions)
-      .load(imageModel),
+      .transition(transitionOptions),
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -264,12 +268,12 @@ fun GlideImage(
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   GlideImage(
+    imageModel = imageModel,
     requestBuilder = Glide
       .with(ContextAmbient.current)
       .asBitmap()
       .apply(requestOptions)
-      .transition(transitionOptions)
-      .load(imageModel),
+      .transition(transitionOptions),
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -288,10 +292,10 @@ fun GlideImage(
  *
  * ```
  * GlideImage(
+ * imageModel = imageUrl,
  * requestBuilder = Glide
  *   .with(ContextAmbient.current)
  *   .asBitmap()
- *   .load(poster.poster)
  *   .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *   .thumbnail(0.6f)
  *   .transition(withCrossFade()),
@@ -307,6 +311,7 @@ fun GlideImage(
  */
 @Composable
 fun GlideImage(
+  imageModel: Any,
   requestBuilder: RequestBuilder<Bitmap>,
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
@@ -320,7 +325,7 @@ fun GlideImage(
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   GlideImage(
-    builder = requestBuilder,
+    builder = requestBuilder.load(imageModel),
     modifier = modifier,
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
@@ -358,10 +363,10 @@ fun GlideImage(
  *
  * ```
  * GlideImage(
+ * imageModel = imageUrl,
  * requestBuilder = Glide
  *   .with(ContextAmbient.current)
  *   .asBitmap()
- *   .load(poster.poster)
  *   .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *   .thumbnail(0.6f)
  *   .transition(withCrossFade()),
@@ -388,6 +393,7 @@ fun GlideImage(
  */
 @Composable
 fun GlideImage(
+  imageModel: Any,
   requestBuilder: RequestBuilder<Bitmap>,
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
@@ -401,7 +407,7 @@ fun GlideImage(
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   GlideImage(
-    builder = requestBuilder,
+    builder = requestBuilder.load(imageModel),
     modifier = modifier,
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
