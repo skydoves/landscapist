@@ -33,7 +33,7 @@ object FrescoAmbientProvider {
 
   /** Returns the current or default [ImageRequest] for the `FrescoImage` parameter. */
   @Composable
-  fun getFrescoImageRequest(imageUrl: String): ImageRequest {
+  fun getFrescoImageRequest(imageUrl: String?): ImageRequest {
     return FrescoImageRequestAmbient.current
       ?: ImageRequestBuilder.newBuilderWithSource(Uri.parse(imageUrl)).build()
   }

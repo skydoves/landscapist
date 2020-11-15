@@ -20,7 +20,6 @@
 
 package com.skydoves.landscapist.fresco
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -34,7 +33,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ContextAmbient
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
-import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageLoad
@@ -58,7 +56,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 @Composable
 fun FrescoImage(
   imageUrl: String?,
-  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
+  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -110,7 +108,7 @@ fun FrescoImage(
 @Composable
 fun FrescoImage(
   imageUrl: String?,
-  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
+  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -177,7 +175,7 @@ fun FrescoImage(
 @Composable
 fun FrescoImage(
   imageUrl: String?,
-  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
+  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -255,7 +253,7 @@ fun FrescoImage(
 @Composable
 fun FrescoImage(
   imageUrl: String?,
-  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
+  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -341,7 +339,3 @@ private fun FrescoImage(
     content = content
   )
 }
-
-private inline val String?.defaultImageRequest: ImageRequest
-  @JvmName("defaultImageRequest")
-  get() = ImageRequestBuilder.newBuilderWithSource(Uri.parse(this)).build()
