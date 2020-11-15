@@ -21,7 +21,7 @@ package com.skydoves.landscapist.glide
 import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticAmbientOf
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.ViewAmbient
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
@@ -52,7 +52,7 @@ object GlideAmbientProvider {
   fun getGlideRequestBuilder(imageModel: Any): RequestBuilder<Bitmap> {
     return GlideRequestBuilderAmbient.current
       ?: Glide
-        .with(ContextAmbient.current)
+        .with(ViewAmbient.current)
         .asBitmap()
         .load(imageModel)
   }

@@ -18,8 +18,11 @@ package com.skydoves.landscapist.glide
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsDisplayed
@@ -28,6 +31,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
+import com.bumptech.glide.Glide
+import com.skydoves.landscapist.ShimmerParams
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.notNullValue
@@ -36,6 +41,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(JUnit4::class)
@@ -54,6 +61,62 @@ class GlideImageTest {
           .testTag(TAG_GLIDE),
         contentScale = ContentScale.Crop
       )
+    }
+
+    composeTestRule.onNodeWithTag(TAG_GLIDE)
+      .assertIsDisplayed()
+      .assertWidthIsAtLeast(128.dp)
+      .assertHeightIsAtLeast(128.dp)
+  }
+
+  @Test
+  fun requestSuccess_shimmer_withoutComposables() {
+    composeTestRule.setContent {
+      GlideImage(
+        imageModel = IMAGE,
+        modifier = Modifier
+          .preferredSize(128.dp, 128.dp)
+          .testTag(TAG_GLIDE),
+        circularRevealedEnabled = true,
+        shimmerParams = ShimmerParams(
+          baseColor = Color.DarkGray,
+          highlightColor = Color.LightGray
+        ),
+        contentScale = ContentScale.Crop
+      )
+    }
+
+    composeTestRule.onNodeWithTag(TAG_GLIDE)
+      .assertIsDisplayed()
+      .assertWidthIsAtLeast(128.dp)
+      .assertHeightIsAtLeast(128.dp)
+  }
+
+  @Test
+  fun requestSuccess_requestBuilder_ambient() {
+    val latch = CountDownLatch(1)
+    composeTestRule.setContent {
+      val glide = Glide.with(ViewAmbient.current).asBitmap()
+        .addListener(
+          TestRequestListener {
+            latch.countDown()
+          }
+        )
+
+      Providers(GlideRequestBuilderAmbient provides glide) {
+        GlideImage(
+          imageModel = IMAGE,
+          modifier = Modifier
+            .preferredSize(128.dp, 128.dp)
+            .testTag(TAG_GLIDE),
+          contentScale = ContentScale.Crop
+        )
+      }
+
+      // Wait for the onRequestCompleted to release the latch
+      latch.await(5, TimeUnit.SECONDS)
+
+      assertThat(latch.count, `is`(1))
     }
 
     composeTestRule.onNodeWithTag(TAG_GLIDE)
