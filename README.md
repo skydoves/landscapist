@@ -68,11 +68,10 @@ GlideImage(
 Also we can request image by passing a [RequestBuilder](https://bumptech.github.io/glide/doc/options.html#requestbuilder). RequestBuilder is the backbone of the request in Glide and is responsible for bringing your options together with your requested url or model to start a new load.
 ```kotlin
 GlideImage(
-  requestBuilder =
-  Glide
-    .with(ContextAmbient.current)
+  imageModel = poster.poster,
+  requestBuilder = Glide
+    .with(ViewAmbient.current)
     .asBitmap()
-    .load(poster.poster)
     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
     .thumbnail(0.1f)
     .transition(withCrossFade()),
@@ -81,6 +80,23 @@ GlideImage(
     top.linkTo(parent.top)
   }.aspectRatio(0.8f)
 )
+```
+
+#### GlideRequestBuilderAmbient
+We can provide the same instance of the `RequestBuilder` in the composable hierarchy.
+```kotlin
+// customize the RequestBuilder as needed
+val requestBuilder = Glide.with(ViewAmbient.current)
+  .asBitmap()
+  .thumbnail(0.1f)
+  .transition(BitmapTransitionOptions.withCrossFade())
+
+Providers(GlideRequestBuilderAmbient provides requestBuilder) {
+  // This will automatically use the value of current RequestBuilder in the hierarchy.
+  GlideImage(
+    imageModel = ...
+  )
+}
 ```
 
 <img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="32%"/>

@@ -32,6 +32,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
 import com.skydoves.landscapist.ShimmerParams
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.instanceOf
@@ -96,7 +97,10 @@ class GlideImageTest {
   fun requestSuccess_requestBuilder_ambient() {
     val latch = CountDownLatch(1)
     composeTestRule.setContent {
-      val glide = Glide.with(ViewAmbient.current).asBitmap()
+      val glide = Glide.with(ViewAmbient.current)
+        .asBitmap()
+        .thumbnail(0.1f)
+        .transition(BitmapTransitionOptions.withCrossFade())
         .addListener(
           TestRequestListener {
             latch.countDown()
@@ -113,7 +117,7 @@ class GlideImageTest {
         )
       }
 
-      // Wait for the onRequestCompleted to release the latch
+      // wait for the onRequestCompleted to release the latch
       latch.await(5, TimeUnit.SECONDS)
 
       assertThat(latch.count, `is`(1))
