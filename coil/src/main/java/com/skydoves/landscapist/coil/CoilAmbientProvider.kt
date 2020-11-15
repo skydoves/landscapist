@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:JvmName("CoilImageLoaderAmbient")
-@file:JvmMultifileClass
 @file:Suppress("unused")
 
 package com.skydoves.landscapist.coil
@@ -32,7 +30,7 @@ import coil.imageLoader
  */
 val CoilImageLoaderAmbient = staticAmbientOf<ImageLoader?> { null }
 
-/** A provider for taking the ambient instances related to the [ImageLoader]. */
+/** A provider for taking the ambient instances related to the `CoilImage`. */
 object CoilAmbientProvider {
 
   /** Returns the current or default [ImageLoader] for the `ColiImage` parameter. */
