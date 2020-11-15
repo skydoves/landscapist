@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:JvmName("GlideAmbientProvider")
-@file:JvmMultifileClass
 @file:Suppress("unused")
 
 package com.skydoves.landscapist.glide
