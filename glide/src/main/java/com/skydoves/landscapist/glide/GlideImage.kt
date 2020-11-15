@@ -34,8 +34,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ContextAmbient
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
-import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
-import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade
 import com.bumptech.glide.request.RequestOptions
 import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
@@ -68,7 +66,6 @@ fun GlideImage(
   imageModel: Any,
   requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
-  transitionOptions: BitmapTransitionOptions = withCrossFade(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -83,7 +80,6 @@ fun GlideImage(
     imageModel = imageModel,
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
-    transitionOptions = transitionOptions,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -142,7 +138,6 @@ fun GlideImage(
   imageModel: Any,
   requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
-  transitionOptions: BitmapTransitionOptions = withCrossFade(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -157,7 +152,6 @@ fun GlideImage(
     imageModel = imageModel,
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
-    transitionOptions = transitionOptions,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -207,7 +201,6 @@ fun GlideImage(
   imageModel: Any,
   requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
-  transitionOptions: BitmapTransitionOptions = withCrossFade(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -222,7 +215,6 @@ fun GlideImage(
   GlideImage(
     builder = requestBuilder
       .apply(requestOptions)
-      .transition(transitionOptions)
       .load(imageModel),
     modifier = modifier,
   ) { imageState ->
@@ -294,7 +286,6 @@ fun GlideImage(
   imageModel: Any,
   requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
-  transitionOptions: BitmapTransitionOptions = withCrossFade(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -309,7 +300,6 @@ fun GlideImage(
   GlideImage(
     builder = requestBuilder
       .apply(requestOptions)
-      .transition(transitionOptions)
       .load(imageModel),
     modifier = modifier,
   ) { imageState ->
