@@ -38,7 +38,6 @@ import androidx.compose.ui.platform.LifecycleOwnerAmbient
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import coil.ImageLoader
-import coil.imageLoader
 import coil.request.Disposable
 import coil.request.ImageRequest
 import com.skydoves.landscapist.CircularRevealedImage
@@ -388,7 +387,7 @@ fun CoilImage(
 @Composable
 fun CoilImage(
   imageRequest: ImageRequest,
-  imageLoader: ImageLoader = ContextAmbient.current.imageLoader,
+  imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -483,7 +482,7 @@ fun CoilImage(
 @Composable
 fun CoilImage(
   imageRequest: ImageRequest,
-  imageLoader: ImageLoader = ContextAmbient.current.imageLoader,
+  imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -551,7 +550,7 @@ fun CoilImage(
 @OptIn(ExperimentalCoroutinesApi::class)
 fun CoilImage(
   request: ImageRequest,
-  imageLoader: ImageLoader = ContextAmbient.current.imageLoader,
+  imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   modifier: Modifier = Modifier.fillMaxWidth(),
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
