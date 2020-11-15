@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@file:JvmName("CoilImageLoaderAmbient")
+@file:JvmName("CoilAmbientProvider")
 @file:JvmMultifileClass
 @file:Suppress("unused")
 

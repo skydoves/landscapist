@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-@file:JvmName("GlideRequestOptionsAmbient")
+@file:JvmName("GlideAmbientProvider")
 @file:JvmMultifileClass
 @file:Suppress("unused")
 
 package com.skydoves.landscapist.glide
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.ui.platform.ContextAmbient
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
 
 /**
@@ -30,6 +34,12 @@ import com.bumptech.glide.request.RequestOptions
  */
 val GlideRequestOptionsAmbient = staticAmbientOf<RequestOptions?> { null }
 
+/**
+ * Ambient containing the preferred [RequestBuilder] for providing the same instance
+ * in our composable hierarchy.
+ */
+val GlideRequestBuilderAmbient = staticAmbientOf<RequestBuilder<Bitmap>?> { null }
+
 /** A provider for taking the ambient instances related to the `GlideImage`. */
 object GlideAmbientProvider {
 
@@ -37,5 +47,14 @@ object GlideAmbientProvider {
   @Composable
   fun getGlideRequestOptions(): RequestOptions {
     return GlideRequestOptionsAmbient.current ?: RequestOptions()
+  }
+
+  /** Returns the current or default [RequestBuilder] for the `GlideImage` parameter. */
+  @Composable
+  fun getGlideRequestBuilder(): RequestBuilder<Bitmap> {
+    return GlideRequestBuilderAmbient.current
+      ?: Glide
+        .with(ContextAmbient.current)
+        .asBitmap()
   }
 }
