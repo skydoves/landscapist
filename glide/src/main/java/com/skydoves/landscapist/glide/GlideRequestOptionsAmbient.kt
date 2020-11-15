@@ -14,30 +14,28 @@
  * limitations under the License.
  */
 
-@file:JvmName("CoilImageLoaderAmbient")
+@file:JvmName("GlideRequestOptionsAmbient")
 @file:JvmMultifileClass
 @file:Suppress("unused")
 
-package com.skydoves.landscapist.coil
+package com.skydoves.landscapist.glide
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticAmbientOf
-import androidx.compose.ui.platform.ContextAmbient
-import coil.ImageLoader
-import coil.imageLoader
+import com.bumptech.glide.request.RequestOptions
 
 /**
- * Ambient containing the preferred [ImageLoader] for providing the same instance
+ * Ambient containing the preferred [RequestOptions] for providing the same instance
  * in our composable hierarchy.
  */
-val CoilImageLoaderAmbient = staticAmbientOf<ImageLoader?> { null }
+val GlideRequestOptionsAmbient = staticAmbientOf<RequestOptions?> { null }
 
-/** A provider for taking the ambient instances related to the `CoilImage`. */
-object CoilAmbientProvider {
+/** A provider for taking the ambient instances related to the `GlideImage`. */
+object GlideAmbientProvider {
 
-  /** Returns the current or default [ImageLoader] for the `ColiImage` parameter. */
+  /** Returns the current or default [RequestOptions] for the `GlideImage` parameter. */
   @Composable
-  fun getCoilImageLoader(): ImageLoader {
-    return CoilImageLoaderAmbient.current ?: ContextAmbient.current.imageLoader
+  fun getGlideRequestOptions(): RequestOptions {
+    return GlideRequestOptionsAmbient.current ?: RequestOptions()
   }
 }
