@@ -29,7 +29,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
 val FrescoImageRequestAmbient = staticAmbientOf<ImageRequest?> { null }
 
 /** A provider for taking the ambient instances related to the `FrescoImage`. */
-object FrescoAmbientProvider {
+internal object FrescoAmbientProvider {
 
   /** Returns the current or default [ImageRequest] for the `FrescoImage` parameter. */
   @Composable

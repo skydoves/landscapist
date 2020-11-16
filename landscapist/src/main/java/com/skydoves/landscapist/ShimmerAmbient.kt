@@ -31,7 +31,7 @@ import com.skydoves.landscapist.ShimmerAmbientProvider.defaultShimmerParams
 val ShimmerParamsAmbient = ambientOf { defaultShimmerParams() }
 
 /** A provider for taking the ambient instances related to the [Shimmer]. */
-object ShimmerAmbientProvider {
+internal object ShimmerAmbientProvider {
 
   /** Returns the current or default [ShimmerParams] for the `shimmerParams` parameter. */
   fun defaultShimmerParams(): ShimmerParams {

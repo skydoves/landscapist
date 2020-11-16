@@ -37,7 +37,7 @@ val GlideRequestOptionsAmbient = staticAmbientOf<RequestOptions?> { null }
 val GlideRequestBuilderAmbient = staticAmbientOf<RequestBuilder<Bitmap>?> { null }
 
 /** A provider for taking the ambient instances related to the `GlideImage`. */
-object GlideAmbientProvider {
+internal object GlideAmbientProvider {
 
   /** Returns the current or default [RequestOptions] for the `GlideImage` parameter. */
   @Composable

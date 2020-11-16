@@ -33,7 +33,7 @@ object CoilAmbientProvider {
 
   /** Returns the current or default [ImageLoader] for the `ColiImage` parameter. */
   @Composable
-  fun getCoilImageLoader(): ImageLoader {
+  internal fun getCoilImageLoader(): ImageLoader {
     return CoilImageLoaderAmbient.current ?: ContextAmbient.current.imageLoader
   }
 }
