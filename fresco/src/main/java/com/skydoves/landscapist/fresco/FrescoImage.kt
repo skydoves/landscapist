@@ -64,7 +64,7 @@ fun FrescoImage(
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
-  shimmerParams: ShimmerParams,
+  placeHolder: ImageAsset? = null,
   error: ImageAsset? = null,
   observeLoadingProcess: Boolean = false
 ) {
@@ -79,7 +79,17 @@ fun FrescoImage(
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
     observeLoadingProcess = observeLoadingProcess,
-    shimmerParams = shimmerParams,
+    loading = {
+      placeHolder?.let {
+        Image(
+          asset = it,
+          alignment = alignment,
+          contentScale = contentScale,
+          colorFilter = colorFilter,
+          alpha = alpha
+        )
+      }
+    },
     failure = {
       error?.let {
         Image(
@@ -116,7 +126,7 @@ fun FrescoImage(
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
-  placeHolder: ImageAsset? = null,
+  shimmerParams: ShimmerParams,
   error: ImageAsset? = null,
   observeLoadingProcess: Boolean = false
 ) {
@@ -131,17 +141,7 @@ fun FrescoImage(
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
     observeLoadingProcess = observeLoadingProcess,
-    loading = {
-      placeHolder?.let {
-        Image(
-          asset = it,
-          alignment = alignment,
-          contentScale = contentScale,
-          colorFilter = colorFilter,
-          alpha = alpha
-        )
-      }
-    },
+    shimmerParams = shimmerParams,
     failure = {
       error?.let {
         Image(

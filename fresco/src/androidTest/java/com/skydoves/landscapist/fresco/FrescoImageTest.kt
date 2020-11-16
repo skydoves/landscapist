@@ -16,9 +16,12 @@
 
 package com.skydoves.landscapist.fresco
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsAtLeast
@@ -28,6 +31,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
+import com.facebook.imagepipeline.common.ResizeOptions
+import com.facebook.imagepipeline.request.ImageRequest
+import com.facebook.imagepipeline.request.ImageRequestBuilder
+import com.skydoves.landscapist.ShimmerParams
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.notNullValue
@@ -36,6 +43,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(JUnit4::class)
@@ -61,6 +70,58 @@ class FrescoImageTest {
       .assertIsDisplayed()
       .assertWidthIsAtLeast(128.dp)
       .assertHeightIsAtLeast(128.dp)
+  }
+
+  @Test
+  fun requestSuccess_shimmer_withoutComposables() {
+    composeTestRule.setContent {
+      FrescoImage(
+        imageUrl = IMAGE,
+        modifier = Modifier
+          .preferredSize(128.dp, 128.dp)
+          .testTag(TAG_FRESCO),
+        shimmerParams = ShimmerParams(
+          baseColor = Color.DarkGray,
+          highlightColor = Color.LightGray
+        ),
+        contentScale = ContentScale.Crop,
+        observeLoadingProcess = false
+      )
+    }
+
+    composeTestRule.onNodeWithTag(TAG_FRESCO)
+      .assertIsDisplayed()
+      .assertWidthIsAtLeast(128.dp)
+      .assertHeightIsAtLeast(128.dp)
+  }
+
+  @Test
+  fun requestSuccess_requestBuilder_ambient() {
+    val latch = CountDownLatch(1)
+    composeTestRule.setContent {
+      val imageRequest = ImageRequestBuilder
+        .newBuilderWithSource(Uri.parse(IMAGE))
+        .setLocalThumbnailPreviewsEnabled(true)
+        .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+        .setProgressiveRenderingEnabled(false)
+        .setResizeOptions(ResizeOptions(350, 350))
+        .build()
+
+      Providers(FrescoImageRequestAmbient provides imageRequest) {
+        FrescoImage(
+          imageUrl = IMAGE,
+          modifier = Modifier
+            .preferredSize(128.dp, 128.dp)
+            .testTag(TAG_FRESCO),
+          contentScale = ContentScale.Crop
+        )
+      }
+
+      // wait for the onRequestCompleted to release the latch
+      latch.await(5, TimeUnit.SECONDS)
+
+      assertThat(latch.count, `is`(1))
+    }
   }
 
   @Test
