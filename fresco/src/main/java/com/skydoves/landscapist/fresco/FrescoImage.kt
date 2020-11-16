@@ -52,6 +52,19 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  *   error = imageResource(R.drawable.error)
  * )
  * ```
+ *
+ * @param imageUrl The target url to request image.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
+ * used for the loaded [ImageAsset].
+ * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
+ * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param placeHolder An [ImageAsset] to be displayed when the request is in progress.
+ * @param error An [ImageAsset] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun FrescoImage(
@@ -114,6 +127,19 @@ fun FrescoImage(
  *   error = imageResource(R.drawable.error)
  * )
  * ```
+ *
+ * @param imageUrl The target url to request image.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
+ * used for the loaded [ImageAsset].
+ * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
+ * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
+ * @param error An [ImageAsset] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun FrescoImage(
@@ -171,6 +197,19 @@ fun FrescoImage(
  *   Text(text = "image request failed.")
  * })
  * ```
+ *
+ * @param imageUrl The target url to request image.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
+ * used for the loaded [ImageAsset].
+ * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
+ * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param success Content to be displayed when the request is succeeded.
+ * @param failure Content to be displayed when the request is failed.
  */
 @Composable
 fun FrescoImage(
@@ -249,6 +288,20 @@ fun FrescoImage(
  *   Text(text = "image request failed.")
  * })
  * ```
+ *
+ * @param imageUrl The target url to request image.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
+ * used for the loaded [ImageAsset].
+ * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
+ * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param loading Content to be displayed when the request is in progress.
+ * @param success Content to be displayed when the request is succeeded.
+ * @param failure Content to be displayed when the request is failed.
  */
 @Composable
 fun FrescoImage(
@@ -310,6 +363,10 @@ fun FrescoImage(
  *   }
  * }
  * ```
+ *
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param content Content to be displayed for the given state.
  */
 @Composable
 @OptIn(ExperimentalCoroutinesApi::class)
