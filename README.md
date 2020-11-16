@@ -15,6 +15,11 @@
 <img src="https://user-images.githubusercontent.com/24237865/95549795-de61c200-0a42-11eb-9ece-ac34346eb5e5.png" width="572" height="280"/>
 </p>
 
+## Usecase
+You can see the use cases of this library in the below repositories.
+- [DisneyCompose](https://github.com/skydoves/disneycompose) - 🧸 A demo Disney app using Jetpack Compose and Hilt based on modern Android tech-stacks and MVVM architecture.
+<br>
+
 <div class="header">
   <a href="https://github.com/bumptech/glide" target="_blank"> <img src="https://user-images.githubusercontent.com/24237865/95545537-1bc15200-0a39-11eb-883d-644f564da5d3.png" align="left" width="4%" alt="Glide" /></a>
   <h1>Glide</h1>
