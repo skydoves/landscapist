@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("unused")
-
 package com.skydoves.landscapist.glide
 
 import android.graphics.Bitmap

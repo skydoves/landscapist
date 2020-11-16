@@ -20,7 +20,6 @@
 
 package com.skydoves.landscapist.fresco
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -34,7 +33,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ContextAmbient
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
-import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageLoad
@@ -54,63 +52,24 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  *   error = imageResource(R.drawable.error)
  * )
  * ```
- */
-@Composable
-fun FrescoImage(
-  imageUrl: String?,
-  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
-  modifier: Modifier = Modifier.fillMaxWidth(),
-  alignment: Alignment = Alignment.Center,
-  contentScale: ContentScale = ContentScale.Crop,
-  alpha: Float = DefaultAlpha,
-  colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
-  shimmerParams: ShimmerParams,
-  error: ImageAsset? = null,
-  observeLoadingProcess: Boolean = false
-) {
-  FrescoImage(
-    imageUrl = imageUrl,
-    imageRequest = imageRequest,
-    modifier = modifier,
-    alignment = alignment,
-    contentScale = contentScale,
-    colorFilter = colorFilter,
-    alpha = alpha,
-    circularRevealedEnabled = circularRevealedEnabled,
-    circularRevealedDuration = circularRevealedDuration,
-    observeLoadingProcess = observeLoadingProcess,
-    shimmerParams = shimmerParams,
-    failure = {
-      error?.let {
-        Image(
-          asset = it,
-          alignment = alignment,
-          contentScale = contentScale,
-          colorFilter = colorFilter,
-          alpha = alpha,
-        )
-      }
-    }
-  )
-}
-
-/**
- * Requests loading an image with a loading placeholder and error imageAsset.
  *
- * ```
- * FrescoImage(
- *   imageUrl = stringImageUrl,
- *   placeHolder = imageResource(R.drawable.placeholder),
- *   error = imageResource(R.drawable.error)
- * )
- * ```
+ * @param imageUrl The target url to request image.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
+ * used for the loaded [ImageAsset].
+ * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
+ * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param placeHolder An [ImageAsset] to be displayed when the request is in progress.
+ * @param error An [ImageAsset] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun FrescoImage(
   imageUrl: String?,
-  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
+  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -159,6 +118,71 @@ fun FrescoImage(
 }
 
 /**
+ * Requests loading an image with a loading placeholder and error imageAsset.
+ *
+ * ```
+ * FrescoImage(
+ *   imageUrl = stringImageUrl,
+ *   placeHolder = imageResource(R.drawable.placeholder),
+ *   error = imageResource(R.drawable.error)
+ * )
+ * ```
+ *
+ * @param imageUrl The target url to request image.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
+ * used for the loaded [ImageAsset].
+ * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
+ * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
+ * @param error An [ImageAsset] for showing instead of the target image when images are failed to load.
+ */
+@Composable
+fun FrescoImage(
+  imageUrl: String?,
+  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
+  modifier: Modifier = Modifier.fillMaxWidth(),
+  alignment: Alignment = Alignment.Center,
+  contentScale: ContentScale = ContentScale.Crop,
+  alpha: Float = DefaultAlpha,
+  colorFilter: ColorFilter? = null,
+  circularRevealedEnabled: Boolean = false,
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  shimmerParams: ShimmerParams,
+  error: ImageAsset? = null,
+  observeLoadingProcess: Boolean = false
+) {
+  FrescoImage(
+    imageUrl = imageUrl,
+    imageRequest = imageRequest,
+    modifier = modifier,
+    alignment = alignment,
+    contentScale = contentScale,
+    colorFilter = colorFilter,
+    alpha = alpha,
+    circularRevealedEnabled = circularRevealedEnabled,
+    circularRevealedDuration = circularRevealedDuration,
+    observeLoadingProcess = observeLoadingProcess,
+    shimmerParams = shimmerParams,
+    failure = {
+      error?.let {
+        Image(
+          asset = it,
+          alignment = alignment,
+          contentScale = contentScale,
+          colorFilter = colorFilter,
+          alpha = alpha,
+        )
+      }
+    }
+  )
+}
+
+/**
  * Requests loading an image and create some composables based on [FrescoImageState].
  *
  * ```
@@ -173,11 +197,24 @@ fun FrescoImage(
  *   Text(text = "image request failed.")
  * })
  * ```
+ *
+ * @param imageUrl The target url to request image.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
+ * used for the loaded [ImageAsset].
+ * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
+ * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param success Content to be displayed when the request is succeeded.
+ * @param failure Content to be displayed when the request is failed.
  */
 @Composable
 fun FrescoImage(
   imageUrl: String?,
-  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
+  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -251,11 +288,25 @@ fun FrescoImage(
  *   Text(text = "image request failed.")
  * })
  * ```
+ *
+ * @param imageUrl The target url to request image.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
+ * used for the loaded [ImageAsset].
+ * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
+ * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param loading Content to be displayed when the request is in progress.
+ * @param success Content to be displayed when the request is succeeded.
+ * @param failure Content to be displayed when the request is failed.
  */
 @Composable
 fun FrescoImage(
   imageUrl: String?,
-  imageRequest: ImageRequest = imageUrl.defaultImageRequest,
+  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
   modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -312,6 +363,10 @@ fun FrescoImage(
  *   }
  * }
  * ```
+ *
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param content Content to be displayed for the given state.
  */
 @Composable
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -341,7 +396,3 @@ private fun FrescoImage(
     content = content
   )
 }
-
-private inline val String?.defaultImageRequest: ImageRequest
-  @JvmName("defaultImageRequest")
-  get() = ImageRequestBuilder.newBuilderWithSource(Uri.parse(this)).build()

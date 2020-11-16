@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package com.skydoves.landscapist.coil
+package com.skydoves.landscapist.fresco
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticAmbientOf
-import androidx.compose.ui.platform.ContextAmbient
-import coil.ImageLoader
-import coil.imageLoader
+import com.facebook.imagepipeline.request.ImageRequest
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 
 /**
- * Ambient containing the preferred [ImageLoader] for providing the same instance
+ * Ambient containing the preferred [ImageRequest] for providing the same instance
  * in our composable hierarchy.
  */
-val CoilImageLoaderAmbient = staticAmbientOf<ImageLoader?> { null }
+val FrescoImageRequestAmbient = staticAmbientOf<ImageRequest?> { null }
 
-/** A provider for taking the ambient instances related to the `CoilImage`. */
-object CoilAmbientProvider {
+/** A provider for taking the ambient instances related to the `FrescoImage`. */
+object FrescoAmbientProvider {
 
-  /** Returns the current or default [ImageLoader] for the `ColiImage` parameter. */
+  /** Returns the current or default [ImageRequest] for the `FrescoImage` parameter. */
   @Composable
-  fun getCoilImageLoader(): ImageLoader {
-    return CoilImageLoaderAmbient.current ?: ContextAmbient.current.imageLoader
+  fun getFrescoImageRequest(imageUrl: String?): ImageRequest {
+    return FrescoImageRequestAmbient.current
+      ?: ImageRequestBuilder.newBuilderWithSource(Uri.parse(imageUrl)).build()
   }
 }
