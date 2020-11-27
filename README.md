@@ -400,6 +400,11 @@ Providers(FrescoImageRequestAmbient provides imageRequest) {
 }
 ```
 
+## Reference repository
+This library is mostly inspired by [Accompanist](https://github.com/chrisbanes/accompanist). <br>
+
+Accompanist is a group of libraries that contains some utilities which I've found myself copying around projects which use Jetpack Compose. Currently, it contains image loading and insets. You can get more variety and recent systems from the library maintained by Google.
+
 ## Find this repository useful? :heart:
 Support it by joining __[stargazers](https://github.com/skydoves/Landscapist/stargazers)__ for this repository. :star: <br>
 And __[follow](https://github.com/skydoves)__ me for my next creations! 🤩
