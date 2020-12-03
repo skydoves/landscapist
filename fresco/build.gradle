@@ -67,8 +67,8 @@ dependencies {
   implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
   implementation "androidx.compose.foundation:foundation:$versions.composeVersion"
 
-  androidTestImplementation "androidx.ui:ui-test:$versions.composeVersion"
   androidTestImplementation "androidx.compose.ui:ui:$versions.composeVersion"
+  androidTestImplementation "androidx.compose.ui:ui-test-junit4:$versions.composeVersion"
   androidTestImplementation "androidx.test:rules:$versions.rulesVersion"
 }
 
