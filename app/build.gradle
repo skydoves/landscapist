@@ -34,9 +34,6 @@ android {
   buildFeatures {
     compose true
   }
-  androidExtensions {
-    experimental = true
-  }
 }
 
 dependencies {
