@@ -39,13 +39,15 @@ import coil.fetch.Fetcher
 import coil.request.ImageRequest
 import com.skydoves.landscapist.ShimmerParams
 import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 @LargeTest
 @RunWith(JUnit4::class)
@@ -99,13 +101,9 @@ class CoilImageTest {
     composeTestRule.setContent {
       CoilImage(
         imageModel = IMAGE,
-        modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
-          .testTag(TAG_COIL),
+        modifier = Modifier.preferredSize(128.dp, 128.dp).testTag(TAG_COIL),
         contentScale = ContentScale.Crop,
-        loading = {
-          Box(modifier = Modifier.testTag(TAG_PROGRESS))
-        }
+        loading = { Box(modifier = Modifier) }
       )
     }
 
@@ -122,8 +120,10 @@ class CoilImageTest {
     val latch = CountDownLatch(1)
 
     val eventListener = object : EventListener {
+      val startCalled = AtomicInteger()
+
       override fun fetchStart(request: ImageRequest, fetcher: Fetcher<*>, options: Options) {
-        latch.countDown()
+        startCalled.incrementAndGet()
       }
     }
 
@@ -132,16 +132,12 @@ class CoilImageTest {
       .build()
 
     composeTestRule.setContent {
-      Providers(CoilImageLoaderAmbient provides imageLoader) {
+      Providers(AmbientCoilImageLoader provides imageLoader) {
         CoilImage(
           imageModel = IMAGE,
-          modifier = Modifier
-            .preferredSize(128.dp, 128.dp)
-            .testTag(TAG_COIL),
+          modifier = Modifier.preferredSize(128.dp, 128.dp),
           contentScale = ContentScale.Crop,
-          loading = {
-            Box(modifier = Modifier.testTag(TAG_PROGRESS))
-          }
+          loading = { Box(modifier = Modifier) }
         )
       }
     }
@@ -149,10 +145,7 @@ class CoilImageTest {
     // wait for the onRequestCompleted to release the latch
     latch.await(5, TimeUnit.SECONDS)
 
-    composeTestRule.onNodeWithTag(TAG_COIL)
-      .assertIsDisplayed()
-      .assertWidthIsAtLeast(128.dp)
-      .assertHeightIsAtLeast(128.dp)
+    assertThat(eventListener.startCalled.get(), `is`(1))
   }
 
   @Test
@@ -168,7 +161,7 @@ class CoilImageTest {
         contentScale = ContentScale.Crop,
         success = {
           state.add(it)
-          MatcherAssert.assertThat(it.imageAsset, CoreMatchers.`is`(CoreMatchers.notNullValue()))
+          assertThat(it.imageBitmap, `is`(CoreMatchers.notNullValue()))
         },
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))
@@ -182,8 +175,8 @@ class CoilImageTest {
       .assertHeightIsAtLeast(128.dp)
 
     composeTestRule.runOnIdle {
-      MatcherAssert.assertThat(state.size, CoreMatchers.`is`(1))
-      MatcherAssert.assertThat(
+      assertThat(state.size, `is`(1))
+      assertThat(
         state[0],
         CoreMatchers.instanceOf(CoilImageState.Success::class.java)
       )
@@ -214,8 +207,8 @@ class CoilImageTest {
       .assertHeightIsAtLeast(128.dp)
 
     composeTestRule.runOnIdle {
-      MatcherAssert.assertThat(state.size, CoreMatchers.`is`(1))
-      MatcherAssert.assertThat(
+      assertThat(state.size, `is`(1))
+      assertThat(
         state[0],
         CoreMatchers.instanceOf(CoilImageState.Failure::class.java)
       )

@@ -26,7 +26,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
  * Ambient containing the preferred [ImageRequest] for providing the same instance
  * in our composable hierarchy.
  */
-val FrescoImageRequestAmbient = staticAmbientOf<ImageRequest?> { null }
+val AmbientFrescoImageRequest = staticAmbientOf<ImageRequest?> { null }
 
 /** A provider for taking the ambient instances related to the `FrescoImage`. */
 internal object FrescoAmbientProvider {
@@ -34,7 +34,7 @@ internal object FrescoAmbientProvider {
   /** Returns the current or default [ImageRequest] for the `FrescoImage` parameter. */
   @Composable
   fun getFrescoImageRequest(imageUrl: String?): ImageRequest {
-    return FrescoImageRequestAmbient.current
+    return AmbientFrescoImageRequest.current
       ?: ImageRequestBuilder.newBuilderWithSource(Uri.parse(imageUrl)).build()
   }
 }

@@ -42,10 +42,10 @@ import kotlin.math.ceil
 fun StaggeredVerticalGrid(
   modifier: Modifier = Modifier,
   maxColumnWidth: Dp,
-  children: @Composable () -> Unit
+  content: @Composable () -> Unit
 ) {
   Layout(
-    children = children,
+    content = content,
     modifier = modifier
   ) { measurables, constraints ->
     check(constraints.hasBoundedWidth) {

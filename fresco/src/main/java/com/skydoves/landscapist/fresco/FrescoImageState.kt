@@ -17,6 +17,7 @@
 package com.skydoves.landscapist.fresco
 
 import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
 import com.facebook.imagepipeline.image.CloseableImage
@@ -32,7 +33,7 @@ sealed class FrescoImageState {
   data class Loading(val progress: Float) : FrescoImageState()
 
   /** Request is completed successfully amd ready to use an [ImageAsset]. */
-  data class Success(val imageAsset: ImageAsset?) : FrescoImageState()
+  data class Success(val imageBitmap: ImageBitmap?) : FrescoImageState()
 
   /** Request failed. */
   data class Failure(val dataSource: DataSource<CloseableReference<CloseableImage>>?) :
@@ -45,7 +46,7 @@ fun ImageLoadState.toFrescoImageState(): FrescoImageState {
   return when (this) {
     is ImageLoadState.None -> FrescoImageState.None
     is ImageLoadState.Loading -> FrescoImageState.Loading(progress)
-    is ImageLoadState.Success -> FrescoImageState.Success(imageAsset)
+    is ImageLoadState.Success -> FrescoImageState.Success(imageBitmap)
     is ImageLoadState.Failure -> FrescoImageState.Failure(
       data as? DataSource<CloseableReference<CloseableImage>>
     )

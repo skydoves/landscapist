@@ -18,6 +18,7 @@ package com.skydoves.landscapist.glide
 
 import android.graphics.drawable.Drawable
 import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import com.skydoves.landscapist.ImageLoadState
 
 /** GlideImageState is a state of the glide image requesting. */
@@ -30,7 +31,7 @@ sealed class GlideImageState {
   data class Loading(val progress: Float) : GlideImageState()
 
   /** Request is completed successfully amd ready to use an [ImageAsset]. */
-  data class Success(val imageAsset: ImageAsset?) : GlideImageState()
+  data class Success(val imageBitmap: ImageBitmap?) : GlideImageState()
 
   /** Request failed. */
   data class Failure(val errorDrawable: Drawable?) : GlideImageState()
@@ -42,7 +43,7 @@ fun ImageLoadState.toGlideImageState(): GlideImageState {
   return when (this) {
     is ImageLoadState.None -> GlideImageState.None
     is ImageLoadState.Loading -> GlideImageState.Loading(progress)
-    is ImageLoadState.Success -> GlideImageState.Success(imageAsset)
+    is ImageLoadState.Success -> GlideImageState.Success(imageBitmap)
     is ImageLoadState.Failure -> GlideImageState.Failure(data as? Drawable)
   }
 }

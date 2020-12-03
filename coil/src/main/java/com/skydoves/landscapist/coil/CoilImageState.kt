@@ -18,6 +18,7 @@ package com.skydoves.landscapist.coil
 
 import android.graphics.drawable.Drawable
 import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import com.skydoves.landscapist.ImageLoadState
 
 /** CoilImageState is a state of the coil image requesting. */
@@ -30,7 +31,7 @@ sealed class CoilImageState {
   data class Loading(val progress: Float) : CoilImageState()
 
   /** Request is completed successfully amd ready to use an [ImageAsset]. */
-  data class Success(val imageAsset: ImageAsset?) : CoilImageState()
+  data class Success(val imageBitmap: ImageBitmap?) : CoilImageState()
 
   /** Request failed. */
   data class Failure(val errorDrawable: Drawable?) : CoilImageState()
@@ -42,7 +43,7 @@ fun ImageLoadState.toCoilImageState(): CoilImageState {
   return when (this) {
     is ImageLoadState.None -> CoilImageState.None
     is ImageLoadState.Loading -> CoilImageState.Loading(progress)
-    is ImageLoadState.Success -> CoilImageState.Success(imageAsset)
+    is ImageLoadState.Success -> CoilImageState.Success(imageBitmap)
     is ImageLoadState.Failure -> CoilImageState.Failure(data as? Drawable)
   }
 }

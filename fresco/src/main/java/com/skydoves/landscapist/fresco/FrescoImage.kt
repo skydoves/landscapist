@@ -28,9 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
 import com.skydoves.landscapist.CircularRevealedImage
@@ -43,7 +43,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
- * Requests loading an image with a loading placeholder and error imageAsset.
+ * Requests loading an image with a loading placeholder and error ImageBitmap.
  *
  * ```
  * FrescoImage(
@@ -54,37 +54,37 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * ```
  *
  * @param imageUrl The target url to request image.
- * @param imageRequest The pipeline has to know about requested image to proceed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
- * @param placeHolder An [ImageAsset] to be displayed when the request is in progress.
- * @param error An [ImageAsset] for showing instead of the target image when images are failed to load.
+ * @param placeHolder An [ImageBitmap] to be displayed when the request is in progress.
+ * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun FrescoImage(
   imageUrl: String?,
+  modifier: Modifier = Modifier,
   imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
-  placeHolder: ImageAsset? = null,
-  error: ImageAsset? = null,
+  placeHolder: ImageBitmap? = null,
+  error: ImageBitmap? = null,
   observeLoadingProcess: Boolean = false
 ) {
   FrescoImage(
     imageUrl = imageUrl,
     imageRequest = imageRequest,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
     colorFilter = colorFilter,
@@ -95,7 +95,7 @@ fun FrescoImage(
     loading = {
       placeHolder?.let {
         Image(
-          asset = it,
+          bitmap = it,
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
@@ -106,7 +106,7 @@ fun FrescoImage(
     failure = {
       error?.let {
         Image(
-          asset = it,
+          bitmap = it,
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
@@ -118,7 +118,7 @@ fun FrescoImage(
 }
 
 /**
- * Requests loading an image with a loading placeholder and error imageAsset.
+ * Requests loading an image with a loading placeholder and error ImageBitmap.
  *
  * ```
  * FrescoImage(
@@ -129,23 +129,23 @@ fun FrescoImage(
  * ```
  *
  * @param imageUrl The target url to request image.
- * @param imageRequest The pipeline has to know about requested image to proceed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
- * @param error An [ImageAsset] for showing instead of the target image when images are failed to load.
+ * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun FrescoImage(
   imageUrl: String?,
+  modifier: Modifier = Modifier,
   imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
@@ -153,13 +153,13 @@ fun FrescoImage(
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   shimmerParams: ShimmerParams,
-  error: ImageAsset? = null,
+  error: ImageBitmap? = null,
   observeLoadingProcess: Boolean = false
 ) {
   FrescoImage(
     imageUrl = imageUrl,
     imageRequest = imageRequest,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
     colorFilter = colorFilter,
@@ -171,7 +171,7 @@ fun FrescoImage(
     failure = {
       error?.let {
         Image(
-          asset = it,
+          bitmap = it,
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
@@ -199,12 +199,12 @@ fun FrescoImage(
  * ```
  *
  * @param imageUrl The target url to request image.
- * @param imageRequest The pipeline has to know about requested image to proceed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -214,8 +214,8 @@ fun FrescoImage(
 @Composable
 fun FrescoImage(
   imageUrl: String?,
+  modifier: Modifier = Modifier,
   imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
@@ -229,7 +229,7 @@ fun FrescoImage(
 ) {
   FrescoImage(
     imageRequest = imageRequest,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     observeLoadingProcess = observeLoadingProcess,
   ) { imageState ->
     when (val frescoImageState = imageState.toFrescoImageState()) {
@@ -246,9 +246,9 @@ fun FrescoImage(
       }
       is FrescoImageState.Failure -> failure?.invoke(frescoImageState)
       is FrescoImageState.Success -> {
-        success?.invoke(frescoImageState) ?: frescoImageState.imageAsset?.let {
+        success?.invoke(frescoImageState) ?: frescoImageState.imageBitmap?.let {
           CircularRevealedImage(
-            asset = it,
+            bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
@@ -290,12 +290,12 @@ fun FrescoImage(
  * ```
  *
  * @param imageUrl The target url to request image.
- * @param imageRequest The pipeline has to know about requested image to proceed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -306,8 +306,8 @@ fun FrescoImage(
 @Composable
 fun FrescoImage(
   imageUrl: String?,
+  modifier: Modifier = Modifier,
   imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
@@ -321,7 +321,7 @@ fun FrescoImage(
 ) {
   FrescoImage(
     imageRequest = imageRequest,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     observeLoadingProcess = observeLoadingProcess,
   ) { imageState ->
     when (val frescoImageState = imageState.toFrescoImageState()) {
@@ -329,9 +329,9 @@ fun FrescoImage(
       is FrescoImageState.Loading -> loading?.invoke(frescoImageState)
       is FrescoImageState.Failure -> failure?.invoke(frescoImageState)
       is FrescoImageState.Success -> {
-        success?.invoke(frescoImageState) ?: frescoImageState.imageAsset?.let {
+        success?.invoke(frescoImageState) ?: frescoImageState.imageBitmap?.let {
           CircularRevealedImage(
-            asset = it,
+            bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
@@ -372,11 +372,11 @@ fun FrescoImage(
 @OptIn(ExperimentalCoroutinesApi::class)
 private fun FrescoImage(
   imageRequest: ImageRequest,
-  modifier: Modifier = Modifier.fillMaxWidth(),
+  modifier: Modifier = Modifier,
   observeLoadingProcess: Boolean = false,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
-  val context = ContextAmbient.current
+  val context = AmbientContext.current
   val datasource = remember { imagePipeline.fetchDecodedImage(imageRequest, context) }
 
   ImageLoad(
@@ -392,7 +392,7 @@ private fun FrescoImage(
         }
       }
     },
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     content = content
   )
 }

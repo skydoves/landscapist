@@ -19,7 +19,7 @@ package com.skydoves.landscapist.glide
 import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticAmbientOf
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
@@ -28,13 +28,13 @@ import com.bumptech.glide.request.RequestOptions
  * Ambient containing the preferred [RequestOptions] for providing the same instance
  * in our composable hierarchy.
  */
-val GlideRequestOptionsAmbient = staticAmbientOf<RequestOptions?> { null }
+val AmbientGlideRequestOptions = staticAmbientOf<RequestOptions?> { null }
 
 /**
  * Ambient containing the preferred [RequestBuilder] for providing the same instance
  * in our composable hierarchy.
  */
-val GlideRequestBuilderAmbient = staticAmbientOf<RequestBuilder<Bitmap>?> { null }
+val AmbientGlideRequestBuilder = staticAmbientOf<RequestBuilder<Bitmap>?> { null }
 
 /** A provider for taking the ambient instances related to the `GlideImage`. */
 internal object GlideAmbientProvider {
@@ -42,15 +42,15 @@ internal object GlideAmbientProvider {
   /** Returns the current or default [RequestOptions] for the `GlideImage` parameter. */
   @Composable
   fun getGlideRequestOptions(): RequestOptions {
-    return GlideRequestOptionsAmbient.current ?: RequestOptions()
+    return AmbientGlideRequestOptions.current ?: RequestOptions()
   }
 
   /** Returns the current or default [RequestBuilder] for the `GlideImage` parameter. */
   @Composable
   fun getGlideRequestBuilder(imageModel: Any): RequestBuilder<Bitmap> {
-    return GlideRequestBuilderAmbient.current
+    return AmbientGlideRequestBuilder.current
       ?: Glide
-        .with(ViewAmbient.current)
+        .with(AmbientView.current)
         .asBitmap()
         .load(imageModel)
   }

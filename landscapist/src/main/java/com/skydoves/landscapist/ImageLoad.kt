@@ -19,7 +19,6 @@
 
 package com.skydoves.landscapist
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,7 +49,7 @@ import kotlinx.coroutines.flow.flowOn
 fun <T : Any> ImageLoad(
   imageRequest: T,
   executeImageRequest: suspend () -> Flow<ImageLoadState>,
-  modifier: Modifier = Modifier.fillMaxWidth(),
+  modifier: Modifier = Modifier,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   var state by remember(imageRequest) { mutableStateOf<ImageLoadState>(ImageLoadState.None) }

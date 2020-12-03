@@ -26,7 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.ShaderBrush
@@ -41,13 +41,13 @@ import androidx.core.util.Pools
  * CircularRevealedPainter is a [Painter] which animates a clipping circle to reveal an image.
  * Reveal animations provide users visual continuity when we show an image.
  *
- * @param imageAsset an image asset for loading for the content.
- * @param painter an image painter to draw an [ImageAsset] into the provided canvas.
+ * @param imageBitmap an image bitmap for loading for the content.
+ * @param painter an image painter to draw an [ImageBitmap] into the provided canvas.
  * @param clock an interface allows AnimationClock to be subscribed and unsubscribed.
  * @param durationMs milli-second times from start to finish animation.
  */
 internal class CircularRevealedPainter(
-  private val imageAsset: ImageAsset,
+  private val imageBitmap: ImageBitmap,
   private val painter: Painter,
   clock: AnimationClockObservable,
   durationMs: Int
@@ -81,7 +81,7 @@ internal class CircularRevealedPainter(
     var dy = 0f
 
     try {
-      val shader = ImageShader(imageAsset, TileMode.Clamp)
+      val shader = ImageShader(imageBitmap, TileMode.Clamp)
       val brush = ShaderBrush(shader)
 
       paint.asFrameworkPaint().apply {
@@ -94,8 +94,8 @@ internal class CircularRevealedPainter(
         canvas.saveLayer(size.toRect(), paint)
 
         val mDrawableRect = RectF(0f, 0f, size.width, size.height)
-        val bitmapWidth: Int = imageAsset.asAndroidBitmap().width
-        val bitmapHeight: Int = imageAsset.asAndroidBitmap().height
+        val bitmapWidth: Int = imageBitmap.asAndroidBitmap().width
+        val bitmapHeight: Int = imageBitmap.asAndroidBitmap().height
 
         if (bitmapWidth * mDrawableRect.height() > mDrawableRect.width() * bitmapHeight) {
           scale = mDrawableRect.height() / bitmapHeight.toFloat()
@@ -136,7 +136,7 @@ internal class CircularRevealedPainter(
     else this.painter
   }
 
-  /** return the dimension size of the [ImageAsset]'s intrinsic width and height. */
+  /** return the dimension size of the [ImageBitmap]'s intrinsic width and height. */
   override val intrinsicSize: Size get() = painter.intrinsicSize
 
   /** starts the circular revealed animation by transitioning to the Loaded state. */

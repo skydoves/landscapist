@@ -30,8 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
@@ -62,9 +63,9 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * ```
  *
  * @param imageModel The data model to request image. See [RequestBuilder.load] for types allowed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
- * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -78,23 +79,23 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 @Composable
 fun GlideImage(
   imageModel: Any,
+  modifier: Modifier = Modifier,
   requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
-  placeHolder: ImageAsset? = null,
-  error: ImageAsset? = null
+  placeHolder: ImageBitmap? = null,
+  error: ImageBitmap? = null
 ) {
   GlideImage(
     imageModel = imageModel,
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
     colorFilter = colorFilter,
@@ -104,7 +105,7 @@ fun GlideImage(
     loading = {
       placeHolder?.let {
         Image(
-          asset = it,
+          bitmap = it,
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
@@ -115,7 +116,7 @@ fun GlideImage(
     failure = {
       error?.let {
         Image(
-          asset = it,
+          bitmap = it,
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
@@ -148,9 +149,9 @@ fun GlideImage(
  * ```
  *
  * @param imageModel The data model to request image. See [RequestBuilder.load] for types allowed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
- * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -164,9 +165,9 @@ fun GlideImage(
 @Composable
 fun GlideImage(
   imageModel: Any,
+  modifier: Modifier = Modifier,
   requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
@@ -174,13 +175,13 @@ fun GlideImage(
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   shimmerParams: ShimmerParams,
-  error: ImageAsset? = null
+  error: ImageBitmap? = null
 ) {
   GlideImage(
     imageModel = imageModel,
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
     colorFilter = colorFilter,
@@ -191,7 +192,7 @@ fun GlideImage(
     failure = {
       error?.let {
         Image(
-          asset = it,
+          bitmap = it,
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
@@ -225,9 +226,9 @@ fun GlideImage(
  * ```
  *
  * @param imageModel The data model to request image. See [RequestBuilder.load] for types allowed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
- * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -242,9 +243,9 @@ fun GlideImage(
 @Composable
 fun GlideImage(
   imageModel: Any,
+  modifier: Modifier = Modifier,
   requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
@@ -259,7 +260,7 @@ fun GlideImage(
     builder = requestBuilder
       .apply(requestOptions)
       .load(imageModel),
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
       is GlideImageState.None -> Unit
@@ -275,9 +276,9 @@ fun GlideImage(
       }
       is GlideImageState.Failure -> failure?.invoke(glideImageState)
       is GlideImageState.Success -> {
-        success?.invoke(glideImageState) ?: glideImageState.imageAsset?.let {
+        success?.invoke(glideImageState) ?: glideImageState.imageBitmap?.let {
           CircularRevealedImage(
-            asset = it,
+            bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
@@ -325,9 +326,9 @@ fun GlideImage(
  * ```
  *
  * @param imageModel The data model to request image. See [RequestBuilder.load] for types allowed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
- * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -342,9 +343,9 @@ fun GlideImage(
 @Composable
 fun GlideImage(
   imageModel: Any,
+  modifier: Modifier = Modifier,
   requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
@@ -359,16 +360,16 @@ fun GlideImage(
     builder = requestBuilder
       .apply(requestOptions)
       .load(imageModel),
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
       is GlideImageState.None -> Unit
       is GlideImageState.Loading -> loading?.invoke(glideImageState)
       is GlideImageState.Failure -> failure?.invoke(glideImageState)
       is GlideImageState.Success -> {
-        success?.invoke(glideImageState) ?: glideImageState.imageAsset?.let {
+        success?.invoke(glideImageState) ?: glideImageState.imageBitmap?.let {
           CircularRevealedImage(
-            asset = it,
+            bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
@@ -414,10 +415,10 @@ fun GlideImage(
 @OptIn(ExperimentalCoroutinesApi::class)
 private fun GlideImage(
   builder: RequestBuilder<Bitmap>,
-  modifier: Modifier = Modifier.fillMaxWidth(),
+  modifier: Modifier = Modifier,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
-  val context = ContextAmbient.current
+  val context = AmbientContext.current
   val target = remember { FlowCustomTarget() }
 
   ImageLoad(
@@ -433,7 +434,7 @@ private fun GlideImage(
         }
       }
     },
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     content = content
   )
 }

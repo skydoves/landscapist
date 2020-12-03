@@ -107,7 +107,7 @@ class FrescoImageTest {
         .setResizeOptions(ResizeOptions(350, 350))
         .build()
 
-      Providers(FrescoImageRequestAmbient provides imageRequest) {
+      Providers(AmbientFrescoImageRequest provides imageRequest) {
         FrescoImage(
           imageUrl = IMAGE,
           modifier = Modifier
@@ -162,7 +162,7 @@ class FrescoImageTest {
         observeLoadingProcess = true,
         success = {
           state.add(it)
-          assertThat(it.imageAsset, `is`(notNullValue()))
+          assertThat(it.imageBitmap, `is`(notNullValue()))
         },
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))

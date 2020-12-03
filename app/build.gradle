@@ -55,7 +55,7 @@ dependencies {
   implementation "androidx.compose.animation:animation:$versions.composeVersion"
   implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
   implementation "androidx.compose.runtime:runtime-livedata:$versions.composeVersion"
-  implementation "androidx.ui:ui-tooling:$versions.composeVersion"
+  implementation "androidx.ui:ui-tooling:$versions.composeToolVersion"
 
   // landscapist
   implementation project(":fresco")

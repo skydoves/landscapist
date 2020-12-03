@@ -1,28 +1,29 @@
 ext.versions = [
-    minSdk           : 21,
-    compileSdk       : 30,
-    versionCode      : 11,
-    versionName      : '1.1.0',
+    minSdk            : 21,
+    compileSdk        : 30,
+    versionCode       : 11,
+    versionName       : '1.1.0',
 
-    gradleBuildTool  : '4.2.0-alpha16',
-    spotlessGradle   : '5.8.0',
-    ktlintGradle     : '0.39.0',
-    dokkaGradle      : '1.4.0',
-    bintrayPlugin    : '1.8.5',
+    gradleBuildTool   : '4.2.0-alpha16',
+    spotlessGradle    : '5.8.0',
+    ktlintGradle      : '0.39.0',
+    dokkaGradle       : '1.4.0',
+    bintrayPlugin     : '1.8.5',
 
-    kotlin           : '1.4.20',
-    coreKtxVersion   : '1.5.0-alpha05',
-    composeVersion   : '1.0.0-alpha08',
-    coroutinesVersion: '1.4.0',
+    kotlin            : '1.4.20',
+    coreKtxVersion    : '1.5.0-alpha05',
+    composeVersion    : '1.0.0-alpha08',
+    composeToolVersion: '1.0.0-alpha07',
+    coroutinesVersion : '1.4.0',
 
-    frescoVersion    : '2.3.0',
-    glideVersion     : '4.11.0',
-    coilVersion      : '1.0.0',
+    frescoVersion     : '2.3.0',
+    glideVersion      : '4.11.0',
+    coilVersion       : '1.0.0',
 
     // unit test
-    rulesVersion     : '1.2.0',
-    runnerVersion    : '1.3.0-beta01',
+    rulesVersion      : '1.2.0',
+    runnerVersion     : '1.3.0-beta01',
 
     // for demo
-    materialVersion  : '1.3.0-alpha04'
+    materialVersion   : '1.3.0-alpha04'
 ]

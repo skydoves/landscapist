@@ -30,11 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
-import androidx.compose.ui.graphics.ImageAsset
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.platform.LifecycleOwnerAmbient
+import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.AmbientLifecycleOwner
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import coil.ImageLoader
@@ -51,7 +51,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
- * Requests loading an image with a loading placeholder and error imageAsset.
+ * Requests loading an image with a loading placeholder and error ImageBitmap.
  *
  * ```
  * CoilImage(
@@ -65,28 +65,28 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * ```
  *
  * @param imageModel The data model to request image. See [ImageRequest.Builder.data] for types allowed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * Defaults to [CoilAmbientProvider.getCoilImageLoader].
- * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
- * @param error An [ImageAsset] for showing instead of the target image when images are failed to load.
+ * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun CoilImage(
   imageModel: Any,
-  context: Context = ContextAmbient.current,
-  lifecycleOwner: LifecycleOwner = LifecycleOwnerAmbient.current,
+  modifier: Modifier = Modifier,
+  context: Context = AmbientContext.current,
+  lifecycleOwner: LifecycleOwner = AmbientLifecycleOwner.current,
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
@@ -94,14 +94,14 @@ fun CoilImage(
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   colorFilter: ColorFilter? = null,
   shimmerParams: ShimmerParams,
-  error: ImageAsset? = null,
+  error: ImageBitmap? = null,
 ) {
   CoilImage(
     imageModel = imageModel,
     context = context,
     lifecycleOwner = lifecycleOwner,
     imageLoader = imageLoader,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
     alpha = alpha,
@@ -112,7 +112,7 @@ fun CoilImage(
     failure = {
       error?.let {
         Image(
-          asset = it,
+          bitmap = it,
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
@@ -124,7 +124,7 @@ fun CoilImage(
 }
 
 /**
- * Requests loading an image with a loading placeholder and error imageAsset.
+ * Requests loading an image with a loading placeholder and error ImageBitmap.
  *
  * ```
  * CoilImage(
@@ -135,43 +135,43 @@ fun CoilImage(
  * ```
  *
  * @param imageModel The data model to request image. See [ImageRequest.Builder.data] for types allowed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * Defaults to [CoilAmbientProvider.getCoilImageLoader].
- * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
- * @param placeHolder An [ImageAsset] to be displayed when the request is in progress.
- * @param error An [ImageAsset] for showing instead of the target image when images are failed to load.
+ * @param placeHolder An [ImageBitmap] to be displayed when the request is in progress.
+ * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun CoilImage(
   imageModel: Any,
-  context: Context = ContextAmbient.current,
-  lifecycleOwner: LifecycleOwner = LifecycleOwnerAmbient.current,
+  modifier: Modifier = Modifier,
+  context: Context = AmbientContext.current,
+  lifecycleOwner: LifecycleOwner = AmbientLifecycleOwner.current,
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   colorFilter: ColorFilter? = null,
-  placeHolder: ImageAsset? = null,
-  error: ImageAsset? = null,
+  placeHolder: ImageBitmap? = null,
+  error: ImageBitmap? = null,
 ) {
   CoilImage(
     imageModel = imageModel,
     context = context,
     lifecycleOwner = lifecycleOwner,
     imageLoader = imageLoader,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
     alpha = alpha,
@@ -181,7 +181,7 @@ fun CoilImage(
     loading = {
       placeHolder?.let {
         Image(
-          asset = it,
+          bitmap = it,
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
@@ -192,7 +192,7 @@ fun CoilImage(
     failure = {
       error?.let {
         Image(
-          asset = it,
+          bitmap = it,
           alignment = alignment,
           contentScale = contentScale,
           colorFilter = colorFilter,
@@ -220,15 +220,15 @@ fun CoilImage(
  * ```
  *
  * @param imageModel The data model to request image. See [ImageRequest.Builder.data] for types allowed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * Defaults to [CoilAmbientProvider.getCoilImageLoader].
- * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -238,10 +238,10 @@ fun CoilImage(
 @Composable
 fun CoilImage(
   imageModel: Any,
-  context: Context = ContextAmbient.current,
-  lifecycleOwner: LifecycleOwner = LifecycleOwnerAmbient.current,
+  modifier: Modifier = Modifier,
+  context: Context = AmbientContext.current,
+  lifecycleOwner: LifecycleOwner = AmbientLifecycleOwner.current,
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
@@ -258,7 +258,7 @@ fun CoilImage(
       .lifecycle(lifecycleOwner)
       .build(),
     imageLoader = imageLoader,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
     alpha = alpha,
@@ -299,15 +299,15 @@ fun CoilImage(
  * ```
  *
  * @param imageModel The data model to request image. See [ImageRequest.Builder.data] for types allowed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * Defaults to [CoilAmbientProvider.getCoilImageLoader].
- * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -318,10 +318,10 @@ fun CoilImage(
 @Composable
 fun CoilImage(
   imageModel: Any,
-  context: Context = ContextAmbient.current,
-  lifecycleOwner: LifecycleOwner = LifecycleOwnerAmbient.current,
+  modifier: Modifier = Modifier,
+  context: Context = AmbientContext.current,
+  lifecycleOwner: LifecycleOwner = AmbientLifecycleOwner.current,
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
@@ -338,7 +338,7 @@ fun CoilImage(
       .lifecycle(lifecycleOwner)
       .build(),
     imageLoader = imageLoader,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
     alpha = alpha,
@@ -371,13 +371,13 @@ fun CoilImage(
  * ```
  *
  * @param imageRequest The request to execute.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * Defaults to [CoilAmbientProvider.getCoilImageLoader].
- * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -387,8 +387,8 @@ fun CoilImage(
 @Composable
 fun CoilImage(
   imageRequest: ImageRequest,
+  modifier: Modifier = Modifier,
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
@@ -402,7 +402,7 @@ fun CoilImage(
   CoilImage(
     request = imageRequest,
     imageLoader = imageLoader,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
   ) { imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
       is CoilImageState.None -> Unit
@@ -418,9 +418,9 @@ fun CoilImage(
       }
       is CoilImageState.Failure -> failure?.invoke(coilImageState)
       is CoilImageState.Success -> {
-        success?.invoke(coilImageState) ?: coilImageState.imageAsset?.let {
+        success?.invoke(coilImageState) ?: coilImageState.imageBitmap?.let {
           CircularRevealedImage(
-            asset = it,
+            bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
@@ -465,13 +465,13 @@ fun CoilImage(
  * ```
  *
  * @param imageRequest The request to execute.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * Defaults to [CoilAmbientProvider.getCoilImageLoader].
- * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -482,8 +482,8 @@ fun CoilImage(
 @Composable
 fun CoilImage(
   imageRequest: ImageRequest,
+  modifier: Modifier = Modifier,
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
@@ -497,16 +497,16 @@ fun CoilImage(
   CoilImage(
     request = imageRequest,
     imageLoader = imageLoader,
-    modifier = modifier,
+    modifier = modifier.fillMaxWidth(),
   ) { imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
       is CoilImageState.None -> Unit
       is CoilImageState.Loading -> loading?.invoke(coilImageState)
       is CoilImageState.Failure -> failure?.invoke(coilImageState)
       is CoilImageState.Success -> {
-        success?.invoke(coilImageState) ?: coilImageState.imageAsset?.let {
+        success?.invoke(coilImageState) ?: coilImageState.imageBitmap?.let {
           CircularRevealedImage(
-            asset = it,
+            bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
             alpha = alpha,
@@ -542,19 +542,19 @@ fun CoilImage(
  * ```
  *
  * @param request The request to execute.
- * @param imageLoader The [ImageLoader] to use when requesting the image.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param imageLoader The [ImageLoader] to use when requesting the image.
  * @param content Content to be displayed for the given state.
  */
 @Composable
 @OptIn(ExperimentalCoroutinesApi::class)
 fun CoilImage(
   request: ImageRequest,
+  modifier: Modifier = Modifier,
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
-  modifier: Modifier = Modifier.fillMaxWidth(),
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
-  val context = ContextAmbient.current
+  val context = AmbientContext.current
   val imageLoadStateFlow = remember { MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f)) }
   val disposable = remember { mutableStateOf<Disposable?>(null) }
 
@@ -565,10 +565,10 @@ fun CoilImage(
         disposable.value = imageLoader.enqueue(
           request.newBuilder(context).target(
             onSuccess = {
-              imageLoadStateFlow.value = ImageLoadState.Success(it.toBitmap().asImageAsset())
+              imageLoadStateFlow.value = ImageLoadState.Success(it.toBitmap().asImageBitmap())
             },
             onError = {
-              imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageAsset())
+              imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageBitmap())
             }
           ).build()
         )

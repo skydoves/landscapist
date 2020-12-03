@@ -28,7 +28,7 @@ import com.skydoves.landscapist.ShimmerAmbientProvider.defaultShimmerParams
  * Ambient containing the preferred [ShimmerParams] for providing the same instance
  * in the composable hierarchy.
  */
-val ShimmerParamsAmbient = ambientOf { defaultShimmerParams() }
+val AmbientShimmerParams = ambientOf { defaultShimmerParams() }
 
 /** A provider for taking the ambient instances related to the [Shimmer]. */
 internal object ShimmerAmbientProvider {
