@@ -34,7 +34,7 @@ You can see the use cases of this library in the below repositories.
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.1.0"
+    implementation "com.github.skydoves:landscapist-glide:1.1.1"
 }
 ```
 
@@ -76,7 +76,7 @@ Also we can request image by passing a [RequestBuilder](https://bumptech.github.
 GlideImage(
   imageModel = poster.poster,
   requestBuilder = Glide
-    .with(ViewAmbient.current)
+    .with(AmbientView.current)
     .asBitmap()
     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
     .thumbnail(0.1f)
@@ -88,16 +88,16 @@ GlideImage(
 )
 ```
 
-#### GlideRequestBuilderAmbient
+#### AmbientGlideRequestBuilder
 We can provide the same instance of the `RequestBuilder` in the composable hierarchy.
 ```kotlin
 // customize the RequestBuilder as needed
-val requestBuilder = Glide.with(ViewAmbient.current)
+val requestBuilder = Glide.with(AmbientView.current)
   .asBitmap()
   .thumbnail(0.1f)
   .transition(BitmapTransitionOptions.withCrossFade())
 
-Providers(GlideRequestBuilderAmbient provides requestBuilder) {
+Providers(AmbientGlideRequestBuilder provides requestBuilder) {
   // This will automatically use the value of current RequestBuilder in the hierarchy.
   GlideImage(
     imageModel = ...
@@ -173,11 +173,11 @@ We can customize request options using [ImageRequest](https://coil-kt.github.io/
 
 ```kotlin
 CoilImage(
-  imageRequest = ImageRequest.Builder(ContextAmbient.current)
+  imageRequest = ImageRequest.Builder(AmbientContext.current)
     .data(poster.poster)
     .crossfade(true)
     .build(),
-  imageLoader = ImageLoader.Builder(ContextAmbient.current)
+  imageLoader = ImageLoader.Builder(AmbientContext.current)
     .availableMemoryPercentage(0.25)
     .crossfade(true)
     .build(),
@@ -242,13 +242,13 @@ We can give a shimmering effect when loading images using a `ShimmerParams`. We 
  })
  ```
 
- ### CoilImageLoaderAmbient
+ ### AmbientCoilImageLoader
  We can provide the same instance of the `ImageLoader` in the composable hierarchy.
  ```kotlin
  val imageLoader = ImageLoader.Builder(context)
     // customize the ImageLoader as needed
     .build()
-Providers(CoilImageLoaderAmbient provides imageLoader) {
+Providers(AmbientCoilImageLoader provides imageLoader) {
    // This will automatically use the value of current imageLoader in the hierarchy.
    CoilImage(
      imageModel = ...
@@ -379,7 +379,7 @@ FrescoImage(
     })
 ```
 
-#### FrescoImageRequestAmbient
+#### AmbientFrescoImageRequest
 We can provide the same instance of the `ImageRequest` in the composable hierarchy.
 ```kotlin
 // customize the ImageRequest as needed
@@ -392,7 +392,7 @@ val imageRequest = ImageRequestBuilder
   .setResizeOptions(ResizeOptions(width, height))
   .build()
 
-Providers(FrescoImageRequestAmbient provides imageRequest) {
+Providers(AmbientFrescoImageRequest provides imageRequest) {
   // This will automatically use the value of current ImageRequest in the hierarchy.
   FrescoImage(
     imageurl = ...
