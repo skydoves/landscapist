@@ -10,7 +10,7 @@ ext.versions = [
     dokkaGradle       : '1.4.0',
     bintrayPlugin     : '1.8.5',
 
-    kotlin            : '1.4.20',
+    kotlin            : '1.4.21',
     coreKtxVersion    : '1.5.0-alpha05',
     composeVersion    : '1.0.0-alpha09',
     composeToolVersion: '1.0.0-alpha07',
