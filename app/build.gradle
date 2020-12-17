@@ -3,7 +3,7 @@ plugins {
   id 'kotlin-android'
 }
 
-apply from: '../dependencies.gradle'
+apply from: "$rootDir/dependencies.gradle"
 
 android {
   compileSdkVersion versions.compileSdk
@@ -59,4 +59,4 @@ dependencies {
   implementation project(":coil")
 }
 
-apply from: '../spotless.gradle'
+apply from: "$rootDir/spotless.gradle"

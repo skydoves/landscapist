@@ -4,7 +4,7 @@ plugins {
   id 'org.jetbrains.dokka'
 }
 
-apply from: '../dependencies.gradle'
+apply from: "$rootDir/dependencies.gradle"
 
 android {
   compileSdkVersion versions.compileSdk
@@ -74,5 +74,5 @@ ext.repository = [
     scm        : 'scm:git@github.com/skydoves/Landscapist.git'
 ]
 
-apply from: '../spotless.gradle'
-apply from: '../publish.gradle'
+apply from: "$rootDir/spotless.gradle"
+apply from: "$rootDir/publish.gradle"
