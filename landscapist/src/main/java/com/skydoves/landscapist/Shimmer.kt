@@ -23,9 +23,8 @@ import android.graphics.Matrix
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import androidx.compose.animation.animatedFloat
-import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.repeatable
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
@@ -71,9 +70,8 @@ fun Shimmer(
   onActive {
     animatedProgress.animateTo(
       targetValue = 1f,
-      anim = repeatable(
-        iterations = AnimationConstants.Infinite,
-        animation = tween(durationMillis = durationMillis, easing = LinearEasing),
+      anim = infiniteRepeatable(
+        animation = tween(durationMillis = durationMillis, easing = LinearEasing)
       ),
     )
   }

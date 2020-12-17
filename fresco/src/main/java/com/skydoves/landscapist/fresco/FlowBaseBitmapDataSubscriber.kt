@@ -17,8 +17,7 @@
 package com.skydoves.landscapist.fresco
 
 import android.graphics.Bitmap
-import androidx.compose.runtime.FrameManager
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.asImageBitmap
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber
@@ -39,8 +38,7 @@ internal class FlowBaseBitmapDataSubscriber(
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
   override fun onNewResultImpl(bitmap: Bitmap?) {
-    FrameManager.ensureStarted()
-    this.internalStateFlow.value = ImageLoadState.Success(bitmap?.asImageAsset())
+    this.internalStateFlow.value = ImageLoadState.Success(bitmap?.asImageBitmap())
   }
 
   override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
