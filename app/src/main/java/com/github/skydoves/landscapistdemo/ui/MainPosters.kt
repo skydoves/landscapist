@@ -26,7 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.ripple.rememberRippleIndication
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -75,7 +75,7 @@ fun HomePoster(
     ConstraintLayout(
       modifier = Modifier.clickable(
         onClick = { },
-        indication = rememberRippleIndication(color = purple500)
+        indication = rememberRipple(true, 20.dp, purple500)
       )
     ) {
       val (image, title, content) = createRefs()

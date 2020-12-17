@@ -19,8 +19,7 @@ package com.skydoves.landscapist.glide
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import androidx.compose.runtime.FrameManager
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.asImageBitmap
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.skydoves.landscapist.ImageLoadState
@@ -37,8 +36,7 @@ internal class FlowCustomTarget : CustomTarget<Bitmap>() {
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
   override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-    FrameManager.ensureStarted()
-    this.internalStateFlow.value = ImageLoadState.Success(resource.asImageAsset())
+    this.internalStateFlow.value = ImageLoadState.Success(resource.asImageBitmap())
   }
 
   override fun onLoadFailed(errorDrawable: Drawable?) {
@@ -48,6 +46,6 @@ internal class FlowCustomTarget : CustomTarget<Bitmap>() {
 
   override fun onLoadCleared(placeholder: Drawable?) {
     val bitmap = (placeholder as? BitmapDrawable)?.bitmap
-    this.internalStateFlow.value = ImageLoadState.Success(bitmap?.asImageAsset())
+    this.internalStateFlow.value = ImageLoadState.Success(bitmap?.asImageBitmap())
   }
 }
