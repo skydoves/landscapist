@@ -67,17 +67,16 @@ fun HomePoster(
   modifier: Modifier = Modifier
 ) {
   Surface(
-    modifier = modifier.padding(4.dp),
+    modifier = modifier.padding(4.dp)
+      .clickable(
+        onClick = { },
+        indication = rememberRipple(bounded = true, color = purple500)
+      ),
     color = MaterialTheme.colors.onBackground,
     elevation = 8.dp,
     shape = RoundedCornerShape(8.dp)
   ) {
-    ConstraintLayout(
-      modifier = Modifier.clickable(
-        onClick = { },
-        indication = rememberRipple(true, 20.dp, purple500)
-      )
-    ) {
+    ConstraintLayout {
       val (image, title, content) = createRefs()
       CoilImage(
         imageModel = poster.poster,
