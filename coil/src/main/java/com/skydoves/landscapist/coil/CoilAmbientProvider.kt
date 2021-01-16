@@ -19,7 +19,6 @@ package com.skydoves.landscapist.coil
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.ContextAmbient
 import coil.ImageLoader
 import coil.imageLoader
 
