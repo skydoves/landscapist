@@ -18,6 +18,7 @@ package com.skydoves.landscapist.coil
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.ContextAmbient
 import coil.ImageLoader
 import coil.imageLoader
@@ -34,6 +35,6 @@ internal object CoilAmbientProvider {
   /** Returns the current or default [ImageLoader] for the `ColiImage` parameter. */
   @Composable
   fun getCoilImageLoader(): ImageLoader {
-    return AmbientCoilImageLoader.current ?: ContextAmbient.current.imageLoader
+    return AmbientCoilImageLoader.current ?: AmbientContext.current.imageLoader
   }
 }
