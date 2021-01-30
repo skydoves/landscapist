@@ -19,6 +19,7 @@
 
 package com.skydoves.landscapist
 
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.WithConstraints
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -60,7 +60,7 @@ fun <T : Any> ImageLoad(
       state = it
     }
   }
-  WithConstraints(modifier) {
+  BoxWithConstraints(modifier) {
     content(state)
   }
 }

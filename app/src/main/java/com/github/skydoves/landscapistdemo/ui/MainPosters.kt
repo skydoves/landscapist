@@ -26,17 +26,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background800
-import com.github.skydoves.landscapistdemo.theme.purple500
 import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.coil.CoilImage
@@ -67,10 +65,10 @@ fun HomePoster(
   modifier: Modifier = Modifier
 ) {
   Surface(
-    modifier = modifier.padding(4.dp)
+    modifier = modifier
+      .padding(4.dp)
       .clickable(
-        onClick = { },
-        indication = rememberRipple(bounded = true, color = purple500)
+        onClick = { }
       ),
     color = MaterialTheme.colors.onBackground,
     elevation = 8.dp,
@@ -80,10 +78,12 @@ fun HomePoster(
       val (image, title, content) = createRefs()
       CoilImage(
         imageModel = poster.poster,
-        modifier = Modifier.constrainAs(image) {
-          centerHorizontallyTo(parent)
-          top.linkTo(parent.top)
-        }.aspectRatio(0.8f),
+        modifier = Modifier
+          .constrainAs(image) {
+            centerHorizontallyTo(parent)
+            top.linkTo(parent.top)
+          }
+          .aspectRatio(0.8f),
         circularRevealedEnabled = true,
         shimmerParams = ShimmerParams(
           baseColor = background800,
@@ -94,19 +94,23 @@ fun HomePoster(
         text = poster.name,
         style = MaterialTheme.typography.h2,
         textAlign = TextAlign.Center,
-        modifier = Modifier.constrainAs(title) {
-          centerHorizontallyTo(parent)
-          top.linkTo(image.bottom)
-        }.padding(8.dp)
+        modifier = Modifier
+          .constrainAs(title) {
+            centerHorizontallyTo(parent)
+            top.linkTo(image.bottom)
+          }
+          .padding(8.dp)
       )
       Text(
         text = poster.playtime,
         style = MaterialTheme.typography.body1,
         textAlign = TextAlign.Center,
-        modifier = Modifier.constrainAs(content) {
-          centerHorizontallyTo(parent)
-          top.linkTo(title.bottom)
-        }.padding(horizontal = 8.dp)
+        modifier = Modifier
+          .constrainAs(content) {
+            centerHorizontallyTo(parent)
+            top.linkTo(title.bottom)
+          }
+          .padding(horizontal = 8.dp)
           .padding(bottom = 12.dp)
       )
     }

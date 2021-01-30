@@ -97,6 +97,7 @@ fun FrescoImage(
         Image(
           bitmap = it,
           alignment = alignment,
+          contentDescription = null,
           contentScale = contentScale,
           colorFilter = colorFilter,
           alpha = alpha
@@ -108,6 +109,7 @@ fun FrescoImage(
         Image(
           bitmap = it,
           alignment = alignment,
+          contentDescription = null,
           contentScale = contentScale,
           colorFilter = colorFilter,
           alpha = alpha,
@@ -173,6 +175,7 @@ fun FrescoImage(
         Image(
           bitmap = it,
           alignment = alignment,
+          contentDescription = null,
           contentScale = contentScale,
           colorFilter = colorFilter,
           alpha = alpha,
