@@ -8,4 +8,10 @@ spotless {
     trimTrailingWhitespace()
     endWithNewline()
   }
+
+  groovyGradle {
+    target '**/*.gradle'
+    licenseHeaderFile rootProject.file('spotless.license.kt'),
+        '(buildscript|apply|import)'
+  }
 }
