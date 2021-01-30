@@ -107,6 +107,7 @@ fun GlideImage(
         Image(
           bitmap = it,
           alignment = alignment,
+          contentDescription = null,
           contentScale = contentScale,
           colorFilter = colorFilter,
           alpha = alpha
@@ -118,6 +119,7 @@ fun GlideImage(
         Image(
           bitmap = it,
           alignment = alignment,
+          contentDescription = null,
           contentScale = contentScale,
           colorFilter = colorFilter,
           alpha = alpha
@@ -194,6 +196,7 @@ fun GlideImage(
         Image(
           bitmap = it,
           alignment = alignment,
+          contentDescription = null,
           contentScale = contentScale,
           colorFilter = colorFilter,
           alpha = alpha

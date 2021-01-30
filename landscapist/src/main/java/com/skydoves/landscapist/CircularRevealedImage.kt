@@ -56,6 +56,7 @@ fun CircularRevealedImage(
   modifier: Modifier = Modifier,
   imagePainter: Painter = ImagePainter(bitmap),
   alignment: Alignment = Alignment.Center,
+  contentDescription: String? = null,
   contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
@@ -79,6 +80,7 @@ fun CircularRevealedImage(
     },
     modifier = modifier,
     alignment = alignment,
+    contentDescription = contentDescription,
     contentScale = contentScale,
     colorFilter = colorFilter,
     alpha = alpha

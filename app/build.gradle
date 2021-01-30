@@ -7,6 +7,7 @@ apply from: "$rootDir/dependencies.gradle"
 
 android {
   compileSdkVersion versions.compileSdk
+
   defaultConfig {
     applicationId "com.github.skydoves.landscapistdemo"
     minSdkVersion versions.minSdk
@@ -14,20 +15,23 @@ android {
     versionCode versions.versionCode
     versionName versions.versionName
   }
+
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
   }
-  kotlinOptions {
-    jvmTarget = '1.8'
-    freeCompilerArgs += [
-        "-Xallow-jvm-ir-dependencies",
-        "-Xskip-prerelease-check",
-        "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"]
-    useIR = true
+
+  composeOptions {
+    kotlinCompilerExtensionVersion versions.composeVersion
   }
+
   buildFeatures {
     compose true
+  }
+
+  packagingOptions {
+    excludes += "/META-INF/AL2.0"
+    excludes += "/META-INF/LGPL2.1"
   }
 }
 
@@ -47,7 +51,7 @@ dependencies {
   implementation "androidx.compose.animation:animation:$versions.composeVersion"
   implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
   implementation "androidx.compose.runtime:runtime-livedata:$versions.composeVersion"
-  implementation "androidx.ui:ui-tooling:$versions.composeToolVersion"
+  implementation "androidx.compose.ui:ui-tooling:$versions.composeVersion"
 
   // landscapist
   implementation project(":fresco")
