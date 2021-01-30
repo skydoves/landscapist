@@ -74,6 +74,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
+ * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -90,6 +91,7 @@ fun CoilImage(
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
+  contentDescription: String? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   colorFilter: ColorFilter? = null,
@@ -114,7 +116,7 @@ fun CoilImage(
         Image(
           bitmap = it,
           alignment = alignment,
-          contentDescription = null,
+          contentDescription = contentDescription,
           contentScale = contentScale,
           colorFilter = colorFilter,
           alpha = alpha,
@@ -145,6 +147,7 @@ fun CoilImage(
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
+ * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -161,6 +164,7 @@ fun CoilImage(
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
+  contentDescription: String? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   colorFilter: ColorFilter? = null,
@@ -184,7 +188,7 @@ fun CoilImage(
         Image(
           bitmap = it,
           alignment = alignment,
-          contentDescription = null,
+          contentDescription = contentDescription,
           contentScale = contentScale,
           colorFilter = colorFilter,
           alpha = alpha
@@ -196,7 +200,7 @@ fun CoilImage(
         Image(
           bitmap = it,
           alignment = alignment,
-          contentDescription = null,
+          contentDescription = contentDescription,
           contentScale = contentScale,
           colorFilter = colorFilter,
           alpha = alpha,
@@ -232,6 +236,7 @@ fun CoilImage(
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
+ * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -247,6 +252,7 @@ fun CoilImage(
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
+  contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
@@ -264,6 +270,7 @@ fun CoilImage(
     modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
+    contentDescription = contentDescription,
     alpha = alpha,
     colorFilter = colorFilter,
     circularRevealedEnabled = circularRevealedEnabled,
@@ -311,6 +318,7 @@ fun CoilImage(
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
+ * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -327,6 +335,7 @@ fun CoilImage(
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
+  contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
@@ -344,6 +353,7 @@ fun CoilImage(
     modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
+    contentDescription = contentDescription,
     alpha = alpha,
     colorFilter = colorFilter,
     circularRevealedEnabled = circularRevealedEnabled,
@@ -381,6 +391,7 @@ fun CoilImage(
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
+ * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -394,6 +405,7 @@ fun CoilImage(
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
+  contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
@@ -426,6 +438,7 @@ fun CoilImage(
             bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
+            contentDescription = contentDescription,
             alpha = alpha,
             colorFilter = colorFilter,
             circularRevealedEnabled = circularRevealedEnabled,
@@ -475,6 +488,7 @@ fun CoilImage(
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
+ * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -489,6 +503,7 @@ fun CoilImage(
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
+  contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
@@ -512,6 +527,7 @@ fun CoilImage(
             bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
+            contentDescription = contentDescription,
             alpha = alpha,
             colorFilter = colorFilter,
             circularRevealedEnabled = circularRevealedEnabled,

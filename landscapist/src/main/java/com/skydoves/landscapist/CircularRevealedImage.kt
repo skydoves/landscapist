@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.AmbientAnimationClock
  * given bounds defined by the width and height.
  * @param contentScale parameter used to determine the aspect ratio scaling to be
  * used if the bounds are a different size from the intrinsic size of the loaded [ImageBitmap].
+ * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param alpha an alpha value to apply for the image when it is rendered onscreen.
  * @param colorFilter colorFilter to apply for the image when it is rendered onscreen.
  * @param circularRevealedEnabled a conditional value for enabling or not the circular revealing animation.
@@ -56,8 +57,8 @@ fun CircularRevealedImage(
   modifier: Modifier = Modifier,
   imagePainter: Painter = ImagePainter(bitmap),
   alignment: Alignment = Alignment.Center,
-  contentDescription: String? = null,
   contentScale: ContentScale = ContentScale.Crop,
+  contentDescription: String?,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
