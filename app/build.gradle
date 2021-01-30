@@ -18,10 +18,6 @@ android {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
   }
-  composeOptions {
-    kotlinCompilerVersion versions.kotlin
-    kotlinCompilerExtensionVersion versions.composeVersion
-  }
   kotlinOptions {
     jvmTarget = '1.8'
     freeCompilerArgs += [
