@@ -72,7 +72,7 @@ fun Shimmer(
       targetValue = 1f,
       anim = infiniteRepeatable(
         animation = tween(durationMillis = durationMillis, easing = LinearEasing)
-      ),
+      )
     )
   }
 

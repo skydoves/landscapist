@@ -19,11 +19,8 @@
 
 package com.skydoves.landscapist
 
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -32,7 +29,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientAnimationClock
 
 /**
  * CircularRevealedImage is an image composable for animating a clipping circle to reveal when loading an image.
@@ -49,7 +45,6 @@ import androidx.compose.ui.platform.AmbientAnimationClock
  * @param colorFilter colorFilter to apply for the image when it is rendered onscreen.
  * @param circularRevealedEnabled a conditional value for enabling or not the circular revealing animation.
  * @param circularRevealedDuration milli-second times from start to finish animation.
- * @param clock an interface allows AnimationClock to be subscribed and unsubscribed.
  */
 @Composable
 fun CircularRevealedImage(
@@ -62,20 +57,11 @@ fun CircularRevealedImage(
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
-  clock: AnimationClockObservable = AmbientAnimationClock.current.asDisposableClock(),
+  circularRevealedDuration: Int = DefaultCircularRevealedDuration
 ) {
-  val circularRevealedPainter = remember(imagePainter) {
-    CircularRevealedPainter(
-      bitmap,
-      imagePainter,
-      clock,
-      circularRevealedDuration
-    ).also { it.start() }
-  }
   Image(
     painter = if (circularRevealedEnabled) {
-      circularRevealedPainter.getMainPainter()
+      imagePainter.circularReveal(bitmap, circularRevealedDuration)
     } else {
       imagePainter
     },

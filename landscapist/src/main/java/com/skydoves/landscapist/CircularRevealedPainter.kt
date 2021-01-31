@@ -18,10 +18,9 @@ package com.skydoves.landscapist
 
 import android.graphics.Matrix
 import android.graphics.RectF
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.createAnimation
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -43,35 +42,13 @@ import androidx.core.util.Pools
  *
  * @param imageBitmap an image bitmap for loading for the content.
  * @param painter an image painter to draw an [ImageBitmap] into the provided canvas.
- * @param clock an interface allows AnimationClock to be subscribed and unsubscribed.
- * @param durationMs milli-second times from start to finish animation.
  */
 internal class CircularRevealedPainter(
   private val imageBitmap: ImageBitmap,
-  private val painter: Painter,
-  clock: AnimationClockObservable,
-  durationMs: Int
+  private val painter: Painter
 ) : Painter() {
 
-  private var radius by mutableStateOf(0f)
-
-  private val circularAnimation =
-    CircularRevealedAnimation.definition(durationMs).createAnimation(clock)
-
-  var isFinished by mutableStateOf(false)
-    private set
-
-  init {
-    circularAnimation.onUpdate = {
-      radius = circularAnimation[CircularRevealedAnimation.Radius]
-    }
-
-    circularAnimation.onStateChangeFinished = { state ->
-      if (state == CircularRevealedAnimation.State.Finished) {
-        isFinished = true
-      }
-    }
-  }
+  var radius by mutableStateOf(0f, policy = neverEqualPolicy())
 
   override fun DrawScope.onDraw() {
     val paint = paintPool.acquire() ?: Paint()
@@ -127,22 +104,8 @@ internal class CircularRevealedPainter(
     }
   }
 
-  /**
-   * if the animation is ongoing, returns a [CircularRevealedPainter],
-   * if the animation is finished, returns a [painter].
-   */
-  fun getMainPainter(): Painter {
-    return if (!isFinished) this
-    else this.painter
-  }
-
   /** return the dimension size of the [ImageBitmap]'s intrinsic width and height. */
   override val intrinsicSize: Size get() = painter.intrinsicSize
-
-  /** starts the circular revealed animation by transitioning to the Loaded state. */
-  fun start() {
-    circularAnimation.toState(CircularRevealedAnimation.State.Finished)
-  }
 }
 
 /** paint pool which caching and reusing [Paint] instances. */

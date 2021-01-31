@@ -16,40 +16,62 @@
 
 package com.skydoves.landscapist
 
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.FloatPropKey
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.transitionDefinition
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 
 /**
- * CircularRevealedAnimation is an animation for animating a clipping circle to reveal an image.
- * The animation has two states Loaded, Empty.
+ * circularReveal is an extension of the [Painter] for animating a clipping circle to reveal an image.
+ * The animation has two states [CircularRevealState.None], [CircularRevealState.Finished].
+ *
+ * @param imageBitmap an image bitmap for loading the content.
+ * @param durationMs milli-second times from start to finish animation.
  */
-internal object CircularRevealedAnimation {
+@Composable
+internal fun Painter.circularReveal(
+  imageBitmap: ImageBitmap,
+  durationMs: Int
+): Painter {
+  // Defines a transition of `CircularRevealState`, and updates the transition when the provided state changes.
+  val transitionState = remember { MutableTransitionState(CircularRevealState.None) }
+  transitionState.targetState = CircularRevealState.Finished
 
-  /** Common interface of the animation states. */
-  enum class State {
-    /** animation not started. */
-    None,
+  // Our actual transition, which reads our transitionState
+  val transition = updateTransition(transitionState)
 
-    /** animation finished. */
-    Finished
-  }
-
-  val Radius = FloatPropKey()
-
-  /** definitions of the specific animating values based on animation states.  */
-  fun definition(durationMillis: Int, easing: Easing = LinearEasing) = transitionDefinition<State> {
-    state(State.None) {
-      this[Radius] = 0f
-    }
-    state(State.Finished) {
-      this[Radius] = 1f
-    }
-
-    transition {
-      Radius using tween(durationMillis = durationMillis, easing = easing)
+  val radius: Float by transition.animateFloat(
+    transitionSpec = { tween(durationMillis = durationMs) }
+  ) { state ->
+    when (state) {
+      CircularRevealState.None -> 0f
+      CircularRevealState.Finished -> 1f
     }
   }
+
+  return remember(this) {
+    CircularRevealedPainter(
+      imageBitmap = imageBitmap,
+      painter = this
+    )
+  }.also {
+    it.radius = radius
+  }
+}
+
+/**
+ * CircularRevealState is state of transition for clipping circle to reveal an image
+ * depending on its state.
+ */
+internal enum class CircularRevealState {
+  /** animation is not started. */
+  None,
+
+  /** animation is finished. */
+  Finished
 }
