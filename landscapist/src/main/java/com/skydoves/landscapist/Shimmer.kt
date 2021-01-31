@@ -29,7 +29,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.onActive
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.toRect
@@ -67,7 +67,7 @@ fun Shimmer(
   durationMillis: Int = DefaultDurationMillis
 ) {
   val animatedProgress = animatedFloat(0f)
-  onActive {
+  SideEffect {
     animatedProgress.animateTo(
       targetValue = 1f,
       anim = infiniteRepeatable(
