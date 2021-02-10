@@ -93,14 +93,5 @@ dokkaHtml.configure {
   }
 }
 
-tasks.withType(Javadoc).all { enabled = false }
-
-ext.repository = [
-    name       : "landscapist-fresco",
-    description: "Jetpack Compose image library for requesting and loading images using Fresco.",
-    websiteUrl : "https://github.com/skydoves/Landscapist",
-    scm        : 'scm:git@github.com/skydoves/Landscapist.git'
-]
-
+apply plugin: "com.vanniktech.maven.publish"
 apply from: "$rootDir/spotless.gradle"
-apply from: "$rootDir/publish.gradle"
