@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.ImagePainter
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 
@@ -35,7 +35,7 @@ import androidx.compose.ui.layout.ContentScale
  *
  * @param bitmap an image bitmap for loading for the content.
  * @param modifier adjust the drawing image layout or drawing decoration of the content.
- * @param imagePainter an image painter to draw an [ImageBitmap] into the provided canvas.
+ * @param bitmapPainter an image painter to draw an [BitmapPainter] into the provided canvas.
  * @param alignment alignment parameter used to place the loaded [ImageBitmap] in the
  * given bounds defined by the width and height.
  * @param contentScale parameter used to determine the aspect ratio scaling to be
@@ -50,7 +50,7 @@ import androidx.compose.ui.layout.ContentScale
 fun CircularRevealedImage(
   bitmap: ImageBitmap,
   modifier: Modifier = Modifier,
-  imagePainter: Painter = ImagePainter(bitmap),
+  bitmapPainter: Painter = BitmapPainter(bitmap),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String?,
@@ -61,9 +61,9 @@ fun CircularRevealedImage(
 ) {
   Image(
     painter = if (circularRevealedEnabled) {
-      imagePainter.circularReveal(bitmap, circularRevealedDuration)
+      bitmapPainter.circularReveal(bitmap, circularRevealedDuration)
     } else {
-      imagePainter
+      bitmapPainter
     },
     modifier = modifier,
     alignment = alignment,

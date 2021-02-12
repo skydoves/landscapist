@@ -22,14 +22,14 @@ package com.skydoves.landscapist
 import android.graphics.Matrix
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
-import androidx.compose.animation.animatedFloat
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.toRect
@@ -66,11 +66,11 @@ fun Shimmer(
   tilt: Float = DefaultShimmerTilt,
   durationMillis: Int = DefaultDurationMillis
 ) {
-  val animatedProgress = animatedFloat(0f)
-  SideEffect {
+  val animatedProgress = remember { androidx.compose.animation.core.Animatable(0f) }
+  LaunchedEffect(key1 = baseColor) {
     animatedProgress.animateTo(
       targetValue = 1f,
-      anim = infiniteRepeatable(
+      animationSpec = infiniteRepeatable(
         animation = tween(durationMillis = durationMillis, easing = LinearEasing)
       )
     )

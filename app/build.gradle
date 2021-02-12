@@ -68,6 +68,7 @@ dependencies {
   implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
   implementation "androidx.compose.runtime:runtime-livedata:$versions.composeVersion"
   implementation "androidx.compose.ui:ui-tooling:$versions.composeVersion"
+  implementation "androidx.constraintlayout:constraintlayout-compose:$versions.constraintVersion"
 
   // landscapist
   implementation project(":fresco")
