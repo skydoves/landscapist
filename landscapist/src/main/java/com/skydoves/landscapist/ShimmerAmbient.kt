@@ -20,7 +20,7 @@
 
 package com.skydoves.landscapist
 
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.skydoves.landscapist.ShimmerAmbientProvider.defaultShimmerParams
 
@@ -28,7 +28,7 @@ import com.skydoves.landscapist.ShimmerAmbientProvider.defaultShimmerParams
  * Ambient containing the preferred [ShimmerParams] for providing the same instance
  * in the composable hierarchy.
  */
-val AmbientShimmerParams = ambientOf { defaultShimmerParams() }
+val AmbientShimmerParams = compositionLocalOf { defaultShimmerParams() }
 
 /** A provider for taking the ambient instances related to the [Shimmer]. */
 internal object ShimmerAmbientProvider {

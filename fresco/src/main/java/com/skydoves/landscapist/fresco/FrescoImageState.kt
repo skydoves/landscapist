@@ -16,7 +16,6 @@
 
 package com.skydoves.landscapist.fresco
 
-import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.ImageBitmap
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
@@ -32,7 +31,7 @@ sealed class FrescoImageState {
   /** Request is currently in progress. */
   data class Loading(val progress: Float) : FrescoImageState()
 
-  /** Request is completed successfully amd ready to use an [ImageAsset]. */
+  /** Request is completed successfully amd ready to use an [ImageBitmap]. */
   data class Success(val imageBitmap: ImageBitmap?) : FrescoImageState()
 
   /** Request failed. */

@@ -54,9 +54,9 @@ GlideImage(
   contentScale = ContentScale.Crop,
   // shows an image with a circular revealed animation.
   circularRevealedEnabled = true,
-  // shows a placeholder imageAsset when loading.
+  // shows a placeholder ImageBitmap when loading.
   placeHolder = imageResource(R.drawable.placeholder),
-  // shows an error imageAsset when the request failed.
+  // shows an error ImageBitmap when the request failed.
   error = imageResource(R.drawable.error)
 )
 ```
@@ -167,9 +167,9 @@ CoilImage(
   contentScale = ContentScale.Crop,
   // shows an image with a circular revealed animation.
   circularRevealedEnabled = true,
-  // shows a placeholder imageAsset when loading.
+  // shows a placeholder ImageBitmap when loading.
   placeHolder = imageResource(R.drawable.placeholder),
-  // shows an error imageAsset when the request failed.
+  // shows an error ImageBitmap when the request failed.
   error = imageResource(R.drawable.error)
 )
 ```
@@ -179,11 +179,11 @@ We can customize request options using [ImageRequest](https://coil-kt.github.io/
 
 ```kotlin
 CoilImage(
-  imageRequest = ImageRequest.Builder(AmbientContext.current)
+  imageRequest = ImageRequest.Builder(LocalContext.current)
     .data(poster.poster)
     .crossfade(true)
     .build(),
-  imageLoader = ImageLoader.Builder(AmbientContext.current)
+  imageLoader = ImageLoader.Builder(LocalContext.current)
     .availableMemoryPercentage(0.25)
     .crossfade(true)
     .build(),
@@ -310,9 +310,9 @@ FrescoImage(
   contentScale = ContentScale.Crop,
   // shows an image with a circular revealed animation.
   circularRevealedEnabled = true,
-  // shows a placeholder imageAsset when loading.
+  // shows a placeholder ImageBitmap when loading.
   placeHolder = imageResource(R.drawable.placeholder),
-  // shows an error imageAsset when the request failed.
+  // shows an error ImageBitmap when the request failed.
   error = imageResource(R.drawable.error)
 )
 ```
@@ -371,7 +371,7 @@ FrescoImage(
     imageUrl = imageUrl,
     // draw a resized image.
     success = { frescoImageState ->
-      frescoImageState.imageAsset?.let {
+      frescoImageState.imageBitmap?.let {
         Image(
           asset = it,
           modifier = Modifier

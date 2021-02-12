@@ -17,8 +17,8 @@
 package com.skydoves.landscapist.coil
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.staticAmbientOf
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalContext
 import coil.ImageLoader
 import coil.imageLoader
 
@@ -26,7 +26,7 @@ import coil.imageLoader
  * Ambient containing the preferred [ImageLoader] for providing the same instance
  * in our composable hierarchy.
  */
-val AmbientCoilImageLoader = staticAmbientOf<ImageLoader?> { null }
+val AmbientCoilImageLoader = staticCompositionLocalOf<ImageLoader?> { null }
 
 /** A provider for taking the ambient instances related to the `CoilImage`. */
 internal object CoilAmbientProvider {
@@ -34,6 +34,6 @@ internal object CoilAmbientProvider {
   /** Returns the current or default [ImageLoader] for the `ColiImage` parameter. */
   @Composable
   fun getCoilImageLoader(): ImageLoader {
-    return AmbientCoilImageLoader.current ?: AmbientContext.current.imageLoader
+    return AmbientCoilImageLoader.current ?: LocalContext.current.imageLoader
   }
 }

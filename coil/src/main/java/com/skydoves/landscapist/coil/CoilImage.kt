@@ -33,8 +33,8 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.AmbientLifecycleOwner
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import coil.ImageLoader
@@ -85,8 +85,8 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 fun CoilImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  context: Context = AmbientContext.current,
-  lifecycleOwner: LifecycleOwner = AmbientLifecycleOwner.current,
+  context: Context = LocalContext.current,
+  lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
@@ -158,8 +158,8 @@ fun CoilImage(
 fun CoilImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  context: Context = AmbientContext.current,
-  lifecycleOwner: LifecycleOwner = AmbientLifecycleOwner.current,
+  context: Context = LocalContext.current,
+  lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
@@ -247,8 +247,8 @@ fun CoilImage(
 fun CoilImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  context: Context = AmbientContext.current,
-  lifecycleOwner: LifecycleOwner = AmbientLifecycleOwner.current,
+  context: Context = LocalContext.current,
+  lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -330,8 +330,8 @@ fun CoilImage(
 fun CoilImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  context: Context = AmbientContext.current,
-  lifecycleOwner: LifecycleOwner = AmbientLifecycleOwner.current,
+  context: Context = LocalContext.current,
+  lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -573,7 +573,7 @@ fun CoilImage(
   imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
-  val context = AmbientContext.current
+  val context = LocalContext.current
   val imageLoadStateFlow = remember { MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f)) }
   val disposable = remember { mutableStateOf<Disposable?>(null) }
 

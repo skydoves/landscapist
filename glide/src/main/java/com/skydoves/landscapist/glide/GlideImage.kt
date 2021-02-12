@@ -29,10 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
-import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
@@ -46,7 +45,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
- * Requests loading an image with a loading placeholder and error imageAsset.
+ * Requests loading an image with a loading placeholder and error ImageBitmap.
  *
  * ```
  * GlideImage(
@@ -66,16 +65,16 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
- * @param placeHolder An [ImageAsset] to be displayed when the request is in progress.
- * @param error An [ImageAsset] for showing instead of the target image when images are failed to load.
+ * @param placeHolder An [ImageBitmap] to be displayed when the request is in progress.
+ * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun GlideImage(
@@ -133,7 +132,7 @@ fun GlideImage(
 }
 
 /**
- * Requests loading an image with a loading placeholder and error imageAsset.
+ * Requests loading an image with a loading placeholder and error ImageBitmap.
  *
  * ```
  * GlideImage(
@@ -157,16 +156,16 @@ fun GlideImage(
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
- * @param error An [ImageAsset] for showing instead of the target image when images are failed to load.
+ * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun GlideImage(
@@ -238,10 +237,10 @@ fun GlideImage(
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
@@ -341,10 +340,10 @@ fun GlideImage(
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
- * @param alignment The alignment parameter used to place the loaded [ImageAsset] in the image container.
+ * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageAsset].
+ * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
@@ -433,7 +432,7 @@ private fun GlideImage(
   modifier: Modifier = Modifier,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
-  val context = AmbientContext.current
+  val context = LocalContext.current
   val target = remember { FlowCustomTarget() }
 
   ImageLoad(

@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
 import com.skydoves.landscapist.CircularRevealedImage
@@ -391,7 +391,7 @@ private fun FrescoImage(
   observeLoadingProcess: Boolean = false,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
-  val context = AmbientContext.current
+  val context = LocalContext.current
   val datasource = remember { imagePipeline.fetchDecodedImage(imageRequest, context) }
 
   ImageLoad(
