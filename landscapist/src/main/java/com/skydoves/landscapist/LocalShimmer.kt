@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@file:JvmName("ShimmerParamsAmbient")
+@file:JvmName("LocalShimmerParams")
 @file:JvmMultifileClass
 @file:Suppress("unused")
 
@@ -22,16 +22,16 @@ package com.skydoves.landscapist
 
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.skydoves.landscapist.ShimmerAmbientProvider.defaultShimmerParams
+import com.skydoves.landscapist.LocalShimmerProvider.defaultShimmerParams
 
 /**
- * Ambient containing the preferred [ShimmerParams] for providing the same instance
+ * Local containing the preferred [ShimmerParams] for providing the same instance
  * in the composable hierarchy.
  */
-val AmbientShimmerParams = compositionLocalOf { defaultShimmerParams() }
+val LocalShimmerParams = compositionLocalOf { defaultShimmerParams() }
 
-/** A provider for taking the ambient instances related to the [Shimmer]. */
-internal object ShimmerAmbientProvider {
+/** A provider for taking the local instances related to the [Shimmer]. */
+internal object LocalShimmerProvider {
 
   /** Returns the current or default [ShimmerParams] for the `shimmerParams` parameter. */
   fun defaultShimmerParams(): ShimmerParams {

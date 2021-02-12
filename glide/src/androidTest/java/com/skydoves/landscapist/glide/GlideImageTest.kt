@@ -22,7 +22,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsDisplayed
@@ -94,10 +94,10 @@ class GlideImageTest {
   }
 
   @Test
-  fun requestSuccess_requestBuilder_ambient() {
+  fun requestSuccess_requestBuilder_local() {
     val latch = CountDownLatch(1)
     composeTestRule.setContent {
-      val glide = Glide.with(AmbientView.current)
+      val glide = Glide.with(LocalView.current)
         .asBitmap()
         .thumbnail(0.1f)
         .transition(BitmapTransitionOptions.withCrossFade())
@@ -107,7 +107,7 @@ class GlideImageTest {
           }
         )
 
-      Providers(AmbientGlideRequestBuilder provides glide) {
+      Providers(LocalGlideRequestBuilder provides glide) {
         GlideImage(
           imageModel = IMAGE,
           modifier = Modifier

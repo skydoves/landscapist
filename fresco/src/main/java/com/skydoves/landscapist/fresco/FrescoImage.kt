@@ -71,7 +71,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
-  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
+  imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -151,7 +151,7 @@ fun FrescoImage(
 fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
-  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
+  imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -225,7 +225,7 @@ fun FrescoImage(
 fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
-  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
+  imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -320,7 +320,7 @@ fun FrescoImage(
 fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
-  imageRequest: ImageRequest = FrescoAmbientProvider.getFrescoImageRequest(imageUrl),
+  imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,

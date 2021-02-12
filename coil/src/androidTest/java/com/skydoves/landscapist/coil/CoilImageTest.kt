@@ -115,7 +115,7 @@ class CoilImageTest {
 
   @ExperimentalCoilApi
   @Test
-  fun requestSuccess_imageLoader_ambient() {
+  fun requestSuccess_imageLoader_local() {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     val latch = CountDownLatch(1)
 
@@ -132,7 +132,7 @@ class CoilImageTest {
       .build()
 
     composeTestRule.setContent {
-      Providers(AmbientCoilImageLoader provides imageLoader) {
+      Providers(LocalCoilImageLoader provides imageLoader) {
         CoilImage(
           imageModel = IMAGE,
           modifier = Modifier.preferredSize(128.dp, 128.dp),

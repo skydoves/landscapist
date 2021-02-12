@@ -96,7 +96,7 @@ class FrescoImageTest {
   }
 
   @Test
-  fun requestSuccess_requestBuilder_ambient() {
+  fun requestSuccess_requestBuilder_local() {
     val latch = CountDownLatch(1)
     composeTestRule.setContent {
       val imageRequest = ImageRequestBuilder
@@ -107,7 +107,7 @@ class FrescoImageTest {
         .setResizeOptions(ResizeOptions(350, 350))
         .build()
 
-      Providers(AmbientFrescoImageRequest provides imageRequest) {
+      Providers(LocalFrescoImageRequest provides imageRequest) {
         FrescoImage(
           imageUrl = IMAGE,
           modifier = Modifier

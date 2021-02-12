@@ -23,17 +23,17 @@ import coil.ImageLoader
 import coil.imageLoader
 
 /**
- * Ambient containing the preferred [ImageLoader] for providing the same instance
+ * Local containing the preferred [ImageLoader] for providing the same instance
  * in our composable hierarchy.
  */
-val AmbientCoilImageLoader = staticCompositionLocalOf<ImageLoader?> { null }
+val LocalCoilImageLoader = staticCompositionLocalOf<ImageLoader?> { null }
 
-/** A provider for taking the ambient instances related to the `CoilImage`. */
-internal object CoilAmbientProvider {
+/** A provider for taking the local instances related to the `CoilImage`. */
+internal object LocalCoilProvider {
 
   /** Returns the current or default [ImageLoader] for the `ColiImage` parameter. */
   @Composable
   fun getCoilImageLoader(): ImageLoader {
-    return AmbientCoilImageLoader.current ?: LocalContext.current.imageLoader
+    return LocalCoilImageLoader.current ?: LocalContext.current.imageLoader
   }
 }

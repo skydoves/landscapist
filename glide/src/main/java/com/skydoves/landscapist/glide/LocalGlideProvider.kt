@@ -25,30 +25,30 @@ import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
 
 /**
- * Ambient containing the preferred [RequestOptions] for providing the same instance
+ * Local containing the preferred [RequestOptions] for providing the same instance
  * in our composable hierarchy.
  */
-val AmbientGlideRequestOptions = staticCompositionLocalOf<RequestOptions?> { null }
+val LocalGlideRequestOptions = staticCompositionLocalOf<RequestOptions?> { null }
 
 /**
- * Ambient containing the preferred [RequestBuilder] for providing the same instance
+ * Local containing the preferred [RequestBuilder] for providing the same instance
  * in our composable hierarchy.
  */
-val AmbientGlideRequestBuilder = staticCompositionLocalOf<RequestBuilder<Bitmap>?> { null }
+val LocalGlideRequestBuilder = staticCompositionLocalOf<RequestBuilder<Bitmap>?> { null }
 
-/** A provider for taking the ambient instances related to the `GlideImage`. */
-internal object GlideAmbientProvider {
+/** A provider for taking the local instances related to the `GlideImage`. */
+internal object LocalGlideProvider {
 
   /** Returns the current or default [RequestOptions] for the `GlideImage` parameter. */
   @Composable
   fun getGlideRequestOptions(): RequestOptions {
-    return AmbientGlideRequestOptions.current ?: RequestOptions()
+    return LocalGlideRequestOptions.current ?: RequestOptions()
   }
 
   /** Returns the current or default [RequestBuilder] for the `GlideImage` parameter. */
   @Composable
   fun getGlideRequestBuilder(imageModel: Any): RequestBuilder<Bitmap> {
-    return AmbientGlideRequestBuilder.current
+    return LocalGlideRequestBuilder.current
       ?: Glide
         .with(LocalView.current)
         .asBitmap()

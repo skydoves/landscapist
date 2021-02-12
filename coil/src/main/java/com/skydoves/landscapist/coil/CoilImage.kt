@@ -69,7 +69,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [CoilAmbientProvider.getCoilImageLoader].
+ * Defaults to [LocalCoilProvider.getCoilImageLoader].
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -87,7 +87,7 @@ fun CoilImage(
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-  imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
+  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
@@ -142,7 +142,7 @@ fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [CoilAmbientProvider.getCoilImageLoader].
+ * Defaults to [LocalCoilProvider.getCoilImageLoader].
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -160,7 +160,7 @@ fun CoilImage(
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-  imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
+  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
@@ -231,7 +231,7 @@ fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [CoilAmbientProvider.getCoilImageLoader].
+ * Defaults to [LocalCoilProvider.getCoilImageLoader].
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -249,7 +249,7 @@ fun CoilImage(
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-  imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
+  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -313,7 +313,7 @@ fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [CoilAmbientProvider.getCoilImageLoader].
+ * Defaults to [LocalCoilProvider.getCoilImageLoader].
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -332,7 +332,7 @@ fun CoilImage(
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-  imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
+  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -386,7 +386,7 @@ fun CoilImage(
  * @param imageRequest The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [CoilAmbientProvider.getCoilImageLoader].
+ * Defaults to [LocalCoilProvider.getCoilImageLoader].
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -402,7 +402,7 @@ fun CoilImage(
 fun CoilImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
-  imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
+  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -483,7 +483,7 @@ fun CoilImage(
  * @param imageRequest The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [CoilAmbientProvider.getCoilImageLoader].
+ * Defaults to [LocalCoilProvider.getCoilImageLoader].
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -500,7 +500,7 @@ fun CoilImage(
 fun CoilImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
-  imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
+  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -570,7 +570,7 @@ fun CoilImage(
 fun CoilImage(
   request: ImageRequest,
   modifier: Modifier = Modifier,
-  imageLoader: ImageLoader = CoilAmbientProvider.getCoilImageLoader(),
+  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current

@@ -83,7 +83,7 @@ Also we can request image by passing a [RequestBuilder](https://bumptech.github.
 GlideImage(
   imageModel = poster.poster,
   requestBuilder = Glide
-    .with(AmbientView.current)
+    .with(LocalView.current)
     .asBitmap()
     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
     .thumbnail(0.1f)
@@ -95,16 +95,16 @@ GlideImage(
 )
 ```
 
-#### AmbientGlideRequestBuilder
+#### LocalGlideRequestBuilder
 We can provide the same instance of the `RequestBuilder` in the composable hierarchy.
 ```kotlin
 // customize the RequestBuilder as needed
-val requestBuilder = Glide.with(AmbientView.current)
+val requestBuilder = Glide.with(LocalView.current)
   .asBitmap()
   .thumbnail(0.1f)
   .transition(BitmapTransitionOptions.withCrossFade())
 
-Providers(AmbientGlideRequestBuilder provides requestBuilder) {
+Providers(LocalGlideRequestBuilder provides requestBuilder) {
   // This will automatically use the value of current RequestBuilder in the hierarchy.
   GlideImage(
     imageModel = ...
@@ -248,13 +248,13 @@ We can give a shimmering effect when loading images using a `ShimmerParams`. We 
  })
  ```
 
- ### AmbientCoilImageLoader
+ ### LocalCoilImageLoader
  We can provide the same instance of the `ImageLoader` in the composable hierarchy.
  ```kotlin
  val imageLoader = ImageLoader.Builder(context)
     // customize the ImageLoader as needed
     .build()
-Providers(AmbientCoilImageLoader provides imageLoader) {
+Providers(LocalCoilImageLoader provides imageLoader) {
    // This will automatically use the value of current imageLoader in the hierarchy.
    CoilImage(
      imageModel = ...
@@ -384,7 +384,7 @@ FrescoImage(
     })
 ```
 
-#### AmbientFrescoImageRequest
+#### LocalFrescoImageRequest
 We can provide the same instance of the `ImageRequest` in the composable hierarchy.
 ```kotlin
 // customize the ImageRequest as needed
@@ -397,7 +397,7 @@ val imageRequest = ImageRequestBuilder
   .setResizeOptions(ResizeOptions(width, height))
   .build()
 
-Providers(AmbientFrescoImageRequest provides imageRequest) {
+Providers(LocalFrescoImageRequest provides imageRequest) {
   // This will automatically use the value of current ImageRequest in the hierarchy.
   FrescoImage(
     imageurl = ...

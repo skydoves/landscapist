@@ -51,7 +51,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * GlideImage(
  *   imageModel = imageUrl,
  *   requestBuilder = Glide
- *     .with(ContextAmbient.current)
+ *     .with(LocalContext.current)
  *     .asBitmap()
  *     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *     .thumbnail(0.6f)
@@ -80,8 +80,8 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
-  requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
+  requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
+  requestOptions: RequestOptions = LocalGlideProvider.getGlideRequestOptions(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -138,7 +138,7 @@ fun GlideImage(
  * GlideImage(
  *   imageModel = imageUrl,
  *   requestBuilder = Glide
- *     .with(ContextAmbient.current)
+ *     .with(LocalContext.current)
  *     .asBitmap()
  *     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *     .thumbnail(0.6f)
@@ -171,8 +171,8 @@ fun GlideImage(
 fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
-  requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
+  requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
+  requestOptions: RequestOptions = LocalGlideProvider.getGlideRequestOptions(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -218,7 +218,7 @@ fun GlideImage(
  * GlideImage(
  * imageModel = imageUrl,
  * requestBuilder = Glide
- *   .with(ContextAmbient.current)
+ *   .with(LocalContext.current)
  *   .asBitmap()
  *   .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *   .thumbnail(0.6f)
@@ -253,8 +253,8 @@ fun GlideImage(
 fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
-  requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
+  requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
+  requestOptions: RequestOptions = LocalGlideProvider.getGlideRequestOptions(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -310,7 +310,7 @@ fun GlideImage(
  * GlideImage(
  * imageModel = imageUrl,
  * requestBuilder = Glide
- *   .with(ContextAmbient.current)
+ *   .with(LocalContext.current)
  *   .asBitmap()
  *   .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *   .thumbnail(0.6f)
@@ -356,8 +356,8 @@ fun GlideImage(
 fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  requestBuilder: RequestBuilder<Bitmap> = GlideAmbientProvider.getGlideRequestBuilder(imageModel),
-  requestOptions: RequestOptions = GlideAmbientProvider.getGlideRequestOptions(),
+  requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
+  requestOptions: RequestOptions = LocalGlideProvider.getGlideRequestOptions(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -404,7 +404,7 @@ fun GlideImage(
  * ```
  * GlideImage(
  * requestBuilder = Glide
- *   .with(ContextAmbient.current)
+ *   .with(LocalContext.current)
  *   .asBitmap()
  *   .load(poster.poster)
  *   .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
