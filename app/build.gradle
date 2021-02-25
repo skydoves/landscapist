@@ -60,6 +60,7 @@ dependencies {
 
   // compose
   implementation "androidx.compose.ui:ui:$versions.composeVersion"
+  implementation "androidx.activity:activity-compose:$versions.activityVersion"
   implementation "androidx.compose.material:material:$versions.composeVersion"
   implementation "androidx.compose.material:material-icons-extended:$versions.composeVersion"
   implementation "androidx.compose.foundation:foundation:$versions.composeVersion"
