@@ -14,6 +14,13 @@ buildscript {
   }
 }
 
+apply plugin: 'org.jetbrains.dokka'
+
+tasks.withType(org.jetbrains.dokka.gradle.DokkaMultiModuleTask).configureEach {
+  outputDirectory = rootProject.file('docs/api')
+  failOnWarning = true
+}
+
 allprojects {
   repositories {
     google()
