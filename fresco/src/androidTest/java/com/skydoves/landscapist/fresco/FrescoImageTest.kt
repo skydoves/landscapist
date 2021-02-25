@@ -18,8 +18,8 @@ package com.skydoves.landscapist.fresco
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.runtime.Providers
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -59,7 +59,7 @@ class FrescoImageTest {
       FrescoImage(
         imageUrl = IMAGE,
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_FRESCO),
         contentScale = ContentScale.Crop,
         observeLoadingProcess = false
@@ -78,7 +78,7 @@ class FrescoImageTest {
       FrescoImage(
         imageUrl = IMAGE,
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_FRESCO),
         shimmerParams = ShimmerParams(
           baseColor = Color.DarkGray,
@@ -107,11 +107,11 @@ class FrescoImageTest {
         .setResizeOptions(ResizeOptions(350, 350))
         .build()
 
-      Providers(LocalFrescoImageRequest provides imageRequest) {
+      CompositionLocalProvider(LocalFrescoImageRequest provides imageRequest) {
         FrescoImage(
           imageUrl = IMAGE,
           modifier = Modifier
-            .preferredSize(128.dp, 128.dp)
+            .size(128.dp, 128.dp)
             .testTag(TAG_FRESCO),
           contentScale = ContentScale.Crop
         )
@@ -130,7 +130,7 @@ class FrescoImageTest {
       FrescoImage(
         imageUrl = IMAGE,
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_FRESCO),
         contentScale = ContentScale.Crop,
         observeLoadingProcess = true,
@@ -156,7 +156,7 @@ class FrescoImageTest {
       FrescoImage(
         imageUrl = IMAGE,
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_FRESCO),
         contentScale = ContentScale.Crop,
         observeLoadingProcess = true,
@@ -192,7 +192,7 @@ class FrescoImageTest {
       FrescoImage(
         imageUrl = "",
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_FRESCO),
         contentScale = ContentScale.Crop,
         observeLoadingProcess = true,

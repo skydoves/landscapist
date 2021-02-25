@@ -17,8 +17,8 @@
 package com.skydoves.landscapist.coil
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.runtime.Providers
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -62,7 +62,7 @@ class CoilImageTest {
       CoilImage(
         imageModel = IMAGE,
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_COIL),
         contentScale = ContentScale.Crop
       )
@@ -80,7 +80,7 @@ class CoilImageTest {
       CoilImage(
         imageModel = IMAGE,
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_COIL),
         shimmerParams = ShimmerParams(
           baseColor = Color.DarkGray,
@@ -101,7 +101,7 @@ class CoilImageTest {
     composeTestRule.setContent {
       CoilImage(
         imageModel = IMAGE,
-        modifier = Modifier.preferredSize(128.dp, 128.dp).testTag(TAG_COIL),
+        modifier = Modifier.size(128.dp, 128.dp).testTag(TAG_COIL),
         contentScale = ContentScale.Crop,
         loading = { Box(modifier = Modifier) }
       )
@@ -132,10 +132,10 @@ class CoilImageTest {
       .build()
 
     composeTestRule.setContent {
-      Providers(LocalCoilImageLoader provides imageLoader) {
+      CompositionLocalProvider(LocalCoilImageLoader provides imageLoader) {
         CoilImage(
           imageModel = IMAGE,
-          modifier = Modifier.preferredSize(128.dp, 128.dp),
+          modifier = Modifier.size(128.dp, 128.dp),
           contentScale = ContentScale.Crop,
           loading = { Box(modifier = Modifier) }
         )
@@ -156,7 +156,7 @@ class CoilImageTest {
       CoilImage(
         imageModel = IMAGE,
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_COIL),
         contentScale = ContentScale.Crop,
         success = {
@@ -191,7 +191,7 @@ class CoilImageTest {
       CoilImage(
         imageModel = "",
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_COIL),
         contentScale = ContentScale.Crop,
         failure = {

@@ -17,8 +17,8 @@
 package com.skydoves.landscapist.glide
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.runtime.Providers
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -58,7 +58,7 @@ class GlideImageTest {
       GlideImage(
         imageModel = IMAGE,
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
         contentScale = ContentScale.Crop
       )
@@ -76,7 +76,7 @@ class GlideImageTest {
       GlideImage(
         imageModel = IMAGE,
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
         circularRevealedEnabled = true,
         shimmerParams = ShimmerParams(
@@ -107,11 +107,11 @@ class GlideImageTest {
           }
         )
 
-      Providers(LocalGlideRequestBuilder provides glide) {
+      CompositionLocalProvider(LocalGlideRequestBuilder provides glide) {
         GlideImage(
           imageModel = IMAGE,
           modifier = Modifier
-            .preferredSize(128.dp, 128.dp)
+            .size(128.dp, 128.dp)
             .testTag(TAG_GLIDE),
           contentScale = ContentScale.Crop
         )
@@ -135,7 +135,7 @@ class GlideImageTest {
       GlideImage(
         imageModel = IMAGE,
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
         contentScale = ContentScale.Crop,
         loading = {
@@ -160,7 +160,7 @@ class GlideImageTest {
       GlideImage(
         imageModel = IMAGE,
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
         contentScale = ContentScale.Crop,
         success = {
@@ -195,7 +195,7 @@ class GlideImageTest {
       GlideImage(
         imageModel = "",
         modifier = Modifier
-          .preferredSize(128.dp, 128.dp)
+          .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
         contentScale = ContentScale.Crop,
         failure = {
