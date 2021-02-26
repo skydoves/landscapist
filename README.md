@@ -104,7 +104,7 @@ val requestBuilder = Glide.with(LocalView.current)
   .thumbnail(0.1f)
   .transition(BitmapTransitionOptions.withCrossFade())
 
-Providers(LocalGlideRequestBuilder provides requestBuilder) {
+CompositionLocalProvider(LocalGlideRequestBuilder provides requestBuilder) {
   // This will automatically use the value of current RequestBuilder in the hierarchy.
   GlideImage(
     imageModel = ...
@@ -254,7 +254,7 @@ We can give a shimmering effect when loading images using a `ShimmerParams`. We 
  val imageLoader = ImageLoader.Builder(context)
     // customize the ImageLoader as needed
     .build()
-Providers(LocalCoilImageLoader provides imageLoader) {
+CompositionLocalProvider(LocalCoilImageLoader provides imageLoader) {
    // This will automatically use the value of current imageLoader in the hierarchy.
    CoilImage(
      imageModel = ...
@@ -397,7 +397,7 @@ val imageRequest = ImageRequestBuilder
   .setResizeOptions(ResizeOptions(width, height))
   .build()
 
-Providers(LocalFrescoImageRequest provides imageRequest) {
+CompositionLocalProvider(LocalFrescoImageRequest provides imageRequest) {
   // This will automatically use the value of current ImageRequest in the hierarchy.
   FrescoImage(
     imageurl = ...
