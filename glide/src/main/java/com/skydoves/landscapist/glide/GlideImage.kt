@@ -288,6 +288,7 @@ fun GlideImage(
       is GlideImageState.Success -> {
         success?.invoke(glideImageState) ?: glideImageState.imageBitmap?.let {
           CircularRevealedImage(
+            modifier = modifier,
             bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
@@ -382,6 +383,7 @@ fun GlideImage(
       is GlideImageState.Success -> {
         success?.invoke(glideImageState) ?: glideImageState.imageBitmap?.let {
           CircularRevealedImage(
+            modifier = modifier,
             bitmap = it,
             alignment = alignment,
             contentScale = contentScale,

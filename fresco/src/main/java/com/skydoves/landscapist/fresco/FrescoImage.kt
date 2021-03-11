@@ -259,6 +259,7 @@ fun FrescoImage(
       is FrescoImageState.Success -> {
         success?.invoke(frescoImageState) ?: frescoImageState.imageBitmap?.let {
           CircularRevealedImage(
+            modifier = modifier,
             bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
@@ -345,6 +346,7 @@ fun FrescoImage(
       is FrescoImageState.Success -> {
         success?.invoke(frescoImageState) ?: frescoImageState.imageBitmap?.let {
           CircularRevealedImage(
+            modifier = modifier,
             bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
