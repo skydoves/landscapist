@@ -435,6 +435,7 @@ fun CoilImage(
       is CoilImageState.Success -> {
         success?.invoke(coilImageState) ?: coilImageState.imageBitmap?.let {
           CircularRevealedImage(
+            modifier = modifier,
             bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
@@ -524,6 +525,7 @@ fun CoilImage(
       is CoilImageState.Success -> {
         success?.invoke(coilImageState) ?: coilImageState.imageBitmap?.let {
           CircularRevealedImage(
+            modifier = modifier,
             bitmap = it,
             alignment = alignment,
             contentScale = contentScale,
