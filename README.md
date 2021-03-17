@@ -55,9 +55,9 @@ GlideImage(
   // shows an image with a circular revealed animation.
   circularRevealedEnabled = true,
   // shows a placeholder ImageBitmap when loading.
-  placeHolder = imageResource(R.drawable.placeholder),
+  placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
   // shows an error ImageBitmap when the request failed.
-  error = imageResource(R.drawable.error)
+  error = ImageBitmap.imageResource(R.drawable.error)
 )
 ```
 
@@ -168,9 +168,9 @@ CoilImage(
   // shows an image with a circular revealed animation.
   circularRevealedEnabled = true,
   // shows a placeholder ImageBitmap when loading.
-  placeHolder = imageResource(R.drawable.placeholder),
+  placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
   // shows an error ImageBitmap when the request failed.
-  error = imageResource(R.drawable.error)
+  error = ImageBitmap.imageResource(R.drawable.error)
 )
 ```
 
@@ -311,9 +311,9 @@ FrescoImage(
   // shows an image with a circular revealed animation.
   circularRevealedEnabled = true,
   // shows a placeholder ImageBitmap when loading.
-  placeHolder = imageResource(R.drawable.placeholder),
+  placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
   // shows an error ImageBitmap when the request failed.
-  error = imageResource(R.drawable.error)
+  error = ImageBitmap.imageResource(R.drawable.error)
 )
 ```
 We can customize our requests using an [ImageRequest](https://frescolib.org/docs/image-requests.html) that consists only of a URI, we can use the helper method ImageRequest.fromURI.
