@@ -26,10 +26,8 @@ subprojects {
   tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach { compile ->
     kotlinOptions {
       jvmTarget = "1.8"
-      freeCompilerArgs += "-Xallow-jvm-ir-dependencies"
       freeCompilerArgs += "-Xskip-prerelease-check"
       freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
-      useIR = true
     }
   }
 }
