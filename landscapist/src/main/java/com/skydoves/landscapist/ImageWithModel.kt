@@ -22,6 +22,7 @@ package com.skydoves.landscapist
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
@@ -43,25 +44,29 @@ import androidx.compose.ui.layout.ContentScale
 @Composable
 fun ImageWithSource(
   source: Any,
+  modifier: Modifier,
   alignment: Alignment,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   colorFilter: ColorFilter? = null,
   alpha: Float = DefaultAlpha,
 ) {
-  if (source is ImageBitmap) {
-    Image(
-      bitmap = source,
-      alignment = alignment,
-      contentDescription = contentDescription,
-      contentScale = contentScale,
-      colorFilter = colorFilter,
-      alpha = alpha,
-    )
-  } else if (source is ImageVector) {
-    if (source is ImageBitmap) {
+  when (source) {
+    is ImageBitmap -> {
+      Image(
+        bitmap = source,
+        modifier = modifier,
+        alignment = alignment,
+        contentDescription = contentDescription,
+        contentScale = contentScale,
+        colorFilter = colorFilter,
+        alpha = alpha,
+      )
+    }
+    is ImageVector -> {
       Image(
         imageVector = source,
+        modifier = modifier,
         alignment = alignment,
         contentDescription = contentDescription,
         contentScale = contentScale,
@@ -69,10 +74,10 @@ fun ImageWithSource(
         alpha = alpha,
       )
     }
-  } else if (source is Painter) {
-    if (source is ImageBitmap) {
+    is Painter -> {
       Image(
         painter = source,
+        modifier = modifier,
         alignment = alignment,
         contentDescription = contentDescription,
         contentScale = contentScale,
@@ -80,10 +85,11 @@ fun ImageWithSource(
         alpha = alpha,
       )
     }
-  } else {
-    throw IllegalArgumentException(
-      "Wrong source was used: $source, " +
-        "The source should be one of ImageBitmap, ImageVector, or Painter."
-    )
+    else -> {
+      throw IllegalArgumentException(
+        "Wrong source was used: $source, " +
+          "The source should be one of ImageBitmap, ImageVector, or Painter."
+      )
+    }
   }
 }
