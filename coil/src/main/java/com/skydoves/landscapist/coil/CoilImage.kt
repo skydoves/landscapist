@@ -21,7 +21,6 @@
 package com.skydoves.landscapist.coil
 
 import android.content.Context
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +31,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -44,6 +45,7 @@ import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageWithSource
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,7 +53,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
- * Requests loading an image with a loading placeholder and error ImageBitmap.
+ * Requests loading an image with a loading placeholder and error image resource ([ImageBitmap], [ImageVector], [Painter]).
  *
  * ```
  * CoilImage(
@@ -60,8 +62,14 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  *  baseColor = backgroundColor,
  *  highlightColor = highlightColor
  * ),
- *  error = imageResource(R.drawable.error)
+ *  error = ImageBitmap.imageResource(R.drawable.error)
  * )
+ * ```
+ *
+ * or we can use [ImageVector] or custom [Painter] like the below.
+ *
+ * ```
+ * error = ImageVector.vectorResource(R.drawable.error)
  * ```
  *
  * @param imageModel The data model to request image. See [ImageRequest.Builder.data] for types allowed.
@@ -79,7 +87,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
- * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
+ * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun CoilImage(
@@ -96,7 +104,7 @@ fun CoilImage(
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   colorFilter: ColorFilter? = null,
   shimmerParams: ShimmerParams,
-  error: ImageBitmap? = null,
+  error: Any? = null,
 ) {
   CoilImage(
     imageModel = imageModel,
@@ -113,13 +121,14 @@ fun CoilImage(
     shimmerParams = shimmerParams,
     failure = {
       error?.let {
-        Image(
-          bitmap = it,
-          alignment = alignment,
-          contentDescription = contentDescription,
-          contentScale = contentScale,
-          colorFilter = colorFilter,
-          alpha = alpha,
+        ImageWithSource(
+          source = it,
+          modifier = modifier,
+          alignment,
+          contentScale,
+          contentDescription,
+          colorFilter,
+          alpha
         )
       }
     }
@@ -127,14 +136,21 @@ fun CoilImage(
 }
 
 /**
- * Requests loading an image with a loading placeholder and error ImageBitmap.
+ * Requests loading an image with a loading placeholder and error image resource ([ImageBitmap], [ImageVector], [Painter]).
  *
  * ```
  * CoilImage(
  *   imageModel = imageModel,
- *   placeHolder = imageResource(R.drawable.placeholder),
- *   error = imageResource(R.drawable.error)
+ *   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
+ *   error = ImageBitmap.imageResource(R.drawable.error)
  * )
+ * ```
+ *
+ * or we can use [ImageVector] or custom [Painter] like the below.
+ *
+ * ```
+ * placeHolder = ImageVector.vectorResource(R.drawable.placeholder)
+ * error = ImageVector.vectorResource(R.drawable.error)
  * ```
  *
  * @param imageModel The data model to request image. See [ImageRequest.Builder.data] for types allowed.
@@ -151,8 +167,8 @@ fun CoilImage(
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
- * @param placeHolder An [ImageBitmap] to be displayed when the request is in progress.
- * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
+ * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
+ * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun CoilImage(
@@ -168,8 +184,8 @@ fun CoilImage(
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   colorFilter: ColorFilter? = null,
-  placeHolder: ImageBitmap? = null,
-  error: ImageBitmap? = null,
+  placeHolder: Any? = null,
+  error: Any? = null,
 ) {
   CoilImage(
     imageModel = imageModel,
@@ -185,8 +201,9 @@ fun CoilImage(
     circularRevealedDuration = circularRevealedDuration,
     loading = {
       placeHolder?.let {
-        Image(
-          bitmap = it,
+        ImageWithSource(
+          source = it,
+          modifier = modifier,
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
@@ -197,8 +214,9 @@ fun CoilImage(
     },
     failure = {
       error?.let {
-        Image(
-          bitmap = it,
+        ImageWithSource(
+          source = it,
+          modifier = modifier,
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
