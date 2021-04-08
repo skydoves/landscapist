@@ -43,9 +43,9 @@ import coil.request.Disposable
 import coil.request.ImageRequest
 import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
+import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
-import com.skydoves.landscapist.ImageWithSource
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -121,7 +121,7 @@ fun CoilImage(
     shimmerParams = shimmerParams,
     failure = {
       error?.let {
-        ImageWithSource(
+        ImageBySource(
           source = it,
           modifier = modifier,
           alignment,
@@ -201,7 +201,7 @@ fun CoilImage(
     circularRevealedDuration = circularRevealedDuration,
     loading = {
       placeHolder?.let {
-        ImageWithSource(
+        ImageBySource(
           source = it,
           modifier = modifier,
           alignment = alignment,
@@ -214,7 +214,7 @@ fun CoilImage(
     },
     failure = {
       error?.let {
-        ImageWithSource(
+        ImageBySource(
           source = it,
           modifier = modifier,
           alignment = alignment,

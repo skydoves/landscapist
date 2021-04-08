@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 
 /**
- * Draw image with a drawable source one of [ImageBitmap], [ImageVector], or [Painter].
+ * Draw image using a drawable source one of [ImageBitmap], [ImageVector], or [Painter].
  *
  * @param source Image source one of [ImageBitmap], [ImageVector], or [Painter].
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
@@ -42,7 +42,7 @@ import androidx.compose.ui.layout.ContentScale
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  */
 @Composable
-fun ImageWithSource(
+fun ImageBySource(
   source: Any,
   modifier: Modifier,
   alignment: Alignment,
