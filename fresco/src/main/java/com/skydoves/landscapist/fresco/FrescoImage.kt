@@ -20,7 +20,6 @@
 
 package com.skydoves.landscapist.fresco
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -29,12 +28,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
 import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
+import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.Shimmer
@@ -43,14 +45,21 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
- * Requests loading an image with a loading placeholder and error ImageBitmap.
+ * Requests loading an image with a loading placeholder and error image resource ([ImageBitmap], [ImageVector], [Painter]).
  *
  * ```
  * FrescoImage(
  *   imageUrl = stringImageUrl,
- *   placeHolder = imageResource(R.drawable.placeholder),
- *   error = imageResource(R.drawable.error)
+ *   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
+ *   error = ImageBitmap.imageResource(R.drawable.error)
  * )
+ * ```
+ *
+ * or we can use [ImageVector] or custom [Painter] like the below.
+ *
+ * ```
+ * placeHolder = ImageVector.vectorResource(R.drawable.placeholder)
+ * error = ImageVector.vectorResource(R.drawable.error)
  * ```
  *
  * @param imageUrl The target url to request image.
@@ -64,8 +73,8 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
- * @param placeHolder An [ImageBitmap] to be displayed when the request is in progress.
- * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
+ * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
+ * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun FrescoImage(
@@ -79,8 +88,8 @@ fun FrescoImage(
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
-  placeHolder: ImageBitmap? = null,
-  error: ImageBitmap? = null,
+  placeHolder: Any? = null,
+  error: Any? = null,
   observeLoadingProcess: Boolean = false
 ) {
   FrescoImage(
@@ -97,8 +106,9 @@ fun FrescoImage(
     observeLoadingProcess = observeLoadingProcess,
     loading = {
       placeHolder?.let {
-        Image(
-          bitmap = it,
+        ImageBySource(
+          source = it,
+          modifier = modifier,
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
@@ -109,8 +119,9 @@ fun FrescoImage(
     },
     failure = {
       error?.let {
-        Image(
-          bitmap = it,
+        ImageBySource(
+          source = it,
+          modifier = modifier,
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
@@ -123,14 +134,20 @@ fun FrescoImage(
 }
 
 /**
- * Requests loading an image with a loading placeholder and error ImageBitmap.
+ * Requests loading an image with a loading an error image resource ([ImageBitmap], [ImageVector], [Painter]).
  *
  * ```
  * FrescoImage(
  *   imageUrl = stringImageUrl,
- *   placeHolder = imageResource(R.drawable.placeholder),
- *   error = imageResource(R.drawable.error)
+ *   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
+ *   error = ImageBitmap.imageResource(R.drawable.error)
  * )
+ * ```
+ *
+ * or we can use [ImageVector] or custom [Painter] like the below.
+ *
+ * ```
+ * error = ImageVector.vectorResource(R.drawable.error)
  * ```
  *
  * @param imageUrl The target url to request image.
@@ -178,8 +195,9 @@ fun FrescoImage(
     shimmerParams = shimmerParams,
     failure = {
       error?.let {
-        Image(
-          bitmap = it,
+        ImageBySource(
+          source = it,
+          modifier = modifier,
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
