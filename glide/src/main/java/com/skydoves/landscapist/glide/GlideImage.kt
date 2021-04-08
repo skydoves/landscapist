@@ -21,7 +21,6 @@
 package com.skydoves.landscapist.glide
 
 import android.graphics.Bitmap
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -30,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import com.bumptech.glide.Glide
@@ -37,6 +38,7 @@ import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
 import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
+import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.Shimmer
@@ -45,7 +47,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
- * Requests loading an image with a loading placeholder and error ImageBitmap.
+ * Requests loading an image with a loading placeholder and error image resource ([ImageBitmap], [ImageVector], [Painter]).
  *
  * ```
  * GlideImage(
@@ -56,8 +58,8 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  *     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *     .thumbnail(0.6f)
  *     .transition(withCrossFade()),
- *   placeHolder = imageResource(R.drawable.placeholder),
- *   error = imageResource(R.drawable.error)
+ *   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
+ *   error = ImageBitmap.imageResource(R.drawable.error)
  * )
  * ```
  *
@@ -73,8 +75,8 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
- * @param placeHolder An [ImageBitmap] to be displayed when the request is in progress.
- * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
+ * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
+ * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun GlideImage(
@@ -89,8 +91,8 @@ fun GlideImage(
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
-  placeHolder: ImageBitmap? = null,
-  error: ImageBitmap? = null
+  placeHolder: Any? = null,
+  error: Any? = null
 ) {
   GlideImage(
     imageModel = imageModel,
@@ -106,8 +108,9 @@ fun GlideImage(
     circularRevealedDuration = circularRevealedDuration,
     loading = {
       placeHolder?.let {
-        Image(
-          bitmap = it,
+        ImageBySource(
+          source = it,
+          modifier = modifier,
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
@@ -118,8 +121,9 @@ fun GlideImage(
     },
     failure = {
       error?.let {
-        Image(
-          bitmap = it,
+        ImageBySource(
+          source = it,
+          modifier = modifier,
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
@@ -132,7 +136,7 @@ fun GlideImage(
 }
 
 /**
- * Requests loading an image with a loading placeholder and error ImageBitmap.
+ * Requests loading an image with a loading placeholder and error image resource ([ImageBitmap], [ImageVector], [Painter]).
  *
  * ```
  * GlideImage(
@@ -148,7 +152,7 @@ fun GlideImage(
  *      baseColor = backgroundColor,
  *      highlightColor = highlightColor
  *   ),
- *   error = imageResource(R.drawable.error)
+ *   error = ImageVector.vectorResource(R.drawable.error)
  * )
  * ```
  *
@@ -165,7 +169,7 @@ fun GlideImage(
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
- * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
+ * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
 fun GlideImage(
@@ -181,7 +185,7 @@ fun GlideImage(
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   shimmerParams: ShimmerParams,
-  error: ImageBitmap? = null
+  error: Any? = null
 ) {
   GlideImage(
     imageModel = imageModel,
@@ -198,8 +202,9 @@ fun GlideImage(
     shimmerParams = shimmerParams,
     failure = {
       error?.let {
-        Image(
-          bitmap = it,
+        ImageBySource(
+          source = it,
+          modifier = modifier,
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
