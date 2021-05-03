@@ -8,7 +8,7 @@ ext.versions = [
     spotlessGradle   : '5.9.0',
     ktlintGradle     : '0.40.0',
     dokkaGradle      : '1.4.20',
-    mavenPublish     : '0.13.0',
+    mavenPublish     : '0.15.1',
 
     kotlin           : '1.4.32',
     coreKtxVersion   : '1.5.0-beta01',
