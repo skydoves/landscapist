@@ -4,7 +4,7 @@ ext.versions = [
     versionCode      : 18,
     versionName      : '1.1.7',
 
-    gradleBuildTool  : '7.0.0-alpha10',
+    gradleBuildTool  : '7.0.0-beta01',
     spotlessGradle   : '5.9.0',
     ktlintGradle     : '0.40.0',
     dokkaGradle      : '1.4.20',
@@ -12,9 +12,9 @@ ext.versions = [
 
     kotlin           : '1.4.32',
     coreKtxVersion   : '1.5.0-beta01',
-    composeVersion   : '1.0.0-beta06',
-    constraintVersion: '1.0.0-alpha03',
-    activityVersion  : '1.3.0-alpha03',
+    composeVersion   : '1.0.0-beta07',
+    constraintVersion: '1.0.0-alpha06',
+    activityVersion  : '1.3.0-alpha07',
     coroutinesVersion: '1.4.1',
 
     frescoVersion    : '2.3.0',
