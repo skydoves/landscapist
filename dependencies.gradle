@@ -7,7 +7,7 @@ ext.versions = [
     gradleBuildTool  : '7.0.0-beta03',
     spotlessGradle   : '5.12.3',
     ktlintGradle     : '0.40.0',
-    dokkaGradle      : '1.4.20',
+    dokkaGradle      : '1.4.32',
     mavenPublish     : '0.15.1',
 
     kotlin           : '1.5.10',
