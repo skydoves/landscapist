@@ -19,7 +19,7 @@ ext.versions = [
 
     frescoVersion    : '2.4.0',
     glideVersion     : '4.12.0',
-    coilVersion      : '1.0.0',
+    coilVersion      : '1.2.1',
 
     // unit test
     rulesVersion     : '1.2.0',
