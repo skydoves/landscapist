@@ -75,12 +75,6 @@ dependencies {
   androidTestImplementation "androidx.test:rules:$versions.rulesVersion"
 }
 
-afterEvaluate {
-  tasks.withType(org.jetbrains.dokka.gradle.DokkaTask).configureEach {
-    outputDirectory.set(rootProject.file('docs/api'))
-  }
-}
-
 dokkaHtml.configure {
   dokkaSourceSets {
     named("main") {

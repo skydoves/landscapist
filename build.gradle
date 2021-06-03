@@ -3,7 +3,6 @@ buildscript {
   repositories {
     google()
     mavenCentral()
-    jcenter()
   }
   dependencies {
     classpath "com.android.tools.build:gradle:$versions.gradleBuildTool"
@@ -18,14 +17,12 @@ allprojects {
   repositories {
     google()
     mavenCentral()
-    jcenter()
   }
 }
 
 subprojects {
   tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach { compile ->
     kotlinOptions {
-      jvmTarget = "1.8"
       freeCompilerArgs += "-Xskip-prerelease-check"
       freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
