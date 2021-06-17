@@ -43,10 +43,10 @@ internal fun Painter.circularReveal(
   transitionState.targetState = CircularRevealState.Finished
 
   // Our actual transition, which reads our transitionState
-  val transition = updateTransition(transitionState)
+  val transition = updateTransition(transitionState, label = null)
 
   val radius: Float by transition.animateFloat(
-    transitionSpec = { tween(durationMillis = durationMs) }
+    transitionSpec = { tween(durationMillis = durationMs) }, label = "FloatAnimation"
   ) { state ->
     when (state) {
       CircularRevealState.None -> 0f
