@@ -17,19 +17,26 @@
 package com.github.skydoves.landscapistdemo.ui
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,26 +48,65 @@ import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background800
 import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
 import com.skydoves.landscapist.ShimmerParams
-import com.skydoves.landscapist.coil.CoilImage
+import com.skydoves.landscapist.fresco.FrescoImage
 
 @Composable
 fun DisneyPosters(
-  posters: List<Poster>,
-  modifier: Modifier = Modifier
+  posters: List<Poster>
 ) {
-  Column(
-    modifier = modifier
-      .verticalScroll(rememberScrollState())
-      .background(MaterialTheme.colors.background)
-  ) {
-    StaggeredVerticalGrid(
-      maxColumnWidth = 220.dp,
-      modifier = Modifier.padding(4.dp)
-    ) {
-      posters.forEach { poster ->
-        HomePoster(poster = poster)
+  val context = LocalContext.current
+  Column {
+    LazyRow {
+      item {
+        Box(
+          modifier = Modifier.padding(
+            start = 16.dp,
+            bottom = 16.dp,
+            top = 16.dp,
+            end = 8.dp
+          )
+        ) {
+          Icon(
+            imageVector = Icons.Filled.Favorite,
+            contentDescription = "Favorite",
+            modifier = Modifier.size(50.dp),
+            tint = Color.Red
+          )
+        }
+      }
+      items(posters) { poster ->
+        Card(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
+          FrescoImage(
+            imageUrl = poster.poster,
+            modifier = Modifier
+              .size(50.dp)
+              .clickable {
+                Toast
+                  .makeText(context, poster.name, Toast.LENGTH_SHORT)
+                  .show()
+              },
+            contentScale = ContentScale.Crop
+          )
+        }
       }
     }
+    val poster = MockUtil.getMockPoster()
+    FrescoImage(
+      imageUrl = poster.poster,
+      modifier = Modifier
+        .padding(vertical = 10.dp)
+        .aspectRatio(0.8f)
+        .clickable {
+          Toast
+            .makeText(context, poster.name, Toast.LENGTH_SHORT)
+            .show()
+        },
+      circularRevealedEnabled = true,
+      shimmerParams = ShimmerParams(
+        baseColor = background800,
+        highlightColor = shimmerHighLight
+      )
+    )
   }
 }
 
@@ -82,8 +128,8 @@ fun HomePoster(
   ) {
     ConstraintLayout {
       val (image, title, content) = createRefs()
-      CoilImage(
-        imageModel = poster.poster,
+      FrescoImage(
+        imageUrl = poster.poster,
         modifier = Modifier
           .aspectRatio(0.8f)
           .constrainAs(image) {

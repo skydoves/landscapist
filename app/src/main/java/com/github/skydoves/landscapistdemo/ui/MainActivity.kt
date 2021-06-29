@@ -49,7 +49,10 @@ class MainActivity : ComponentActivity() {
           backgroundColor = MaterialTheme.colors.primarySurface,
           topBar = { PosterAppBar() }
         ) {
-          DisneyPosters(posters = MockUtil.getMockPosters())
+          val list = MockUtil.getMockPosters().toMutableList()
+          list.addAll(MockUtil.getMockPosters())
+          list.addAll(MockUtil.getMockPosters())
+          DisneyPosters(posters = list)
         }
       }
     }
