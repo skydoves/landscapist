@@ -20,7 +20,7 @@ import android.graphics.Bitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber
+import com.facebook.imagepipeline.datasource.BaseBitmapReferenceDataSubscriber
 import com.facebook.imagepipeline.image.CloseableImage
 import com.skydoves.landscapist.ImageLoadState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,14 +32,14 @@ import kotlinx.coroutines.flow.StateFlow
  */
 internal class FlowBaseBitmapDataSubscriber(
   private val observeLoadingProcess: Boolean
-) : BaseBitmapDataSubscriber() {
+) : BaseBitmapReferenceDataSubscriber() {
+
+  override fun onNewResultImpl(bitmapReference: CloseableReference<Bitmap>?) {
+    this.internalStateFlow.value = ImageLoadState.Success(bitmapReference?.get()?.asImageBitmap())
+  }
 
   private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f))
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
-
-  override fun onNewResultImpl(bitmap: Bitmap?) {
-    this.internalStateFlow.value = ImageLoadState.Success(bitmap?.asImageBitmap())
-  }
 
   override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
     this.internalStateFlow.value = ImageLoadState.Failure(dataSource)
