@@ -34,6 +34,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -48,13 +49,17 @@ import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background800
 import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
 import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.fresco.FrescoImage
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun DisneyPosters(
-  posters: List<Poster>
+  posters: List<Poster>,
+  vm: MainViewModel
 ) {
   val context = LocalContext.current
+  val poster = vm.poster.observeAsState()
   Column {
     LazyRow {
       item {
@@ -76,11 +81,12 @@ fun DisneyPosters(
       }
       items(posters) { poster ->
         Card(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
-          FrescoImage(
-            imageUrl = poster.poster,
+          GlideImage(
+            imageModel = poster.poster,
             modifier = Modifier
               .size(50.dp)
               .clickable {
+                vm.poster.value = poster
                 Toast
                   .makeText(context, poster.name, Toast.LENGTH_SHORT)
                   .show()
@@ -90,15 +96,15 @@ fun DisneyPosters(
         }
       }
     }
-    val poster = MockUtil.getMockPoster()
-    FrescoImage(
-      imageUrl = poster.poster,
+
+    CoilImage(
+      imageModel = poster.value?.poster!!,
       modifier = Modifier
         .padding(vertical = 10.dp)
         .aspectRatio(0.8f)
         .clickable {
           Toast
-            .makeText(context, poster.name, Toast.LENGTH_SHORT)
+            .makeText(context, poster.value?.name, Toast.LENGTH_SHORT)
             .show()
         },
       circularRevealedEnabled = true,
@@ -106,6 +112,13 @@ fun DisneyPosters(
         baseColor = background800,
         highlightColor = shimmerHighLight
       )
+    )
+
+    Text(
+      text = poster.value?.name.toString(),
+      style = MaterialTheme.typography.h2,
+      textAlign = TextAlign.Center,
+      modifier = Modifier.padding(8.dp)
     )
   }
 }

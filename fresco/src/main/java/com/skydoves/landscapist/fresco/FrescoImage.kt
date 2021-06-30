@@ -20,6 +20,7 @@
 
 package com.skydoves.landscapist.fresco
 
+import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -34,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageBySource
@@ -168,7 +170,7 @@ fun FrescoImage(
 fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
-  imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
+  imageRequest: ImageRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(imageUrl)).build(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -182,7 +184,7 @@ fun FrescoImage(
 ) {
   FrescoImage(
     imageUrl = imageUrl,
-    imageRequest = imageRequest,
+    imageRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(imageUrl)).build(),
     modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
@@ -258,6 +260,7 @@ fun FrescoImage(
 ) {
   FrescoImage(
     imageRequest = imageRequest,
+    recomposeUrl = imageUrl,
     modifier = modifier.fillMaxWidth(),
     observeLoadingProcess = observeLoadingProcess,
   ) { imageState ->
@@ -354,6 +357,7 @@ fun FrescoImage(
 ) {
   FrescoImage(
     imageRequest = imageRequest,
+    recomposeUrl = imageUrl,
     modifier = modifier.fillMaxWidth(),
     observeLoadingProcess = observeLoadingProcess,
   ) { imageState ->
@@ -407,6 +411,7 @@ fun FrescoImage(
 @OptIn(ExperimentalCoroutinesApi::class)
 private fun FrescoImage(
   imageRequest: ImageRequest,
+  recomposeUrl: String?,
   modifier: Modifier = Modifier,
   observeLoadingProcess: Boolean = false,
   content: @Composable (imageState: ImageLoadState) -> Unit

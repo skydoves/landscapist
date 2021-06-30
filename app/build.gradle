@@ -17,6 +17,8 @@
 plugins {
   id 'com.android.application'
   id 'kotlin-android'
+  id 'kotlin-kapt'
+  id 'dagger.hilt.android.plugin'
 }
 
 apply from: "$rootDir/dependencies.gradle"
@@ -61,6 +63,14 @@ dependencies {
 
   // androidx jetpack
   implementation "androidx.core:core-ktx:$versions.coreKtxVersion"
+
+  // hilt
+  implementation "com.google.dagger:hilt-android:$versions.hiltCoreVersion"
+  implementation "androidx.hilt:hilt-navigation-compose:$versions.hiltComposeNavigation"
+  kapt "com.google.dagger:hilt-compiler:$versions.hiltCoreVersion"
+  kapt "androidx.hilt:hilt-compiler:$versions.hiltVersion"
+  androidTestImplementation "com.google.dagger:hilt-android-testing:$versions.hiltCoreVersion"
+  kaptAndroidTest "com.google.dagger:hilt-compiler:$versions.hiltCoreVersion"
 
   // compose
   implementation "androidx.compose.ui:ui:$versions.composeVersion"

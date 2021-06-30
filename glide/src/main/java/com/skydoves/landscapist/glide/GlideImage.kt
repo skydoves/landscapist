@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
@@ -273,8 +274,8 @@ fun GlideImage(
 ) {
   GlideImage(
     builder = requestBuilder
-      .apply(requestOptions)
-      .load(imageModel),
+      .apply(requestOptions),
+    imageModel = imageModel,
     modifier = modifier.fillMaxWidth(),
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
@@ -377,8 +378,8 @@ fun GlideImage(
 ) {
   GlideImage(
     builder = requestBuilder
-      .apply(requestOptions)
-      .load(imageModel),
+      .apply(requestOptions),
+    imageModel = imageModel,
     modifier = modifier.fillMaxWidth(),
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
@@ -436,18 +437,24 @@ fun GlideImage(
 @OptIn(ExperimentalCoroutinesApi::class)
 private fun GlideImage(
   builder: RequestBuilder<Bitmap>,
+  imageModel: Any,
   modifier: Modifier = Modifier,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
   val target = remember { FlowCustomTarget() }
 
+  val builder_ = Glide
+    .with(LocalView.current)
+    .asBitmap()
+    .load(imageModel)
+
   ImageLoad(
-    imageRequest = builder,
+    imageRequest = builder_,
     executeImageRequest = {
       suspendCancellableCoroutine { cont ->
-        builder.into(target)
-        builder.submit()
+        builder_.into(target)
+        builder_.submit()
 
         cont.resume(target.imageLoadStateFlow) {
           // clear the glide target request if cancelled.
