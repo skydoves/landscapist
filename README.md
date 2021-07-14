@@ -405,6 +405,13 @@ CompositionLocalProvider(LocalFrescoImageRequest provides imageRequest) {
 }
 ```
 
+## Who's using Landscapist?
+If your project using Landscapist, let me know via creating a new issue! 🤗
+
+## [Twitter for Android](https://user-images.githubusercontent.com/24237865/125583736-f0ffa76f-8f87-433b-a9fd-192231dc5e63.jpg)
+
+[![twitter](https://user-images.githubusercontent.com/24237865/125583182-9527dd48-433e-4e17-ae52-3f2bb544a847.jpg)](https://play.google.com/store/apps/details?id=com.twitter.android&hl=ko&gl=US)
+
 ## Reference repository
 This library is mostly inspired by [Accompanist](https://github.com/chrisbanes/accompanist). <br>
 
