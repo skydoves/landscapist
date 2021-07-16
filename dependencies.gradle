@@ -4,9 +4,9 @@ ext.versions = [
     versionCode      : 29,
     versionName      : '1.2.8',
 
-    gradleBuildTool  : '7.0.0-beta03',
+    gradleBuildTool  : '7.0.0-beta05',
     spotlessGradle   : '5.14.0',
-    ktlintGradle     : '0.40.0',
+    ktlintGradle     : '0.41.0',
     dokkaGradle      : '1.4.32',
     mavenPublish     : '0.15.1',
 
