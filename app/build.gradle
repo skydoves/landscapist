@@ -25,14 +25,12 @@ apply from: "$rootDir/dependencies.gradle"
 
 android {
   compileSdkVersion versions.compileSdk
-
   defaultConfig {
     applicationId "com.github.skydoves.landscapistdemo"
     minSdkVersion versions.minSdk
     targetSdkVersion versions.compileSdk
     versionCode versions.versionCode
     versionName versions.versionName
-
     javaCompileOptions {
       annotationProcessorOptions {
         arguments["dagger.hilt.disableModulesHaveInstallInCheck"] = "true"

@@ -25,7 +25,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -57,9 +59,8 @@ fun DisneyPosters(
   posters: List<Poster>,
   vm: MainViewModel
 ) {
-  val context = LocalContext.current
   val poster = vm.poster.observeAsState()
-  Column {
+  Column(Modifier.verticalScroll(rememberScrollState())) {
     LazyRow {
       item {
         Box(
@@ -79,47 +80,58 @@ fun DisneyPosters(
         }
       }
       items(posters) { poster ->
-        Card(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
-          GlideImage(
-            imageModel = poster.poster,
-            modifier = Modifier
-              .size(50.dp)
-              .clickable {
-                vm.poster.value = poster
-                Toast
-                  .makeText(context, poster.name, Toast.LENGTH_SHORT)
-                  .show()
-              },
-            contentScale = ContentScale.Crop
-          )
-        }
+        PosterItem(poster, vm)
       }
     }
+    SelectedPoster(poster.value)
+  }
+}
 
+@Composable
+fun PosterItem(
+  poster: Poster,
+  vm: MainViewModel
+) {
+  Card(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
     GlideImage(
-      imageModel = poster.value?.poster!!,
+      imageModel = poster.poster,
       modifier = Modifier
-        .padding(vertical = 10.dp)
-        .aspectRatio(0.8f)
-        .clickable {
-          Toast
-            .makeText(context, poster.value?.name, Toast.LENGTH_SHORT)
-            .show()
-        },
-      circularRevealedEnabled = true,
-      shimmerParams = ShimmerParams(
-        baseColor = background800,
-        highlightColor = shimmerHighLight
-      )
-    )
-
-    Text(
-      text = poster.value?.name.toString(),
-      style = MaterialTheme.typography.h2,
-      textAlign = TextAlign.Center,
-      modifier = Modifier.padding(8.dp)
+        .size(50.dp)
+        .clickable { vm.poster.value = poster },
+      contentScale = ContentScale.Crop
     )
   }
+}
+
+@Composable
+fun SelectedPoster(
+  poster: Poster?
+) {
+  GlideImage(
+    imageModel = poster?.poster!!,
+    modifier = Modifier
+      .padding(vertical = 10.dp)
+      .aspectRatio(0.8f),
+    circularRevealedEnabled = true,
+    shimmerParams = ShimmerParams(
+      baseColor = background800,
+      highlightColor = shimmerHighLight
+    )
+  )
+
+  Text(
+    text = poster.name,
+    style = MaterialTheme.typography.h2,
+    textAlign = TextAlign.Center,
+    modifier = Modifier.padding(8.dp)
+  )
+
+  Text(
+    text = poster.description,
+    style = MaterialTheme.typography.body1,
+    textAlign = TextAlign.Start,
+    modifier = Modifier.padding(8.dp)
+  )
 }
 
 @Composable
