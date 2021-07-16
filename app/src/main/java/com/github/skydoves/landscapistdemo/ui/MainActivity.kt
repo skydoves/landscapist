@@ -19,6 +19,7 @@ package com.github.skydoves.landscapistdemo.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -38,8 +39,13 @@ import com.github.skydoves.landscapistdemo.R
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.purple200
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+  private val vm: MainViewModel by viewModels()
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -49,7 +55,10 @@ class MainActivity : ComponentActivity() {
           backgroundColor = MaterialTheme.colors.primarySurface,
           topBar = { PosterAppBar() }
         ) {
-          DisneyPosters(posters = MockUtil.getMockPosters())
+          val list = MockUtil.getMockPosters().toMutableList()
+          list.addAll(MockUtil.getMockPosters())
+          list.addAll(MockUtil.getMockPosters())
+          DisneyPosters(posters = list, vm)
         }
       }
     }

@@ -17,19 +17,26 @@
 plugins {
   id 'com.android.application'
   id 'kotlin-android'
+  id 'kotlin-kapt'
+  id 'dagger.hilt.android.plugin'
 }
 
 apply from: "$rootDir/dependencies.gradle"
 
 android {
   compileSdkVersion versions.compileSdk
-
   defaultConfig {
     applicationId "com.github.skydoves.landscapistdemo"
     minSdkVersion versions.minSdk
     targetSdkVersion versions.compileSdk
     versionCode versions.versionCode
     versionName versions.versionName
+    multiDexEnabled = true
+    javaCompileOptions {
+      annotationProcessorOptions {
+        arguments["dagger.hilt.disableModulesHaveInstallInCheck"] = "true"
+      }
+    }
   }
 
   lintOptions {
@@ -62,6 +69,11 @@ dependencies {
   // androidx jetpack
   implementation "androidx.core:core-ktx:$versions.coreKtxVersion"
 
+  // hilt
+  implementation "com.google.dagger:hilt-android:$versions.hiltCoreVersion"
+  kapt "com.google.dagger:hilt-compiler:$versions.hiltCoreVersion"
+  kapt "androidx.hilt:hilt-compiler:$versions.hiltVersion"
+
   // compose
   implementation "androidx.compose.ui:ui:$versions.composeVersion"
   implementation "androidx.activity:activity-compose:$versions.activityVersion"
@@ -74,6 +86,8 @@ dependencies {
   implementation "androidx.compose.runtime:runtime-livedata:$versions.composeVersion"
   implementation "androidx.compose.ui:ui-tooling:$versions.composeVersion"
   implementation "androidx.constraintlayout:constraintlayout-compose:$versions.constraintVersion"
+
+  implementation "androidx.multidex:multidex:$versions.multidex"
 
   // landscapist
   implementation project(":fresco")

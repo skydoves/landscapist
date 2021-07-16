@@ -272,6 +272,7 @@ fun GlideImage(
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   GlideImage(
+    recomposeKey = imageModel,
     builder = requestBuilder
       .apply(requestOptions)
       .load(imageModel),
@@ -376,6 +377,7 @@ fun GlideImage(
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   GlideImage(
+    recomposeKey = imageModel,
     builder = requestBuilder
       .apply(requestOptions)
       .load(imageModel),
@@ -435,15 +437,16 @@ fun GlideImage(
 @Composable
 @OptIn(ExperimentalCoroutinesApi::class)
 private fun GlideImage(
+  recomposeKey: Any,
   builder: RequestBuilder<Bitmap>,
   modifier: Modifier = Modifier,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
-  val target = remember { FlowCustomTarget() }
+  val target = remember(recomposeKey) { FlowCustomTarget() }
 
   ImageLoad(
-    imageRequest = builder,
+    recomposeKey = recomposeKey,
     executeImageRequest = {
       suspendCancellableCoroutine { cont ->
         builder.into(target)

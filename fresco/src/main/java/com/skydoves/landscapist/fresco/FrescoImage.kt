@@ -257,6 +257,7 @@ fun FrescoImage(
   failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
   FrescoImage(
+    recomposeKey = imageUrl,
     imageRequest = imageRequest,
     modifier = modifier.fillMaxWidth(),
     observeLoadingProcess = observeLoadingProcess,
@@ -353,6 +354,7 @@ fun FrescoImage(
   failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
   FrescoImage(
+    recomposeKey = imageUrl,
     imageRequest = imageRequest,
     modifier = modifier.fillMaxWidth(),
     observeLoadingProcess = observeLoadingProcess,
@@ -406,16 +408,17 @@ fun FrescoImage(
 @Composable
 @OptIn(ExperimentalCoroutinesApi::class)
 private fun FrescoImage(
+  recomposeKey: Any?,
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
   observeLoadingProcess: Boolean = false,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
-  val datasource = remember { imagePipeline.fetchDecodedImage(imageRequest, context) }
+  val datasource = remember(recomposeKey) { imagePipeline.fetchDecodedImage(imageRequest, context) }
 
   ImageLoad(
-    imageRequest = imageRequest,
+    recomposeKey = recomposeKey,
     executeImageRequest = {
       suspendCancellableCoroutine { cont ->
         val subscriber = FlowBaseBitmapDataSubscriber(observeLoadingProcess)
