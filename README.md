@@ -17,6 +17,9 @@
 <img src="https://user-images.githubusercontent.com/24237865/95549795-de61c200-0a42-11eb-9ece-ac34346eb5e5.png" width="572" height="280"/>
 </p>
 
+## Who's using Landscapist?
+[See who's using Landscapist](/usecases.md).
+
 ## Usecase
 You can see the use cases of this library in the below repositories.
 - [DisneyCompose](https://github.com/skydoves/disneycompose) - 🧸 A demo Disney app using Jetpack Compose and Hilt based on modern Android tech-stacks and MVVM architecture.
@@ -407,7 +410,7 @@ CompositionLocalProvider(LocalFrescoImageRequest provides imageRequest) {
 ```
 
 ## Who's using Landscapist?
-If your project using Landscapist, let me know via creating a new issue! 🤗
+If your project uses Landscapist, let me know via creating a new issue! 🤗
 
 ## [Twitter for Android](https://user-images.githubusercontent.com/24237865/125583736-f0ffa76f-8f87-433b-a9fd-192231dc5e63.jpg)
 
