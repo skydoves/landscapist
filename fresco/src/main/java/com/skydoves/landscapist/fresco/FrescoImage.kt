@@ -20,7 +20,6 @@
 
 package com.skydoves.landscapist.fresco
 
-import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -35,7 +34,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
-import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.skydoves.landscapist.CircularRevealedImage
 import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageBySource
@@ -170,7 +168,7 @@ fun FrescoImage(
 fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
-  imageRequest: ImageRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(imageUrl)).build(),
+  imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -184,7 +182,7 @@ fun FrescoImage(
 ) {
   FrescoImage(
     imageUrl = imageUrl,
-    imageRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(imageUrl)).build(),
+    imageRequest = imageRequest,
     modifier = modifier.fillMaxWidth(),
     alignment = alignment,
     contentScale = contentScale,
@@ -259,8 +257,8 @@ fun FrescoImage(
   failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
   FrescoImage(
+    recomposeKey = imageUrl,
     imageRequest = imageRequest,
-    recomposeUrl = imageUrl,
     modifier = modifier.fillMaxWidth(),
     observeLoadingProcess = observeLoadingProcess,
   ) { imageState ->
@@ -356,8 +354,8 @@ fun FrescoImage(
   failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
   FrescoImage(
+    recomposeKey = imageUrl,
     imageRequest = imageRequest,
-    recomposeUrl = imageUrl,
     modifier = modifier.fillMaxWidth(),
     observeLoadingProcess = observeLoadingProcess,
   ) { imageState ->
@@ -410,17 +408,17 @@ fun FrescoImage(
 @Composable
 @OptIn(ExperimentalCoroutinesApi::class)
 private fun FrescoImage(
+  recomposeKey: Any?,
   imageRequest: ImageRequest,
-  recomposeUrl: String?,
   modifier: Modifier = Modifier,
   observeLoadingProcess: Boolean = false,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
-  val datasource = remember { imagePipeline.fetchDecodedImage(imageRequest, context) }
+  val datasource = remember(recomposeKey) { imagePipeline.fetchDecodedImage(imageRequest, context) }
 
   ImageLoad(
-    imageRequest = imageRequest,
+    recomposeKey = recomposeKey,
     executeImageRequest = {
       suspendCancellableCoroutine { cont ->
         val subscriber = FlowBaseBitmapDataSubscriber(observeLoadingProcess)

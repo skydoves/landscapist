@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
@@ -273,9 +272,10 @@ fun GlideImage(
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   GlideImage(
+    recomposeKey = imageModel,
     builder = requestBuilder
-      .apply(requestOptions),
-    imageModel = imageModel,
+      .apply(requestOptions)
+      .load(imageModel),
     modifier = modifier.fillMaxWidth(),
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
@@ -377,9 +377,10 @@ fun GlideImage(
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   GlideImage(
+    recomposeKey = imageModel,
     builder = requestBuilder
-      .apply(requestOptions),
-    imageModel = imageModel,
+      .apply(requestOptions)
+      .load(imageModel),
     modifier = modifier.fillMaxWidth(),
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
@@ -436,25 +437,20 @@ fun GlideImage(
 @Composable
 @OptIn(ExperimentalCoroutinesApi::class)
 private fun GlideImage(
+  recomposeKey: Any,
   builder: RequestBuilder<Bitmap>,
-  imageModel: Any,
   modifier: Modifier = Modifier,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
-  val target = remember { FlowCustomTarget() }
-
-  val builder_ = Glide
-    .with(LocalView.current)
-    .asBitmap()
-    .load(imageModel)
+  val target = remember(recomposeKey) { FlowCustomTarget() }
 
   ImageLoad(
-    imageRequest = builder_,
+    recomposeKey = recomposeKey,
     executeImageRequest = {
       suspendCancellableCoroutine { cont ->
-        builder_.into(target)
-        builder_.submit()
+        builder.into(target)
+        builder.submit()
 
         cont.resume(target.imageLoadStateFlow) {
           // clear the glide target request if cancelled.

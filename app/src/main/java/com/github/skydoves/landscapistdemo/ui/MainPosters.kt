@@ -49,7 +49,6 @@ import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background800
 import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
 import com.skydoves.landscapist.ShimmerParams
-import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -97,7 +96,7 @@ fun DisneyPosters(
       }
     }
 
-    CoilImage(
+    GlideImage(
       imageModel = poster.value?.poster!!,
       modifier = Modifier
         .padding(vertical = 10.dp)

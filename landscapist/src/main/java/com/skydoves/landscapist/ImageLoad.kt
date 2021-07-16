@@ -40,20 +40,20 @@ import kotlinx.coroutines.flow.flowOn
  * A common image loading model for fetching an image asynchronously and
  * run composable for displaying the image.
  *
- * @param imageRequest request to execute image loading asynchronously.
+ * @param recomposeKey request to execute image loading asynchronously.
  * @param executeImageRequest suspending lambda to execute an image loading request.
  * @param modifier adjust the drawing image layout or drawing decoration of the content.
  * @param content the image content to be loaded from executing for given states.
  */
 @Composable
 fun <T : Any> ImageLoad(
-  imageRequest: T,
+  recomposeKey: T?,
   executeImageRequest: suspend () -> Flow<ImageLoadState>,
   modifier: Modifier = Modifier,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
-  var state by remember(imageRequest) { mutableStateOf<ImageLoadState>(ImageLoadState.None) }
-  LaunchedEffect(imageRequest) {
+  var state by remember(recomposeKey) { mutableStateOf<ImageLoadState>(ImageLoadState.None) }
+  LaunchedEffect(recomposeKey) {
     executeImageLoading(
       executeImageRequest
     ).collect {

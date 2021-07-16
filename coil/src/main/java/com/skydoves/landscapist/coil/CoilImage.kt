@@ -433,7 +433,7 @@ fun CoilImage(
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
   CoilImage(
-    request = imageRequest,
+    recomposeKey = imageRequest,
     imageLoader = imageLoader,
     modifier = modifier.fillMaxWidth(),
   ) { imageState ->
@@ -532,7 +532,7 @@ fun CoilImage(
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
   CoilImage(
-    request = imageRequest,
+    recomposeKey = imageRequest,
     imageLoader = imageLoader,
     modifier = modifier.fillMaxWidth(),
   ) { imageState ->
@@ -580,7 +580,7 @@ fun CoilImage(
  * }
  * ```
  *
- * @param request The request to execute.
+ * @param recomposeKey The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * @param content Content to be displayed for the given state.
@@ -588,21 +588,22 @@ fun CoilImage(
 @Composable
 @OptIn(ExperimentalCoroutinesApi::class)
 fun CoilImage(
-  request: ImageRequest,
+  recomposeKey: ImageRequest,
   modifier: Modifier = Modifier,
   imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
-  val imageLoadStateFlow = remember { MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f)) }
-  val disposable = remember { mutableStateOf<Disposable?>(null) }
+  val imageLoadStateFlow =
+    remember(recomposeKey) { MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f)) }
+  val disposable = remember(recomposeKey) { mutableStateOf<Disposable?>(null) }
 
   ImageLoad(
-    imageRequest = request,
+    recomposeKey = recomposeKey,
     executeImageRequest = {
       suspendCancellableCoroutine { cont ->
         disposable.value = imageLoader.enqueue(
-          request.newBuilder(context).target(
+          recomposeKey.newBuilder(context).target(
             onSuccess = {
               imageLoadStateFlow.value = ImageLoadState.Success(it.toBitmap().asImageBitmap())
             },
