@@ -18,18 +18,19 @@
 
 package com.github.skydoves.landscapistdemo
 
-import android.app.Application
+import androidx.multidex.MultiDexApplication
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 
 @HiltAndroidApp
-class App : Application() {
+class App : MultiDexApplication() {
 
   override fun onCreate() {
     super.onCreate()
 
+    // initializes an image pipeline for Fresco only.
     val pipelineConfig =
       OkHttpImagePipelineConfigFactory
         .newBuilder(this, OkHttpClient.Builder().build())

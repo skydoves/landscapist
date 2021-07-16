@@ -22,10 +22,6 @@ import com.github.skydoves.landscapistdemo.model.MockUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-/**
- * Developed by skydoves on 2021-06-30.
- * Copyright (c) 2017 skydoves rights reserved.
- */
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
 
