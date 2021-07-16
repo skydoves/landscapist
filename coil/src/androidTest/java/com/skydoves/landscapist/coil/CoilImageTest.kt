@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @LargeTest
 @RunWith(JUnit4::class)
-class CoilImageTest {
+internal class CoilImageTest {
 
   @get:Rule
   val composeTestRule = createComposeRule()

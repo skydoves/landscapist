@@ -18,6 +18,7 @@ package com.skydoves.landscapist.glide
 
 import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalView
 import com.bumptech.glide.Glide
@@ -28,13 +29,15 @@ import com.bumptech.glide.request.RequestOptions
  * Local containing the preferred [RequestOptions] for providing the same instance
  * in our composable hierarchy.
  */
-val LocalGlideRequestOptions = staticCompositionLocalOf<RequestOptions?> { null }
+public val LocalGlideRequestOptions: ProvidableCompositionLocal<RequestOptions?> =
+  staticCompositionLocalOf { null }
 
 /**
  * Local containing the preferred [RequestBuilder] for providing the same instance
  * in our composable hierarchy.
  */
-val LocalGlideRequestBuilder = staticCompositionLocalOf<RequestBuilder<Bitmap>?> { null }
+public val LocalGlideRequestBuilder: ProvidableCompositionLocal<RequestBuilder<Bitmap>?> =
+  staticCompositionLocalOf { null }
 
 /** A provider for taking the local instances related to the `GlideImage`. */
 internal object LocalGlideProvider {

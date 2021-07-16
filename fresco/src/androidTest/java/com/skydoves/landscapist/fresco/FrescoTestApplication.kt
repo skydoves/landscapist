@@ -21,7 +21,7 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import okhttp3.OkHttpClient
 
-class FrescoTestApplication : Application() {
+internal class FrescoTestApplication : Application() {
 
   override fun onCreate() {
     super.onCreate()

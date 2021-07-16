@@ -79,7 +79,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
-fun GlideImage(
+public fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
   requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
@@ -172,7 +172,7 @@ fun GlideImage(
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
-fun GlideImage(
+public fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
   requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
@@ -255,7 +255,7 @@ fun GlideImage(
  * @param failure Content to be displayed when the request is failed.
  */
 @Composable
-fun GlideImage(
+public fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
   requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
@@ -360,7 +360,7 @@ fun GlideImage(
  * @param failure Content to be displayed when the request is failed.
  */
 @Composable
-fun GlideImage(
+public fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
   requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),

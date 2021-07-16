@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color
  * @param tilt adjust an angle at which the highlight is tilted and measured in degrees.
  * @param durationMillis a milli-second time to move the simmering effect from start to finish animation.
  */
-data class ShimmerParams(
+public data class ShimmerParams(
   val baseColor: Color,
   val highlightColor: Color,
   val intensity: Float = DefaultShimmerIntensity,

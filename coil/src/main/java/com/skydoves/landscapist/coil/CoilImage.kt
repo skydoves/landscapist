@@ -90,7 +90,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
-fun CoilImage(
+public fun CoilImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
@@ -171,7 +171,7 @@ fun CoilImage(
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
-fun CoilImage(
+public fun CoilImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
@@ -262,7 +262,7 @@ fun CoilImage(
  * @param failure Content to be displayed when the request is failed.
  */
 @Composable
-fun CoilImage(
+public fun CoilImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
@@ -345,7 +345,7 @@ fun CoilImage(
  * @param failure Content to be displayed when the request is failed.
  */
 @Composable
-fun CoilImage(
+public fun CoilImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
@@ -417,7 +417,7 @@ fun CoilImage(
  * @param failure Content to be displayed when the request is failed.
  */
 @Composable
-fun CoilImage(
+public fun CoilImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
   imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
@@ -516,7 +516,7 @@ fun CoilImage(
  * @param failure Content to be displayed when the request is failed.
  */
 @Composable
-fun CoilImage(
+public fun CoilImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
   imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
@@ -587,7 +587,7 @@ fun CoilImage(
  */
 @Composable
 @OptIn(ExperimentalCoroutinesApi::class)
-fun CoilImage(
+private fun CoilImage(
   recomposeKey: ImageRequest,
   modifier: Modifier = Modifier,
   imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),

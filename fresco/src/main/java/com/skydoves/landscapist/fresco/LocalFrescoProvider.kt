@@ -18,6 +18,7 @@ package com.skydoves.landscapist.fresco
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
@@ -26,7 +27,8 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
  * Local containing the preferred [ImageRequest] for providing the same instance
  * in our composable hierarchy.
  */
-val LocalFrescoImageRequest = staticCompositionLocalOf<ImageRequest?> { null }
+public val LocalFrescoImageRequest: ProvidableCompositionLocal<ImageRequest?> =
+  staticCompositionLocalOf { null }
 
 /** A provider for taking the local instances related to the `FrescoImage`. */
 internal object LocalFrescoProvider {

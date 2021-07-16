@@ -77,7 +77,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
-fun FrescoImage(
+public fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
   imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
@@ -165,7 +165,7 @@ fun FrescoImage(
  * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
  */
 @Composable
-fun FrescoImage(
+public fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
   imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
@@ -240,7 +240,7 @@ fun FrescoImage(
  * @param failure Content to be displayed when the request is failed.
  */
 @Composable
-fun FrescoImage(
+public fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
   imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
@@ -337,7 +337,7 @@ fun FrescoImage(
  * @param failure Content to be displayed when the request is failed.
  */
 @Composable
-fun FrescoImage(
+public fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
   imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
