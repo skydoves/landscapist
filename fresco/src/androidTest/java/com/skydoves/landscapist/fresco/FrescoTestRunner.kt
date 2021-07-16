@@ -21,7 +21,7 @@ import android.content.Context
 import androidx.test.runner.AndroidJUnitRunner
 
 @Suppress("unused")
-class FrescoTestRunner : AndroidJUnitRunner() {
+internal class FrescoTestRunner : AndroidJUnitRunner() {
   override fun newApplication(
     cl: ClassLoader?,
     className: String?,

@@ -57,7 +57,7 @@ import kotlin.math.tan
  * @param durationMillis animation duration of the shimmering start to end.
  */
 @Composable
-fun Shimmer(
+public fun Shimmer(
   modifier: Modifier = Modifier,
   baseColor: Color,
   highlightColor: Color,
@@ -129,7 +129,7 @@ fun Shimmer(
 }
 
 /** returns a shimmer matrix offset. */
-fun offset(start: Float, end: Float, percent: Float): Float {
+private fun offset(start: Float, end: Float, percent: Float): Float {
   return start + (end - start) * percent
 }
 

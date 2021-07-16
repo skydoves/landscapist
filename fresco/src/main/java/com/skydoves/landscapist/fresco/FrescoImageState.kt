@@ -23,25 +23,25 @@ import com.facebook.imagepipeline.image.CloseableImage
 import com.skydoves.landscapist.ImageLoadState
 
 /** FrescoImageState is a state of the fresco image requesting. */
-sealed class FrescoImageState {
+public sealed class FrescoImageState {
 
   /** Request not started. */
-  object None : FrescoImageState()
+  public object None : FrescoImageState()
 
   /** Request is currently in progress. */
-  data class Loading(val progress: Float) : FrescoImageState()
+  public data class Loading(val progress: Float) : FrescoImageState()
 
   /** Request is completed successfully amd ready to use an [ImageBitmap]. */
-  data class Success(val imageBitmap: ImageBitmap?) : FrescoImageState()
+  public data class Success(val imageBitmap: ImageBitmap?) : FrescoImageState()
 
   /** Request failed. */
-  data class Failure(val dataSource: DataSource<CloseableReference<CloseableImage>>?) :
+  public data class Failure(val dataSource: DataSource<CloseableReference<CloseableImage>>?) :
     FrescoImageState()
 }
 
 /** casts an [ImageLoadState] type to a [FrescoImageState]. */
 @Suppress("UNCHECKED_CAST")
-fun ImageLoadState.toFrescoImageState(): FrescoImageState {
+public fun ImageLoadState.toFrescoImageState(): FrescoImageState {
   return when (this) {
     is ImageLoadState.None -> FrescoImageState.None
     is ImageLoadState.Loading -> FrescoImageState.Loading(progress)

@@ -46,7 +46,7 @@ import kotlinx.coroutines.flow.flowOn
  * @param content the image content to be loaded from executing for given states.
  */
 @Composable
-fun <T : Any> ImageLoad(
+public fun <T : Any> ImageLoad(
   recomposeKey: T?,
   executeImageRequest: suspend () -> Flow<ImageLoadState>,
   modifier: Modifier = Modifier,

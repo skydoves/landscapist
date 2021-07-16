@@ -42,7 +42,7 @@ import androidx.compose.ui.layout.ContentScale
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  */
 @Composable
-fun ImageBySource(
+public fun ImageBySource(
   source: Any,
   modifier: Modifier,
   alignment: Alignment,

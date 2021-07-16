@@ -19,7 +19,7 @@ ext.versions = [
     composeVersion   : '1.0.0-rc02',
     constraintVersion: '1.0.0-alpha07',
     activityVersion  : '1.3.0-alpha08',
-    coroutinesVersion: '1.4.1',
+    coroutinesVersion: '1.5.0',
     multidex         : '2.0.1',
 
     frescoVersion    : '2.5.0',

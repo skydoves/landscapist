@@ -20,6 +20,7 @@
 
 package com.skydoves.landscapist
 
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.skydoves.landscapist.LocalShimmerProvider.defaultShimmerParams
@@ -28,7 +29,8 @@ import com.skydoves.landscapist.LocalShimmerProvider.defaultShimmerParams
  * Local containing the preferred [ShimmerParams] for providing the same instance
  * in the composable hierarchy.
  */
-val LocalShimmerParams = compositionLocalOf { defaultShimmerParams() }
+public val LocalShimmerParams: ProvidableCompositionLocal<ShimmerParams> =
+  compositionLocalOf { defaultShimmerParams() }
 
 /** A provider for taking the local instances related to the [Shimmer]. */
 internal object LocalShimmerProvider {

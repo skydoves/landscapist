@@ -19,17 +19,17 @@ package com.skydoves.landscapist
 import androidx.compose.ui.graphics.ImageBitmap
 
 /** FrescoImageState is a common interface of the image requesting states. */
-sealed class ImageLoadState {
+public sealed class ImageLoadState {
 
   /** Request not started. */
-  object None : ImageLoadState()
+  public object None : ImageLoadState()
 
   /** Request is currently in progress. */
-  data class Loading(val progress: Float) : ImageLoadState()
+  public data class Loading(val progress: Float) : ImageLoadState()
 
   /** Request is completed successfully amd ready to use an [ImageBitmap]. */
-  data class Success(val imageBitmap: ImageBitmap?) : ImageLoadState()
+  public data class Success(val imageBitmap: ImageBitmap?) : ImageLoadState()
 
   /** Request failed. */
-  data class Failure(val data: Any?) : ImageLoadState()
+  public data class Failure(val data: Any?) : ImageLoadState()
 }

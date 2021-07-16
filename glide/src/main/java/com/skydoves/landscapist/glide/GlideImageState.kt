@@ -21,24 +21,24 @@ import androidx.compose.ui.graphics.ImageBitmap
 import com.skydoves.landscapist.ImageLoadState
 
 /** GlideImageState is a state of the glide image requesting. */
-sealed class GlideImageState {
+public sealed class GlideImageState {
 
   /** Request not started. */
-  object None : GlideImageState()
+  public object None : GlideImageState()
 
   /** Request is currently in progress. */
-  data class Loading(val progress: Float) : GlideImageState()
+  public data class Loading(val progress: Float) : GlideImageState()
 
   /** Request is completed successfully amd ready to use an [ImageBitmap]. */
-  data class Success(val imageBitmap: ImageBitmap?) : GlideImageState()
+  public data class Success(val imageBitmap: ImageBitmap?) : GlideImageState()
 
   /** Request failed. */
-  data class Failure(val errorDrawable: Drawable?) : GlideImageState()
+  public data class Failure(val errorDrawable: Drawable?) : GlideImageState()
 }
 
 /** casts an [ImageLoadState] type to a [GlideImageState]. */
 @Suppress("UNCHECKED_CAST")
-fun ImageLoadState.toGlideImageState(): GlideImageState {
+public fun ImageLoadState.toGlideImageState(): GlideImageState {
   return when (this) {
     is ImageLoadState.None -> GlideImageState.None
     is ImageLoadState.Loading -> GlideImageState.Loading(progress)

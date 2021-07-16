@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(JUnit4::class)
-class GlideImageTest {
+internal class GlideImageTest {
 
   @get:Rule
   val composeTestRule = createComposeRule()

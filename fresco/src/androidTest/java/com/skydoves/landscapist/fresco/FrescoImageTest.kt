@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(JUnit4::class)
-class FrescoImageTest {
+internal class FrescoImageTest {
 
   @get:Rule
   val composeTestRule = createComposeRule()

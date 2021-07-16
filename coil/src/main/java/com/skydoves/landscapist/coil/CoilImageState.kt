@@ -21,24 +21,24 @@ import androidx.compose.ui.graphics.ImageBitmap
 import com.skydoves.landscapist.ImageLoadState
 
 /** CoilImageState is a state of the coil image requesting. */
-sealed class CoilImageState {
+public sealed class CoilImageState {
 
   /** Request not started. */
-  object None : CoilImageState()
+  public object None : CoilImageState()
 
   /** Request is currently in progress. */
-  data class Loading(val progress: Float) : CoilImageState()
+  public data class Loading(val progress: Float) : CoilImageState()
 
   /** Request is completed successfully amd ready to use an [ImageBitmap]. */
-  data class Success(val imageBitmap: ImageBitmap?) : CoilImageState()
+  public data class Success(val imageBitmap: ImageBitmap?) : CoilImageState()
 
   /** Request failed. */
-  data class Failure(val errorDrawable: Drawable?) : CoilImageState()
+  public data class Failure(val errorDrawable: Drawable?) : CoilImageState()
 }
 
 /** casts an [ImageLoadState] type to a [CoilImageState]. */
 @Suppress("UNCHECKED_CAST")
-fun ImageLoadState.toCoilImageState(): CoilImageState {
+public fun ImageLoadState.toCoilImageState(): CoilImageState {
   return when (this) {
     is ImageLoadState.None -> CoilImageState.None
     is ImageLoadState.Loading -> CoilImageState.Loading(progress)

@@ -47,7 +47,7 @@ import androidx.compose.ui.layout.ContentScale
  * @param circularRevealedDuration milli-second times from start to finish animation.
  */
 @Composable
-fun CircularRevealedImage(
+public fun CircularRevealedImage(
   bitmap: ImageBitmap,
   modifier: Modifier = Modifier,
   bitmapPainter: Painter = BitmapPainter(bitmap),
@@ -75,4 +75,4 @@ fun CircularRevealedImage(
 }
 
 /** a definition of the default circular revealed animations duration. */
-const val DefaultCircularRevealedDuration = 350
+public const val DefaultCircularRevealedDuration: Int = 350
