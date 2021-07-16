@@ -2,6 +2,7 @@
 <h1 align="center">Landscapist</h1></br>
 
 <p align="center">
+  <a href="https://devlibrary.withgoogle.com/products/android/repos/skydoves-Landscapist"><img alt="Google" src="https://skydoves.github.io/badges/google-devlib.svg"/></a><br>
   <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
   <a href="https://android-arsenal.com/api?level=21"><img alt="API" src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat"/></a>
   <a href="https://github.com/skydoves/Landscapist/actions"><img alt="Build Status" src="https://github.com/skydoves/Frescomposable/workflows/Android%20CI/badge.svg"/></a>
@@ -41,7 +42,7 @@ allprojects {
 And add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.2.4"
+    implementation "com.github.skydoves:landscapist-glide:1.2.7"
 }
 ```
 
@@ -404,6 +405,13 @@ CompositionLocalProvider(LocalFrescoImageRequest provides imageRequest) {
   )
 }
 ```
+
+## Who's using Landscapist?
+If your project using Landscapist, let me know via creating a new issue! 🤗
+
+## [Twitter for Android](https://user-images.githubusercontent.com/24237865/125583736-f0ffa76f-8f87-433b-a9fd-192231dc5e63.jpg)
+
+[![twitter](https://user-images.githubusercontent.com/24237865/125583182-9527dd48-433e-4e17-ae52-3f2bb544a847.jpg)](https://play.google.com/store/apps/details?id=com.twitter.android&hl=ko&gl=US)
 
 ## Reference repository
 This library is mostly inspired by [Accompanist](https://github.com/chrisbanes/accompanist). <br>

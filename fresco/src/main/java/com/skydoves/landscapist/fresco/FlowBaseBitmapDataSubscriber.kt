@@ -34,12 +34,12 @@ internal class FlowBaseBitmapDataSubscriber(
   private val observeLoadingProcess: Boolean
 ) : BaseBitmapReferenceDataSubscriber() {
 
+  private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f))
+  val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
+
   override fun onNewResultImpl(bitmapReference: CloseableReference<Bitmap>?) {
     this.internalStateFlow.value = ImageLoadState.Success(bitmapReference?.get()?.asImageBitmap())
   }
-
-  private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f))
-  val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
   override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
     this.internalStateFlow.value = ImageLoadState.Failure(dataSource)
