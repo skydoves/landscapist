@@ -37,7 +37,6 @@ public sealed class CoilImageState {
 }
 
 /** casts an [ImageLoadState] type to a [CoilImageState]. */
-@Suppress("UNCHECKED_CAST")
 public fun ImageLoadState.toCoilImageState(): CoilImageState {
   return when (this) {
     is ImageLoadState.None -> CoilImageState.None

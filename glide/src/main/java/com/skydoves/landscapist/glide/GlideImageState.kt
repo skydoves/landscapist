@@ -37,7 +37,6 @@ public sealed class GlideImageState {
 }
 
 /** casts an [ImageLoadState] type to a [GlideImageState]. */
-@Suppress("UNCHECKED_CAST")
 public fun ImageLoadState.toGlideImageState(): GlideImageState {
   return when (this) {
     is ImageLoadState.None -> GlideImageState.None
