@@ -1,5 +1,6 @@
 
-<h1 align="center">Landscapist</h1></br>
+![landscapist](https://user-images.githubusercontent.com/24237865/127742110-398b598b-c39a-4a43-a300-0dc7c1f717c2.png)
+
 
 <p align="center">
   <a href="https://devlibrary.withgoogle.com/products/android/repos/skydoves-Landscapist"><img alt="Google" src="https://skydoves.github.io/badges/google-devlib.svg"/></a><br>
@@ -12,9 +13,6 @@
 
 <p align="center">
 🍂 Jetpack Compose image loading library which can fetch and display network images using <a href="https://github.com/bumptech/glide" target="_blank"> Glide</a>, <a href="https://github.com/coil-kt/coil" target="_blank"> Coil</a>, <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>
-</p>
-<p align="center">
-<img src="https://user-images.githubusercontent.com/24237865/95549795-de61c200-0a42-11eb-9ece-ac34346eb5e5.png" width="572" height="280"/>
 </p>
 
 ## Who's using Landscapist?
