@@ -1,6 +1,5 @@
 
-![landscapist](https://user-images.githubusercontent.com/24237865/127742110-398b598b-c39a-4a43-a300-0dc7c1f717c2.png)
-
+![landscapist](https://user-images.githubusercontent.com/24237865/127742110-398b598b-c39a-4a43-a300-0dc7c1f717c2.png)<br><br>
 
 <p align="center">
   <a href="https://devlibrary.withgoogle.com/products/android/repos/skydoves-Landscapist"><img alt="Google" src="https://skydoves.github.io/badges/google-devlib.svg"/></a><br>
