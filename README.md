@@ -375,7 +375,7 @@ FrescoImage(
     success = { frescoImageState ->
       frescoImageState.imageBitmap?.let {
         Image(
-          asset = it,
+          bitmap = it,
           modifier = Modifier
             .width(128.dp)
             .height(128.dp))
