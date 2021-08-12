@@ -23,5 +23,5 @@ import androidx.palette.graphics.Palette
  */
 public fun interface PaletteLoadedListener {
   /** Invoked when the palette loaded. */
-  public fun onPaletteLoaded(palette: Palette?)
+  public fun onPaletteLoaded(palette: Palette)
 }

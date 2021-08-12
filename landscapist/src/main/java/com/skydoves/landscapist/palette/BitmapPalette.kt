@@ -30,31 +30,34 @@ import androidx.palette.graphics.Palette
  * @param paletteLoadedListener A listener for listening to the loaded palette.
  */
 public class BitmapPalette constructor(
-  public var imageModel: Any? = null,
+  private var imageModel: Any? = null,
   private val useCache: Boolean = true,
   private val interceptor: PaletteBuilderInterceptor? = null,
   private val paletteLoadedListener: PaletteLoadedListener? = null
 ) {
 
-  public fun applyImageModel(imageModel: Any): BitmapPalette = apply {
+  public fun applyImageModel(imageModel: Any?): BitmapPalette = apply {
     this.imageModel = imageModel
   }
 
-  public fun generate(bitmap: Bitmap) {
+  public fun generate(bitmap: Bitmap?) {
+    val target = bitmap ?: return
+    val model = imageModel ?: return
     if (useCache) {
-      val palette = cache.get(imageModel)
+      val palette = cache.get(model)
       if (palette != null) {
         paletteLoadedListener?.onPaletteLoaded(palette)
         return
       }
     }
-    val builder = interceptor?.intercept(Palette.Builder(bitmap))
-      ?: Palette.Builder(bitmap)
-    builder.generate {
+    val builder = interceptor?.intercept(Palette.Builder(target))
+      ?: Palette.Builder(target)
+    builder.generate async@{
+      val palette: Palette = it ?: return@async
       if (useCache) {
-        cache.put(imageModel, it)
+        cache.put(model, palette)
       }
-      paletteLoadedListener?.onPaletteLoaded(it)
+      paletteLoadedListener?.onPaletteLoaded(palette)
     }
   }
 
