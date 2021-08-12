@@ -21,6 +21,7 @@
 package com.skydoves.landscapist.coil
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -631,7 +632,8 @@ private fun CoilImage(
             },
             onSuccess = {
               imageLoadStateFlow.value = ImageLoadState.Success(it.toBitmap().asImageBitmap())
-              bitmapPalette?.applyImageModel(recomposeKey.data)?.generate(it.toBitmap())
+              bitmapPalette?.applyImageModel(recomposeKey.data)
+                ?.generate(it.toBitmap().copy(Bitmap.Config.ARGB_8888, true))
             },
             onError = {
               imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageBitmap())

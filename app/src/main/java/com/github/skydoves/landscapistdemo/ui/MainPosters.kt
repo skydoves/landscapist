@@ -120,8 +120,8 @@ fun SelectedPoster(
 ) {
   var palette by remember { mutableStateOf<Palette?>(null) }
 
-  FrescoImage(
-    imageUrl = poster?.poster!!,
+  GlideImage(
+    imageModel = poster?.poster!!,
     modifier = Modifier
       .padding(vertical = 10.dp)
       .aspectRatio(0.8f),
