@@ -34,7 +34,7 @@ internal class FlowBaseBitmapDataSubscriber(
   private val observeLoadingProcess: Boolean
 ) : BaseBitmapReferenceDataSubscriber() {
 
-  private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f))
+  private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.None)
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
   override fun onNewResultImpl(bitmapReference: CloseableReference<Bitmap>?) {
@@ -49,7 +49,7 @@ internal class FlowBaseBitmapDataSubscriber(
     super.onProgressUpdate(dataSource)
 
     /** collect progress values whenever progress is changed if the [observeLoadingProcess] is true. */
-    if (observeLoadingProcess) {
+    if (internalStateFlow.value == ImageLoadState.None || observeLoadingProcess) {
       this.internalStateFlow.value = ImageLoadState.Loading(dataSource.progress)
     }
   }

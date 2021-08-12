@@ -32,11 +32,16 @@ import kotlinx.coroutines.flow.StateFlow
  */
 internal class FlowCustomTarget : CustomTarget<Bitmap>() {
 
-  private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f))
+  private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.None)
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
   override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
     this.internalStateFlow.value = ImageLoadState.Success(resource.asImageBitmap())
+  }
+
+  override fun onLoadStarted(placeholder: Drawable?) {
+    super.onLoadStarted(placeholder)
+    this.internalStateFlow.value = ImageLoadState.Loading(0f)
   }
 
   override fun onLoadFailed(errorDrawable: Drawable?) {
