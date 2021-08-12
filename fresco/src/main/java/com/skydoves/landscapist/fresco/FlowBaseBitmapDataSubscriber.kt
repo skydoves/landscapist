@@ -23,6 +23,7 @@ import com.facebook.datasource.DataSource
 import com.facebook.imagepipeline.datasource.BaseBitmapReferenceDataSubscriber
 import com.facebook.imagepipeline.image.CloseableImage
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.palette.BitmapPalette
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -31,13 +32,15 @@ import kotlinx.coroutines.flow.StateFlow
  * [ImageLoadState] as a stateFlow.
  */
 internal class FlowBaseBitmapDataSubscriber(
-  private val observeLoadingProcess: Boolean
+  private val observeLoadingProcess: Boolean,
+  private val bitmapPalette: BitmapPalette?
 ) : BaseBitmapReferenceDataSubscriber() {
 
   private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f))
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
   override fun onNewResultImpl(bitmapReference: CloseableReference<Bitmap>?) {
+    bitmapPalette?.generate(bitmapReference?.get())
     this.internalStateFlow.value = ImageLoadState.Success(bitmapReference?.get()?.asImageBitmap())
   }
 
