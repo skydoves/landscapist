@@ -40,10 +40,10 @@ allprojects {
     }
 }
 ```
-And add a dependency code to your **module**'s `build.gradle` file.
+Also add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.3.1"
+    implementation "com.github.skydoves:landscapist-glide:1.3.2"
 }
 ```
 
@@ -120,7 +120,7 @@ CompositionLocalProvider(LocalGlideRequestBuilder provides requestBuilder) {
 We can create our own composable functions following requesting states.<br>
 Here is an example that shows a progress indicator when loading an image,<br>
 After complete requesting, the indicator will be gone and a content image will be shown.<br>
-And if the request failed (e.g. network error, wrong destination), error text will be shown.
+If the request failed (e.g. network error, wrong destination), error text will be shown.
 ```kotlin
  GlideImage(
  imageModel = poster.poster,
@@ -153,7 +153,7 @@ And if the request failed (e.g. network error, wrong destination), error text wi
 </div>
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
-And add a dependency code to your **module**'s `build.gradle` file.
+Also add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
     implementation "com.github.skydoves:landscapist-coil:<version>"
@@ -198,7 +198,7 @@ CoilImage(
 <img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="32%"/>
 
 ### Composable loading, success, failure
-We can create our own composable functions following requesting states. Here is an example that shows a progress indicator when loading an image, After complete requesting, the indicator will be gone and a content image will be shown. And if the request failed (e.g. network error, wrong destination), error text will be shown.
+We can create our own composable functions following requesting states. Here is an example that shows a progress indicator when loading an image, After complete requesting, the indicator will be gone and a content image will be shown. If the request failed (e.g. network error, wrong destination), error text will be shown.
 ```kotlin
 CoilImage(
   imageModel = poster.poster,
@@ -270,7 +270,7 @@ CompositionLocalProvider(LocalCoilImageLoader provides imageLoader) {
 </div>
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
-And add a dependency code to your **module**'s `build.gradle` file.
+Also add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
     implementation "com.github.skydoves:landscapist-fresco:<version>"
@@ -341,7 +341,7 @@ FrescoImage(
 We can create our own composable functions following requesting states.<br>
 Here is an example that shows a progress indicator when loading an image,<br>
 After complete requesting, the indicator will be gone and a content image will be shown.<br>
-And if the request failed (e.g. network error, wrong destination), error text will be shown.
+If the request failed (e.g. network error, wrong destination), error text will be shown.
 ```kotlin
  FrescoImage(
  imageUrl = stringImageUrl,
@@ -407,6 +407,59 @@ CompositionLocalProvider(LocalFrescoImageRequest provides imageRequest) {
 }
 ```
 
+<img src="https://user-images.githubusercontent.com/24237865/129226361-877689b8-a1ec-4f59-b8a6-e2efe33a8de7.gif" align="right" width="32%"/>
+
+## Palette
+We can extract major (theme) color profiles using `BitmapPalette`. Basically, we should use `BitmapPalette` for extracting the major colors from image. You can reference which kinds of colors can be extracted [here](https://developer.android.com/training/material/palette-colors#extract-color-profiles).
+
+```kotlin
+var palette by remember { mutableStateOf<Palette?>(null) }
+
+GlideImage( // CoilImage, FrescoImage also can be used.
+  imageModel = poster?.poster!!,
+  bitmapPalette = BitmapPalette {
+    palette = it
+  }
+)
+
+Crossfade(
+  targetState = palette,
+  modifier = Modifier
+    .padding(horizontal = 8.dp)
+    .size(45.dp)
+) {
+  Box(
+    modifier = Modifier
+      .background(color = Color(it?.lightVibrantSwatch?.rgb ?: 0))
+      .fillMaxSize()
+  )
+}
+```
+Also we can customize attributes of `BitmapPalette` like the below.
+
+```kotlin
+  var palette by remember { mutableStateOf<Palette?>(null) }
+
+  GlideImage(
+    imageModel = poster?.poster!!,
+    modifier = Modifier
+      .aspectRatio(0.8f),
+    bitmapPalette = BitmapPalette(
+      imageModel = poster.poster,
+      useCache = true,
+      interceptor = {
+        it.addFilter { rgb, hsl ->
+          // here edit to add the filter colors.
+          false
+        }
+      },
+      paletteLoadedListener = {
+        palette = it
+      }
+    )
+  )
+```
+
 ## Who's using Landscapist?
 If your project uses Landscapist, let me know via creating a new issue! 🤗
 
@@ -421,7 +474,7 @@ Accompanist is a group of libraries that contains some utilities which I've foun
 
 ## Find this repository useful? :heart:
 Support it by joining __[stargazers](https://github.com/skydoves/Landscapist/stargazers)__ for this repository. :star: <br>
-And __[follow](https://github.com/skydoves)__ me for my next creations! 🤩
+Also __[follow](https://github.com/skydoves)__ me for my next creations! 🤩
 
 # License
 ```xml

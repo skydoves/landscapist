@@ -124,11 +124,6 @@ fun SelectedPoster(
     imageModel = poster?.poster!!,
     modifier = Modifier
       .aspectRatio(0.8f),
-    circularRevealedEnabled = true,
-    shimmerParams = ShimmerParams(
-      baseColor = background800,
-      highlightColor = shimmerHighLight
-    ),
     bitmapPalette = BitmapPalette {
       palette = it
     }
