@@ -63,6 +63,13 @@ object MockUtil {
         "https://user-images.githubusercontent.com/24237865/75088277-dea85e00-5542-11ea-961b-7f0942cd8f47.jpg"
       ),
       Poster(
+        "Alice Through the Looking Glass",
+        "2016",
+        "1 h 45 min",
+        "Finding Dory is a 2016 American 3D computer-animated adventure film produced by Pixar Animation Studios and released by Walt Disney Pictures. Directed by Andrew Stanton with co-direction by Angus MacLane,[5][6] the screenplay was written by Stanton and Victoria Strouse.[7] The film is a sequel/spinoff[8][9] to 2003's Finding Nemo and features the returning voices of Ellen DeGeneres and Albert Brooks, with Hayden Rolence (replacing Alexander Gould), Ed O'Neill, Kaitlin Olson, Ty Burrell, Diane Keaton, and Eugene Levy joining the cast. The film focuses on the amnesiac fish Dory, who journeys to be reunited with her parents.[10]",
+        "https://user-images.githubusercontent.com/24237865/75088202-0d720480-5542-11ea-85f3-8726e69a9a26.jpg"
+      ),
+      Poster(
         "The Lion King",
         "2016",
         "1 h 50 min",

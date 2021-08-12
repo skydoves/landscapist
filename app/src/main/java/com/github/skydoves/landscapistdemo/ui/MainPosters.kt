@@ -123,7 +123,6 @@ fun SelectedPoster(
   GlideImage(
     imageModel = poster?.poster!!,
     modifier = Modifier
-      .padding(vertical = 10.dp)
       .aspectRatio(0.8f),
     circularRevealedEnabled = true,
     shimmerParams = ShimmerParams(
@@ -156,7 +155,7 @@ fun SelectedPoster(
 fun ColorPalettes(palette: Palette?) {
   Row(
     modifier = Modifier
-      .padding(8.dp)
+      .padding(horizontal = 8.dp, vertical = 16.dp)
       .horizontalScroll(rememberScrollState())
   ) {
     Crossfade(
