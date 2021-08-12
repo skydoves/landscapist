@@ -616,7 +616,6 @@ private fun CoilImage(
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
-  val lifecycle = LocalLifecycleOwner.current
   val imageLoadStateFlow =
     remember(recomposeKey) { MutableStateFlow<ImageLoadState>(ImageLoadState.None) }
   val disposable = remember(recomposeKey) { mutableStateOf<Disposable?>(null) }

@@ -40,8 +40,8 @@ internal class FlowBaseBitmapDataSubscriber(
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
   override fun onNewResultImpl(bitmapReference: CloseableReference<Bitmap>?) {
-    bitmapPalette?.generate(bitmapReference?.get())
     this.internalStateFlow.value = ImageLoadState.Success(bitmapReference?.get()?.asImageBitmap())
+    this.bitmapPalette?.generate(bitmapReference?.get())
   }
 
   override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {

@@ -40,8 +40,8 @@ internal class FlowCustomTarget constructor(
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
   override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-    bitmapPalette?.generate(resource)
     this.internalStateFlow.value = ImageLoadState.Success(resource.asImageBitmap())
+    this.bitmapPalette?.generate(resource)
   }
 
   override fun onLoadStarted(placeholder: Drawable?) {
