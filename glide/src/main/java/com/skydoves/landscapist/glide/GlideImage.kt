@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
@@ -43,6 +44,7 @@ import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.palette.BitmapPalette
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 
@@ -75,6 +77,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
@@ -91,6 +94,7 @@ public fun GlideImage(
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  bitmapPalette: BitmapPalette? = null,
   placeHolder: Any? = null,
   error: Any? = null
 ) {
@@ -106,6 +110,7 @@ public fun GlideImage(
     alpha = alpha,
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
+    bitmapPalette = bitmapPalette,
     loading = {
       placeHolder?.let {
         ImageBySource(
@@ -169,6 +174,7 @@ public fun GlideImage(
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
@@ -184,6 +190,7 @@ public fun GlideImage(
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  bitmapPalette: BitmapPalette? = null,
   shimmerParams: ShimmerParams,
   error: Any? = null
 ) {
@@ -200,6 +207,7 @@ public fun GlideImage(
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
     shimmerParams = shimmerParams,
+    bitmapPalette = bitmapPalette,
     failure = {
       error?.let {
         ImageBySource(
@@ -251,6 +259,7 @@ public fun GlideImage(
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
  */
@@ -268,6 +277,7 @@ public fun GlideImage(
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   shimmerParams: ShimmerParams,
+  bitmapPalette: BitmapPalette? = null,
   success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
@@ -276,6 +286,7 @@ public fun GlideImage(
     builder = requestBuilder
       .apply(requestOptions)
       .load(imageModel),
+    bitmapPalette = bitmapPalette,
     modifier = modifier.fillMaxWidth(),
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
@@ -355,6 +366,7 @@ public fun GlideImage(
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
@@ -372,6 +384,7 @@ public fun GlideImage(
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  bitmapPalette: BitmapPalette? = null,
   loading: @Composable ((imageState: GlideImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
@@ -382,6 +395,7 @@ public fun GlideImage(
       .apply(requestOptions)
       .load(imageModel),
     modifier = modifier.fillMaxWidth(),
+    bitmapPalette = bitmapPalette
   ) { imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
       is GlideImageState.None -> Unit
@@ -433,6 +447,7 @@ public fun GlideImage(
  * @param builder The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param content Content to be displayed for the given state.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  */
 @Composable
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -440,10 +455,13 @@ private fun GlideImage(
   recomposeKey: Any,
   builder: RequestBuilder<Bitmap>,
   modifier: Modifier = Modifier,
+  bitmapPalette: BitmapPalette? = null,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
-  val target = remember(recomposeKey) { FlowCustomTarget() }
+  val target = remember(recomposeKey) {
+    FlowCustomTarget(bitmapPalette?.applyImageModel(recomposeKey))
+  }
 
   ImageLoad(
     recomposeKey = recomposeKey,

@@ -17,10 +17,15 @@
 package com.github.skydoves.landscapistdemo.ui
 
 import android.widget.Toast
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -36,7 +41,11 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -45,6 +54,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.palette.graphics.Palette
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
@@ -53,6 +63,7 @@ import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.palette.BitmapPalette
 
 @Composable
 fun DisneyPosters(
@@ -107,6 +118,8 @@ fun PosterItem(
 fun SelectedPoster(
   poster: Poster?
 ) {
+  var palette by remember { mutableStateOf<Palette?>(null) }
+
   GlideImage(
     imageModel = poster?.poster!!,
     modifier = Modifier
@@ -116,8 +129,13 @@ fun SelectedPoster(
     shimmerParams = ShimmerParams(
       baseColor = background800,
       highlightColor = shimmerHighLight
-    )
+    ),
+    bitmapPalette = BitmapPalette {
+      palette = it
+    }
   )
+
+  ColorPalettes(palette)
 
   Text(
     text = poster.name,
@@ -132,6 +150,100 @@ fun SelectedPoster(
     textAlign = TextAlign.Start,
     modifier = Modifier.padding(8.dp)
   )
+}
+
+@Composable
+fun ColorPalettes(palette: Palette?) {
+  Row(
+    modifier = Modifier
+      .padding(8.dp)
+      .horizontalScroll(rememberScrollState())
+  ) {
+    Crossfade(
+      targetState = palette,
+      modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .size(45.dp)
+    ) {
+      Box(
+        modifier = Modifier
+          .background(color = Color(it?.lightVibrantSwatch?.rgb ?: 0))
+          .fillMaxSize()
+      )
+    }
+    Crossfade(
+      targetState = palette,
+      modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .size(45.dp)
+    ) {
+      Box(
+        modifier = Modifier
+          .background(color = Color(it?.lightMutedSwatch?.rgb ?: 0))
+          .fillMaxSize()
+      )
+    }
+    Crossfade(
+      targetState = palette,
+      modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .size(45.dp)
+    ) {
+      Box(
+        modifier = Modifier
+          .background(color = Color(it?.vibrantSwatch?.rgb ?: 0))
+          .fillMaxSize()
+      )
+    }
+    Crossfade(
+      targetState = palette,
+      modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .size(45.dp)
+    ) {
+      Box(
+        modifier = Modifier
+          .background(color = Color(it?.mutedSwatch?.rgb ?: 0))
+          .fillMaxSize()
+      )
+    }
+    Crossfade(
+      targetState = palette,
+      modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .size(45.dp)
+    ) {
+      Box(
+        modifier = Modifier
+          .background(color = Color(it?.darkVibrantSwatch?.rgb ?: 0))
+          .fillMaxSize()
+      )
+    }
+    Crossfade(
+      targetState = palette,
+      modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .size(45.dp)
+    ) {
+      Box(
+        modifier = Modifier
+          .background(color = Color(it?.darkMutedSwatch?.rgb ?: 0))
+          .fillMaxSize()
+      )
+    }
+    Crossfade(
+      targetState = palette,
+      modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .size(45.dp)
+    ) {
+      Box(
+        modifier = Modifier
+          .background(color = Color(it?.dominantSwatch?.rgb ?: 0))
+          .fillMaxSize()
+      )
+    }
+  }
 }
 
 @Composable
