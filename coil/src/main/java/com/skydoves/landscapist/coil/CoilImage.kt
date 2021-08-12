@@ -616,8 +616,9 @@ private fun CoilImage(
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
+  val lifecycle = LocalLifecycleOwner.current
   val imageLoadStateFlow =
-    remember(recomposeKey) { MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f)) }
+    remember(recomposeKey) { MutableStateFlow<ImageLoadState>(ImageLoadState.None) }
   val disposable = remember(recomposeKey) { mutableStateOf<Disposable?>(null) }
 
   ImageLoad(
@@ -626,6 +627,9 @@ private fun CoilImage(
       suspendCancellableCoroutine { cont ->
         disposable.value = imageLoader.enqueue(
           recomposeKey.newBuilder(context).target(
+            onStart = {
+              imageLoadStateFlow.value = ImageLoadState.Loading(0f)
+            },
             onSuccess = {
               imageLoadStateFlow.value = ImageLoadState.Success(it.toBitmap().asImageBitmap())
               bitmapPalette?.applyImageModel(recomposeKey.data)?.generate(it.toBitmap())

@@ -22,6 +22,7 @@ package com.skydoves.landscapist
 import android.graphics.Matrix
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
@@ -66,7 +67,7 @@ public fun Shimmer(
   tilt: Float = DefaultShimmerTilt,
   durationMillis: Int = DefaultDurationMillis
 ) {
-  val animatedProgress = remember { androidx.compose.animation.core.Animatable(0f) }
+  val animatedProgress = remember { Animatable(0f) }
   LaunchedEffect(key1 = baseColor) {
     animatedProgress.animateTo(
       targetValue = 1f,

@@ -21,6 +21,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.compose.ui.graphics.asImageBitmap
 import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.palette.BitmapPalette
@@ -33,14 +34,19 @@ import kotlinx.coroutines.flow.StateFlow
  */
 internal class FlowCustomTarget constructor(
   private val bitmapPalette: BitmapPalette?
-) : CustomTarget<Bitmap>() {
+) : CustomTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
 
-  private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f))
+  private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.None)
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
   override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
     bitmapPalette?.generate(resource)
     this.internalStateFlow.value = ImageLoadState.Success(resource.asImageBitmap())
+  }
+
+  override fun onLoadStarted(placeholder: Drawable?) {
+    super.onLoadStarted(placeholder)
+    this.internalStateFlow.value = ImageLoadState.Loading(0f)
   }
 
   override fun onLoadFailed(errorDrawable: Drawable?) {
