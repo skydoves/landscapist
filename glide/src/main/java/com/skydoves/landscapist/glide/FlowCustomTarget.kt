@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.StateFlow
  * [ImageLoadState] as a stateFlow.
  */
 internal class FlowCustomTarget constructor(
-  private val bitmapPalette: BitmapPalette? = null
+  private val bitmapPalette: BitmapPalette?
 ) : CustomTarget<Bitmap>() {
 
   private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f))

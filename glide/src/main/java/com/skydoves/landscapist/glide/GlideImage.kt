@@ -446,8 +446,8 @@ public fun GlideImage(
  *
  * @param builder The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param content Content to be displayed for the given state.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
+ * @param content Content to be displayed for the given state.
  */
 @Composable
 @OptIn(ExperimentalCoroutinesApi::class)
