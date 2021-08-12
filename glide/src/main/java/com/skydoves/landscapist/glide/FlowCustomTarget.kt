@@ -24,6 +24,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.palette.BitmapPalette
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -31,13 +32,16 @@ import kotlinx.coroutines.flow.StateFlow
  * FlowCustomTarget is a glide bitmap custom target which collects
  * [ImageLoadState] as a stateFlow.
  */
-internal class FlowCustomTarget : CustomTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+internal class FlowCustomTarget constructor(
+  private val bitmapPalette: BitmapPalette?
+) : CustomTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
 
   private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.None)
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
   override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
     this.internalStateFlow.value = ImageLoadState.Success(resource.asImageBitmap())
+    this.bitmapPalette?.generate(resource)
   }
 
   override fun onLoadStarted(placeholder: Drawable?) {

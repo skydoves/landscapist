@@ -26,6 +26,8 @@ ext.versions = [
     glideVersion     : '4.12.0',
     coilVersion      : '1.3.2',
 
+    paletteVersion   : '1.0.0',
+
     // unit test
     rulesVersion     : '1.2.0',
     runnerVersion    : '1.3.0-beta01',

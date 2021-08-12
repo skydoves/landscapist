@@ -21,6 +21,7 @@
 package com.skydoves.landscapist.coil
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
+import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.request.Disposable
 import coil.request.ImageRequest
@@ -48,6 +50,7 @@ import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.palette.BitmapPalette
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -87,6 +90,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param circularRevealedDuration The duration of the circular reveal animation.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
  */
 @Composable
@@ -104,6 +108,7 @@ public fun CoilImage(
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   colorFilter: ColorFilter? = null,
   shimmerParams: ShimmerParams,
+  bitmapPalette: BitmapPalette? = null,
   error: Any? = null,
 ) {
   CoilImage(
@@ -119,6 +124,7 @@ public fun CoilImage(
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
     shimmerParams = shimmerParams,
+    bitmapPalette = bitmapPalette,
     failure = {
       error?.let {
         ImageBySource(
@@ -166,6 +172,7 @@ public fun CoilImage(
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
@@ -183,6 +190,7 @@ public fun CoilImage(
   contentDescription: String? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  bitmapPalette: BitmapPalette? = null,
   colorFilter: ColorFilter? = null,
   placeHolder: Any? = null,
   error: Any? = null,
@@ -199,6 +207,7 @@ public fun CoilImage(
     colorFilter = colorFilter,
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
+    bitmapPalette = bitmapPalette,
     loading = {
       placeHolder?.let {
         ImageBySource(
@@ -257,6 +266,7 @@ public fun CoilImage(
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
@@ -276,6 +286,7 @@ public fun CoilImage(
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   shimmerParams: ShimmerParams,
+  bitmapPalette: BitmapPalette? = null,
   success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
@@ -294,6 +305,7 @@ public fun CoilImage(
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
     shimmerParams = shimmerParams,
+    bitmapPalette = bitmapPalette,
     success = success,
     failure = failure
   )
@@ -339,6 +351,7 @@ public fun CoilImage(
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
@@ -358,6 +371,7 @@ public fun CoilImage(
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  bitmapPalette: BitmapPalette? = null,
   loading: @Composable ((imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
@@ -376,6 +390,7 @@ public fun CoilImage(
     colorFilter = colorFilter,
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
+    bitmapPalette = bitmapPalette,
     loading = loading,
     success = success,
     failure = failure
@@ -412,6 +427,7 @@ public fun CoilImage(
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
@@ -429,6 +445,7 @@ public fun CoilImage(
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   shimmerParams: ShimmerParams,
+  bitmapPalette: BitmapPalette? = null,
   success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
@@ -436,6 +453,7 @@ public fun CoilImage(
     recomposeKey = imageRequest,
     imageLoader = imageLoader,
     modifier = modifier.fillMaxWidth(),
+    bitmapPalette = bitmapPalette,
   ) { imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
       is CoilImageState.None -> Unit
@@ -510,6 +528,7 @@ public fun CoilImage(
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
@@ -527,6 +546,7 @@ public fun CoilImage(
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  bitmapPalette: BitmapPalette? = null,
   loading: @Composable ((imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
@@ -535,6 +555,7 @@ public fun CoilImage(
     recomposeKey = imageRequest,
     imageLoader = imageLoader,
     modifier = modifier.fillMaxWidth(),
+    bitmapPalette = bitmapPalette,
   ) { imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
       is CoilImageState.None -> Unit
@@ -583,6 +604,7 @@ public fun CoilImage(
  * @param recomposeKey The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param content Content to be displayed for the given state.
  */
 @Composable
@@ -591,12 +613,12 @@ private fun CoilImage(
   recomposeKey: ImageRequest,
   modifier: Modifier = Modifier,
   imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
+  bitmapPalette: BitmapPalette? = null,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
-  val lifecycle = LocalLifecycleOwner.current
   val imageLoadStateFlow =
-    remember(recomposeKey) { MutableStateFlow<ImageLoadState>(ImageLoadState.Loading(0f)) }
+    remember(recomposeKey) { MutableStateFlow<ImageLoadState>(ImageLoadState.None) }
   val disposable = remember(recomposeKey) { mutableStateOf<Disposable?>(null) }
 
   ImageLoad(
@@ -610,11 +632,13 @@ private fun CoilImage(
             },
             onSuccess = {
               imageLoadStateFlow.value = ImageLoadState.Success(it.toBitmap().asImageBitmap())
+              bitmapPalette?.applyImageModel(recomposeKey.data)
+                ?.generate(it.toBitmap().copy(Bitmap.Config.ARGB_8888, true))
             },
             onError = {
               imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageBitmap())
             }
-          ).lifecycle(lifecycle).build()
+          ).build()
         )
 
         cont.resume(imageLoadStateFlow) {

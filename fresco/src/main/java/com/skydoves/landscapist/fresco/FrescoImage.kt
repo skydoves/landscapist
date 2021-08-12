@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.palette.graphics.Palette
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
 import com.skydoves.landscapist.CircularRevealedImage
@@ -41,6 +42,7 @@ import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.palette.BitmapPalette
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 
@@ -72,6 +74,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
@@ -88,6 +91,7 @@ public fun FrescoImage(
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  bitmapPalette: BitmapPalette? = null,
   placeHolder: Any? = null,
   error: Any? = null,
   observeLoadingProcess: Boolean = false
@@ -103,6 +107,7 @@ public fun FrescoImage(
     alpha = alpha,
     circularRevealedEnabled = circularRevealedEnabled,
     circularRevealedDuration = circularRevealedDuration,
+    bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
     loading = {
       placeHolder?.let {
@@ -160,6 +165,7 @@ public fun FrescoImage(
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
  * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
@@ -177,6 +183,7 @@ public fun FrescoImage(
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   shimmerParams: ShimmerParams,
+  bitmapPalette: BitmapPalette? = null,
   error: ImageBitmap? = null,
   observeLoadingProcess: Boolean = false
 ) {
@@ -193,6 +200,7 @@ public fun FrescoImage(
     circularRevealedDuration = circularRevealedDuration,
     observeLoadingProcess = observeLoadingProcess,
     shimmerParams = shimmerParams,
+    bitmapPalette = bitmapPalette,
     failure = {
       error?.let {
         ImageBySource(
@@ -235,6 +243,7 @@ public fun FrescoImage(
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
@@ -253,6 +262,7 @@ public fun FrescoImage(
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
   observeLoadingProcess: Boolean = false,
   shimmerParams: ShimmerParams,
+  bitmapPalette: BitmapPalette? = null,
   success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
@@ -260,6 +270,7 @@ public fun FrescoImage(
     recomposeKey = imageUrl,
     imageRequest = imageRequest,
     modifier = modifier.fillMaxWidth(),
+    bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
   ) { imageState ->
     when (val frescoImageState = imageState.toFrescoImageState()) {
@@ -331,6 +342,7 @@ public fun FrescoImage(
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
  * @param circularRevealedDuration The duration of the circular reveal animation.
+ *
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
@@ -348,6 +360,7 @@ public fun FrescoImage(
   colorFilter: ColorFilter? = null,
   circularRevealedEnabled: Boolean = false,
   circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  bitmapPalette: BitmapPalette? = null,
   observeLoadingProcess: Boolean = false,
   loading: @Composable ((imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
@@ -357,6 +370,7 @@ public fun FrescoImage(
     recomposeKey = imageUrl,
     imageRequest = imageRequest,
     modifier = modifier.fillMaxWidth(),
+    bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
   ) { imageState ->
     when (val frescoImageState = imageState.toFrescoImageState()) {
@@ -403,6 +417,7 @@ public fun FrescoImage(
  *
  * @param imageRequest The pipeline has to know about requested image to proceed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param content Content to be displayed for the given state.
  */
 @Composable
@@ -411,6 +426,7 @@ private fun FrescoImage(
   recomposeKey: Any?,
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
+  bitmapPalette: BitmapPalette? = null,
   observeLoadingProcess: Boolean = false,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
@@ -421,7 +437,10 @@ private fun FrescoImage(
     recomposeKey = recomposeKey,
     executeImageRequest = {
       suspendCancellableCoroutine { cont ->
-        val subscriber = FlowBaseBitmapDataSubscriber(observeLoadingProcess)
+        val subscriber = FlowBaseBitmapDataSubscriber(
+          observeLoadingProcess,
+          bitmapPalette?.applyImageModel(recomposeKey)
+        )
         datasource.subscribe(subscriber, CallerThreadExecutor.getInstance())
 
         cont.resume(subscriber.imageLoadStateFlow) {
