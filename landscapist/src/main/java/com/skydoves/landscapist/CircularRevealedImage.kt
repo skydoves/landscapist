@@ -43,8 +43,7 @@ import androidx.compose.ui.layout.ContentScale
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param alpha an alpha value to apply for the image when it is rendered onscreen.
  * @param colorFilter colorFilter to apply for the image when it is rendered onscreen.
- * @param circularRevealedEnabled a conditional value for enabling or not the circular revealing animation.
- * @param circularRevealedDuration milli-second times from start to finish animation.
+ * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  */
 @Composable
 public fun CircularRevealedImage(
@@ -56,12 +55,15 @@ public fun CircularRevealedImage(
   contentDescription: String?,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration
+  circularReveal: CircularReveal? = null,
 ) {
   Image(
-    painter = if (circularRevealedEnabled) {
-      bitmapPainter.circularReveal(bitmap, circularRevealedDuration)
+    painter = if (circularReveal != null) {
+      bitmapPainter.circularReveal(
+        bitmap,
+        circularReveal.duration,
+        circularReveal.onFinishListener
+      )
     } else {
       bitmapPainter
     },
