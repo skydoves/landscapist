@@ -60,6 +60,7 @@ import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background800
 import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
+import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
@@ -124,6 +125,11 @@ fun SelectedPoster(
     imageModel = poster?.poster!!,
     modifier = Modifier
       .aspectRatio(0.8f),
+    circularReveal = CircularReveal(),
+    shimmerParams = ShimmerParams(
+      baseColor = background800,
+      highlightColor = shimmerHighLight
+    ),
     bitmapPalette = BitmapPalette {
       palette = it
     }
@@ -271,7 +277,7 @@ fun HomePoster(
               .makeText(context, poster.name, Toast.LENGTH_SHORT)
               .show()
           },
-        circularRevealedEnabled = true,
+        circularReveal = CircularReveal(),
         shimmerParams = ShimmerParams(
           baseColor = background800,
           highlightColor = shimmerHighLight

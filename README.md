@@ -55,7 +55,7 @@ GlideImage(
   // Crop, Fit, Inside, FillHeight, FillWidth, None
   contentScale = ContentScale.Crop,
   // shows an image with a circular revealed animation.
-  circularRevealedEnabled = true,
+  circularReveal = CircularReveal(duration = 250),
   // shows a placeholder ImageBitmap when loading.
   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
   // shows an error ImageBitmap when the request failed.
@@ -168,7 +168,7 @@ CoilImage(
   // Crop, Fit, Inside, FillHeight, FillWidth, None
   contentScale = ContentScale.Crop,
   // shows an image with a circular revealed animation.
-  circularRevealedEnabled = true,
+  circularReveal = CircularReveal(duration = 250),
   // shows a placeholder ImageBitmap when loading.
   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
   // shows an error ImageBitmap when the request failed.
@@ -311,7 +311,7 @@ FrescoImage(
   // Crop, Fit, Inside, FillHeight, FillWidth, None
   contentScale = ContentScale.Crop,
   // shows an image with a circular revealed animation.
-  circularRevealedEnabled = true,
+  circularReveal = CircularReveal(duration = 250),
   // shows a placeholder ImageBitmap when loading.
   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
   // shows an error ImageBitmap when the request failed.
