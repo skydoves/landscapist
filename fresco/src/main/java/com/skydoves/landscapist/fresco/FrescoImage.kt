@@ -35,8 +35,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.palette.graphics.Palette
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
+import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.CircularRevealedImage
-import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
@@ -72,8 +72,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
- * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
@@ -89,8 +88,7 @@ public fun FrescoImage(
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   placeHolder: Any? = null,
   error: Any? = null,
@@ -105,8 +103,7 @@ public fun FrescoImage(
     contentDescription = contentDescription,
     colorFilter = colorFilter,
     alpha = alpha,
-    circularRevealedEnabled = circularRevealedEnabled,
-    circularRevealedDuration = circularRevealedDuration,
+    circularReveal = circularReveal,
     bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
     loading = {
@@ -163,8 +160,7 @@ public fun FrescoImage(
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
- * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
@@ -180,8 +176,7 @@ public fun FrescoImage(
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  circularReveal: CircularReveal? = null,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   error: ImageBitmap? = null,
@@ -196,8 +191,7 @@ public fun FrescoImage(
     contentDescription = contentDescription,
     colorFilter = colorFilter,
     alpha = alpha,
-    circularRevealedEnabled = circularRevealedEnabled,
-    circularRevealedDuration = circularRevealedDuration,
+    circularReveal = circularReveal,
     observeLoadingProcess = observeLoadingProcess,
     shimmerParams = shimmerParams,
     bitmapPalette = bitmapPalette,
@@ -241,8 +235,7 @@ public fun FrescoImage(
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
- * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param success Content to be displayed when the request is succeeded.
@@ -258,8 +251,7 @@ public fun FrescoImage(
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  circularReveal: CircularReveal? = null,
   observeLoadingProcess: Boolean = false,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
@@ -296,8 +288,7 @@ public fun FrescoImage(
             contentDescription = contentDescription,
             alpha = alpha,
             colorFilter = colorFilter,
-            circularRevealedEnabled = circularRevealedEnabled,
-            circularRevealedDuration = circularRevealedDuration
+            circularReveal = circularReveal
           )
         }
       }
@@ -340,9 +331,7 @@ public fun FrescoImage(
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
- * @param circularRevealedDuration The duration of the circular reveal animation.
- *
+ * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
@@ -358,8 +347,7 @@ public fun FrescoImage(
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   observeLoadingProcess: Boolean = false,
   loading: @Composable ((imageState: FrescoImageState.Loading) -> Unit)? = null,
@@ -387,8 +375,7 @@ public fun FrescoImage(
             contentDescription = contentDescription,
             alpha = alpha,
             colorFilter = colorFilter,
-            circularRevealedEnabled = circularRevealedEnabled,
-            circularRevealedDuration = circularRevealedDuration
+            circularReveal = circularReveal
           )
         }
       }

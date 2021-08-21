@@ -36,7 +36,8 @@ import androidx.compose.ui.graphics.painter.Painter
 @Composable
 internal fun Painter.circularReveal(
   imageBitmap: ImageBitmap,
-  durationMs: Int
+  durationMs: Int,
+  onFinishListener: CircularRevealFinishListener? = null
 ): Painter {
   // Defines a transition of `CircularRevealState`, and updates the transition when the provided state changes.
   val transitionState = remember { MutableTransitionState(CircularRevealState.None) }
@@ -50,7 +51,10 @@ internal fun Painter.circularReveal(
   ) { state ->
     when (state) {
       CircularRevealState.None -> 0f
-      CircularRevealState.Finished -> 1f
+      CircularRevealState.Finished -> {
+        onFinishListener?.onFinish()
+        1f
+      }
     }
   }
 

@@ -37,8 +37,8 @@ import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
+import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.CircularRevealedImage
-import com.skydoves.landscapist.DefaultCircularRevealedDuration
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
@@ -74,8 +74,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
- * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
@@ -92,8 +91,7 @@ public fun GlideImage(
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   placeHolder: Any? = null,
   error: Any? = null
@@ -108,8 +106,7 @@ public fun GlideImage(
     contentDescription = contentDescription,
     colorFilter = colorFilter,
     alpha = alpha,
-    circularRevealedEnabled = circularRevealedEnabled,
-    circularRevealedDuration = circularRevealedDuration,
+    circularReveal = circularReveal,
     bitmapPalette = bitmapPalette,
     loading = {
       placeHolder?.let {
@@ -170,8 +167,7 @@ public fun GlideImage(
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
- * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
@@ -188,8 +184,7 @@ public fun GlideImage(
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   shimmerParams: ShimmerParams,
   error: Any? = null
@@ -204,8 +199,7 @@ public fun GlideImage(
     contentDescription = contentDescription,
     colorFilter = colorFilter,
     alpha = alpha,
-    circularRevealedEnabled = circularRevealedEnabled,
-    circularRevealedDuration = circularRevealedDuration,
+    circularReveal = circularReveal,
     shimmerParams = shimmerParams,
     bitmapPalette = bitmapPalette,
     failure = {
@@ -255,8 +249,7 @@ public fun GlideImage(
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
- * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
@@ -274,8 +267,7 @@ public fun GlideImage(
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  circularReveal: CircularReveal? = null,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
@@ -312,8 +304,7 @@ public fun GlideImage(
             contentDescription = contentDescription,
             alpha = alpha,
             colorFilter = colorFilter,
-            circularRevealedEnabled = circularRevealedEnabled,
-            circularRevealedDuration = circularRevealedDuration
+            circularReveal = circularReveal
           )
         }
       }
@@ -363,8 +354,7 @@ public fun GlideImage(
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularRevealedEnabled Whether to run a circular reveal animation when images are successfully loaded.
- * @param circularRevealedDuration The duration of the circular reveal animation.
+ * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param loading Content to be displayed when the request is in progress.
@@ -382,8 +372,7 @@ public fun GlideImage(
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularRevealedEnabled: Boolean = false,
-  circularRevealedDuration: Int = DefaultCircularRevealedDuration,
+  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   loading: @Composable ((imageState: GlideImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
@@ -411,8 +400,7 @@ public fun GlideImage(
             contentDescription = contentDescription,
             alpha = alpha,
             colorFilter = colorFilter,
-            circularRevealedEnabled = circularRevealedEnabled,
-            circularRevealedDuration = circularRevealedDuration
+            circularReveal = circularReveal
           )
         }
       }
