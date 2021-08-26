@@ -73,7 +73,6 @@ GlideImage(
     .override(256, 256)
     .diskCacheStrategy(DiskCacheStrategy.ALL)
     .centerCrop(),
-  transitionOptions = BitmapTransitionOptions.withCrossFade(), 
   contentScale = ContentScale.Crop,
   modifier = modifier,
   alignment = Alignment.Center,
