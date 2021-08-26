@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.github.skydoves.landscapistdemo">
-
-  <uses-permission android:name="android.permission.INTERNET" />
+  xmlns:tools="http://schemas.android.com/tools"
+  package="com.github.skydoves.landscapistdemo">
 
   <application
-      android:allowBackup="false"
-      android:icon="@mipmap/ic_launcher"
-      android:label="@string/app_name"
-      android:roundIcon="@mipmap/ic_launcher_round"
-      android:name="com.github.skydoves.landscapistdemo.App"
-      android:supportsRtl="true"
-      android:theme="@style/Landscapist.NoActionBar"
-      tools:ignore="AllowBackup">
-    <activity android:name="com.github.skydoves.landscapistdemo.ui.MainActivity">
+    android:name="com.github.skydoves.landscapistdemo.App"
+    android:allowBackup="false"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:roundIcon="@mipmap/ic_launcher_round"
+    android:supportsRtl="true"
+    android:theme="@style/Landscapist.NoActionBar"
+    tools:ignore="AllowBackup">
+    <activity
+      android:name="com.github.skydoves.landscapistdemo.ui.MainActivity"
+      android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
 
@@ -22,5 +22,7 @@
       </intent-filter>
     </activity>
   </application>
+
+  <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
