@@ -62,7 +62,6 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 }
 
 dependencies {
-  api project(":landscapist")
   api project(":fresco")
   api "com.facebook.fresco:animated-webp:$versions.frescoVersion"
   api "com.facebook.fresco:webpsupport:$versions.frescoVersion"
