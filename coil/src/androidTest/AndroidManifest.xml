@@ -2,15 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.skydoves.landscapist.coil">
 
-  <uses-sdk android:targetSdkVersion="30" />
+  <uses-sdk android:targetSdkVersion="31" />
 
   <uses-permission android:name="android.permission.INTERNET" />
 
   <application>
     <activity
-        android:name="androidx.activity.ComponentActivity"
-        android:theme="@style/Theme.CoilTest"
-        tools:replace="android:theme" />
+      android:name="androidx.activity.ComponentActivity"
+      android:exported="false"
+      tools:node="merge" />
   </application>
 
 </manifest>
