@@ -91,6 +91,7 @@ dependencies {
 
   // landscapist
   implementation project(":fresco")
+  implementation project(":fresco-websupport")
   implementation project(":glide")
   implementation project(":coil")
 }
