@@ -64,6 +64,8 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 dependencies {
   api project(":fresco")
   api "com.facebook.fresco:animated-webp:$versions.frescoVersion"
+  api "com.facebook.fresco:animated-gif:$versions.frescoVersion"
+  api "com.facebook.fresco:animated-drawable:$versions.frescoVersion"
   api "com.facebook.fresco:webpsupport:$versions.frescoVersion"
 
   implementation "androidx.core:core-ktx:$versions.coreKtxVersion"

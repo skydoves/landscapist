@@ -24,8 +24,11 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -47,6 +50,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -55,6 +59,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.palette.graphics.Palette
+import com.facebook.drawee.backends.pipeline.Fresco
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
@@ -63,6 +68,7 @@ import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.fresco.FrescoImage
+import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.palette.BitmapPalette
 
@@ -150,6 +156,26 @@ fun SelectedPoster(
     textAlign = TextAlign.Start,
     modifier = Modifier.padding(8.dp)
   )
+
+  Text(
+    text = "Gif",
+    style = MaterialTheme.typography.h2,
+    textAlign = TextAlign.Center,
+    modifier = Modifier.padding(8.dp)
+  )
+
+  FrescoWebImage(
+    controllerBuilder = Fresco.newDraweeControllerBuilder()
+      .setUri(poster.gif)
+      .setAutoPlayAnimations(true),
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(8.dp)
+      .height(500.dp)
+      .clip(RoundedCornerShape(8.dp))
+  )
+
+  Spacer(modifier = Modifier.height(12.dp))
 }
 
 @Composable
