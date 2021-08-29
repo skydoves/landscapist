@@ -31,7 +31,7 @@ public sealed class FrescoImageState {
   /** Request is currently in progress. */
   public data class Loading(val progress: Float) : FrescoImageState()
 
-  /** Request is completed successfully amd ready to use an [ImageBitmap]. */
+  /** Request is completed successfully and ready to use an [ImageBitmap]. */
   public data class Success(val imageBitmap: ImageBitmap?) : FrescoImageState()
 
   /** Request failed. */

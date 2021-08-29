@@ -44,7 +44,7 @@ allprojects {
 Also add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.3.3"
+    implementation "com.github.skydoves:landscapist-glide:1.3.4"
 }
 ```
 
@@ -153,7 +153,7 @@ If the request failed (e.g. network error, wrong destination), error text will b
 </div>
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
-Also add a dependency code to your **module**'s `build.gradle` file.
+Add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
     implementation "com.github.skydoves:landscapist-coil:<version>"
@@ -270,7 +270,7 @@ CompositionLocalProvider(LocalCoilImageLoader provides imageLoader) {
 </div>
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
-Also add a dependency code to your **module**'s `build.gradle` file.
+Add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
     implementation "com.github.skydoves:landscapist-fresco:<version>"
@@ -458,6 +458,32 @@ Also we can customize attributes of `BitmapPalette` like the below.
       }
     )
   )
+```
+
+<img src="https://user-images.githubusercontent.com/24237865/131246748-b88903a1-43de-4e6c-9069-3e956a0cf8a6.gif" align="right" width="32%"/>
+
+## Fresco Animated Support (GIF, Webp)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+Add a dependency code to your **module**'s `build.gradle` file.
+```gradle
+dependencies {
+    implementation "com.github.skydoves:landscapist-fresco-websupport:<version>"
+}
+```
+Fresco supports animated GIF and WebP Images using `FrescoWebImage` composable function. <br>
+We should pass the `AbstractDraweeController` that can be created like the below.<br>
+You can reference how to build the [DraweeController](https://frescolib.org/docs/animations.html), and [Supported URIs](https://frescolib.org/docs/supported-uris.html) for setting uri address.
+
+
+```kotlin
+FrescoWebImage(
+  controllerBuilder = Fresco.newDraweeControllerBuilder()
+    .setUri(poster.gif) // GIF or Webp image url.
+    .setAutoPlayAnimations(true),
+  modifier = Modifier
+    .fillMaxWidth()
+    .height(300.dp)
+)
 ```
 
 ## Who's using Landscapist?

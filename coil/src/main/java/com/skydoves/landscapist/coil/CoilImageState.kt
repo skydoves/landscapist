@@ -29,7 +29,7 @@ public sealed class CoilImageState {
   /** Request is currently in progress. */
   public data class Loading(val progress: Float) : CoilImageState()
 
-  /** Request is completed successfully amd ready to use an [ImageBitmap]. */
+  /** Request is completed successfully and ready to use an [ImageBitmap]. */
   public data class Success(val imageBitmap: ImageBitmap?) : CoilImageState()
 
   /** Request failed. */
