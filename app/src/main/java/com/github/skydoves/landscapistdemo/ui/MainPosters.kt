@@ -180,6 +180,10 @@ fun SelectedPoster(
   CoilImage(
     imageModel = poster.gif,
     imageLoader = imageLoader,
+    shimmerParams = ShimmerParams(
+      baseColor = background800,
+      highlightColor = shimmerHighLight
+    ),
     modifier = Modifier
       .fillMaxWidth()
       .padding(8.dp)
