@@ -64,6 +64,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 dependencies {
   api project(":landscapist")
   api "io.coil-kt:coil:$versions.coilVersion"
+  api "io.coil-kt:coil-gif:$versions.coilVersion"
 
   implementation "androidx.core:core-ktx:$versions.coreKtxVersion"
   implementation "androidx.compose.ui:ui:$versions.composeVersion"
