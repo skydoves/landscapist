@@ -34,7 +34,7 @@ import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder
 import com.facebook.drawee.generic.GenericDraweeHierarchy
 import com.facebook.drawee.generic.GenericDraweeHierarchyInflater
 import com.facebook.drawee.view.DraweeHolder
-import com.skydoves.landscapist.toPainter
+import com.skydoves.landscapist.rememberDrawablePainter
 
 /**
  * FrescoWebImage requests loading an image using Fresco Pipeline for web supports like webp.
@@ -91,7 +91,7 @@ public fun FrescoWebImage(
   if (topLevelDrawable != null) {
     Image(
       modifier = modifier,
-      painter = topLevelDrawable.toPainter(),
+      painter = rememberDrawablePainter(topLevelDrawable),
       contentDescription = contentDescription,
       alignment = alignment,
       contentScale = contentScale,
