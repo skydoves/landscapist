@@ -45,7 +45,7 @@ public fun ImageLoadState.toFrescoImageState(): FrescoImageState {
   return when (this) {
     is ImageLoadState.None -> FrescoImageState.None
     is ImageLoadState.Loading -> FrescoImageState.Loading(progress)
-    is ImageLoadState.Success -> FrescoImageState.Success(imageBitmap)
+    is ImageLoadState.Success -> FrescoImageState.Success(data as? ImageBitmap)
     is ImageLoadState.Failure -> FrescoImageState.Failure(
       data as? DataSource<CloseableReference<CloseableImage>>
     )

@@ -41,7 +41,7 @@ public fun ImageLoadState.toGlideImageState(): GlideImageState {
   return when (this) {
     is ImageLoadState.None -> GlideImageState.None
     is ImageLoadState.Loading -> GlideImageState.Loading(progress)
-    is ImageLoadState.Success -> GlideImageState.Success(imageBitmap)
+    is ImageLoadState.Success -> GlideImageState.Success(data as? ImageBitmap)
     is ImageLoadState.Failure -> GlideImageState.Failure(data as? Drawable)
   }
 }

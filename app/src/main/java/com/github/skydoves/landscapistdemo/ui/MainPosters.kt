@@ -16,6 +16,7 @@
 
 package com.github.skydoves.landscapistdemo.ui
 
+import android.os.Build.VERSION.SDK_INT
 import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
@@ -59,7 +60,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.palette.graphics.Palette
-import com.facebook.drawee.backends.pipeline.Fresco
+import coil.ImageLoader
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
@@ -67,9 +70,8 @@ import com.github.skydoves.landscapistdemo.theme.background800
 import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.fresco.FrescoImage
-import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
-import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.palette.BitmapPalette
 
 @Composable
@@ -111,7 +113,7 @@ fun PosterItem(
   vm: MainViewModel
 ) {
   Card(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
-    GlideImage(
+    CoilImage(
       imageModel = poster.poster,
       modifier = Modifier
         .size(50.dp)
@@ -127,7 +129,7 @@ fun SelectedPoster(
 ) {
   var palette by remember { mutableStateOf<Palette?>(null) }
 
-  GlideImage(
+  CoilImage(
     imageModel = poster?.poster!!,
     modifier = Modifier
       .aspectRatio(0.8f),
@@ -164,10 +166,20 @@ fun SelectedPoster(
     modifier = Modifier.padding(8.dp)
   )
 
-  FrescoWebImage(
-    controllerBuilder = Fresco.newDraweeControllerBuilder()
-      .setUri(poster.gif)
-      .setAutoPlayAnimations(true),
+  val context = LocalContext.current
+  val imageLoader = ImageLoader.Builder(context)
+    .componentRegistry {
+      if (SDK_INT >= 28) {
+        add(ImageDecoderDecoder(context))
+      } else {
+        add(GifDecoder())
+      }
+    }
+    .build()
+
+  CoilImage(
+    imageModel = poster.gif,
+    imageLoader = imageLoader,
     modifier = Modifier
       .fillMaxWidth()
       .padding(8.dp)

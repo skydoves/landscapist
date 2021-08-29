@@ -51,6 +51,7 @@ import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.palette.BitmapPalette
+import com.skydoves.landscapist.rememberDrawablePainter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -455,10 +456,11 @@ public fun CoilImage(
       }
       is CoilImageState.Failure -> failure?.invoke(coilImageState)
       is CoilImageState.Success -> {
-        success?.invoke(coilImageState) ?: coilImageState.imageBitmap?.let {
+        success?.invoke(coilImageState) ?: coilImageState.drawable?.let {
           CircularRevealedImage(
             modifier = modifier,
-            bitmap = it,
+            bitmap = it.toBitmap().asImageBitmap(),
+            bitmapPainter = rememberDrawablePainter(drawable = it),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
@@ -545,10 +547,11 @@ public fun CoilImage(
       is CoilImageState.Loading -> loading?.invoke(coilImageState)
       is CoilImageState.Failure -> failure?.invoke(coilImageState)
       is CoilImageState.Success -> {
-        success?.invoke(coilImageState) ?: coilImageState.imageBitmap?.let {
+        success?.invoke(coilImageState) ?: coilImageState.drawable?.let {
           CircularRevealedImage(
             modifier = modifier,
-            bitmap = it,
+            bitmap = it.toBitmap().asImageBitmap(),
+            bitmapPainter = rememberDrawablePainter(drawable = it),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
@@ -613,7 +616,7 @@ private fun CoilImage(
               imageLoadStateFlow.value = ImageLoadState.Loading(0f)
             },
             onSuccess = {
-              imageLoadStateFlow.value = ImageLoadState.Success(it.toBitmap().asImageBitmap())
+              imageLoadStateFlow.value = ImageLoadState.Success(it)
               bitmapPalette?.applyImageModel(recomposeKey.data)
                 ?.generate(it.toBitmap().copy(Bitmap.Config.ARGB_8888, true))
             },
