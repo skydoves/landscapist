@@ -471,8 +471,8 @@ dependencies {
 }
 ```
 
-Fresco supports animated GIF and WebP Images using `FrescoWebImage` composable function.We should pass the `AbstractDraweeController` that can be created like the below.
-You can reference how to build the [DraweeController](https://frescolib.org/docs/animations.html), and [Supported URIs](https://frescolib.org/docs/supported-uris.html) for setting uri address. Also, we can load a normal image (jpeg, png, etc) using the custom controller.
+Fresco supports animated GIF and WebP Images using `FrescoWebImage` composable function. We should pass the `AbstractDraweeController` that can be created like the below.
+You can reference how to build the [DraweeController](https://frescolib.org/docs/animations.html), and [Supported URIs](https://frescolib.org/docs/supported-uris.html) for setting URI addresses. Also, we can load a normal image (jpeg, png, etc) using the custom controller.
 
 
 ```kotlin
