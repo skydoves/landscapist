@@ -27,7 +27,7 @@ public sealed class ImageLoadState {
   /** Request is currently in progress. */
   public data class Loading(val progress: Float) : ImageLoadState()
 
-  /** Request is completed successfully amd ready to use an [ImageBitmap]. */
+  /** Request is completed successfully and ready to use an [ImageBitmap]. */
   public data class Success(val imageBitmap: ImageBitmap?) : ImageLoadState()
 
   /** Request failed. */
