@@ -467,12 +467,12 @@ Also we can customize attributes of `BitmapPalette` like the below.
 Add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-fresco-websupport:<version>"
+  implementation "com.github.skydoves:landscapist-fresco-websupport:<version>"
 }
 ```
-Fresco supports animated GIF and WebP Images using `FrescoWebImage` composable function. <br>
-We should pass the `AbstractDraweeController` that can be created like the below.<br>
-You can reference how to build the [DraweeController](https://frescolib.org/docs/animations.html), and [Supported URIs](https://frescolib.org/docs/supported-uris.html) for setting uri address.
+
+Fresco supports animated GIF and WebP Images using `FrescoWebImage` composable function.We should pass the `AbstractDraweeController` that can be created like the below.
+You can reference how to build the [DraweeController](https://frescolib.org/docs/animations.html), and [Supported URIs](https://frescolib.org/docs/supported-uris.html) for setting uri address. Also, we can load a normal image (jpeg, png, etc) using the custom controller.
 
 
 ```kotlin
