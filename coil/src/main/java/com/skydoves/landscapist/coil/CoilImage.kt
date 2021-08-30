@@ -52,7 +52,6 @@ import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.palette.BitmapPalette
 import com.skydoves.landscapist.rememberDrawablePainter
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 
@@ -593,7 +592,6 @@ public fun CoilImage(
  * @param content Content to be displayed for the given state.
  */
 @Composable
-@OptIn(ExperimentalCoroutinesApi::class)
 private fun CoilImage(
   recomposeKey: ImageRequest,
   modifier: Modifier = Modifier,

@@ -16,13 +16,14 @@
 
 package com.skydoves.landscapist.glide
 
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 
 /**
@@ -34,9 +35,16 @@ public val LocalGlideRequestOptions: ProvidableCompositionLocal<RequestOptions?>
 
 /**
  * Local containing the preferred [RequestBuilder] for providing the same instance
- * in our composable hierarchy.
+ * in our composable hierarchy.staticCompositionLocalOf
  */
-public val LocalGlideRequestBuilder: ProvidableCompositionLocal<RequestBuilder<Bitmap>?> =
+public val LocalGlideRequestBuilder: ProvidableCompositionLocal<RequestBuilder<Drawable>?> =
+  staticCompositionLocalOf { null }
+
+/**
+ * Local containing the preferred [RequestManager] for providing the same instance
+ * in our composable hierarchy.staticCompositionLocalOf
+ */
+public val LocalGlideRequestManager: ProvidableCompositionLocal<RequestManager?> =
   staticCompositionLocalOf { null }
 
 /** A provider for taking the local instances related to the `GlideImage`. */
@@ -50,11 +58,20 @@ internal object LocalGlideProvider {
 
   /** Returns the current or default [RequestBuilder] for the `GlideImage` parameter. */
   @Composable
-  fun getGlideRequestBuilder(imageModel: Any): RequestBuilder<Bitmap> {
+  fun getGlideRequestBuilder(imageModel: Any): RequestBuilder<Drawable> {
     return LocalGlideRequestBuilder.current
-      ?: Glide
-        .with(LocalView.current)
-        .asBitmap()
+      ?: getGlideRequestManager()
+        .asDrawable()
         .load(imageModel)
+  }
+
+  /** Returns the current or default [RequestManager] for the `GlideImage` processor. */
+  @Composable
+  fun getGlideRequestManager(): RequestManager {
+    // By default Glide tries to install lifecycle listeners to automatically re-trigger
+    // requests when resumed. We don't want that with Compose, since we rely on composition
+    // for our 'lifecycle'. We can stop Glide doing this by using the application context.
+    return LocalGlideRequestManager.current
+      ?: Glide.with(LocalContext.current.applicationContext)
   }
 }

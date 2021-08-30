@@ -43,7 +43,6 @@ import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.palette.BitmapPalette
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
@@ -408,7 +407,6 @@ public fun FrescoImage(
  * @param content Content to be displayed for the given state.
  */
 @Composable
-@OptIn(ExperimentalCoroutinesApi::class)
 private fun FrescoImage(
   recomposeKey: Any?,
   imageRequest: ImageRequest,
