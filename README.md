@@ -276,7 +276,7 @@ val imageLoader = ImageLoader.Builder(context)
   .build()
 
 CoilImage(
-    imageModel = poster.gif, // URL of the animated images like GIF, webP.
+    imageModel = poster.gif, // URL of the animated images.
     imageLoader = imageLoader,
     shimmerParams = ShimmerParams(
       baseColor = background800,
