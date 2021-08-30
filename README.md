@@ -44,7 +44,7 @@ allprojects {
 Also add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.3.4"
+    implementation "com.github.skydoves:landscapist-glide:1.3.5"
 }
 ```
 
@@ -84,12 +84,7 @@ Also we can request image by passing a [RequestBuilder](https://bumptech.github.
 ```kotlin
 GlideImage(
   imageModel = poster.poster,
-  requestBuilder = Glide
-    .with(LocalView.current)
-    .asBitmap()
-    .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
-    .thumbnail(0.1f)
-    .transition(withCrossFade()),
+  requestBuilder = Glide.with(LocalContext.current.applicationContext).asDrawable(),
   modifier = Modifier.constrainAs(image) {
     centerHorizontallyTo(parent)
     top.linkTo(parent.top)
@@ -97,17 +92,16 @@ GlideImage(
 )
 ```
 
-#### LocalGlideRequestBuilder
-We can provide the same instance of the `RequestBuilder` in the composable hierarchy.
+#### LocalGlideRequestOptions
+We can provide the same instance of the `RequestOptions` in the composable hierarchy.
 ```kotlin
-// customize the RequestBuilder as needed
-val requestBuilder = Glide.with(LocalView.current)
-  .asBitmap()
-  .thumbnail(0.1f)
-  .transition(BitmapTransitionOptions.withCrossFade())
+// customize the RequestOptions as needed
+val requestOptions = RequestOptions()
+    .override(300, 300)
+    .circleCrop()
 
-CompositionLocalProvider(LocalGlideRequestBuilder provides requestBuilder) {
-  // This will automatically use the value of current RequestBuilder in the hierarchy.
+CompositionLocalProvider(LocalGlideRequestOptions provides requestOptions) {
+  // This will automatically use the value of current RequestOptions in the hierarchy.
   GlideImage(
     imageModel = ...
   )
@@ -263,6 +257,38 @@ CompositionLocalProvider(LocalCoilImageLoader provides imageLoader) {
    )
  }
  ```
+
+ <img src="https://user-images.githubusercontent.com/24237865/131246748-b88903a1-43de-4e6c-9069-3e956a0cf8a6.gif" align="right" width="32%"/>
+
+## Coil Animated Image Support (GIF, Webp)
+Landscapist-coil supports animated GIF and WebP Images using `ImageLoader`.
+
+```kotlin
+val context = LocalContext.current
+val imageLoader = ImageLoader.Builder(context)
+  .componentRegistry {
+    if (SDK_INT >= 28) {
+      add(ImageDecoderDecoder(context))
+    } else {
+      add(GifDecoder())
+    }
+  }
+  .build()
+
+CoilImage(
+    imageModel = poster.gif, // URL of the animated images like GIF, webP.
+    imageLoader = imageLoader,
+    shimmerParams = ShimmerParams(
+      baseColor = background800,
+      highlightColor = shimmerHighLight
+    ),
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(8.dp)
+      .height(500.dp)
+      .clip(RoundedCornerShape(8.dp))
+  )
+```
 
 <div class="header">
   <a href="https://github.com/facebook/fresco" target="_blank"> <img src="https://user-images.githubusercontent.com/24237865/95545540-1cf27f00-0a39-11eb-9e84-96b9df81364b.png" align="left" width="4%" alt="Fresco" /></a>
@@ -462,7 +488,7 @@ Also we can customize attributes of `BitmapPalette` like the below.
 
 <img src="https://user-images.githubusercontent.com/24237865/131246748-b88903a1-43de-4e6c-9069-3e956a0cf8a6.gif" align="right" width="32%"/>
 
-## Fresco Animated Support (GIF, Webp)
+## Fresco Animated Image Support (GIF, Webp)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
 Add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
