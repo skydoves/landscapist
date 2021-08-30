@@ -30,7 +30,7 @@ public sealed class GlideImageState {
   public data class Loading(val progress: Float) : GlideImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
-  public data class Success(val imageBitmap: ImageBitmap?) : GlideImageState()
+  public data class Success(val drawable: Drawable?) : GlideImageState()
 
   /** Request failed. */
   public data class Failure(val errorDrawable: Drawable?) : GlideImageState()
@@ -41,7 +41,7 @@ public fun ImageLoadState.toGlideImageState(): GlideImageState {
   return when (this) {
     is ImageLoadState.None -> GlideImageState.None
     is ImageLoadState.Loading -> GlideImageState.Loading(progress)
-    is ImageLoadState.Success -> GlideImageState.Success(data as? ImageBitmap)
+    is ImageLoadState.Success -> GlideImageState.Success(data as? Drawable)
     is ImageLoadState.Failure -> GlideImageState.Failure(data as? Drawable)
   }
 }
