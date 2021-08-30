@@ -20,21 +20,20 @@
 
 package com.skydoves.landscapist.glide
 
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
-import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
 import com.skydoves.landscapist.CircularReveal
@@ -45,8 +44,9 @@ import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.palette.BitmapPalette
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
+import com.skydoves.landscapist.rememberDrawablePainter
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 
 /**
  * Requests loading an image with a loading placeholder and error image resource ([ImageBitmap], [ImageVector], [Painter]).
@@ -84,7 +84,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 public fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
+  requestBuilder: RequestBuilder<Drawable> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = LocalGlideProvider.getGlideRequestOptions(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -177,7 +177,7 @@ public fun GlideImage(
 public fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
+  requestBuilder: RequestBuilder<Drawable> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = LocalGlideProvider.getGlideRequestOptions(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -260,7 +260,7 @@ public fun GlideImage(
 public fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
+  requestBuilder: RequestBuilder<Drawable> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = LocalGlideProvider.getGlideRequestOptions(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -295,10 +295,11 @@ public fun GlideImage(
       }
       is GlideImageState.Failure -> failure?.invoke(glideImageState)
       is GlideImageState.Success -> {
-        success?.invoke(glideImageState) ?: glideImageState.imageBitmap?.let {
+        success?.invoke(glideImageState) ?: glideImageState.drawable?.let {
           CircularRevealedImage(
             modifier = modifier,
-            bitmap = it,
+            bitmap = it.toBitmap().asImageBitmap(),
+            bitmapPainter = rememberDrawablePainter(it),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
@@ -365,7 +366,7 @@ public fun GlideImage(
 public fun GlideImage(
   imageModel: Any,
   modifier: Modifier = Modifier,
-  requestBuilder: RequestBuilder<Bitmap> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
+  requestBuilder: RequestBuilder<Drawable> = LocalGlideProvider.getGlideRequestBuilder(imageModel),
   requestOptions: RequestOptions = LocalGlideProvider.getGlideRequestOptions(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -391,10 +392,11 @@ public fun GlideImage(
       is GlideImageState.Loading -> loading?.invoke(glideImageState)
       is GlideImageState.Failure -> failure?.invoke(glideImageState)
       is GlideImageState.Success -> {
-        success?.invoke(glideImageState) ?: glideImageState.imageBitmap?.let {
+        success?.invoke(glideImageState) ?: glideImageState.drawable?.let {
           CircularRevealedImage(
             modifier = modifier,
-            bitmap = it,
+            bitmap = it.toBitmap().asImageBitmap(),
+            bitmapPainter = rememberDrawablePainter(it),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
@@ -438,29 +440,34 @@ public fun GlideImage(
  * @param content Content to be displayed for the given state.
  */
 @Composable
-@OptIn(ExperimentalCoroutinesApi::class)
 private fun GlideImage(
   recomposeKey: Any,
-  builder: RequestBuilder<Bitmap>,
+  builder: RequestBuilder<Drawable>,
   modifier: Modifier = Modifier,
   bitmapPalette: BitmapPalette? = null,
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
-  val context = LocalContext.current
-  val target = remember(recomposeKey) {
-    FlowCustomTarget(bitmapPalette?.applyImageModel(recomposeKey))
-  }
+  val requestManager = LocalGlideProvider.getGlideRequestManager()
 
   ImageLoad(
     recomposeKey = recomposeKey,
     executeImageRequest = {
-      suspendCancellableCoroutine { cont ->
-        builder.into(target)
-        builder.submit()
+      callbackFlow {
+        val target = FlowCustomTarget(this)
+        val requestListener =
+          FlowRequestListener(
+            this, bitmapPalette?.applyImageModel(recomposeKey)
+          )
 
-        cont.resume(target.imageLoadStateFlow) {
-          // clear the glide target request if cancelled.
-          Glide.with(context).clear(target)
+        // start the image request into the target.
+        requestManager
+          .load(recomposeKey)
+          .apply(builder)
+          .addListener(requestListener)
+          .into(target)
+
+        awaitClose {
+          // intentionally do not clear using the Glide.clear for recycling internal bitmaps.
         }
       }
     },
