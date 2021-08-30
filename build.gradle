@@ -26,6 +26,7 @@ subprojects {
     kotlinOptions {
       freeCompilerArgs += "-Xskip-prerelease-check"
       freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+      freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
     }
   }
 }
