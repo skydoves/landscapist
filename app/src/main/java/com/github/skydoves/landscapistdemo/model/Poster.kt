@@ -16,7 +16,6 @@
 
 package com.github.skydoves.landscapistdemo.model
 
-
 data class Poster(
   val name: String,
   val release: String,
