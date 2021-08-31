@@ -16,9 +16,7 @@
 
 package com.github.skydoves.landscapistdemo.model
 
-import androidx.compose.runtime.Immutable
 
-@Immutable
 data class Poster(
   val name: String,
   val release: String,
