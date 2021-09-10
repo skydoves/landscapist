@@ -15,7 +15,6 @@ jobs:
           java-version: 11
       
       - name: Make Gradle executable
-        uses: actions/checkout@v2
         run: chmod +x ./gradlew
 
   lint:
