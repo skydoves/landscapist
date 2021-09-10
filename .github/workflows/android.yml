@@ -3,6 +3,13 @@ name: Android CI
 on: [push, pull_request]
 
 jobs:
+  permission:
+    name: gradle executable permission
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+
   lint:
     name: Spotless check
     runs-on: ubuntu-18.04
@@ -48,9 +55,6 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
         restore-keys: |
            ${{ runner.os }}-gradle-
-        
-    - name: Make Gradle executable
-      run: chmod +x ./gradlew
       
     - name: Build with Gradle
       run: ./gradlew build
