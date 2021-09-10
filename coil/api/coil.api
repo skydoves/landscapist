@@ -1,0 +1,62 @@
+public final class com/skydoves/landscapist/coil/CoilImage {
+	public static final fun CoilImage (Lcoil/request/ImageRequest;Landroidx/compose/ui/Modifier;Lcoil/ImageLoader;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;FLandroidx/compose/ui/graphics/ColorFilter;Lcom/skydoves/landscapist/CircularReveal;Lcom/skydoves/landscapist/ShimmerParams;Lcom/skydoves/landscapist/palette/BitmapPalette;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun CoilImage (Lcoil/request/ImageRequest;Landroidx/compose/ui/Modifier;Lcoil/ImageLoader;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;FLandroidx/compose/ui/graphics/ColorFilter;Lcom/skydoves/landscapist/CircularReveal;Lcom/skydoves/landscapist/palette/BitmapPalette;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun CoilImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Landroid/content/Context;Landroidx/lifecycle/LifecycleOwner;Lcoil/ImageLoader;Landroidx/compose/ui/Alignment;FLandroidx/compose/ui/layout/ContentScale;Ljava/lang/String;Lcom/skydoves/landscapist/CircularReveal;Landroidx/compose/ui/graphics/ColorFilter;Lcom/skydoves/landscapist/ShimmerParams;Lcom/skydoves/landscapist/palette/BitmapPalette;Ljava/lang/Object;Landroidx/compose/runtime/Composer;III)V
+	public static final fun CoilImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Landroid/content/Context;Landroidx/lifecycle/LifecycleOwner;Lcoil/ImageLoader;Landroidx/compose/ui/Alignment;FLandroidx/compose/ui/layout/ContentScale;Ljava/lang/String;Lcom/skydoves/landscapist/CircularReveal;Lcom/skydoves/landscapist/palette/BitmapPalette;Landroidx/compose/ui/graphics/ColorFilter;Ljava/lang/Object;Ljava/lang/Object;Landroidx/compose/runtime/Composer;III)V
+	public static final fun CoilImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Landroid/content/Context;Landroidx/lifecycle/LifecycleOwner;Lcoil/ImageLoader;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;FLandroidx/compose/ui/graphics/ColorFilter;Lcom/skydoves/landscapist/CircularReveal;Lcom/skydoves/landscapist/ShimmerParams;Lcom/skydoves/landscapist/palette/BitmapPalette;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun CoilImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Landroid/content/Context;Landroidx/lifecycle/LifecycleOwner;Lcoil/ImageLoader;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;FLandroidx/compose/ui/graphics/ColorFilter;Lcom/skydoves/landscapist/CircularReveal;Lcom/skydoves/landscapist/palette/BitmapPalette;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+}
+
+public abstract class com/skydoves/landscapist/coil/CoilImageState {
+	public static final field $stable I
+}
+
+public final class com/skydoves/landscapist/coil/CoilImageState$Failure : com/skydoves/landscapist/coil/CoilImageState {
+	public static final field $stable I
+	public fun <init> (Landroid/graphics/drawable/Drawable;)V
+	public final fun component1 ()Landroid/graphics/drawable/Drawable;
+	public final fun copy (Landroid/graphics/drawable/Drawable;)Lcom/skydoves/landscapist/coil/CoilImageState$Failure;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/coil/CoilImageState$Failure;Landroid/graphics/drawable/Drawable;ILjava/lang/Object;)Lcom/skydoves/landscapist/coil/CoilImageState$Failure;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getErrorDrawable ()Landroid/graphics/drawable/Drawable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/coil/CoilImageState$Loading : com/skydoves/landscapist/coil/CoilImageState {
+	public static final field $stable I
+	public fun <init> (F)V
+	public final fun component1 ()F
+	public final fun copy (F)Lcom/skydoves/landscapist/coil/CoilImageState$Loading;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/coil/CoilImageState$Loading;FILjava/lang/Object;)Lcom/skydoves/landscapist/coil/CoilImageState$Loading;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getProgress ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/coil/CoilImageState$None : com/skydoves/landscapist/coil/CoilImageState {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/skydoves/landscapist/coil/CoilImageState$None;
+}
+
+public final class com/skydoves/landscapist/coil/CoilImageState$Success : com/skydoves/landscapist/coil/CoilImageState {
+	public static final field $stable I
+	public fun <init> (Landroid/graphics/drawable/Drawable;)V
+	public final fun component1 ()Landroid/graphics/drawable/Drawable;
+	public final fun copy (Landroid/graphics/drawable/Drawable;)Lcom/skydoves/landscapist/coil/CoilImageState$Success;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/coil/CoilImageState$Success;Landroid/graphics/drawable/Drawable;ILjava/lang/Object;)Lcom/skydoves/landscapist/coil/CoilImageState$Success;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDrawable ()Landroid/graphics/drawable/Drawable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/coil/CoilImageStateKt {
+	public static final fun toCoilImageState (Lcom/skydoves/landscapist/ImageLoadState;)Lcom/skydoves/landscapist/coil/CoilImageState;
+}
+
+public final class com/skydoves/landscapist/coil/LocalCoilProviderKt {
+	public static final fun getLocalCoilImageLoader ()Landroidx/compose/runtime/ProvidableCompositionLocal;
+}
+

@@ -1,0 +1,60 @@
+public final class com/skydoves/landscapist/fresco/FrescoImage {
+	public static final fun FrescoImage (Ljava/lang/String;Landroidx/compose/ui/Modifier;Lcom/facebook/imagepipeline/request/ImageRequest;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;FLandroidx/compose/ui/graphics/ColorFilter;Lcom/skydoves/landscapist/CircularReveal;Lcom/skydoves/landscapist/ShimmerParams;Lcom/skydoves/landscapist/palette/BitmapPalette;Landroidx/compose/ui/graphics/ImageBitmap;ZLandroidx/compose/runtime/Composer;III)V
+	public static final fun FrescoImage (Ljava/lang/String;Landroidx/compose/ui/Modifier;Lcom/facebook/imagepipeline/request/ImageRequest;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;FLandroidx/compose/ui/graphics/ColorFilter;Lcom/skydoves/landscapist/CircularReveal;Lcom/skydoves/landscapist/palette/BitmapPalette;Ljava/lang/Object;Ljava/lang/Object;ZLandroidx/compose/runtime/Composer;III)V
+	public static final fun FrescoImage (Ljava/lang/String;Landroidx/compose/ui/Modifier;Lcom/facebook/imagepipeline/request/ImageRequest;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;FLandroidx/compose/ui/graphics/ColorFilter;Lcom/skydoves/landscapist/CircularReveal;Lcom/skydoves/landscapist/palette/BitmapPalette;ZLkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun FrescoImage (Ljava/lang/String;Landroidx/compose/ui/Modifier;Lcom/facebook/imagepipeline/request/ImageRequest;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;FLandroidx/compose/ui/graphics/ColorFilter;Lcom/skydoves/landscapist/CircularReveal;ZLcom/skydoves/landscapist/ShimmerParams;Lcom/skydoves/landscapist/palette/BitmapPalette;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+}
+
+public abstract class com/skydoves/landscapist/fresco/FrescoImageState {
+	public static final field $stable I
+}
+
+public final class com/skydoves/landscapist/fresco/FrescoImageState$Failure : com/skydoves/landscapist/fresco/FrescoImageState {
+	public static final field $stable I
+	public fun <init> (Lcom/facebook/datasource/DataSource;)V
+	public final fun component1 ()Lcom/facebook/datasource/DataSource;
+	public final fun copy (Lcom/facebook/datasource/DataSource;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Failure;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/fresco/FrescoImageState$Failure;Lcom/facebook/datasource/DataSource;ILjava/lang/Object;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Failure;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDataSource ()Lcom/facebook/datasource/DataSource;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/fresco/FrescoImageState$Loading : com/skydoves/landscapist/fresco/FrescoImageState {
+	public static final field $stable I
+	public fun <init> (F)V
+	public final fun component1 ()F
+	public final fun copy (F)Lcom/skydoves/landscapist/fresco/FrescoImageState$Loading;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/fresco/FrescoImageState$Loading;FILjava/lang/Object;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Loading;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getProgress ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/fresco/FrescoImageState$None : com/skydoves/landscapist/fresco/FrescoImageState {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/skydoves/landscapist/fresco/FrescoImageState$None;
+}
+
+public final class com/skydoves/landscapist/fresco/FrescoImageState$Success : com/skydoves/landscapist/fresco/FrescoImageState {
+	public static final field $stable I
+	public fun <init> (Landroidx/compose/ui/graphics/ImageBitmap;)V
+	public final fun component1 ()Landroidx/compose/ui/graphics/ImageBitmap;
+	public final fun copy (Landroidx/compose/ui/graphics/ImageBitmap;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Success;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/fresco/FrescoImageState$Success;Landroidx/compose/ui/graphics/ImageBitmap;ILjava/lang/Object;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Success;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getImageBitmap ()Landroidx/compose/ui/graphics/ImageBitmap;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/fresco/FrescoImageStateKt {
+	public static final fun toFrescoImageState (Lcom/skydoves/landscapist/ImageLoadState;)Lcom/skydoves/landscapist/fresco/FrescoImageState;
+}
+
+public final class com/skydoves/landscapist/fresco/LocalFrescoProviderKt {
+	public static final fun getLocalFrescoImageRequest ()Landroidx/compose/runtime/ProvidableCompositionLocal;
+}
+
