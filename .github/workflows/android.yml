@@ -5,14 +5,22 @@ on: [push, pull_request]
 jobs:
   permission:
     name: gradle executable permission
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+      
+      - name: set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      
       - name: Make Gradle executable
+        uses: actions/checkout@v2
         run: chmod +x ./gradlew
 
   lint:
     name: Spotless check
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -25,7 +33,7 @@ jobs:
 
   api_check:
     name: API check
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v2
