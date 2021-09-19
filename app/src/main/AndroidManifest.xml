@@ -3,6 +3,8 @@
   xmlns:tools="http://schemas.android.com/tools"
   package="com.github.skydoves.landscapistdemo">
 
+  <uses-permission android:name="android.permission.INTERNET" />
+
   <application
     android:name="com.github.skydoves.landscapistdemo.App"
     android:allowBackup="false"
@@ -22,7 +24,5 @@
       </intent-filter>
     </activity>
   </application>
-
-  <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
