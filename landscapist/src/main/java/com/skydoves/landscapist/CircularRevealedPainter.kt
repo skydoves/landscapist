@@ -93,7 +93,8 @@ internal class CircularRevealedPainter(
 
         shader.setLocalMatrix(shaderMatrix)
 
-        drawCircle(brush, size.height * radius, Offset(size.width / 2, size.height / 2))
+        val calculatedRadius = size.width.coerceAtLeast(size.height) * radius
+        drawCircle(brush, calculatedRadius, Offset(size.width / 2, size.height / 2))
 
         canvas.restore()
       }
