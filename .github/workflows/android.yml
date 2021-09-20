@@ -1,8 +1,41 @@
 name: Android CI
 
-on: [push, pull_request]
+on:
+ push:
+  branches:
+   - master
+ pull_request:
+  branches:
+   - '*'
 
 jobs:
+
+  lint:
+    name: Spotless check
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: spotless
+        run: ./gradlew spotlessCheck
+
+  api_check:
+    name: API check
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: API check
+        run: ./gradlew apiCheck
+
  build:
     runs-on: ubuntu-latest
     steps:
