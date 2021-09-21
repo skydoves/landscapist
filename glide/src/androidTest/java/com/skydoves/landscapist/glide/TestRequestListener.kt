@@ -16,7 +16,7 @@
 
 package com.skydoves.landscapist.glide
 
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -24,11 +24,11 @@ import com.bumptech.glide.request.target.Target
 
 internal class TestRequestListener(
   private val onComplete: (Any?) -> Unit
-) : RequestListener<Bitmap> {
+) : RequestListener<Drawable> {
   override fun onLoadFailed(
     e: GlideException?,
     model: Any?,
-    target: Target<Bitmap>?,
+    target: Target<Drawable>?,
     isFirstResource: Boolean
   ): Boolean {
     onComplete(model)
@@ -36,9 +36,9 @@ internal class TestRequestListener(
   }
 
   override fun onResourceReady(
-    resource: Bitmap?,
+    resource: Drawable?,
     model: Any?,
-    target: Target<Bitmap>?,
+    target: Target<Drawable>?,
     dataSource: DataSource?,
     isFirstResource: Boolean
   ): Boolean {

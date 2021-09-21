@@ -161,7 +161,7 @@ internal class CoilImageTest {
         contentScale = ContentScale.Crop,
         success = {
           state.add(it)
-          assertThat(it.imageBitmap, `is`(CoreMatchers.notNullValue()))
+          assertThat(it.drawable, `is`(CoreMatchers.notNullValue()))
         },
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))

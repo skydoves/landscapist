@@ -32,7 +32,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
+import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.ShimmerParams
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.instanceOf
@@ -78,7 +78,7 @@ internal class GlideImageTest {
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
-        circularRevealedEnabled = true,
+        circularReveal = CircularReveal(),
         shimmerParams = ShimmerParams(
           baseColor = Color.DarkGray,
           highlightColor = Color.LightGray
@@ -98,9 +98,8 @@ internal class GlideImageTest {
     val latch = CountDownLatch(1)
     composeTestRule.setContent {
       val glide = Glide.with(LocalView.current)
-        .asBitmap()
+        .asDrawable()
         .thumbnail(0.1f)
-        .transition(BitmapTransitionOptions.withCrossFade())
         .addListener(
           TestRequestListener {
             latch.countDown()
@@ -165,7 +164,7 @@ internal class GlideImageTest {
         contentScale = ContentScale.Crop,
         success = {
           state.add(it)
-          assertThat(it.imageBitmap, `is`(notNullValue()))
+          assertThat(it.drawable, `is`(notNullValue()))
         },
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))
