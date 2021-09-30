@@ -37,6 +37,6 @@ internal object LocalFrescoProvider {
   @Composable
   fun getFrescoImageRequest(imageUrl: String?): ImageRequest {
     return LocalFrescoImageRequest.current
-      ?: ImageRequestBuilder.newBuilderWithSource(Uri.parse(imageUrl)).build()
+      ?: ImageRequestBuilder.newBuilderWithSource(Uri.parse(imageUrl ?: "")).build()
   }
 }
