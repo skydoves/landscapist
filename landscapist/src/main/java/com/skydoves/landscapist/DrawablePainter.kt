@@ -48,6 +48,10 @@ import kotlin.math.roundToInt
 /**
  * https://gist.github.com/chrisbanes/9a1d64847278876186be81249d9f9eda
  *
+ * Updates:
+ * [Drawable Painter] Handle drawables with no intrinsic size #774
+ * https://github.com/google/accompanist/pull/774/files
+ *
  * A [Painter] which draws an Android [Drawable]. Supports [Animatable] drawables.
  *
  * Taken from https://goo.gle/compose-drawable-painter
@@ -75,8 +79,10 @@ internal class DrawablePainter(
   }
 
   init {
-    // Update the drawable's bounds to match the intrinsic size
-    drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+    if (drawable.intrinsicWidth >= 0 && drawable.intrinsicHeight >= 0) {
+      // Update the drawable's bounds to match the intrinsic size
+      drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+    }
   }
 
   override fun onRemembered() {
@@ -116,10 +122,16 @@ internal class DrawablePainter(
   }
 
   override val intrinsicSize: Size
-    get() = Size(
-      width = drawable.intrinsicWidth.toFloat(),
-      height = drawable.intrinsicHeight.toFloat()
-    )
+    get() = when {
+      // Only return a finite size if the drawable has an intrinsic size
+      drawable.intrinsicWidth >= 0 && drawable.intrinsicHeight >= 0 -> {
+        Size(
+          width = drawable.intrinsicWidth.toFloat(),
+          height = drawable.intrinsicHeight.toFloat(),
+        )
+      }
+      else -> Size.Unspecified
+    }
 
   override fun DrawScope.onDraw() {
     drawIntoCanvas { canvas ->
