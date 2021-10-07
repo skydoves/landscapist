@@ -47,6 +47,7 @@ dependencies {
     implementation "com.github.skydoves:landscapist-glide:1.3.7"
 }
 ```
+`Landscapist-Glide` uses the `4.12.0` version of Glide internally. So if your project already includes Glide dependency, highly recommended removing it or migrating to the same version.
 
 ### Usage
 We can request and load images simply using a `GlideImage` composable function.
@@ -302,6 +303,7 @@ dependencies {
     implementation "com.github.skydoves:landscapist-fresco:<version>"
 }
 ```
+`Landscapist-Fresco` uses the `2.5.0` version of Fresco internally. So if your project already includes Fresco dependency, highly recommended removing it or migrating to the same version.
 
 ### Initialize
 We should initialize `Fresco` using [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in our `Application` class.<br>
