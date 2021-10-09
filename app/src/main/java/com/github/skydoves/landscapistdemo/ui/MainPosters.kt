@@ -21,10 +21,8 @@ import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,7 +44,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -79,7 +76,8 @@ fun DisneyPosters(
   posters: List<Poster>,
   vm: MainViewModel
 ) {
-  val poster = vm.poster.observeAsState()
+  val poster: Poster by vm.poster
+
   Column(Modifier.verticalScroll(rememberScrollState())) {
     LazyRow {
       item {
@@ -103,12 +101,12 @@ fun DisneyPosters(
         PosterItem(poster, vm)
       }
     }
-    SelectedPoster(poster.value)
+    SelectedPoster(poster)
   }
 }
 
 @Composable
-fun PosterItem(
+private fun PosterItem(
   poster: Poster,
   vm: MainViewModel
 ) {
@@ -124,7 +122,7 @@ fun PosterItem(
 }
 
 @Composable
-fun SelectedPoster(
+private fun SelectedPoster(
   poster: Poster?
 ) {
   var palette by remember { mutableStateOf<Palette?>(null) }
@@ -195,101 +193,32 @@ fun SelectedPoster(
 }
 
 @Composable
-fun ColorPalettes(palette: Palette?) {
-  Row(
+private fun ColorPalettes(palette: Palette?) {
+  val colorList: List<Int> = palette.paletteColorList()
+
+  LazyRow(
     modifier = Modifier
       .padding(horizontal = 8.dp, vertical = 16.dp)
-      .horizontalScroll(rememberScrollState())
   ) {
-    Crossfade(
-      targetState = palette,
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .size(45.dp)
-    ) {
-      Box(
+    items(colorList) { color ->
+      Crossfade(
+        targetState = color,
         modifier = Modifier
-          .background(color = Color(it?.lightVibrantSwatch?.rgb ?: 0))
-          .fillMaxSize()
-      )
-    }
-    Crossfade(
-      targetState = palette,
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .size(45.dp)
-    ) {
-      Box(
-        modifier = Modifier
-          .background(color = Color(it?.lightMutedSwatch?.rgb ?: 0))
-          .fillMaxSize()
-      )
-    }
-    Crossfade(
-      targetState = palette,
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .size(45.dp)
-    ) {
-      Box(
-        modifier = Modifier
-          .background(color = Color(it?.vibrantSwatch?.rgb ?: 0))
-          .fillMaxSize()
-      )
-    }
-    Crossfade(
-      targetState = palette,
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .size(45.dp)
-    ) {
-      Box(
-        modifier = Modifier
-          .background(color = Color(it?.mutedSwatch?.rgb ?: 0))
-          .fillMaxSize()
-      )
-    }
-    Crossfade(
-      targetState = palette,
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .size(45.dp)
-    ) {
-      Box(
-        modifier = Modifier
-          .background(color = Color(it?.darkVibrantSwatch?.rgb ?: 0))
-          .fillMaxSize()
-      )
-    }
-    Crossfade(
-      targetState = palette,
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .size(45.dp)
-    ) {
-      Box(
-        modifier = Modifier
-          .background(color = Color(it?.darkMutedSwatch?.rgb ?: 0))
-          .fillMaxSize()
-      )
-    }
-    Crossfade(
-      targetState = palette,
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .size(45.dp)
-    ) {
-      Box(
-        modifier = Modifier
-          .background(color = Color(it?.dominantSwatch?.rgb ?: 0))
-          .fillMaxSize()
-      )
+          .padding(horizontal = 8.dp)
+          .size(45.dp)
+      ) {
+        Box(
+          modifier = Modifier
+            .background(color = Color(it))
+            .fillMaxSize()
+        )
+      }
     }
   }
 }
 
 @Composable
-fun HomePoster(
+private fun HomePoster(
   poster: Poster,
   modifier: Modifier = Modifier
 ) {
@@ -354,7 +283,7 @@ fun HomePoster(
 
 @Preview
 @Composable
-fun HomePosterPreviewLight() {
+private fun HomePosterPreviewLight() {
   DisneyComposeTheme(darkTheme = false) {
     HomePoster(
       poster = MockUtil.getMockPoster()
@@ -364,7 +293,7 @@ fun HomePosterPreviewLight() {
 
 @Preview
 @Composable
-fun HomePosterPreviewDark() {
+private fun HomePosterPreviewDark() {
   DisneyComposeTheme(darkTheme = true) {
     HomePoster(
       poster = MockUtil.getMockPoster()
