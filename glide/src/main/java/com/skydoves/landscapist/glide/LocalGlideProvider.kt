@@ -58,7 +58,7 @@ internal object LocalGlideProvider {
 
   /** Returns the current or default [RequestBuilder] for the `GlideImage` parameter. */
   @Composable
-  fun getGlideRequestBuilder(imageModel: Any): RequestBuilder<Drawable> {
+  fun getGlideRequestBuilder(imageModel: Any?): RequestBuilder<Drawable> {
     return LocalGlideRequestBuilder.current
       ?: getGlideRequestManager()
         .asDrawable()

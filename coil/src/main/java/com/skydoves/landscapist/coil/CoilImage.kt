@@ -94,7 +94,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  */
 @Composable
 public fun CoilImage(
-  imageModel: Any,
+  imageModel: Any?,
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
@@ -175,7 +175,7 @@ public fun CoilImage(
  */
 @Composable
 public fun CoilImage(
-  imageModel: Any,
+  imageModel: Any?,
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
@@ -266,7 +266,7 @@ public fun CoilImage(
  */
 @Composable
 public fun CoilImage(
-  imageModel: Any,
+  imageModel: Any?,
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
@@ -349,7 +349,7 @@ public fun CoilImage(
  */
 @Composable
 public fun CoilImage(
-  imageModel: Any,
+  imageModel: Any?,
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
