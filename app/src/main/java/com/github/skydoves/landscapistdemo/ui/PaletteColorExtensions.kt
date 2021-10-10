@@ -16,16 +16,16 @@
 
 package com.github.skydoves.landscapistdemo.ui
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import com.github.skydoves.landscapistdemo.model.MockUtil
-import com.github.skydoves.landscapistdemo.model.Poster
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import androidx.palette.graphics.Palette
 
-@HiltViewModel
-class MainViewModel @Inject constructor() : ViewModel() {
-
-  val poster: MutableState<Poster> = mutableStateOf(MockUtil.getMockPoster())
+fun Palette?.paletteColorList(): List<Int> {
+  return listOf(
+    this?.lightVibrantSwatch?.rgb,
+    this?.lightMutedSwatch?.rgb,
+    this?.vibrantSwatch?.rgb,
+    this?.mutedSwatch?.rgb,
+    this?.darkVibrantSwatch?.rgb,
+    this?.darkMutedSwatch?.rgb,
+    this?.dominantSwatch?.rgb
+  ).map { it ?: 0 }
 }
