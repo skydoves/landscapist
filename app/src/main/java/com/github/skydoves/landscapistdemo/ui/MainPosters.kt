@@ -123,12 +123,12 @@ private fun PosterItem(
 
 @Composable
 private fun SelectedPoster(
-  poster: Poster?
+  poster: Poster
 ) {
   var palette by remember { mutableStateOf<Palette?>(null) }
 
   CoilImage(
-    imageModel = poster?.poster!!,
+    imageModel = poster.poster,
     modifier = Modifier
       .aspectRatio(0.8f),
     circularReveal = CircularReveal(),
@@ -235,6 +235,7 @@ private fun HomePoster(
   ) {
     ConstraintLayout {
       val (image, title, content) = createRefs()
+
       FrescoImage(
         imageUrl = poster.poster,
         modifier = Modifier
@@ -254,6 +255,7 @@ private fun HomePoster(
           highlightColor = shimmerHighLight
         )
       )
+
       Text(
         text = poster.name,
         style = MaterialTheme.typography.h2,
@@ -265,6 +267,7 @@ private fun HomePoster(
           }
           .padding(8.dp)
       )
+
       Text(
         text = poster.playtime,
         style = MaterialTheme.typography.body1,
