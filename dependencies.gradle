@@ -23,7 +23,7 @@ ext.versions = [
     coroutinesVersion: '1.5.0',
     multidex         : '2.0.1',
 
-    frescoVersion    : '2.5.0',
+    frescoVersion    : '2.6.0',
     glideVersion     : '4.12.0',
     coilVersion      : '1.4.0',
 
