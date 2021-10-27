@@ -53,7 +53,7 @@ allprojects {
 Also add a dependency code to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.3.9"
+    implementation "com.github.skydoves:landscapist-glide:1.4.0"
 }
 ```
 `Landscapist-Glide` uses the `4.12.0` version of Glide internally. So if your project already includes Glide dependency, highly recommended removing it or migrating to the same version.
