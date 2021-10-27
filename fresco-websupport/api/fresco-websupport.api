@@ -1,4 +1,4 @@
 public final class com/skydoves/landscapist/fresco/websupport/FrescoWebImage {
-	public static final fun FrescoWebImage (Lcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerBuilder;Landroidx/compose/ui/Modifier;Ljava/lang/String;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;FLandroidx/compose/ui/graphics/ColorFilter;Landroidx/compose/runtime/Composer;II)V
+	public static final fun FrescoWebImage (Lcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerBuilder;Landroidx/compose/ui/Modifier;Ljava/lang/String;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;FLandroidx/compose/ui/graphics/ColorFilter;ILandroidx/compose/runtime/Composer;II)V
 }
 
