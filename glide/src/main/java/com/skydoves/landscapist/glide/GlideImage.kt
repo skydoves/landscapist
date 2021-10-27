@@ -21,6 +21,8 @@
 package com.skydoves.landscapist.glide
 
 import android.graphics.drawable.Drawable
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,6 +34,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.RequestBuilder
@@ -79,6 +83,7 @@ import kotlinx.coroutines.flow.callbackFlow
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  */
 @Composable
 public fun GlideImage(
@@ -94,7 +99,8 @@ public fun GlideImage(
   circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   placeHolder: Any? = null,
-  error: Any? = null
+  error: Any? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
 ) {
   GlideImage(
     imageModel = imageModel,
@@ -108,6 +114,7 @@ public fun GlideImage(
     alpha = alpha,
     circularReveal = circularReveal,
     bitmapPalette = bitmapPalette,
+    previewPlaceholder = previewPlaceholder,
     loading = {
       placeHolder?.let {
         ImageBySource(
@@ -172,6 +179,7 @@ public fun GlideImage(
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  */
 @Composable
 public fun GlideImage(
@@ -187,7 +195,8 @@ public fun GlideImage(
   circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   shimmerParams: ShimmerParams,
-  error: Any? = null
+  error: Any? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
 ) {
   GlideImage(
     imageModel = imageModel,
@@ -202,6 +211,7 @@ public fun GlideImage(
     circularReveal = circularReveal,
     shimmerParams = shimmerParams,
     bitmapPalette = bitmapPalette,
+    previewPlaceholder = previewPlaceholder,
     failure = {
       error?.let {
         ImageBySource(
@@ -253,6 +263,7 @@ public fun GlideImage(
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
  */
@@ -270,9 +281,23 @@ public fun GlideImage(
   circularReveal: CircularReveal? = null,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
   success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
+  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+    Image(
+      modifier = modifier.fillMaxWidth(),
+      painter = painterResource(id = previewPlaceholder),
+      alignment = alignment,
+      contentScale = contentScale,
+      alpha = alpha,
+      colorFilter = colorFilter,
+      contentDescription = contentDescription
+    )
+    return
+  }
+
   GlideImage(
     recomposeKey = imageModel,
     builder = requestBuilder
@@ -358,6 +383,7 @@ public fun GlideImage(
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
@@ -375,10 +401,24 @@ public fun GlideImage(
   colorFilter: ColorFilter? = null,
   circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable ((imageState: GlideImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
+  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+    Image(
+      modifier = modifier.fillMaxWidth(),
+      painter = painterResource(id = previewPlaceholder),
+      alignment = alignment,
+      contentScale = contentScale,
+      alpha = alpha,
+      colorFilter = colorFilter,
+      contentDescription = contentDescription
+    )
+    return
+  }
+
   GlideImage(
     recomposeKey = imageModel,
     builder = requestBuilder

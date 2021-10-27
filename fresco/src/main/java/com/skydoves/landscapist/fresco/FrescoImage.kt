@@ -111,6 +111,7 @@ public fun FrescoImage(
     circularReveal = circularReveal,
     bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
+    previewPlaceholder = previewPlaceholder,
     loading = {
       placeHolder?.let {
         ImageBySource(
@@ -202,6 +203,7 @@ public fun FrescoImage(
     observeLoadingProcess = observeLoadingProcess,
     shimmerParams = shimmerParams,
     bitmapPalette = bitmapPalette,
+    previewPlaceholder = previewPlaceholder,
     failure = {
       error?.let {
         ImageBySource(
