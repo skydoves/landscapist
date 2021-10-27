@@ -60,6 +60,7 @@ import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import com.github.skydoves.landscapistdemo.R
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
@@ -116,7 +117,8 @@ private fun PosterItem(
       modifier = Modifier
         .size(50.dp)
         .clickable { vm.poster.value = poster },
-      contentScale = ContentScale.Crop
+      contentScale = ContentScale.Crop,
+      previewPlaceholder = R.drawable.poster
     )
   }
 }
@@ -138,7 +140,8 @@ private fun SelectedPoster(
     ),
     bitmapPalette = BitmapPalette {
       palette = it
-    }
+    },
+    previewPlaceholder = R.drawable.poster
   )
 
   ColorPalettes(palette)
@@ -186,7 +189,8 @@ private fun SelectedPoster(
       .fillMaxWidth()
       .padding(8.dp)
       .height(500.dp)
-      .clip(RoundedCornerShape(8.dp))
+      .clip(RoundedCornerShape(8.dp)),
+    previewPlaceholder = R.drawable.poster
   )
 
   Spacer(modifier = Modifier.height(12.dp))
@@ -281,6 +285,14 @@ private fun HomePoster(
           .padding(bottom = 12.dp)
       )
     }
+  }
+}
+
+@Preview
+@Composable
+private fun SelectedPosterPreview() {
+  DisneyComposeTheme(darkTheme = false) {
+    SelectedPoster(poster = MockUtil.getMockPoster())
   }
 }
 
