@@ -257,7 +257,8 @@ private fun HomePoster(
         shimmerParams = ShimmerParams(
           baseColor = background800,
           highlightColor = shimmerHighLight
-        )
+        ),
+        previewPlaceholder = R.drawable.poster
       )
 
       Text(

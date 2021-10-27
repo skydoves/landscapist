@@ -20,8 +20,10 @@
 
 package com.skydoves.landscapist.fresco.websupport
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +32,8 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder
 import com.facebook.drawee.generic.GenericDraweeHierarchy
 import com.facebook.drawee.generic.GenericDraweeHierarchyInflater
@@ -70,6 +74,7 @@ import com.skydoves.landscapist.rememberDrawablePainter
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  */
 @Composable
 public fun FrescoWebImage(
@@ -79,8 +84,22 @@ public fun FrescoWebImage(
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Fit,
   alpha: Float = DefaultAlpha,
-  colorFilter: ColorFilter? = null
+  colorFilter: ColorFilter? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
 ) {
+  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+    Image(
+      modifier = modifier.fillMaxWidth(),
+      painter = painterResource(id = previewPlaceholder),
+      alignment = alignment,
+      contentScale = contentScale,
+      alpha = alpha,
+      colorFilter = colorFilter,
+      contentDescription = contentDescription
+    )
+    return
+  }
+
   val context = LocalContext.current
   val hierarchy = GenericDraweeHierarchyInflater.inflateBuilder(context, null).build()
   val holder: DraweeHolder<GenericDraweeHierarchy> = DraweeHolder.create(hierarchy, context)
