@@ -20,6 +20,8 @@
 
 package com.skydoves.landscapist.fresco
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -32,6 +34,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.palette.graphics.Palette
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
@@ -76,6 +80,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  */
 @Composable
 public fun FrescoImage(
@@ -91,7 +96,8 @@ public fun FrescoImage(
   bitmapPalette: BitmapPalette? = null,
   placeHolder: Any? = null,
   error: Any? = null,
-  observeLoadingProcess: Boolean = false
+  observeLoadingProcess: Boolean = false,
+  @DrawableRes previewPlaceholder: Int = 0,
 ) {
   FrescoImage(
     imageUrl = imageUrl,
@@ -105,6 +111,7 @@ public fun FrescoImage(
     circularReveal = circularReveal,
     bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
+    previewPlaceholder = previewPlaceholder,
     loading = {
       placeHolder?.let {
         ImageBySource(
@@ -164,6 +171,7 @@ public fun FrescoImage(
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
  * @param error An [ImageBitmap] for showing instead of the target image when images are failed to load.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  */
 @Composable
 public fun FrescoImage(
@@ -179,7 +187,8 @@ public fun FrescoImage(
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   error: ImageBitmap? = null,
-  observeLoadingProcess: Boolean = false
+  observeLoadingProcess: Boolean = false,
+  @DrawableRes previewPlaceholder: Int = 0,
 ) {
   FrescoImage(
     imageUrl = imageUrl,
@@ -194,6 +203,7 @@ public fun FrescoImage(
     observeLoadingProcess = observeLoadingProcess,
     shimmerParams = shimmerParams,
     bitmapPalette = bitmapPalette,
+    previewPlaceholder = previewPlaceholder,
     failure = {
       error?.let {
         ImageBySource(
@@ -239,6 +249,7 @@ public fun FrescoImage(
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  */
 @Composable
 public fun FrescoImage(
@@ -254,9 +265,23 @@ public fun FrescoImage(
   observeLoadingProcess: Boolean = false,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
   success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
+  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+    Image(
+      modifier = modifier.fillMaxWidth(),
+      painter = painterResource(id = previewPlaceholder),
+      alignment = alignment,
+      contentScale = contentScale,
+      alpha = alpha,
+      colorFilter = colorFilter,
+      contentDescription = contentDescription
+    )
+    return
+  }
+
   FrescoImage(
     recomposeKey = imageUrl,
     imageRequest = imageRequest,
@@ -335,6 +360,7 @@ public fun FrescoImage(
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  */
 @Composable
 public fun FrescoImage(
@@ -349,10 +375,24 @@ public fun FrescoImage(
   circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   observeLoadingProcess: Boolean = false,
+  @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable ((imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
+  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+    Image(
+      modifier = modifier.fillMaxWidth(),
+      painter = painterResource(id = previewPlaceholder),
+      alignment = alignment,
+      contentScale = contentScale,
+      alpha = alpha,
+      colorFilter = colorFilter,
+      contentDescription = contentDescription
+    )
+    return
+  }
+
   FrescoImage(
     recomposeKey = imageUrl,
     imageRequest = imageRequest,

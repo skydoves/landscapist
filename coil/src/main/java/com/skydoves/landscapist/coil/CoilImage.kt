@@ -22,6 +22,8 @@ package com.skydoves.landscapist.coil
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +38,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import androidx.palette.graphics.Palette
@@ -91,6 +95,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  */
 @Composable
 public fun CoilImage(
@@ -108,6 +113,7 @@ public fun CoilImage(
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   error: Any? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
 ) {
   CoilImage(
     imageModel = imageModel,
@@ -122,6 +128,7 @@ public fun CoilImage(
     circularReveal = circularReveal,
     shimmerParams = shimmerParams,
     bitmapPalette = bitmapPalette,
+    previewPlaceholder = previewPlaceholder,
     failure = {
       error?.let {
         ImageBySource(
@@ -172,6 +179,7 @@ public fun CoilImage(
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
  * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  */
 @Composable
 public fun CoilImage(
@@ -189,6 +197,7 @@ public fun CoilImage(
   colorFilter: ColorFilter? = null,
   placeHolder: Any? = null,
   error: Any? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
 ) {
   CoilImage(
     imageModel = imageModel,
@@ -202,6 +211,7 @@ public fun CoilImage(
     colorFilter = colorFilter,
     circularReveal = circularReveal,
     bitmapPalette = bitmapPalette,
+    previewPlaceholder = previewPlaceholder,
     loading = {
       placeHolder?.let {
         ImageBySource(
@@ -261,6 +271,7 @@ public fun CoilImage(
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
  */
@@ -279,6 +290,7 @@ public fun CoilImage(
   circularReveal: CircularReveal? = null,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
   success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
@@ -297,6 +309,7 @@ public fun CoilImage(
     circularReveal = circularReveal,
     shimmerParams = shimmerParams,
     bitmapPalette = bitmapPalette,
+    previewPlaceholder = previewPlaceholder,
     success = success,
     failure = failure
   )
@@ -343,6 +356,7 @@ public fun CoilImage(
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
@@ -361,6 +375,7 @@ public fun CoilImage(
   colorFilter: ColorFilter? = null,
   circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable ((imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
@@ -379,6 +394,7 @@ public fun CoilImage(
     colorFilter = colorFilter,
     circularReveal = circularReveal,
     bitmapPalette = bitmapPalette,
+    previewPlaceholder = previewPlaceholder,
     loading = loading,
     success = success,
     failure = failure
@@ -416,6 +432,7 @@ public fun CoilImage(
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
  */
@@ -432,9 +449,23 @@ public fun CoilImage(
   circularReveal: CircularReveal? = null,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
   success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
+  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+    Image(
+      modifier = modifier.fillMaxWidth(),
+      painter = painterResource(id = previewPlaceholder),
+      alignment = alignment,
+      contentScale = contentScale,
+      alpha = alpha,
+      colorFilter = colorFilter,
+      contentDescription = contentDescription
+    )
+    return
+  }
+
   CoilImage(
     recomposeKey = imageRequest,
     imageLoader = imageLoader,
@@ -514,6 +545,7 @@ public fun CoilImage(
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
@@ -531,10 +563,24 @@ public fun CoilImage(
   colorFilter: ColorFilter? = null,
   circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
+  @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable ((imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
+  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+    Image(
+      modifier = modifier.fillMaxWidth(),
+      painter = painterResource(id = previewPlaceholder),
+      alignment = alignment,
+      contentScale = contentScale,
+      alpha = alpha,
+      colorFilter = colorFilter,
+      contentDescription = contentDescription
+    )
+    return
+  }
+
   CoilImage(
     recomposeKey = imageRequest,
     imageLoader = imageLoader,
