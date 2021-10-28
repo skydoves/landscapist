@@ -471,7 +471,7 @@ public fun CoilImage(
     imageLoader = imageLoader,
     modifier = modifier.fillMaxWidth(),
     bitmapPalette = bitmapPalette,
-  ) { imageState ->
+  ) ImageRequest@{ imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
       is CoilImageState.None -> Unit
       is CoilImageState.Loading -> {
@@ -486,11 +486,14 @@ public fun CoilImage(
       }
       is CoilImageState.Failure -> failure?.invoke(coilImageState)
       is CoilImageState.Success -> {
-        success?.invoke(coilImageState) ?: coilImageState.drawable?.let {
+        if (success != null) {
+          success.invoke(coilImageState)
+        } else {
+          val drawable = coilImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
             modifier = modifier,
-            bitmap = it.toBitmap().asImageBitmap(),
-            bitmapPainter = rememberDrawablePainter(drawable = it),
+            bitmap = drawable.toBitmap().asImageBitmap(),
+            bitmapPainter = rememberDrawablePainter(drawable = drawable),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
@@ -586,17 +589,20 @@ public fun CoilImage(
     imageLoader = imageLoader,
     modifier = modifier.fillMaxWidth(),
     bitmapPalette = bitmapPalette,
-  ) { imageState ->
+  ) ImageRequest@{ imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
       is CoilImageState.None -> Unit
       is CoilImageState.Loading -> loading?.invoke(coilImageState)
       is CoilImageState.Failure -> failure?.invoke(coilImageState)
       is CoilImageState.Success -> {
-        success?.invoke(coilImageState) ?: coilImageState.drawable?.let {
+        if (success != null) {
+          success.invoke(coilImageState)
+        } else {
+          val drawable = coilImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
             modifier = modifier,
-            bitmap = it.toBitmap().asImageBitmap(),
-            bitmapPainter = rememberDrawablePainter(drawable = it),
+            bitmap = drawable.toBitmap().asImageBitmap(),
+            bitmapPainter = rememberDrawablePainter(drawable = drawable),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
