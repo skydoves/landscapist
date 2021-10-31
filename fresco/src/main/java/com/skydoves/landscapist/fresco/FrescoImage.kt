@@ -288,7 +288,7 @@ public fun FrescoImage(
     modifier = modifier.fillMaxWidth(),
     bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
-  ) { imageState ->
+  ) ImageRequest@{ imageState ->
     when (val frescoImageState = imageState.toFrescoImageState()) {
       is FrescoImageState.None -> Unit
       is FrescoImageState.Loading -> {
@@ -303,10 +303,13 @@ public fun FrescoImage(
       }
       is FrescoImageState.Failure -> failure?.invoke(frescoImageState)
       is FrescoImageState.Success -> {
-        success?.invoke(frescoImageState) ?: frescoImageState.imageBitmap?.let {
+        if (success != null) {
+          success.invoke(frescoImageState)
+        } else {
+          val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           CircularRevealedImage(
             modifier = modifier,
-            bitmap = it,
+            bitmap = imageBitmap,
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
@@ -399,16 +402,19 @@ public fun FrescoImage(
     modifier = modifier.fillMaxWidth(),
     bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
-  ) { imageState ->
+  ) ImageRequest@{ imageState ->
     when (val frescoImageState = imageState.toFrescoImageState()) {
       is FrescoImageState.None -> Unit
       is FrescoImageState.Loading -> loading?.invoke(frescoImageState)
       is FrescoImageState.Failure -> failure?.invoke(frescoImageState)
       is FrescoImageState.Success -> {
-        success?.invoke(frescoImageState) ?: frescoImageState.imageBitmap?.let {
+        if (success != null) {
+          success.invoke(frescoImageState)
+        } else {
+          val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           CircularRevealedImage(
             modifier = modifier,
-            bitmap = it,
+            bitmap = imageBitmap,
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,

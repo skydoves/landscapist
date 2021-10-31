@@ -305,7 +305,7 @@ public fun GlideImage(
       .load(imageModel),
     bitmapPalette = bitmapPalette,
     modifier = modifier.fillMaxWidth(),
-  ) { imageState ->
+  ) ImageRequest@{ imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
       is GlideImageState.None -> Unit
       is GlideImageState.Loading -> {
@@ -320,11 +320,14 @@ public fun GlideImage(
       }
       is GlideImageState.Failure -> failure?.invoke(glideImageState)
       is GlideImageState.Success -> {
-        success?.invoke(glideImageState) ?: glideImageState.drawable?.let {
+        if (success != null) {
+          success.invoke(glideImageState)
+        } else {
+          val drawable = glideImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
             modifier = modifier,
-            bitmap = it.toBitmap().asImageBitmap(),
-            bitmapPainter = rememberDrawablePainter(it),
+            bitmap = drawable.toBitmap().asImageBitmap(),
+            bitmapPainter = rememberDrawablePainter(drawable),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
@@ -426,17 +429,20 @@ public fun GlideImage(
       .load(imageModel),
     modifier = modifier.fillMaxWidth(),
     bitmapPalette = bitmapPalette
-  ) { imageState ->
+  ) ImageRequest@{ imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
       is GlideImageState.None -> Unit
       is GlideImageState.Loading -> loading?.invoke(glideImageState)
       is GlideImageState.Failure -> failure?.invoke(glideImageState)
       is GlideImageState.Success -> {
-        success?.invoke(glideImageState) ?: glideImageState.drawable?.let {
+        if (success != null) {
+          success.invoke(glideImageState)
+        } else {
+          val drawable = glideImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
             modifier = modifier,
-            bitmap = it.toBitmap().asImageBitmap(),
-            bitmapPainter = rememberDrawablePainter(it),
+            bitmap = drawable.toBitmap().asImageBitmap(),
+            bitmapPainter = rememberDrawablePainter(drawable),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
