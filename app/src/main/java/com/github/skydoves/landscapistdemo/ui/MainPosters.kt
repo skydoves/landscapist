@@ -70,6 +70,7 @@ import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.fresco.FrescoImage
+import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.palette.BitmapPalette
 
 @Composable
@@ -129,7 +130,7 @@ private fun SelectedPoster(
 ) {
   var palette by remember { mutableStateOf<Palette?>(null) }
 
-  CoilImage(
+  GlideImage(
     imageModel = poster.poster,
     modifier = Modifier
       .aspectRatio(0.8f),
