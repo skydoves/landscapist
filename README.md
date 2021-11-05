@@ -79,10 +79,12 @@ We can customize our request options using [RequestOptions](https://bumptech.git
 ```kotlin
 GlideImage(
   imageModel = poster.poster,
-  requestOptions = RequestOptions()
-    .override(256, 256)
-    .diskCacheStrategy(DiskCacheStrategy.ALL)
-    .centerCrop(),
+  requestOptions = {
+    RequestOptions()
+        .override(256, 256)
+        .diskCacheStrategy(DiskCacheStrategy.ALL)
+        .centerCrop()
+  },
   contentScale = ContentScale.Crop,
   modifier = modifier,
   alignment = Alignment.Center,
@@ -94,7 +96,7 @@ Also we can request image by passing a [RequestBuilder](https://bumptech.github.
 ```kotlin
 GlideImage(
   imageModel = poster.poster,
-  requestBuilder = Glide.with(LocalContext.current.applicationContext).asDrawable(),
+  requestBuilder = { Glide.with(LocalContext.current.applicationContext).asDrawable() },
   modifier = Modifier.constrainAs(image) {
     centerHorizontallyTo(parent)
     top.linkTo(parent.top)
@@ -185,14 +187,16 @@ We can customize request options using [ImageRequest](https://coil-kt.github.io/
 
 ```kotlin
 CoilImage(
-  imageRequest = ImageRequest.Builder(LocalContext.current)
-    .data(poster.poster)
-    .crossfade(true)
-    .build(),
-  imageLoader = ImageLoader.Builder(LocalContext.current)
-    .availableMemoryPercentage(0.25)
-    .crossfade(true)
-    .build(),
+  imageRequest = {
+      ImageRequest.Builder(LocalContext.current)
+        .data(poster.poster)
+        .crossfade(true)
+        .build() },
+  imageLoader = {
+      ImageLoader.Builder(LocalContext.current)
+        .availableMemoryPercentage(0.25)
+        .crossfade(true)
+        .build() },
   contentScale = ContentScale.Crop,
   modifier = modifier,
   alignment = Alignment.Center,
@@ -287,7 +291,7 @@ val imageLoader = ImageLoader.Builder(context)
 
 CoilImage(
     imageModel = poster.gif, // URL of the animated images.
-    imageLoader = imageLoader,
+    imageLoader = { imageLoader },
     shimmerParams = ShimmerParams(
       baseColor = background800,
       highlightColor = shimmerHighLight
@@ -368,7 +372,7 @@ val imageRequest = ImageRequestBuilder
 
 FrescoImage(
   imageUrl = stringImageUrl,
-  imageRequest = imageRequest,
+  imageRequest = { imageRequest },
   contentScale = ContentScale.Crop)
 ```
 
