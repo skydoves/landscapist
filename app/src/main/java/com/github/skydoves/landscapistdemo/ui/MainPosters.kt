@@ -113,8 +113,8 @@ private fun PosterItem(
   vm: MainViewModel
 ) {
   Card(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
-    CoilImage(
-      imageModel = poster.poster,
+    FrescoImage(
+      imageUrl = poster.poster,
       modifier = Modifier
         .size(50.dp)
         .clickable { vm.poster.value = poster },
@@ -181,7 +181,7 @@ private fun SelectedPoster(
 
   CoilImage(
     imageModel = poster.gif,
-    imageLoader = imageLoader,
+    imageLoader = { imageLoader },
     shimmerParams = ShimmerParams(
       baseColor = background800,
       highlightColor = shimmerHighLight

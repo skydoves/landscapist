@@ -103,7 +103,7 @@ public fun CoilImage(
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
+  imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
@@ -187,7 +187,7 @@ public fun CoilImage(
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
+  imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
@@ -281,7 +281,7 @@ public fun CoilImage(
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
+  imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -367,7 +367,7 @@ public fun CoilImage(
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
+  imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -440,7 +440,7 @@ public fun CoilImage(
 public fun CoilImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
-  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
+  imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -468,7 +468,7 @@ public fun CoilImage(
 
   CoilImage(
     recomposeKey = imageRequest,
-    imageLoader = imageLoader,
+    imageLoader = imageLoader.invoke(),
     modifier = modifier.fillMaxWidth(),
     bitmapPalette = bitmapPalette,
   ) ImageRequest@{ imageState ->
@@ -558,7 +558,7 @@ public fun CoilImage(
 public fun CoilImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
-  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
+  imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -586,7 +586,7 @@ public fun CoilImage(
 
   CoilImage(
     recomposeKey = imageRequest,
-    imageLoader = imageLoader,
+    imageLoader = imageLoader.invoke(),
     modifier = modifier.fillMaxWidth(),
     bitmapPalette = bitmapPalette,
   ) ImageRequest@{ imageState ->
@@ -671,7 +671,8 @@ private fun CoilImage(
                 ?.generate(it.toBitmap().copy(Bitmap.Config.ARGB_8888, true))
             },
             onError = {
-              imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageBitmap())
+              imageLoadStateFlow.value =
+                ImageLoadState.Failure(it?.toBitmap()?.asImageBitmap())
             }
           ).build()
         )
