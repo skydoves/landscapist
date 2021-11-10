@@ -70,6 +70,7 @@ import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.fresco.FrescoImage
+import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.palette.BitmapPalette
 
 @Composable
@@ -112,8 +113,8 @@ private fun PosterItem(
   vm: MainViewModel
 ) {
   Card(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
-    CoilImage(
-      imageModel = poster.poster,
+    FrescoImage(
+      imageUrl = poster.poster,
       modifier = Modifier
         .size(50.dp)
         .clickable { vm.poster.value = poster },
@@ -129,7 +130,7 @@ private fun SelectedPoster(
 ) {
   var palette by remember { mutableStateOf<Palette?>(null) }
 
-  CoilImage(
+  GlideImage(
     imageModel = poster.poster,
     modifier = Modifier
       .aspectRatio(0.8f),
@@ -180,7 +181,7 @@ private fun SelectedPoster(
 
   CoilImage(
     imageModel = poster.gif,
-    imageLoader = imageLoader,
+    imageLoader = { imageLoader },
     shimmerParams = ShimmerParams(
       baseColor = background800,
       highlightColor = shimmerHighLight

@@ -86,7 +86,9 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 public fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
-  imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
+  imageRequest: @Composable () -> ImageRequest = {
+    LocalFrescoProvider.getFrescoImageRequest(imageUrl)
+  },
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -177,7 +179,9 @@ public fun FrescoImage(
 public fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
-  imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
+  imageRequest: @Composable () -> ImageRequest = {
+    LocalFrescoProvider.getFrescoImageRequest(imageUrl)
+  },
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -255,7 +259,9 @@ public fun FrescoImage(
 public fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
-  imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
+  imageRequest: @Composable () -> ImageRequest = {
+    LocalFrescoProvider.getFrescoImageRequest(imageUrl)
+  },
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -284,7 +290,7 @@ public fun FrescoImage(
 
   FrescoImage(
     recomposeKey = imageUrl,
-    imageRequest = imageRequest,
+    imageRequest = imageRequest.invoke(),
     modifier = modifier.fillMaxWidth(),
     bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
@@ -369,7 +375,9 @@ public fun FrescoImage(
 public fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
-  imageRequest: ImageRequest = LocalFrescoProvider.getFrescoImageRequest(imageUrl),
+  imageRequest: @Composable () -> ImageRequest = {
+    LocalFrescoProvider.getFrescoImageRequest(imageUrl)
+  },
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -398,7 +406,7 @@ public fun FrescoImage(
 
   FrescoImage(
     recomposeKey = imageUrl,
-    imageRequest = imageRequest,
+    imageRequest = imageRequest.invoke(),
     modifier = modifier.fillMaxWidth(),
     bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
@@ -462,7 +470,8 @@ private fun FrescoImage(
   content: @Composable (imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
-  val datasource = remember(recomposeKey) { imagePipeline.fetchDecodedImage(imageRequest, context) }
+  val datasource =
+    remember(recomposeKey) { imagePipeline.fetchDecodedImage(imageRequest, context) }
 
   ImageLoad(
     recomposeKey = recomposeKey,
