@@ -23,7 +23,8 @@ package com.skydoves.landscapist.glide
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -110,7 +111,7 @@ public fun GlideImage(
     imageModel = imageModel,
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
@@ -210,7 +211,7 @@ public fun GlideImage(
     imageModel = imageModel,
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
@@ -299,7 +300,7 @@ public fun GlideImage(
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
-      modifier = modifier.fillMaxWidth(),
+      modifier = modifier,
       painter = painterResource(id = previewPlaceholder),
       alignment = alignment,
       contentScale = contentScale,
@@ -316,7 +317,7 @@ public fun GlideImage(
       .apply(requestOptions.invoke())
       .load(imageModel),
     bitmapPalette = bitmapPalette,
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
   ) ImageRequest@{ imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
       is GlideImageState.None -> Unit
@@ -337,7 +338,7 @@ public fun GlideImage(
         } else {
           val drawable = glideImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable),
             alignment = alignment,
@@ -427,7 +428,7 @@ public fun GlideImage(
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
-      modifier = modifier.fillMaxWidth(),
+      modifier = modifier,
       painter = painterResource(id = previewPlaceholder),
       alignment = alignment,
       contentScale = contentScale,
@@ -443,7 +444,7 @@ public fun GlideImage(
     builder = requestBuilder.invoke()
       .apply(requestOptions.invoke())
       .load(imageModel),
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     bitmapPalette = bitmapPalette
   ) ImageRequest@{ imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
@@ -456,7 +457,7 @@ public fun GlideImage(
         } else {
           val drawable = glideImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable),
             alignment = alignment,
@@ -507,7 +508,7 @@ private fun GlideImage(
   builder: RequestBuilder<Drawable>,
   modifier: Modifier = Modifier,
   bitmapPalette: BitmapPalette? = null,
-  content: @Composable (imageState: ImageLoadState) -> Unit
+  content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   val requestManager = LocalGlideProvider.getGlideRequestManager()
 
@@ -533,7 +534,7 @@ private fun GlideImage(
         }
       }
     },
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     content = content
   )
 }

@@ -24,7 +24,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -120,7 +121,7 @@ public fun CoilImage(
     context = context,
     lifecycleOwner = lifecycleOwner,
     imageLoader = imageLoader,
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     alpha = alpha,
@@ -204,7 +205,7 @@ public fun CoilImage(
     context = context,
     lifecycleOwner = lifecycleOwner,
     imageLoader = imageLoader,
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     alpha = alpha,
@@ -300,7 +301,7 @@ public fun CoilImage(
       .lifecycle(lifecycleOwner)
       .build(),
     imageLoader = imageLoader,
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
@@ -386,7 +387,7 @@ public fun CoilImage(
       .lifecycle(lifecycleOwner)
       .build(),
     imageLoader = imageLoader,
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
@@ -455,7 +456,7 @@ public fun CoilImage(
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
-      modifier = modifier.fillMaxWidth(),
+      modifier = modifier,
       painter = painterResource(id = previewPlaceholder),
       alignment = alignment,
       contentScale = contentScale,
@@ -469,7 +470,7 @@ public fun CoilImage(
   CoilImage(
     recomposeKey = imageRequest,
     imageLoader = imageLoader.invoke(),
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     bitmapPalette = bitmapPalette,
   ) ImageRequest@{ imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
@@ -491,7 +492,7 @@ public fun CoilImage(
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable = drawable),
             alignment = alignment,
@@ -573,7 +574,7 @@ public fun CoilImage(
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
-      modifier = modifier.fillMaxWidth(),
+      modifier = modifier,
       painter = painterResource(id = previewPlaceholder),
       alignment = alignment,
       contentScale = contentScale,
@@ -587,7 +588,7 @@ public fun CoilImage(
   CoilImage(
     recomposeKey = imageRequest,
     imageLoader = imageLoader.invoke(),
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     bitmapPalette = bitmapPalette,
   ) ImageRequest@{ imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
@@ -600,7 +601,7 @@ public fun CoilImage(
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable = drawable),
             alignment = alignment,
@@ -649,7 +650,7 @@ private fun CoilImage(
   modifier: Modifier = Modifier,
   imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
   bitmapPalette: BitmapPalette? = null,
-  content: @Composable (imageState: ImageLoadState) -> Unit
+  content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
   val imageLoadStateFlow =

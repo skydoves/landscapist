@@ -22,7 +22,8 @@ package com.skydoves.landscapist.fresco
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -104,7 +105,7 @@ public fun FrescoImage(
   FrescoImage(
     imageUrl = imageUrl,
     imageRequest = imageRequest,
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
@@ -197,7 +198,7 @@ public fun FrescoImage(
   FrescoImage(
     imageUrl = imageUrl,
     imageRequest = imageRequest,
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
@@ -277,7 +278,7 @@ public fun FrescoImage(
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
-      modifier = modifier.fillMaxWidth(),
+      modifier = modifier,
       painter = painterResource(id = previewPlaceholder),
       alignment = alignment,
       contentScale = contentScale,
@@ -291,7 +292,7 @@ public fun FrescoImage(
   FrescoImage(
     recomposeKey = imageUrl,
     imageRequest = imageRequest.invoke(),
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
   ) ImageRequest@{ imageState ->
@@ -314,7 +315,7 @@ public fun FrescoImage(
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             bitmap = imageBitmap,
             alignment = alignment,
             contentScale = contentScale,
@@ -393,7 +394,7 @@ public fun FrescoImage(
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
-      modifier = modifier.fillMaxWidth(),
+      modifier = modifier,
       painter = painterResource(id = previewPlaceholder),
       alignment = alignment,
       contentScale = contentScale,
@@ -407,7 +408,7 @@ public fun FrescoImage(
   FrescoImage(
     recomposeKey = imageUrl,
     imageRequest = imageRequest.invoke(),
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
   ) ImageRequest@{ imageState ->
@@ -421,7 +422,7 @@ public fun FrescoImage(
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             bitmap = imageBitmap,
             alignment = alignment,
             contentScale = contentScale,
@@ -467,7 +468,7 @@ private fun FrescoImage(
   modifier: Modifier = Modifier,
   bitmapPalette: BitmapPalette? = null,
   observeLoadingProcess: Boolean = false,
-  content: @Composable (imageState: ImageLoadState) -> Unit
+  content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
   val datasource =
@@ -489,7 +490,7 @@ private fun FrescoImage(
         }
       }
     },
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier,
     content = content
   )
 }
