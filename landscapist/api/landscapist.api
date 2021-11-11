@@ -28,7 +28,7 @@ public final class com/skydoves/landscapist/DrawablePainterKt {
 }
 
 public final class com/skydoves/landscapist/ImageLoad {
-	public static final fun ImageLoad (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+	public static final fun ImageLoad (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
 }
 
 public abstract class com/skydoves/landscapist/ImageLoadState {
