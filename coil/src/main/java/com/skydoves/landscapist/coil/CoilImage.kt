@@ -25,6 +25,7 @@ import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -491,7 +492,7 @@ public fun CoilImage(
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = Modifier.matchParentSize(),
+            modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable = drawable),
             alignment = alignment,
@@ -600,7 +601,7 @@ public fun CoilImage(
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = Modifier.matchParentSize(),
+            modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable = drawable),
             alignment = alignment,

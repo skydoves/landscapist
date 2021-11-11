@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -337,7 +338,7 @@ public fun GlideImage(
         } else {
           val drawable = glideImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = Modifier.matchParentSize(),
+            modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable),
             alignment = alignment,
@@ -456,7 +457,7 @@ public fun GlideImage(
         } else {
           val drawable = glideImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = Modifier.matchParentSize(),
+            modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable),
             alignment = alignment,

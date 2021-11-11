@@ -23,6 +23,7 @@ package com.skydoves.landscapist.fresco
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -314,7 +315,7 @@ public fun FrescoImage(
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = modifier.matchParentSize(),
+            modifier = Modifier.fillMaxSize(),
             bitmap = imageBitmap,
             alignment = alignment,
             contentScale = contentScale,
@@ -421,7 +422,7 @@ public fun FrescoImage(
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           CircularRevealedImage(
-            modifier = modifier.matchParentSize(),
+            modifier = Modifier.fillMaxSize(),
             bitmap = imageBitmap,
             alignment = alignment,
             contentScale = contentScale,

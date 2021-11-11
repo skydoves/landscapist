@@ -23,6 +23,7 @@ package com.skydoves.landscapist.fresco.websupport
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -109,7 +110,7 @@ public fun FrescoWebImage(
   Box(modifier = modifier) {
     if (topLevelDrawable != null) {
       Image(
-        modifier = Modifier.matchParentSize(),
+        modifier = Modifier.fillMaxSize(),
         painter = rememberDrawablePainter(topLevelDrawable),
         contentDescription = contentDescription,
         alignment = alignment,

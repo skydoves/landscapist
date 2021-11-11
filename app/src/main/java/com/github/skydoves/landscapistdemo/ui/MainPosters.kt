@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -187,9 +186,8 @@ private fun SelectedPoster(
       highlightColor = shimmerHighLight
     ),
     modifier = Modifier
-      .fillMaxWidth()
-      .padding(8.dp)
       .height(500.dp)
+      .padding(8.dp)
       .clip(RoundedCornerShape(8.dp)),
     previewPlaceholder = R.drawable.poster
   )
@@ -244,7 +242,6 @@ private fun HomePoster(
       FrescoImage(
         imageUrl = poster.poster,
         modifier = Modifier
-          .aspectRatio(0.8f)
           .constrainAs(image) {
             centerHorizontallyTo(parent)
             top.linkTo(parent.top)
