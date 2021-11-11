@@ -19,6 +19,7 @@
 
 package com.skydoves.landscapist
 
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,7 +51,7 @@ public fun <T : Any> ImageLoad(
   recomposeKey: T?,
   executeImageRequest: suspend () -> Flow<ImageLoadState>,
   modifier: Modifier = Modifier,
-  content: @Composable (imageState: ImageLoadState) -> Unit
+  content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   var state by remember(recomposeKey) { mutableStateOf<ImageLoadState>(ImageLoadState.None) }
   LaunchedEffect(recomposeKey) {

@@ -23,7 +23,6 @@ package com.skydoves.landscapist.fresco.websupport
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -89,7 +88,7 @@ public fun FrescoWebImage(
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
-      modifier = modifier.fillMaxWidth(),
+      modifier = modifier,
       painter = painterResource(id = previewPlaceholder),
       alignment = alignment,
       contentScale = contentScale,
@@ -107,17 +106,17 @@ public fun FrescoWebImage(
   holder.controller = controllerBuilder.build()
 
   val topLevelDrawable = holder.topLevelDrawable
-  if (topLevelDrawable != null) {
-    Image(
-      modifier = modifier,
-      painter = rememberDrawablePainter(topLevelDrawable),
-      contentDescription = contentDescription,
-      alignment = alignment,
-      contentScale = contentScale,
-      alpha = alpha,
-      colorFilter = colorFilter
-    )
-  } else {
-    Box(modifier = modifier)
+  Box(modifier = modifier) {
+    if (topLevelDrawable != null) {
+      Image(
+        modifier = Modifier.matchParentSize(),
+        painter = rememberDrawablePainter(topLevelDrawable),
+        contentDescription = contentDescription,
+        alignment = alignment,
+        contentScale = contentScale,
+        alpha = alpha,
+        colorFilter = colorFilter
+      )
+    }
   }
 }
