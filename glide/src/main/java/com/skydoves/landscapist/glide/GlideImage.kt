@@ -295,8 +295,8 @@ public fun GlideImage(
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
-  success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
+  success: @Composable (BoxScope.(imageState: GlideImageState.Success) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -331,10 +331,10 @@ public fun GlideImage(
           durationMillis = shimmerParams.durationMillis
         )
       }
-      is GlideImageState.Failure -> failure?.invoke(glideImageState)
+      is GlideImageState.Failure -> failure?.invoke(this, glideImageState)
       is GlideImageState.Success -> {
         if (success != null) {
-          success.invoke(glideImageState)
+          success.invoke(this, glideImageState)
         } else {
           val drawable = glideImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
@@ -422,9 +422,9 @@ public fun GlideImage(
   circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
-  loading: @Composable ((imageState: GlideImageState.Loading) -> Unit)? = null,
-  success: @Composable ((imageState: GlideImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: GlideImageState.Failure) -> Unit)? = null,
+  loading: @Composable (BoxScope.(imageState: GlideImageState.Loading) -> Unit)? = null,
+  success: @Composable (BoxScope.(imageState: GlideImageState.Success) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -449,11 +449,11 @@ public fun GlideImage(
   ) ImageRequest@{ imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
       is GlideImageState.None -> Unit
-      is GlideImageState.Loading -> loading?.invoke(glideImageState)
-      is GlideImageState.Failure -> failure?.invoke(glideImageState)
+      is GlideImageState.Loading -> loading?.invoke(this, glideImageState)
+      is GlideImageState.Failure -> failure?.invoke(this, glideImageState)
       is GlideImageState.Success -> {
         if (success != null) {
-          success.invoke(glideImageState)
+          success.invoke(this, glideImageState)
         } else {
           val drawable = glideImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
