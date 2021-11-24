@@ -292,8 +292,8 @@ public fun CoilImage(
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
-  success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
+  success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
   CoilImage(
     imageRequest = ImageRequest.Builder(context)
@@ -377,9 +377,9 @@ public fun CoilImage(
   circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
-  loading: @Composable ((imageState: CoilImageState.Loading) -> Unit)? = null,
-  success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
+  loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
+  success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
   CoilImage(
     imageRequest = ImageRequest.Builder(context)
@@ -451,8 +451,8 @@ public fun CoilImage(
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
-  success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
+  success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -485,10 +485,10 @@ public fun CoilImage(
           durationMillis = shimmerParams.durationMillis
         )
       }
-      is CoilImageState.Failure -> failure?.invoke(coilImageState)
+      is CoilImageState.Failure -> failure?.invoke(this, coilImageState)
       is CoilImageState.Success -> {
         if (success != null) {
-          success.invoke(coilImageState)
+          success.invoke(this, coilImageState)
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(
@@ -568,9 +568,9 @@ public fun CoilImage(
   circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
-  loading: @Composable ((imageState: CoilImageState.Loading) -> Unit)? = null,
-  success: @Composable ((imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: CoilImageState.Failure) -> Unit)? = null,
+  loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
+  success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -593,11 +593,11 @@ public fun CoilImage(
   ) ImageRequest@{ imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
       is CoilImageState.None -> Unit
-      is CoilImageState.Loading -> loading?.invoke(coilImageState)
-      is CoilImageState.Failure -> failure?.invoke(coilImageState)
+      is CoilImageState.Loading -> loading?.invoke(this, coilImageState)
+      is CoilImageState.Failure -> failure?.invoke(this, coilImageState)
       is CoilImageState.Success -> {
         if (success != null) {
-          success.invoke(coilImageState)
+          success.invoke(this, coilImageState)
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
           CircularRevealedImage(

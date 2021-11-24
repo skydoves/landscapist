@@ -273,8 +273,8 @@ public fun FrescoImage(
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
-  success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
+  success: @Composable (BoxScope.(imageState: FrescoImageState.Success) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -308,10 +308,10 @@ public fun FrescoImage(
           durationMillis = shimmerParams.durationMillis
         )
       }
-      is FrescoImageState.Failure -> failure?.invoke(frescoImageState)
+      is FrescoImageState.Failure -> failure?.invoke(this, frescoImageState)
       is FrescoImageState.Success -> {
         if (success != null) {
-          success.invoke(frescoImageState)
+          success.invoke(this, frescoImageState)
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           CircularRevealedImage(
@@ -388,9 +388,9 @@ public fun FrescoImage(
   bitmapPalette: BitmapPalette? = null,
   observeLoadingProcess: Boolean = false,
   @DrawableRes previewPlaceholder: Int = 0,
-  loading: @Composable ((imageState: FrescoImageState.Loading) -> Unit)? = null,
-  success: @Composable ((imageState: FrescoImageState.Success) -> Unit)? = null,
-  failure: @Composable ((imageState: FrescoImageState.Failure) -> Unit)? = null,
+  loading: @Composable (BoxScope.(imageState: FrescoImageState.Loading) -> Unit)? = null,
+  success: @Composable (BoxScope.(imageState: FrescoImageState.Success) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -414,11 +414,11 @@ public fun FrescoImage(
   ) ImageRequest@{ imageState ->
     when (val frescoImageState = imageState.toFrescoImageState()) {
       is FrescoImageState.None -> Unit
-      is FrescoImageState.Loading -> loading?.invoke(frescoImageState)
-      is FrescoImageState.Failure -> failure?.invoke(frescoImageState)
+      is FrescoImageState.Loading -> loading?.invoke(this, frescoImageState)
+      is FrescoImageState.Failure -> failure?.invoke(this, frescoImageState)
       is FrescoImageState.Success -> {
         if (success != null) {
-          success.invoke(frescoImageState)
+          success.invoke(this, frescoImageState)
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           CircularRevealedImage(
