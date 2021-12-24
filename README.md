@@ -341,7 +341,7 @@ dependencies {
 `Landscapist-Fresco` includes version `2.5.0` of Fresco. So please check out if you use the same version or you can remove the Fresco dependency on your project.
 
 ### Setup
-To get started, you should setup `Fresco` with [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) on your `Application` class. Generally we're recommend initializing with  `OkHttpImagePipelineConfigFactory`. Also, you can customize caching, networking, and thread pool strategies with your own `ImagePipelineConfig`. For more details, you can check out [Using Other Network Layers](https://frescolib.org/docs/using-other-network-layers.html#using-okhttp).
+To get started, you should set up `Fresco` with [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in your `Application` class. Generally, we recommend initializing with  `OkHttpImagePipelineConfigFactory`. Also, you can customize caching, networking, and thread pool strategies with your own `ImagePipelineConfig`. For more details, you can check out [Using Other Network Layers](https://frescolib.org/docs/using-other-network-layers.html#using-okhttp).
 ```kotlin
 class App : Application() {
 
