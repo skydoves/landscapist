@@ -13,25 +13,32 @@
 </p>
 
 <p align="center">
-🍂 Jetpack Compose image loading library which can fetch and display network images using <a href="https://github.com/bumptech/glide" target="_blank"> Glide</a>, <a href="https://github.com/coil-kt/coil" target="_blank"> Coil</a>, <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>
+🍂 Jetpack Compose image loading library which fetches and displays network images with <a href="https://github.com/bumptech/glide" target="_blank"> Glide</a>, <a href="https://github.com/coil-kt/coil" target="_blank"> Coil</a>, and <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>
 </p>
 
 ## Who's using Landscapist?
-[See who's using Landscapist](/usecases.md).
+👉 [Check out who's using Landscapist](/usecases.md).
 
-## Usecase
-You can see the use cases of this library in the below repositories.
+## Demo projects
+You can see the use cases of this library in the repositories below:
 - [DisneyCompose](https://github.com/skydoves/disneycompose) - 🧸 A demo Disney app using Jetpack Compose and Hilt based on modern Android tech-stacks and MVVM architecture.
 - [MovieCompose](https://github.com/skydoves/MovieCompose) - 🎞 A demo movie app using Jetpack Compose and Hilt based on modern Android tech stacks. <br>
 
-## SNAPSHOT 
+## SNAPSHOT
+<details>
+ <summary>See how to import the snapshot</summary>
+
+### Including the SNAPSHOT
 [![Balloon](https://img.shields.io/static/v1?label=snapshot&message=landscapist&logo=apache%20maven&color=C71A36)](https://oss.sonatype.org/content/repositories/snapshots/com/github/skydoves/landscapist/) <br>
 Snapshots of the current development version of Landscapist are available, which track [the latest versions](https://oss.sonatype.org/content/repositories/snapshots/com/github/skydoves/landscapist/).
+
+To import snapshot versions on your project, add the code snippet below on your gradle file.
 ```Gradle
 repositories {
    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 }
 ```
+</details>
 
 <div class="header">
   <a href="https://github.com/bumptech/glide" target="_blank"> <img src="https://user-images.githubusercontent.com/24237865/95545537-1bc15200-0a39-11eb-883d-644f564da5d3.png" align="left" width="4%" alt="Glide" /></a>
@@ -42,7 +49,7 @@ repositories {
 
 <img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="32%"/>
 
-Add below codes to your **root** `build.gradle` file (not your module build.gradle file).
+Add the below codes to your **root** `build.gradle` file (not your module-level build.gradle file):
 ```gradle
 allprojects {
     repositories {
@@ -50,16 +57,19 @@ allprojects {
     }
 }
 ```
-Also add a dependency code to your **module**'s `build.gradle` file.
+
+Next, add the below dependency to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
     implementation "com.github.skydoves:landscapist-glide:1.4.4"
 }
 ```
-`Landscapist-Glide` uses the `4.12.0` version of Glide internally. So if your project already includes Glide dependency, highly recommended removing it or migrating to the same version.
 
-### Usage
-We can request and load images simply using a `GlideImage` composable function.
+`Landscapist-Glide` includes version `4.12.0` of [Glide](https://github.com/bumptech/glide) internally. So please check out if you use the same version or you can remove the Glide dependency on your project.
+
+### GlideImage
+You can load images simply by using `GlideImage` composable function as the following example below:
+
 ```kotlin
 GlideImage(
   imageModel = imageUrl,
@@ -74,8 +84,9 @@ GlideImage(
 )
 ```
 
-#### RequestOptions and TransitionOptions
-We can customize our request options using [RequestOptions](https://bumptech.github.io/glide/doc/options.html#requestoptions) and [TransitionOptions](https://bumptech.github.io/glide/doc/options.html#transitionoptions) for applying caching strategies, loading transformations.
+### Custom RequestOptions and TransitionOptions
+You can customize your request-options with your own [RequestOptions](https://bumptech.github.io/glide/doc/options.html#requestoptions) and [TransitionOptions](https://bumptech.github.io/glide/doc/options.html#transitionoptions) for applying caching strategies, loading transformations like below:
+
 ```kotlin
 GlideImage(
   imageModel = poster.poster,
@@ -91,8 +102,9 @@ GlideImage(
 )
 ```
 
-#### RequestBuilder
-Also we can request image by passing a [RequestBuilder](https://bumptech.github.io/glide/doc/options.html#requestbuilder). RequestBuilder is the backbone of the request in Glide and is responsible for bringing your options together with your requested url or model to start a new load.
+### Custom RequestBuilder
+You can request image with your own [RequestBuilder](https://bumptech.github.io/glide/doc/options.html#requestbuilder), which is the backbone of the request in Glide and is responsible for bringing your options together with your requested url or model to start a new load.
+
 ```kotlin
 GlideImage(
   imageModel = poster.poster,
@@ -104,16 +116,16 @@ GlideImage(
 )
 ```
 
-#### LocalGlideRequestOptions
-We can provide the same instance of the `RequestOptions` in the composable hierarchy.
+### LocalGlideRequestOptions
+You can pass the same instance of your `RequestOptions` down through the Composition in your composable hierarchy as following the example below:
+
 ```kotlin
-// customize the RequestOptions as needed
 val requestOptions = RequestOptions()
     .override(300, 300)
     .circleCrop()
 
 CompositionLocalProvider(LocalGlideRequestOptions provides requestOptions) {
-  // This will automatically use the value of current RequestOptions in the hierarchy.
+  // Loads images with the custom `requestOptions` without explicit defines.
   GlideImage(
     imageModel = ...
   )
@@ -122,16 +134,19 @@ CompositionLocalProvider(LocalGlideRequestOptions provides requestOptions) {
 
 <img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="32%"/>
 
-### Composable loading, success, failure
-We can create our own composable functions following requesting states.<br>
-Here is an example that shows a progress indicator when loading an image,<br>
-After complete requesting, the indicator will be gone and a content image will be shown.<br>
-If the request failed (e.g. network error, wrong destination), error text will be shown.
+### Custom Composables
+
+You can build compose with your own composable functions following the three request states.
+
+- loading: While loading an image, the indicator will be shown up.
+- success: If succeed to load an image, the indicator will be gone and a content image will be shown. 
+- failure: If fail to load an image (e.g. network error, wrong destination), an error placeholder will be shown up instead.
+
 ```kotlin
  GlideImage(
  imageModel = poster.poster,
  modifier = modifier,
- // shows a progress indicator when loading an image.
+ // shows an indicator while loading an image.
  loading = {
    ConstraintLayout(
      modifier = Modifier.fillMaxSize()
@@ -147,7 +162,7 @@ If the request failed (e.g. network error, wrong destination), error text will b
      )
    }
  },
- // shows an error text message when request failed.
+ // shows an error text if fail to load an image.
  failure = {
    Text(text = "image request failed.")
  })
@@ -159,15 +174,16 @@ If the request failed (e.g. network error, wrong destination), error text will b
 </div>
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
-Add a dependency code to your **module**'s `build.gradle` file.
+Add the below dependency to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
     implementation "com.github.skydoves:landscapist-coil:<version>"
 }
 ```
 
-### Usage
-We can request and load images simply using a `CoilImage` composable function.
+### CoilImage
+You can load images by using the `CoilImage` composable function as the following example below:
+
 ```kotlin
 CoilImage(
   imageModel = imageUrl,
@@ -182,8 +198,8 @@ CoilImage(
 )
 ```
 
-#### ImageRequest and ImageLoader
-We can customize request options using [ImageRequest](https://coil-kt.github.io/coil/image_requests/) and [ImageLoader](https://coil-kt.github.io/coil/image_loaders/) for providing all the necessary information for loading images like caching strategies and transformations.
+#### Custom ImageRequest and ImageLoader
+You can load images with your own [ImageRequest](https://coil-kt.github.io/coil/image_requests/) and [ImageLoader](https://coil-kt.github.io/coil/image_loaders/), which provides all the necessary information for loading images like caching strategies and transformations.
 
 ```kotlin
 CoilImage(
@@ -205,8 +221,13 @@ CoilImage(
 
 <img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="32%"/>
 
-### Composable loading, success, failure
-We can create our own composable functions following requesting states. Here is an example that shows a progress indicator when loading an image, After complete requesting, the indicator will be gone and a content image will be shown. If the request failed (e.g. network error, wrong destination), error text will be shown.
+### Custom Composables
+You can build compose with your own composable functions following the three request states.
+
+- loading: While loading an image, the indicator will be shown up.
+- success: If succeed to load an image, the indicator will be gone and a content image will be shown. 
+- failure: If fail to load an image (e.g. network error, wrong destination), an error placeholder will be shown up instead.
+
 ```kotlin
 CoilImage(
   imageModel = poster.poster,
@@ -214,7 +235,7 @@ CoilImage(
     centerHorizontallyTo(parent)
     top.linkTo(parent.top)
   }.aspectRatio(0.8f),
-  // shows a progress indicator when loading an image.
+  // shows an indicator while loading an image.
   loading = {
     ConstraintLayout(
       modifier = Modifier.fillMaxSize()
@@ -230,7 +251,7 @@ CoilImage(
       )
     }
   },
-  // shows an error text message when request failed.
+  // shows an error text if loading fails.
   failure = {
     Text(text = "image request failed.")
   })
@@ -239,7 +260,8 @@ CoilImage(
 <img src="https://user-images.githubusercontent.com/24237865/95812167-be3a4780-0d4f-11eb-9360-2a4a66a3fb46.gif" align="right" width="26%"/>
 
 ### Shimmer effect
-We can give a shimmering effect when loading images using a `ShimmerParams`. We can also use `ShimmerParams` in `GlideImage` and `FrescoImage`.
+You can make a shimmering effect while loading an image by using the `ShimmerParams` parameter as following the example below:
+
 ```kotlin
  CoilImage(
  imageModel = poster.poster,
@@ -259,11 +281,10 @@ We can give a shimmering effect when loading images using a `ShimmerParams`. We 
  ```
 
  ### LocalCoilImageLoader
- We can provide the same instance of the `ImageLoader` in the composable hierarchy.
+ ou can pass the same instance of your `ImageLoader` down through the Composition in your composable hierarchy as following the example below:
+
  ```kotlin
- val imageLoader = ImageLoader.Builder(context)
-    // customize the ImageLoader as needed
-    .build()
+ val imageLoader = ImageLoader.Builder(context).build()
 CompositionLocalProvider(LocalCoilImageLoader provides imageLoader) {
    // This will automatically use the value of current imageLoader in the hierarchy.
    CoilImage(
@@ -274,8 +295,8 @@ CompositionLocalProvider(LocalCoilImageLoader provides imageLoader) {
 
  <img src="https://user-images.githubusercontent.com/24237865/131246748-b88903a1-43de-4e6c-9069-3e956a0cf8a6.gif" align="right" width="32%"/>
 
-## Coil Animated Image Support (GIF, Webp)
-Landscapist-coil supports animated GIF and WebP Images using `ImageLoader`.
+## Animated Image Supports (GIF, Webp)
+You can load animated GIFs and WebP Images with your `ImageLoader`.
 
 ```kotlin
 val context = LocalContext.current
@@ -290,7 +311,7 @@ val imageLoader = ImageLoader.Builder(context)
   .build()
 
 CoilImage(
-    imageModel = poster.gif, // URL of the animated images.
+    imageModel = poster.gif, // URL of an animated image.
     imageLoader = { imageLoader },
     shimmerParams = ShimmerParams(
       baseColor = background800,
@@ -310,19 +331,17 @@ CoilImage(
 </div>
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
-Add a dependency code to your **module**'s `build.gradle` file.
+
+Add the below dependency to your **module**'s `build.gradle` file.
 ```gradle
 dependencies {
     implementation "com.github.skydoves:landscapist-fresco:<version>"
 }
 ```
-`Landscapist-Fresco` uses the `2.5.0` version of Fresco internally. So if your project already includes Fresco dependency, highly recommended removing it or migrating to the same version.
+`Landscapist-Fresco` includes version `2.5.0` of Fresco. So please check out if you use the same version or you can remove the Fresco dependency on your project.
 
-### Initialize
-We should initialize `Fresco` using [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in our `Application` class.<br>
-If we need to fetch images from the network, recommend using `OkHttpImagePipelineConfigFactory`.<br>
-By using an `ImagePipelineConfig`, we can customize caching, networking, and thread pool strategies.<br>
-[Here](https://fresco.buzhidao.net/javadoc/reference/com/facebook/imagepipeline/core/ImagePipelineConfig.Builder.html) are more references related to the pipeline config.
+### Setup
+To get started, you should setup `Fresco` with [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) on your `Application` class. Generally we're recommend initializing with  `OkHttpImagePipelineConfigFactory`. Also, you can customize caching, networking, and thread pool strategies with your own `ImagePipelineConfig`. For more details, you can check out [Using Other Network Layers](https://frescolib.org/docs/using-other-network-layers.html#using-okhttp).
 ```kotlin
 class App : Application() {
 
@@ -344,8 +363,9 @@ class App : Application() {
 
 <img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="32%"/>
 
-### Usage
-We can request and load images simply using a `FrescoImage` composable function.
+### FrescoImage
+You can load images by using the `FrescoImage` composable function as the following example below:
+
 ```kotlin
 FrescoImage(
   imageUrl = stringImageUrl,
@@ -359,7 +379,9 @@ FrescoImage(
   error = ImageBitmap.imageResource(R.drawable.error)
 )
 ```
-We can customize our requests using an [ImageRequest](https://frescolib.org/docs/image-requests.html) that consists only of a URI, we can use the helper method ImageRequest.fromURI.
+
+You can load images with your own [ImageRequest](https://frescolib.org/docs/image-requests.html), which provides some necessary information for loading images like decoding strategies and resizing.
+
 ```kotlin
 val imageRequest = ImageRequestBuilder
   .newBuilderWithSource(uri)
@@ -378,16 +400,18 @@ FrescoImage(
 
 <img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="32%"/>
 
-### Composable loading, success, failure
-We can create our own composable functions following requesting states.<br>
-Here is an example that shows a progress indicator when loading an image,<br>
-After complete requesting, the indicator will be gone and a content image will be shown.<br>
-If the request failed (e.g. network error, wrong destination), error text will be shown.
+### Custom Composables
+You can build compose with your own composable functions following the three request states.
+
+- loading: While loading an image, the indicator will be shown up.
+- success: If succeed to load an image, the indicator will be gone and a content image will be shown. 
+- failure: If fail to load an image (e.g. network error, wrong destination), an error placeholder will be shown up instead.
+
 ```kotlin
  FrescoImage(
  imageUrl = stringImageUrl,
  modifier = modifier,
- // shows a progress indicator when loading an image.
+ // shows an indicator while loading an image.
  loading = {
    ConstraintLayout(
      modifier = Modifier.fillMaxSize()
@@ -403,12 +427,14 @@ If the request failed (e.g. network error, wrong destination), error text will b
      )
    }
  },
- // shows an error text message when request failed.
+ // shows an error text if fail to load an image.
  failure = {
    Text(text = "image request failed.")
  })
 ```
-Also, we can customize the content image using our own composable function like below.
+
+Also, you can customize the content image with our own composable function like example below:
+
 ```kotlin
 FrescoImage(
     imageUrl = imageUrl,
@@ -428,7 +454,8 @@ FrescoImage(
 ```
 
 #### LocalFrescoImageRequest
-We can provide the same instance of the `ImageRequest` in the composable hierarchy.
+You can pass the same instance of your `ImageRequest` down through the Composition in your composable hierarchy as following the example below:
+
 ```kotlin
 // customize the ImageRequest as needed
 val imageRequest = ImageRequestBuilder
@@ -451,7 +478,7 @@ CompositionLocalProvider(LocalFrescoImageRequest provides imageRequest) {
 <img src="https://user-images.githubusercontent.com/24237865/129226361-877689b8-a1ec-4f59-b8a6-e2efe33a8de7.gif" align="right" width="32%"/>
 
 ## Palette
-We can extract major (theme) color profiles using `BitmapPalette`. Basically, we should use `BitmapPalette` for extracting the major colors from image. You can reference which kinds of colors can be extracted [here](https://developer.android.com/training/material/palette-colors#extract-color-profiles).
+You can extract major (theme) color profiles with `BitmapPalette`. You can check out [Extract color profiles](https://developer.android.com/training/material/palette-colors#extract-color-profiles) to see which kinds of colors can be extracted.
 
 ```kotlin
 var palette by remember { mutableStateOf<Palette?>(null) }
@@ -476,7 +503,7 @@ Crossfade(
   )
 }
 ```
-Also we can customize attributes of `BitmapPalette` like the below.
+Also, you can customize attributes of `BitmapPalette` like the example below:
 
 ```kotlin
   var palette by remember { mutableStateOf<Palette?>(null) }
@@ -505,16 +532,16 @@ Also we can customize attributes of `BitmapPalette` like the below.
 
 ## Fresco Animated Image Support (GIF, Webp)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
-Add a dependency code to your **module**'s `build.gradle` file.
+
+Add the below dependency to your **module**'s `build.gradle` file.
+
 ```gradle
 dependencies {
   implementation "com.github.skydoves:landscapist-fresco-websupport:<version>"
 }
 ```
 
-Fresco supports animated GIF and WebP Images using `FrescoWebImage` composable function. We should pass the `AbstractDraweeController` that can be created like the below.
-You can reference how to build the [DraweeController](https://frescolib.org/docs/animations.html), and [Supported URIs](https://frescolib.org/docs/supported-uris.html) for setting URI addresses. Also, we can load a normal image (jpeg, png, etc) using the custom controller.
-
+You can load animated GIFs and WebP Images with `FrescoWebImage` composable function. You should pass the `AbstractDraweeController` like the following example below:
 
 ```kotlin
 FrescoWebImage(
@@ -527,17 +554,19 @@ FrescoWebImage(
 )
 ```
 
+For more details, check out [DraweeController](https://frescolib.org/docs/animations.html), and [Supported URIs](https://frescolib.org/docs/supported-uris.html) for setting URI addresses. Also, you can load general images (jpeg, png, etc) which can be loaded with `FrescoImage` by using `FrescoWebImage` and your custom controller.
+
 ## Who's using Landscapist?
-If your project uses Landscapist, let me know via creating a new issue! 🤗
+If your project uses Landscapist, please let me know by creating a new issue! 🤗
 
 ## [Twitter for Android](https://user-images.githubusercontent.com/24237865/125583736-f0ffa76f-8f87-433b-a9fd-192231dc5e63.jpg)
 
 [![twitter](https://user-images.githubusercontent.com/24237865/125583182-9527dd48-433e-4e17-ae52-3f2bb544a847.jpg)](https://play.google.com/store/apps/details?id=com.twitter.android&hl=ko&gl=US)
 
-## Reference repository
-This library is mostly inspired by [Accompanist](https://github.com/chrisbanes/accompanist). <br>
+## Inspiration
+This library was mostly inspired by [Accompanist](https://github.com/chrisbanes/accompanist).<br>
 
-Accompanist is a group of libraries that contains some utilities which I've found myself copying around projects which use Jetpack Compose. Currently, it contains image loading and insets. You can get more variety and recent systems from the library maintained by Google.
+> Accompanist is a group of libraries that contains some utilities which I've found myself copying around projects which use Jetpack Compose. Currently, it contains image loading and insets. You can get more variety and recent systems from the library maintained by Google.
 
 ## Find this repository useful? :heart:
 Support it by joining __[stargazers](https://github.com/skydoves/Landscapist/stargazers)__ for this repository. :star: <br>
