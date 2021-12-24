@@ -281,7 +281,7 @@ You can make a shimmering effect while loading an image by using the `ShimmerPar
  ```
 
  ### LocalCoilImageLoader
- ou can pass the same instance of your `ImageLoader` down through the Composition in your composable hierarchy as following the example below:
+ You can pass the same instance of your `ImageLoader` down through the Composition in your composable hierarchy as following the example below:
 
  ```kotlin
  val imageLoader = ImageLoader.Builder(context).build()
