@@ -47,8 +47,6 @@ repositories {
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
 
-<img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="32%"/>
-
 Add the below codes to your **root** `build.gradle` file (not your module-level build.gradle file):
 ```gradle
 allprojects {
@@ -83,6 +81,10 @@ GlideImage(
   error = ImageBitmap.imageResource(R.drawable.error)
 )
 ```
+
+### More Details for GlideImage
+<details>
+ <summary>👉 Read further for more details</summary>
 
 ### Custom RequestOptions and TransitionOptions
 You can customize your request-options with your own [RequestOptions](https://bumptech.github.io/glide/doc/options.html#requestoptions) and [TransitionOptions](https://bumptech.github.io/glide/doc/options.html#transitionoptions) for applying caching strategies, loading transformations like below:
@@ -132,41 +134,7 @@ CompositionLocalProvider(LocalGlideRequestOptions provides requestOptions) {
 }
 ```
 
-<img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="32%"/>
-
-### Custom Composables
-
-You can build compose with your own composable functions following the three request states.
-
-- loading: While loading an image, the indicator will be shown up.
-- success: If succeed to load an image, the indicator will be gone and a content image will be shown. 
-- failure: If fail to load an image (e.g. network error, wrong destination), an error placeholder will be shown up instead.
-
-```kotlin
- GlideImage(
- imageModel = poster.poster,
- modifier = modifier,
- // shows an indicator while loading an image.
- loading = {
-   ConstraintLayout(
-     modifier = Modifier.fillMaxSize()
-   ) {
-     val indicator = createRef()
-     CircularProgressIndicator(
-       modifier = Modifier.constrainAs(indicator) {
-         top.linkTo(parent.top)
-         bottom.linkTo(parent.bottom)
-        start.linkTo(parent.start)
-        end.linkTo(parent.end)
-       }
-     )
-   }
- },
- // shows an error text if fail to load an image.
- failure = {
-   Text(text = "image request failed.")
- })
-```
+</details>
 
 <div class="header">
   <a href="https://github.com/coil-kt/coil" target="_blank"> <img src="https://user-images.githubusercontent.com/24237865/95545538-1cf27f00-0a39-11eb-83dd-ef9b8c6a74cb.png" align="left" width="4%" alt="Fresco" /></a>
@@ -198,7 +166,11 @@ CoilImage(
 )
 ```
 
-#### Custom ImageRequest and ImageLoader
+### More Details for CoilImage
+<details>
+ <summary>👉 Read further for more details</summary>
+
+### Custom ImageRequest and ImageLoader
 You can load images with your own [ImageRequest](https://coil-kt.github.io/coil/image_requests/) and [ImageLoader](https://coil-kt.github.io/coil/image_loaders/), which provides all the necessary information for loading images like caching strategies and transformations.
 
 ```kotlin
@@ -218,67 +190,6 @@ CoilImage(
   alignment = Alignment.Center,
 )
 ```
-
-<img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="32%"/>
-
-### Custom Composables
-You can build compose with your own composable functions following the three request states.
-
-- loading: While loading an image, the indicator will be shown up.
-- success: If succeed to load an image, the indicator will be gone and a content image will be shown. 
-- failure: If fail to load an image (e.g. network error, wrong destination), an error placeholder will be shown up instead.
-
-```kotlin
-CoilImage(
-  imageModel = poster.poster,
-  modifier = Modifier.constrainAs(image) {
-    centerHorizontallyTo(parent)
-    top.linkTo(parent.top)
-  }.aspectRatio(0.8f),
-  // shows an indicator while loading an image.
-  loading = {
-    ConstraintLayout(
-      modifier = Modifier.fillMaxSize()
-    ) {
-      val indicator = createRef()
-      CircularProgressIndicator(
-        modifier = Modifier.constrainAs(indicator) {
-          top.linkTo(parent.top)
-          bottom.linkTo(parent.bottom)
-          start.linkTo(parent.start)
-          end.linkTo(parent.end)
-        }
-      )
-    }
-  },
-  // shows an error text if loading fails.
-  failure = {
-    Text(text = "image request failed.")
-  })
-```
-
-<img src="https://user-images.githubusercontent.com/24237865/95812167-be3a4780-0d4f-11eb-9360-2a4a66a3fb46.gif" align="right" width="26%"/>
-
-### Shimmer effect
-You can make a shimmering effect while loading an image by using the `ShimmerParams` parameter as following the example below:
-
-```kotlin
- CoilImage(
- imageModel = poster.poster,
- modifier = modifier,
- // shows a shimmering effect when loading an image.
- shimmerParams = ShimmerParams(
-        baseColor = MaterialTheme.colors.background,
-        highlightColor = shimmerHighLight,
-        durationMillis = 350,
-        dropOff = 0.65f,
-        tilt = 20f
-      ),
- // shows an error text message when request failed.
- failure = {
-   Text(text = "image request failed.")
- })
- ```
 
  ### LocalCoilImageLoader
  You can pass the same instance of your `ImageLoader` down through the Composition in your composable hierarchy as following the example below:
@@ -325,6 +236,8 @@ CoilImage(
   )
 ```
 
+</details>
+
 <div class="header">
   <a href="https://github.com/facebook/fresco" target="_blank"> <img src="https://user-images.githubusercontent.com/24237865/95545540-1cf27f00-0a39-11eb-9e84-96b9df81364b.png" align="left" width="4%" alt="Fresco" /></a>
   <h1>Fresco</h1>
@@ -341,7 +254,7 @@ dependencies {
 `Landscapist-Fresco` includes version `2.5.0` of Fresco. So please check out if you use the same version or you can remove the Fresco dependency on your project.
 
 ### Setup
-To get started, you should set up `Fresco` with [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in your `Application` class. Generally, we recommend initializing with  `OkHttpImagePipelineConfigFactory`. Also, you can customize caching, networking, and thread pool strategies with your own `ImagePipelineConfig`. For more details, you can check out [Using Other Network Layers](https://frescolib.org/docs/using-other-network-layers.html#using-okhttp).
+To get started, you should set up `Fresco` with [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in your `Application` class. Generally, it's recommended initializing with  `OkHttpImagePipelineConfigFactory`. Also, you can customize caching, networking, and thread pool strategies with your own `ImagePipelineConfig`. For more details, you can check out [Using Other Network Layers](https://frescolib.org/docs/using-other-network-layers.html#using-okhttp).
 ```kotlin
 class App : Application() {
 
@@ -361,8 +274,6 @@ class App : Application() {
 }
 ```
 
-<img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="32%"/>
-
 ### FrescoImage
 You can load images by using the `FrescoImage` composable function as the following example below:
 
@@ -380,6 +291,11 @@ FrescoImage(
 )
 ```
 
+### More Details for FrescoImage
+<details>
+ <summary>👉 Read further for more details</summary>
+
+### Custom ImageRequest
 You can load images with your own [ImageRequest](https://frescolib.org/docs/image-requests.html), which provides some necessary information for loading images like decoding strategies and resizing.
 
 ```kotlin
@@ -398,62 +314,7 @@ FrescoImage(
   contentScale = ContentScale.Crop)
 ```
 
-<img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="32%"/>
-
-### Custom Composables
-You can build compose with your own composable functions following the three request states.
-
-- loading: While loading an image, the indicator will be shown up.
-- success: If succeed to load an image, the indicator will be gone and a content image will be shown. 
-- failure: If fail to load an image (e.g. network error, wrong destination), an error placeholder will be shown up instead.
-
-```kotlin
- FrescoImage(
- imageUrl = stringImageUrl,
- modifier = modifier,
- // shows an indicator while loading an image.
- loading = {
-   ConstraintLayout(
-     modifier = Modifier.fillMaxSize()
-   ) {
-     val indicator = createRef()
-     CircularProgressIndicator(
-       modifier = Modifier.constrainAs(indicator) {
-         top.linkTo(parent.top)
-         bottom.linkTo(parent.bottom)
-        start.linkTo(parent.start)
-        end.linkTo(parent.end)
-       }
-     )
-   }
- },
- // shows an error text if fail to load an image.
- failure = {
-   Text(text = "image request failed.")
- })
-```
-
-Also, you can customize the content image with our own composable function like example below:
-
-```kotlin
-FrescoImage(
-    imageUrl = imageUrl,
-    // draw a resized image.
-    success = { frescoImageState ->
-      frescoImageState.imageBitmap?.let {
-        Image(
-          bitmap = it,
-          modifier = Modifier
-            .width(128.dp)
-            .height(128.dp))
-      }
-    },
-    loading = { 
-      // do something 
-    })
-```
-
-#### LocalFrescoImageRequest
+### LocalFrescoImageRequest
 You can pass the same instance of your `ImageRequest` down through the Composition in your composable hierarchy as following the example below:
 
 ```kotlin
@@ -473,59 +334,6 @@ CompositionLocalProvider(LocalFrescoImageRequest provides imageRequest) {
     imageurl = ...
   )
 }
-```
-
-<img src="https://user-images.githubusercontent.com/24237865/129226361-877689b8-a1ec-4f59-b8a6-e2efe33a8de7.gif" align="right" width="32%"/>
-
-## Palette
-You can extract major (theme) color profiles with `BitmapPalette`. You can check out [Extract color profiles](https://developer.android.com/training/material/palette-colors#extract-color-profiles) to see which kinds of colors can be extracted.
-
-```kotlin
-var palette by remember { mutableStateOf<Palette?>(null) }
-
-GlideImage( // CoilImage, FrescoImage also can be used.
-  imageModel = poster?.poster!!,
-  bitmapPalette = BitmapPalette {
-    palette = it
-  }
-)
-
-Crossfade(
-  targetState = palette,
-  modifier = Modifier
-    .padding(horizontal = 8.dp)
-    .size(45.dp)
-) {
-  Box(
-    modifier = Modifier
-      .background(color = Color(it?.lightVibrantSwatch?.rgb ?: 0))
-      .fillMaxSize()
-  )
-}
-```
-Also, you can customize attributes of `BitmapPalette` like the example below:
-
-```kotlin
-  var palette by remember { mutableStateOf<Palette?>(null) }
-
-  GlideImage(
-    imageModel = poster?.poster!!,
-    modifier = Modifier
-      .aspectRatio(0.8f),
-    bitmapPalette = BitmapPalette(
-      imageModel = poster.poster,
-      useCache = true,
-      interceptor = {
-        it.addFilter { rgb, hsl ->
-          // here edit to add the filter colors.
-          false
-        }
-      },
-      paletteLoadedListener = {
-        palette = it
-      }
-    )
-  )
 ```
 
 <img src="https://user-images.githubusercontent.com/24237865/131246748-b88903a1-43de-4e6c-9069-3e956a0cf8a6.gif" align="right" width="32%"/>
@@ -555,6 +363,159 @@ FrescoWebImage(
 ```
 
 For more details, check out [DraweeController](https://frescolib.org/docs/animations.html), and [Supported URIs](https://frescolib.org/docs/supported-uris.html) for setting URI addresses. Also, you can load general images (jpeg, png, etc) which can be loaded with `FrescoImage` by using `FrescoWebImage` and your custom controller.
+
+</details>
+
+## Custom Composables
+You can build compose with your own composable functions following the three request states.
+
+- **loading**: While loading an image, the indicator will be shown up.
+- **success**: If succeed to load an image, the indicator will be gone and a content image will be shown. 
+- **failure**: If fail to load an image (e.g. network error, wrong destination), an error placeholder will be shown up instead.
+
+<img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="28%"/>
+
+```kotlin
+ GlideImage( // CoilImage, FrescoImage
+   imageModel = imageUrl,
+   modifier = modifier,
+   // shows an indicator while loading an image.
+   loading = {
+     ConstraintLayout(
+       modifier = Modifier.fillMaxSize()
+     ) {
+       val indicator = createRef()
+       CircularProgressIndicator(
+         modifier = Modifier.constrainAs(indicator) {
+           top.linkTo(parent.top)
+           bottom.linkTo(parent.bottom)
+          start.linkTo(parent.start)
+          end.linkTo(parent.end)
+         }
+       )
+     }
+   },
+   // shows an error text if fail to load an image.
+   failure = {
+     Text(text = "image request failed.")
+   })
+```
+
+Also, you can customize the image content with our own composable function like the example below:
+
+```kotlin
+GlideImage( // CoilImage, FrescoImage
+  imageModel = imageUrl,
+  // draw a resized image.
+  success = { frescoImageState ->
+    frescoImageState.imageBitmap?.let {
+      Image(
+        bitmap = it,
+        modifier = Modifier
+          .width(128.dp)
+          .height(128.dp))
+    }
+  },
+  loading = { 
+    // do something 
+  })
+```
+
+<img src="https://user-images.githubusercontent.com/24237865/95812167-be3a4780-0d4f-11eb-9360-2a4a66a3fb46.gif" align="right" width="26%"/>
+
+## Shimmer effect
+You can implement a shimmering effect while loading an image by using the `ShimmerParams` parameter as following the example below:
+
+```kotlin
+GlideImage( // CoilImage, FrescoImage
+   imageModel = imageUrl,
+   modifier = modifier,
+   // shows a shimmering effect when loading an image.
+   shimmerParams = ShimmerParams(
+       baseColor = MaterialTheme.colors.background,
+       highlightColor = shimmerHighLight,
+       durationMillis = 350,
+       dropOff = 0.65f,
+       tilt = 20f
+     ),
+   // shows an error text message when request failed.
+   failure = {
+     Text(text = "image request failed.")
+   })
+ ```
+
+ <img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="26%"/>
+
+## Circular Reveal Animation
+You can implement the circular reveal animation while drawing images with `circularRevealedEnabled` attribute as `true`.
+
+```kotlin
+GlideImage( // CoilImage, FrescoImage
+  imageModel = imageUrl,
+  // Crop, Fit, Inside, FillHeight, FillWidth, None
+  contentScale = ContentScale.Crop,
+  // shows an image with a circular revealed animation.
+  circularRevealedEnabled = true,
+  // shows a placeholder ImageBitmap when loading.
+  placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
+  // shows an error ImageBitmap when the request failed.
+  error = ImageBitmap.imageResource(R.drawable.error)
+)
+```
+The default value of the `circularRevealedEnabled` is `false`.
+
+## Palette
+You can extract major (theme) color profiles with `BitmapPalette`. You can check out [Extract color profiles](https://developer.android.com/training/material/palette-colors#extract-color-profiles) to see which kinds of colors can be extracted.
+
+<img src="https://user-images.githubusercontent.com/24237865/129226361-877689b8-a1ec-4f59-b8a6-e2efe33a8de7.gif" align="right" width="26%"/>
+
+```kotlin
+var palette by remember { mutableStateOf<Palette?>(null) }
+
+GlideImage( // CoilImage, FrescoImage also can be used.
+  imageModel = imageUrl,
+  bitmapPalette = BitmapPalette {
+    palette = it
+  }
+)
+
+Crossfade(
+  targetState = palette,
+  modifier = Modifier
+    .padding(horizontal = 8.dp)
+    .size(45.dp)
+) {
+  Box(
+    modifier = Modifier
+      .background(color = Color(it?.lightVibrantSwatch?.rgb ?: 0))
+      .fillMaxSize()
+  )
+}
+```
+Also, you can customize attributes of `BitmapPalette` like the example below:
+
+```kotlin
+var palette by remember { mutableStateOf<Palette?>(null) }
+
+GlideImage( // CoilImage, FrescoImage also can be used.
+  imageModel = imageUrl,
+  modifier = Modifier
+    .aspectRatio(0.8f),
+  bitmapPalette = BitmapPalette(
+    imageModel = poster.poster,
+    useCache = true,
+    interceptor = {
+      it.addFilter { rgb, hsl ->
+        // here edit to add the filter colors.
+        false
+      }
+    },
+    paletteLoadedListener = {
+      palette = it
+    }
+  )
+)
+```
 
 ## Who's using Landscapist?
 If your project uses Landscapist, please let me know by creating a new issue! 🤗
