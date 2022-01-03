@@ -63,7 +63,7 @@ dependencies {
 }
 ```
 
-`Landscapist-Glide` includes version `4.12.0` of [Glide](https://github.com/bumptech/glide) internally. So please check out if you use the same version or you can remove the Glide dependency on your project.
+> Note: `Landscapist-Glide` includes version `4.12.0` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### GlideImage
 You can load images simply by using `GlideImage` composable function as the following example below:
@@ -148,6 +148,8 @@ dependencies {
     implementation "com.github.skydoves:landscapist-coil:<version>"
 }
 ```
+
+> Note: Please make sure your project uses the same Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### CoilImage
 You can load images by using the `CoilImage` composable function as the following example below:
@@ -251,7 +253,7 @@ dependencies {
     implementation "com.github.skydoves:landscapist-fresco:<version>"
 }
 ```
-`Landscapist-Fresco` includes version `2.5.0` of Fresco. So please check out if you use the same version or you can remove the Fresco dependency on your project.
+> Note: `Landscapist-Fresco` includes version `2.5.0` of Fresco. So please make sure your project is using the same Fresco version or exclude the Fresco dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### Setup
 To get started, you should set up `Fresco` with [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in your `Application` class. Generally, it's recommended initializing with  `OkHttpImagePipelineConfigFactory`. Also, you can customize caching, networking, and thread pool strategies with your own `ImagePipelineConfig`. For more details, you can check out [Using Other Network Layers](https://frescolib.org/docs/using-other-network-layers.html#using-okhttp).
