@@ -59,7 +59,7 @@ allprojects {
 Next, add the below dependency to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.4.4"
+    implementation "com.github.skydoves:landscapist-glide:1.4.5"
 }
 ```
 
