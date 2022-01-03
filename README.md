@@ -59,7 +59,7 @@ allprojects {
 Next, add the below dependency to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.4.4"
+    implementation "com.github.skydoves:landscapist-glide:1.4.5"
 }
 ```
 
@@ -253,7 +253,7 @@ dependencies {
     implementation "com.github.skydoves:landscapist-fresco:<version>"
 }
 ```
-> Note: `Landscapist-Fresco` includes version `2.5.0` of Fresco. So please make sure your project is using the same Fresco version or exclude the Fresco dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
+> Note: `Landscapist-Fresco` includes version `2.6.0` of Fresco. So please make sure your project is using the same Fresco version or exclude the Fresco dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### Setup
 To get started, you should set up `Fresco` with [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in your `Application` class. Generally, it's recommended initializing with  `OkHttpImagePipelineConfigFactory`. Also, you can customize caching, networking, and thread pool strategies with your own `ImagePipelineConfig`. For more details, you can check out [Using Other Network Layers](https://frescolib.org/docs/using-other-network-layers.html#using-okhttp).
