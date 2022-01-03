@@ -251,7 +251,7 @@ dependencies {
     implementation "com.github.skydoves:landscapist-fresco:<version>"
 }
 ```
-`Landscapist-Fresco` includes version `2.5.0` of Fresco. So please check out if you use the same version or you can remove the Fresco dependency on your project.
+`Landscapist-Fresco` includes version `2.6.0` of Fresco. So please check out if you use the same version or you can remove the Fresco dependency on your project.
 
 ### Setup
 To get started, you should set up `Fresco` with [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in your `Application` class. Generally, it's recommended initializing with  `OkHttpImagePipelineConfigFactory`. Also, you can customize caching, networking, and thread pool strategies with your own `ImagePipelineConfig`. For more details, you can check out [Using Other Network Layers](https://frescolib.org/docs/using-other-network-layers.html#using-okhttp).
