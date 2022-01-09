@@ -424,7 +424,7 @@ GlideImage( // CoilImage, FrescoImage
 ```
 > Note: You can also use the custom Composables for **CoilImage** and **FrescoImage**.
 
-<img src="https://user-images.githubusercontent.com/24237865/148672035-6a82eba5-900c-44ee-a42c-acbf8038d0ab.png" align="right" width="36%">
+<img src="https://user-images.githubusercontent.com/24237865/148672035-6a82eba5-900c-44ee-a42c-acbf8038d0ab.png" align="right" width="46%">
 
 
 ## Preview on Android Studio
