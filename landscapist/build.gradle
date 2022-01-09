@@ -63,13 +63,5 @@ dependencies {
   api "androidx.palette:palette-ktx:$versions.paletteVersion"
 }
 
-dokkaHtml.configure {
-  dokkaSourceSets {
-    named("main") {
-      noAndroidSdkLink.set(false)
-    }
-  }
-}
-
 apply plugin: "com.vanniktech.maven.publish"
 apply from: "$rootDir/spotless.gradle"

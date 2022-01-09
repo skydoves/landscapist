@@ -1,3 +1,4 @@
+apply plugin: 'org.jetbrains.dokka'
 buildscript {
   apply from: './dependencies.gradle'
   repositories {
@@ -29,6 +30,10 @@ subprojects {
       freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
       freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
     }
+  }
+  tasks.withType(org.jetbrains.dokka.gradle.DokkaMultiModuleTask).configureEach {
+    outputDirectory = rootProject.file('docs/api')
+    failOnWarning = true
   }
 }
 
