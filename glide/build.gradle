@@ -80,13 +80,5 @@ dependencies {
   androidTestImplementation "androidx.test:rules:$versions.rulesVersion"
 }
 
-dokkaHtml.configure {
-  dokkaSourceSets {
-    named("main") {
-      noAndroidSdkLink.set(false)
-    }
-  }
-}
-
 apply plugin: "com.vanniktech.maven.publish"
 apply from: "$rootDir/spotless.gradle"

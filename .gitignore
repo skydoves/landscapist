@@ -54,7 +54,5 @@ captures/
 # Google Services (e.g. APIs or Firebase)
 google-services.json
 
-# Freeline
-freeline.py
-freeline/
-freeline_project_description.json
+# Temporary API docs
+docs/api
