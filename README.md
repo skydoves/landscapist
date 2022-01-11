@@ -409,8 +409,8 @@ Also, you can customize the image content with our own composable function like 
 GlideImage( // CoilImage, FrescoImage
   imageModel = imageUrl,
   // draw a resized image.
-  success = { frescoImageState ->
-    frescoImageState.imageBitmap?.let {
+  success = { imageState ->
+    imageState.imageBitmap?.let {
       Image(
         bitmap = it,
         modifier = Modifier
