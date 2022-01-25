@@ -21,8 +21,9 @@
 
 ## Demo projects
 You can see the use cases of this library in the repositories below:
-- [DisneyCompose](https://github.com/skydoves/disneycompose) - 🧸 A demo Disney app using Jetpack Compose and Hilt based on modern Android tech-stacks and MVVM architecture.
-- [MovieCompose](https://github.com/skydoves/MovieCompose) - 🎞 A demo movie app using Jetpack Compose and Hilt based on modern Android tech stacks. <br>
+- [Google/Storage-Samples](https://github.com/android/storage-samples/tree/main/ScopedStorage) - Multiple samples showing the best practices in storage APIs on Android.
+- [skydoves/DisneyCompose](https://github.com/skydoves/disneycompose) - 🧸 A demo Disney app using Jetpack Compose and Hilt based on modern Android tech-stacks and MVVM architecture.
+- [skydoves/MovieCompose](https://github.com/skydoves/MovieCompose) - 🎞 A demo movie app using Jetpack Compose and Hilt based on modern Android tech stacks. <br>
 
 ## SNAPSHOT
 <details>
