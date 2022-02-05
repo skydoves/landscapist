@@ -42,7 +42,7 @@ import androidx.palette.graphics.Palette
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
 import com.skydoves.landscapist.CircularReveal
-import com.skydoves.landscapist.CircularRevealedImage
+import com.skydoves.landscapist.CircularRevealImage
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
@@ -161,7 +161,7 @@ public fun GlideImage(
  *     .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *     .thumbnail(0.6f)
  *     .transition(withCrossFade()),
- *   circularRevealedEnabled = true,
+ *   circularRevealEnabled = true,
  *   shimmerParams = ShimmerParams (
  *      baseColor = backgroundColor,
  *      highlightColor = highlightColor
@@ -337,7 +337,7 @@ public fun GlideImage(
           success.invoke(this, glideImageState)
         } else {
           val drawable = glideImageState.drawable ?: return@ImageRequest
-          CircularRevealedImage(
+          CircularRevealImage(
             modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable),
@@ -456,7 +456,7 @@ public fun GlideImage(
           success.invoke(this, glideImageState)
         } else {
           val drawable = glideImageState.drawable ?: return@ImageRequest
-          CircularRevealedImage(
+          CircularRevealImage(
             modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable),

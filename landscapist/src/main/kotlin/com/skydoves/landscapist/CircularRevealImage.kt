@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@file:JvmName("CircularRevealedImage")
+@file:JvmName("CircularRevealImage")
 @file:JvmMultifileClass
 
 package com.skydoves.landscapist
@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 
 /**
- * CircularRevealedImage is an image composable for animating a clipping circle to reveal when loading an image.
+ * CircularRevealImage is an image composable for animating a clipping circle to reveal when loading an image.
  *
  * @param bitmap an image bitmap for loading for the content.
  * @param modifier adjust the drawing image layout or drawing decoration of the content.
@@ -46,7 +46,7 @@ import androidx.compose.ui.layout.ContentScale
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  */
 @Composable
-public fun CircularRevealedImage(
+public fun CircularRevealImage(
   bitmap: ImageBitmap,
   modifier: Modifier = Modifier,
   bitmapPainter: Painter = BitmapPainter(bitmap),
@@ -77,4 +77,4 @@ public fun CircularRevealedImage(
 }
 
 /** a definition of the default circular revealed animations duration. */
-public const val DefaultCircularRevealedDuration: Int = 350
+public const val DefaultCircularRevealDuration: Int = 350

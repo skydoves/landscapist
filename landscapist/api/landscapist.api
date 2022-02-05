@@ -18,9 +18,9 @@ public abstract interface class com/skydoves/landscapist/CircularRevealFinishLis
 	public abstract fun onFinish ()V
 }
 
-public final class com/skydoves/landscapist/CircularRevealedImage {
-	public static final field DefaultCircularRevealedDuration I
-	public static final fun CircularRevealedImage (Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/ui/Modifier;Landroidx/compose/ui/graphics/painter/Painter;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;FLandroidx/compose/ui/graphics/ColorFilter;Lcom/skydoves/landscapist/CircularReveal;Landroidx/compose/runtime/Composer;II)V
+public final class com/skydoves/landscapist/CircularRevealImage {
+	public static final field DefaultCircularRevealDuration I
+	public static final fun CircularRevealImage (Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/ui/Modifier;Landroidx/compose/ui/graphics/painter/Painter;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;FLandroidx/compose/ui/graphics/ColorFilter;Lcom/skydoves/landscapist/CircularReveal;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class com/skydoves/landscapist/DrawablePainterKt {

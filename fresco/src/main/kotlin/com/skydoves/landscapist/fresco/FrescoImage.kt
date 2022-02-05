@@ -41,7 +41,7 @@ import androidx.palette.graphics.Palette
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
 import com.skydoves.landscapist.CircularReveal
-import com.skydoves.landscapist.CircularRevealedImage
+import com.skydoves.landscapist.CircularRevealImage
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
@@ -314,7 +314,7 @@ public fun FrescoImage(
           success.invoke(this, frescoImageState)
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
-          CircularRevealedImage(
+          CircularRevealImage(
             modifier = Modifier.fillMaxSize(),
             bitmap = imageBitmap,
             alignment = alignment,
@@ -421,7 +421,7 @@ public fun FrescoImage(
           success.invoke(this, frescoImageState)
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
-          CircularRevealedImage(
+          CircularRevealImage(
             modifier = Modifier.fillMaxSize(),
             bitmap = imageBitmap,
             alignment = alignment,

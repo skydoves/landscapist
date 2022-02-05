@@ -22,6 +22,6 @@ package com.skydoves.landscapist
  * @param duration milli-second times from start to finish animation.
  */
 public data class CircularReveal(
-  public val duration: Int = DefaultCircularRevealedDuration,
+  public val duration: Int = DefaultCircularRevealDuration,
   public val onFinishListener: CircularRevealFinishListener? = null
 )

@@ -49,7 +49,7 @@ import coil.ImageLoader
 import coil.request.Disposable
 import coil.request.ImageRequest
 import com.skydoves.landscapist.CircularReveal
-import com.skydoves.landscapist.CircularRevealedImage
+import com.skydoves.landscapist.CircularRevealImage
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
@@ -491,7 +491,7 @@ public fun CoilImage(
           success.invoke(this, coilImageState)
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
-          CircularRevealedImage(
+          CircularRevealImage(
             modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable = drawable),
@@ -600,7 +600,7 @@ public fun CoilImage(
           success.invoke(this, coilImageState)
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
-          CircularRevealedImage(
+          CircularRevealImage(
             modifier = Modifier.fillMaxSize(),
             bitmap = drawable.toBitmap().asImageBitmap(),
             bitmapPainter = rememberDrawablePainter(drawable = drawable),
