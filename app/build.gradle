@@ -21,8 +21,6 @@ plugins {
   id 'dagger.hilt.android.plugin'
 }
 
-apply from: "$rootDir/dependencies.gradle"
-
 android {
   compileSdkVersion versions.compileSdk
   defaultConfig {
@@ -96,4 +94,3 @@ dependencies {
   implementation project(":coil")
 }
 
-apply from: "$rootDir/spotless.gradle"

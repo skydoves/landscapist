@@ -21,8 +21,6 @@ plugins {
   id 'binary-compatibility-validator'
 }
 
-apply from: "$rootDir/dependencies.gradle"
-
 android {
   compileSdkVersion versions.compileSdk
 
@@ -84,4 +82,4 @@ dependencies {
 }
 
 apply plugin: "com.vanniktech.maven.publish"
-apply from: "$rootDir/spotless.gradle"
+

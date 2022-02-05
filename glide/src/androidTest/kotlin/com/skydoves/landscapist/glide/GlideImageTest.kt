@@ -34,8 +34,8 @@ import androidx.test.filters.LargeTest
 import com.bumptech.glide.Glide
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.ShimmerParams
-import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.instanceOf
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
