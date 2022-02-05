@@ -29,6 +29,10 @@ subprojects {
 
   tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach { compile ->
     kotlinOptions {
+      // set JVM target to 1.8
+      jvmTarget = "1.8"
+
+      // set compiler options
       freeCompilerArgs += "-Xskip-prerelease-check"
       freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
       freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
