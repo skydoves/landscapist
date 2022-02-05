@@ -76,9 +76,11 @@ dependencies {
   implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
   implementation "androidx.compose.foundation:foundation:$versions.composeVersion"
 
+  androidTestImplementation "androidx.test:rules:$versions.rules"
+  androidTestImplementation "androidx.test:runner:$versions.androidxTest"
+  androidTestImplementation "androidx.test.ext:junit-ktx:$versions.androidxTestJunit"
   androidTestImplementation "androidx.compose.ui:ui:$versions.composeVersion"
   androidTestImplementation "androidx.compose.ui:ui-test-junit4:$versions.composeVersion"
-  androidTestImplementation "androidx.test:rules:$versions.rulesVersion"
 }
 
 apply plugin: "com.vanniktech.maven.publish"
