@@ -30,6 +30,7 @@ import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.request.ImageRequest
@@ -42,12 +43,11 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 internal class FrescoImageTest {
 
   @get:Rule
@@ -203,7 +203,7 @@ internal class FrescoImageTest {
       )
     }
 
-    composeTestRule.onNodeWithTag(TAG_ERROR)
+    composeTestRule.onNodeWithTag(TAG_FRESCO)
       .assertIsDisplayed()
       .assertWidthIsAtLeast(128.dp)
       .assertHeightIsAtLeast(128.dp)

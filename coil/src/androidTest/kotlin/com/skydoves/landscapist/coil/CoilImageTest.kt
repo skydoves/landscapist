@@ -29,6 +29,7 @@ import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import coil.EventListener
@@ -44,13 +45,12 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 internal class CoilImageTest {
 
   @get:Rule
@@ -101,7 +101,9 @@ internal class CoilImageTest {
     composeTestRule.setContent {
       CoilImage(
         imageModel = IMAGE,
-        modifier = Modifier.size(128.dp, 128.dp).testTag(TAG_COIL),
+        modifier = Modifier
+          .size(128.dp, 128.dp)
+          .testTag(TAG_COIL),
         contentScale = ContentScale.Crop,
         loading = { Box(modifier = Modifier) }
       )
@@ -201,7 +203,7 @@ internal class CoilImageTest {
       )
     }
 
-    composeTestRule.onNodeWithTag(TAG_ERROR)
+    composeTestRule.onNodeWithTag(TAG_COIL)
       .assertIsDisplayed()
       .assertWidthIsAtLeast(128.dp)
       .assertHeightIsAtLeast(128.dp)
