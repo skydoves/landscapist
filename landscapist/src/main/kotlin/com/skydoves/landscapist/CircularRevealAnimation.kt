@@ -59,7 +59,7 @@ internal fun Painter.circularReveal(
   }
 
   return remember(this) {
-    CircularRevealedPainter(
+    CircularRevealPainter(
       imageBitmap = imageBitmap,
       painter = this
     )

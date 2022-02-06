@@ -37,13 +37,13 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.core.util.Pools
 
 /**
- * CircularRevealedPainter is a [Painter] which animates a clipping circle to reveal an image.
+ * CircularRevealPainter is a [Painter] which animates a clipping circle to reveal an image.
  * Reveal animations provide users visual continuity when we show an image.
  *
  * @param imageBitmap an image bitmap for loading for the content.
  * @param painter an image painter to draw an [ImageBitmap] into the provided canvas.
  */
-internal class CircularRevealedPainter(
+internal class CircularRevealPainter(
   private val imageBitmap: ImageBitmap,
   private val painter: Painter
 ) : Painter() {

@@ -468,7 +468,7 @@ GlideImage( // CoilImage, FrescoImage
  <img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="26%"/>
 
 ## Circular Reveal Animation
-You can implement the circular reveal animation while drawing images with `circularRevealedEnabled` attribute as `true`.
+You can implement the circular reveal animation while drawing images with `circularRevealEnabled` attribute as `true`.
 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage
@@ -476,14 +476,14 @@ GlideImage( // CoilImage, FrescoImage
   // Crop, Fit, Inside, FillHeight, FillWidth, None
   contentScale = ContentScale.Crop,
   // shows an image with a circular revealed animation.
-  circularRevealedEnabled = true,
+  circularRevealEnabled = true,
   // shows a placeholder ImageBitmap when loading.
   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
   // shows an error ImageBitmap when the request failed.
   error = ImageBitmap.imageResource(R.drawable.error)
 )
 ```
-The default value of the `circularRevealedEnabled` is `false`.
+The default value of the `circularRevealEnabled` is `false`.
 
  > Note: You can also use the Circular Revewal Animation for **CoilImage** and **FrescoImage**.
 
