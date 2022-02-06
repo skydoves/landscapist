@@ -49,7 +49,7 @@ repositories {
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
 
-Add the below codes to your **root** `build.gradle` file (not your module-level build.gradle file):
+Add the codes below to your **root** `build.gradle` file (not your module-level build.gradle file):
 ```gradle
 allprojects {
     repositories {
@@ -58,10 +58,10 @@ allprojects {
 }
 ```
 
-Next, add the below dependency to your **module**'s `build.gradle` file:
+Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.4.5"
+    implementation "com.github.skydoves:landscapist-glide:1.4.6"
 }
 ```
 
