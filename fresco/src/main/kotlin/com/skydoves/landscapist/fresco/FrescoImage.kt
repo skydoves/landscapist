@@ -119,7 +119,7 @@ public fun FrescoImage(
       placeHolder?.let {
         ImageBySource(
           source = it,
-          modifier = modifier,
+          modifier = Modifier.matchParentSize(),
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
@@ -132,7 +132,7 @@ public fun FrescoImage(
       error?.let {
         ImageBySource(
           source = it,
-          modifier = modifier,
+          modifier = Modifier.matchParentSize(),
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
@@ -213,7 +213,7 @@ public fun FrescoImage(
       error?.let {
         ImageBySource(
           source = it,
-          modifier = modifier,
+          modifier = Modifier.matchParentSize(),
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,

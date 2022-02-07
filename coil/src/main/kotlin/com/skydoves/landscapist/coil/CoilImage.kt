@@ -134,7 +134,7 @@ public fun CoilImage(
       error?.let {
         ImageBySource(
           source = it,
-          modifier = modifier,
+          modifier = Modifier.matchParentSize(),
           alignment,
           contentScale,
           contentDescription,
@@ -217,7 +217,7 @@ public fun CoilImage(
       placeHolder?.let {
         ImageBySource(
           source = it,
-          modifier = modifier,
+          modifier = Modifier.matchParentSize(),
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
@@ -230,7 +230,7 @@ public fun CoilImage(
       error?.let {
         ImageBySource(
           source = it,
-          modifier = modifier,
+          modifier = Modifier.matchParentSize(),
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,

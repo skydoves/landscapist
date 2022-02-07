@@ -124,7 +124,7 @@ public fun GlideImage(
       placeHolder?.let {
         ImageBySource(
           source = it,
-          modifier = modifier,
+          modifier = Modifier.matchParentSize(),
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
@@ -137,7 +137,7 @@ public fun GlideImage(
       error?.let {
         ImageBySource(
           source = it,
-          modifier = modifier,
+          modifier = Modifier.matchParentSize(),
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
@@ -225,7 +225,7 @@ public fun GlideImage(
       error?.let {
         ImageBySource(
           source = it,
-          modifier = modifier,
+          modifier = Modifier.matchParentSize(),
           alignment = alignment,
           contentDescription = contentDescription,
           contentScale = contentScale,
