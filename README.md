@@ -65,7 +65,7 @@ dependencies {
 }
 ```
 
-> Note: `Landscapist-Glide` includes version `4.12.0` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
+> Note: `Landscapist-Glide` includes version `4.13.0` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### GlideImage
 You can load images simply by using `GlideImage` composable function as the following example below:
