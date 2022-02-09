@@ -70,7 +70,6 @@ dependencies {
   // hilt
   implementation "com.google.dagger:hilt-android:$versions.hiltCoreVersion"
   kapt "com.google.dagger:hilt-compiler:$versions.hiltCoreVersion"
-  kapt "androidx.hilt:hilt-compiler:$versions.hiltVersion"
 
   // compose
   implementation "androidx.compose.ui:ui:$versions.composeVersion"
