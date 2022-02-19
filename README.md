@@ -374,7 +374,7 @@ For more details, check out [DraweeController](https://frescolib.org/docs/animat
 You can build compose with your own composable functions following the three request states.
 
 - **loading**: While loading an image, the indicator will be shown up.
-- **success**: If succeed to load an image, the indicator will be gone and a content image will be shown. 
+- **success**: If success to load an image, the indicator will be gone and a content image will be shown. 
 - **failure**: If fail to load an image (e.g. network error, wrong destination), an error placeholder will be shown up instead.
 
 <img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="28%"/>
