@@ -371,11 +371,11 @@ For more details, check out [DraweeController](https://frescolib.org/docs/animat
 </details>
 
 ## Custom Composables
-You can build compose with your own composable functions following the three request states.
+You can execute your own composable functions depending on the three request states below:
 
-- **loading**: While loading an image, the indicator will be shown up.
-- **success**: If success to load an image, the indicator will be gone and a content image will be shown. 
-- **failure**: If fail to load an image (e.g. network error, wrong destination), an error placeholder will be shown up instead.
+- **loading**: Executed when loading an image.
+- **success**: Executed when successful to load an image.
+- **failure**: Executed when failing to load an image (e.g. network error, wrong destination).
 
 <img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="28%"/>
 
@@ -468,27 +468,27 @@ GlideImage( // CoilImage, FrescoImage
  <img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="26%"/>
 
 ## Circular Reveal Animation
-You can implement the circular reveal animation while drawing images with `circularRevealEnabled` attribute as `true`.
+You can implement the circular reveal animation while drawing images with `CircularReveal` attribute as the following:
 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage
   imageModel = imageUrl,
   // Crop, Fit, Inside, FillHeight, FillWidth, None
   contentScale = ContentScale.Crop,
-  // shows an image with a circular revealed animation.
-  circularRevealEnabled = true,
+  // shows an image with the circular reveal animation.
+  circularReveal = CircularReveal(duration = 350),
   // shows a placeholder ImageBitmap when loading.
   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
   // shows an error ImageBitmap when the request failed.
   error = ImageBitmap.imageResource(R.drawable.error)
 )
 ```
-The default value of the `circularRevealEnabled` is `false`.
+The default value of the `circularReveal` is `null`.
 
- > Note: You can also use the Circular Revewal Animation for **CoilImage** and **FrescoImage**.
+ > Note: You can also use the Circular Reveal Animation for **CoilImage** and **FrescoImage**.
 
 ## Palette
-You can extract major (theme) color profiles with `BitmapPalette`. You can check out [Extract color profiles](https://developer.android.com/training/material/palette-colors#extract-color-profiles) to see which kinds of colors can be extracted.
+You can extract primary (theme) color profiles with `BitmapPalette`. You can check out [Extract color profiles](https://developer.android.com/training/material/palette-colors#extract-color-profiles) to see what kinds of colors can be extracted.
 
 <img src="https://user-images.githubusercontent.com/24237865/129226361-877689b8-a1ec-4f59-b8a6-e2efe33a8de7.gif" align="right" width="26%"/>
 
