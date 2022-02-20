@@ -75,9 +75,7 @@ GlideImage(
   imageModel = imageUrl,
   // Crop, Fit, Inside, FillHeight, FillWidth, None
   contentScale = ContentScale.Crop,
-  // shows an image with a circular revealed animation.
-  circularReveal = CircularReveal(duration = 250),
-  // shows a placeholder ImageBitmap when loading.
+  // shows a placeholder while loading the image.
   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
   // shows an error ImageBitmap when the request failed.
   error = ImageBitmap.imageResource(R.drawable.error)
@@ -144,7 +142,7 @@ CompositionLocalProvider(LocalGlideRequestOptions provides requestOptions) {
 </div>
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
-Add the below dependency to your **module**'s `build.gradle` file.
+Add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
     implementation "com.github.skydoves:landscapist-coil:<version>"
@@ -161,9 +159,7 @@ CoilImage(
   imageModel = imageUrl,
   // Crop, Fit, Inside, FillHeight, FillWidth, None
   contentScale = ContentScale.Crop,
-  // shows an image with a circular revealed animation.
-  circularReveal = CircularReveal(duration = 250),
-  // shows a placeholder ImageBitmap when loading.
+  // shows a placeholder while loading the image.
   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
   // shows an error ImageBitmap when the request failed.
   error = ImageBitmap.imageResource(R.drawable.error)
@@ -249,7 +245,7 @@ CoilImage(
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
 
-Add the below dependency to your **module**'s `build.gradle` file.
+Add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
     implementation "com.github.skydoves:landscapist-fresco:<version>"
@@ -286,9 +282,7 @@ FrescoImage(
   imageUrl = stringImageUrl,
   // Crop, Fit, Inside, FillHeight, FillWidth, None
   contentScale = ContentScale.Crop,
-  // shows an image with a circular revealed animation.
-  circularReveal = CircularReveal(duration = 250),
-  // shows a placeholder ImageBitmap when loading.
+  // shows a placeholder while loading the image.
   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
   // shows an error ImageBitmap when the request failed.
   error = ImageBitmap.imageResource(R.drawable.error)
@@ -385,18 +379,10 @@ You can execute your own composable functions depending on the three request sta
    modifier = modifier,
    // shows an indicator while loading an image.
    loading = {
-     ConstraintLayout(
-       modifier = Modifier.fillMaxSize()
-     ) {
-       val indicator = createRef()
-       CircularProgressIndicator(
-         modifier = Modifier.constrainAs(indicator) {
-           top.linkTo(parent.top)
-           bottom.linkTo(parent.bottom)
-          start.linkTo(parent.start)
-          end.linkTo(parent.end)
-         }
-       )
+     Box(modifier = Modifier.matchParentSize()) {
+        CircularProgressIndicator(
+          modifier = Modifier.align(Alignment.Center)
+        )
      }
    },
    // shows an error text if fail to load an image.
@@ -415,9 +401,8 @@ GlideImage( // CoilImage, FrescoImage
     imageState.imageBitmap?.let {
       Image(
         bitmap = it,
-        modifier = Modifier
-          .width(128.dp)
-          .height(128.dp))
+        modifier = Modifier.size(128.dp)
+      )
     }
   },
   loading = { 
