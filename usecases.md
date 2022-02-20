@@ -1,6 +1,6 @@
 
 # Who's using Landscapist?
-If your project uses Landscapist, let me know via creating a new issue! 🤗
+If your product uses landscapist, welcome to contribute by creating a pull request or let me know through other contacts! 🤗
 
 ## [Twitter for Android](https://user-images.githubusercontent.com/24237865/125583736-f0ffa76f-8f87-433b-a9fd-192231dc5e63.jpg)
 
