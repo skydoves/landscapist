@@ -338,17 +338,9 @@ public fun FrescoImage(
  * imageUrl = stringImageUrl,
  * modifier = modifier,
  * loading = {
- *   ConstraintLayout(
- *     modifier = Modifier.fillMaxSize()
- *   ) {
- *     val indicator = createRef()
+ *   Box(modifier = Modifier.matchParentSize()) {
  *     CircularProgressIndicator(
- *       modifier = Modifier.constrainAs(indicator) {
- *         top.linkTo(parent.top)
- *         bottom.linkTo(parent.bottom)
- *        start.linkTo(parent.start)
- *        end.linkTo(parent.end)
- *       }
+ *        modifier = Modifier.align(Alignment.Center)
  *     )
  *   }
  * },

@@ -18,7 +18,7 @@ ext.versions = [
     composeVersion   : '1.1.1',
     constraintVersion: '1.0.0-alpha07',
     activityVersion  : '1.3.0-alpha08',
-    coroutinesVersion: '1.5.0',
+    coroutinesVersion: '1.6.0',
     multidex         : '2.0.1',
 
     frescoVersion    : '2.6.0',
@@ -33,5 +33,8 @@ ext.versions = [
     androidxTestJunit: '1.1.3',
 
     // for demo
-    materialVersion  : '1.3.0-beta01'
+    constraintVersion: '1.0.0-alpha07',
+    activityVersion  : '1.3.0-alpha08',
+    multidex         : '2.0.1',
+    materialVersion  : '1.5.0',
 ]
