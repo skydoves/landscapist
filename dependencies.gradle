@@ -15,7 +15,7 @@ ext.versions = [
 
     kotlin           : '1.6.10',
     coreKtxVersion   : '1.5.0-beta01',
-    composeVersion   : '1.1.0',
+    composeVersion   : '1.1.1',
     constraintVersion: '1.0.0-alpha07',
     activityVersion  : '1.3.0-alpha08',
     coroutinesVersion: '1.5.0',
