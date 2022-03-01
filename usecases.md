@@ -2,11 +2,13 @@
 # Who's using Landscapist?
 If your product uses landscapist, welcome to contribute by creating a pull request or let me know through other contacts! 🤗
 
-## [Twitter for Android](https://user-images.githubusercontent.com/24237865/125583736-f0ffa76f-8f87-433b-a9fd-192231dc5e63.jpg)
+## [Twitter for Android](https://play.google.com/store/apps/details?id=com.twitter.android)
+- **[License](https://user-images.githubusercontent.com/24237865/125583736-f0ffa76f-8f87-433b-a9fd-192231dc5e63.jpg)**
 
 [![twitter](https://user-images.githubusercontent.com/24237865/125583182-9527dd48-433e-4e17-ae52-3f2bb544a847.jpg)](https://play.google.com/store/apps/details?id=com.twitter.android)
 
-## [Azar for Android](https://user-images.githubusercontent.com/24237865/155270807-5edcab23-2690-4c05-a068-885ee5558b25.jpeg)
+## [Azar for Android](https://play.google.com/store/apps/details?id=com.azarlive.android)
+- **[License](https://user-images.githubusercontent.com/24237865/155270807-5edcab23-2690-4c05-a068-885ee5558b25.jpeg)**
 
 [![Azar](https://user-images.githubusercontent.com/24237865/155271118-2bbd5087-58b3-4360-a545-8fe4fc42efc8.jpg)](https://play.google.com/store/apps/details?id=com.azarlive.android)
 
