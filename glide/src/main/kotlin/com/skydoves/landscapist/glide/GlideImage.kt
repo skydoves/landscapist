@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.CircularRevealImage
@@ -74,6 +75,7 @@ import kotlinx.coroutines.flow.callbackFlow
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
+ * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -96,6 +98,7 @@ public fun GlideImage(
   requestOptions: @Composable () -> RequestOptions = {
     LocalGlideProvider.getGlideRequestOptions()
   },
+  requestListener: RequestListener<Drawable>? = null,
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -111,6 +114,7 @@ public fun GlideImage(
     imageModel = imageModel,
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
+    requestListener = requestListener,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -174,6 +178,7 @@ public fun GlideImage(
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
+ * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -196,6 +201,7 @@ public fun GlideImage(
   requestOptions: @Composable () -> RequestOptions = {
     LocalGlideProvider.getGlideRequestOptions()
   },
+  requestListener: RequestListener<Drawable>? = null,
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -211,6 +217,7 @@ public fun GlideImage(
     imageModel = imageModel,
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
+    requestListener = requestListener,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -263,6 +270,7 @@ public fun GlideImage(
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
+ * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -286,6 +294,7 @@ public fun GlideImage(
   requestOptions: @Composable () -> RequestOptions = {
     LocalGlideProvider.getGlideRequestOptions()
   },
+  requestListener: RequestListener<Drawable>? = null,
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -316,6 +325,7 @@ public fun GlideImage(
     builder = requestBuilder.invoke()
       .apply(requestOptions.invoke())
       .load(imageModel),
+    requestListener = requestListener,
     bitmapPalette = bitmapPalette,
     modifier = modifier,
   ) ImageRequest@{ imageState ->
@@ -383,6 +393,7 @@ public fun GlideImage(
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
+ * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -406,6 +417,7 @@ public fun GlideImage(
   requestOptions: @Composable () -> RequestOptions = {
     LocalGlideProvider.getGlideRequestOptions()
   },
+  requestListener: RequestListener<Drawable>? = null,
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -436,6 +448,7 @@ public fun GlideImage(
     builder = requestBuilder.invoke()
       .apply(requestOptions.invoke())
       .load(imageModel),
+    requestListener = requestListener,
     modifier = modifier,
     bitmapPalette = bitmapPalette
   ) ImageRequest@{ imageState ->
@@ -492,6 +505,7 @@ public fun GlideImage(
  * @param builder The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
+ * @param requestListener A class for monitoring the status of a request while images load.
  * @param content Content to be displayed for the given state.
  */
 @Composable
@@ -499,6 +513,7 @@ private fun GlideImage(
   recomposeKey: Any?,
   builder: RequestBuilder<Drawable>,
   modifier: Modifier = Modifier,
+  requestListener: RequestListener<Drawable>? = null,
   bitmapPalette: BitmapPalette? = null,
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
@@ -509,7 +524,7 @@ private fun GlideImage(
     executeImageRequest = {
       callbackFlow {
         val target = FlowCustomTarget(this)
-        val requestListener =
+        val flowRequestListener =
           FlowRequestListener(
             this, bitmapPalette?.applyImageModel(recomposeKey)
           )
@@ -518,6 +533,7 @@ private fun GlideImage(
         requestManager
           .load(recomposeKey)
           .apply(builder)
+          .addListener(flowRequestListener)
           .addListener(requestListener)
           .into(target)
 
