@@ -118,6 +118,37 @@ GlideImage(
 )
 ```
 
+### Custom RequestListener
+You can register your own [RequestListener](https://bumptech.github.io/glide/javadocs/440/com/bumptech/glide/request/RequestListener.html), which allows you to trace the status of a request while images load.
+
+```kotlin
+GlideImage(
+  imageModel = poster.poster,
+  requestListener = object: RequestListener<Drawable> {
+    override fun onLoadFailed(
+      e: GlideException?,
+      model: Any?,
+      target: Target<Drawable>?,
+      isFirstResource: Boolean
+    ): Boolean {
+      // do something
+      return false
+    }
+
+    override fun onResourceReady(
+    resource: Drawable?,
+      model: Any?,
+      target: Target<Drawable>?,
+      dataSource: DataSource?,
+      isFirstResource: Boolean
+    ): Boolean {
+      // do something
+      return true
+    }
+  }
+)
+```
+
 ### LocalGlideRequestOptions
 You can pass the same instance of your `RequestOptions` down through the Composition in your composable hierarchy as following the example below:
 
