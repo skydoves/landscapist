@@ -34,10 +34,17 @@ You can see the use cases of this library in the repositories below:
 [![Balloon](https://img.shields.io/static/v1?label=snapshot&message=landscapist&logo=apache%20maven&color=C71A36)](https://oss.sonatype.org/content/repositories/snapshots/com/github/skydoves/landscapist/) <br>
 Snapshots of the current development version of Landscapist are available, which track [the latest versions](https://oss.sonatype.org/content/repositories/snapshots/com/github/skydoves/landscapist/).
 
-To import snapshot versions on your project, add the code snippet below on your gradle file.
+To import snapshot versions on your project, add the code snippet below on your gradle file:
 ```Gradle
 repositories {
    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+}
+```
+
+Next, add the dependency below to your **module**'s `build.gradle` file:
+```gradle
+dependencies {
+    implementation "com.github.skydoves:landscapist-glide:1.5.0-SNAPSHOT"
 }
 ```
 </details>
@@ -61,7 +68,7 @@ allprojects {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.4.8"
+    implementation "com.github.skydoves:landscapist-glide:1.4.9"
 }
 ```
 
