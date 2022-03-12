@@ -85,11 +85,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [LocalCoilProvider.getCoilImageLoader].
+ * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageBitmap].
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -105,6 +104,7 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
+  requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
@@ -121,6 +121,7 @@ public fun CoilImage(
     context = context,
     lifecycleOwner = lifecycleOwner,
     imageLoader = imageLoader,
+    requestListener = requestListener,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -169,11 +170,10 @@ public fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [LocalCoilProvider.getCoilImageLoader].
+ * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageBitmap].
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
@@ -189,6 +189,7 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
+  requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
@@ -205,6 +206,7 @@ public fun CoilImage(
     context = context,
     lifecycleOwner = lifecycleOwner,
     imageLoader = imageLoader,
+    requestListener = requestListener,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -263,11 +265,10 @@ public fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [LocalCoilProvider.getCoilImageLoader].
+ * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageBitmap].
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
@@ -283,6 +284,7 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
+  requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -298,6 +300,7 @@ public fun CoilImage(
   CoilImage(
     imageRequest = ImageRequest.Builder(context)
       .data(imageModel)
+      .listener(requestListener)
       .lifecycle(lifecycleOwner)
       .build(),
     imageLoader = imageLoader,
@@ -340,11 +343,10 @@ public fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [LocalCoilProvider.getCoilImageLoader].
+ * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageBitmap].
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
@@ -361,6 +363,7 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
+  requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -376,6 +379,7 @@ public fun CoilImage(
   CoilImage(
     imageRequest = ImageRequest.Builder(context)
       .data(imageModel)
+      .listener(requestListener)
       .lifecycle(lifecycleOwner)
       .build(),
     imageLoader = imageLoader,
@@ -416,11 +420,9 @@ public fun CoilImage(
  * @param imageRequest The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [LocalCoilProvider.getCoilImageLoader].
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageBitmap].
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
@@ -525,11 +527,9 @@ public fun CoilImage(
  * @param imageRequest The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * Defaults to [LocalCoilProvider.getCoilImageLoader].
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageBitmap].
+ * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
  * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
