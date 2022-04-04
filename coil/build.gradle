@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+import com.github.skydoves.landscapist.Configuration
+import com.github.skydoves.landscapist.Dependencies
+import com.github.skydoves.landscapist.Versions
+
 plugins {
   id 'com.android.library'
   id 'kotlin-android'
@@ -21,12 +25,20 @@ plugins {
   id 'binary-compatibility-validator'
 }
 
+ext {
+  PUBLISH_GROUP_ID = Configuration.artifactGroup
+  PUBLISH_ARTIFACT_ID = 'landscapist-coil'
+  PUBLISH_VERSION = rootVersionName
+}
+
+apply from: "${rootDir}/scripts/publish-module.gradle"
+
 android {
-  compileSdkVersion versions.compileSdk
+  compileSdkVersion Configuration.compileSdk
 
   defaultConfig {
-    minSdkVersion versions.minSdk
-    targetSdkVersion versions.compileSdk
+    minSdkVersion Configuration.minSdk
+    targetSdkVersion Configuration.targetSdk
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
 
@@ -36,7 +48,7 @@ android {
   }
 
   composeOptions {
-    kotlinCompilerExtensionVersion versions.composeVersion
+    kotlinCompilerExtensionVersion Versions.COMPOSE
   }
 
   buildFeatures {
@@ -62,19 +74,17 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 
 dependencies {
   api project(":landscapist")
-  api "io.coil-kt:coil:$versions.coilVersion"
-  api "io.coil-kt:coil-gif:$versions.coilVersion"
+  api Dependencies.coil
+  api Dependencies.coilGif
 
-  implementation "androidx.core:core-ktx:$versions.coreKtxVersion"
-  implementation "androidx.compose.ui:ui:$versions.composeVersion"
-  implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
-  implementation "androidx.compose.foundation:foundation:$versions.composeVersion"
+  implementation Dependencies.coreKtx
+  implementation Dependencies.composeUI
+  implementation Dependencies.composeRuntime
+  implementation Dependencies.composeFoundation
 
-  androidTestImplementation "androidx.test:rules:$versions.rules"
-  androidTestImplementation "androidx.test:runner:$versions.androidxTest"
-  androidTestImplementation "androidx.test.ext:junit-ktx:$versions.androidxTestJunit"
-  androidTestImplementation "androidx.compose.ui:ui:$versions.composeVersion"
-  androidTestImplementation "androidx.compose.ui:ui-test-junit4:$versions.composeVersion"
+  androidTestImplementation Dependencies.testRules
+  androidTestImplementation Dependencies.androidTestRunner
+  androidTestImplementation Dependencies.androidTestJunit
+  androidTestImplementation Dependencies.composeUI
+  androidTestImplementation Dependencies.composeJunitTest
 }
-
-apply plugin: "com.vanniktech.maven.publish"

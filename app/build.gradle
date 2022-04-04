@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+import com.github.skydoves.landscapist.Configuration
+import com.github.skydoves.landscapist.Dependencies
+import com.github.skydoves.landscapist.Versions
+
 plugins {
   id 'com.android.application'
   id 'kotlin-android'
@@ -22,13 +26,13 @@ plugins {
 }
 
 android {
-  compileSdkVersion versions.compileSdk
+  compileSdkVersion Configuration.compileSdk
   defaultConfig {
     applicationId "com.github.skydoves.landscapistdemo"
-    minSdkVersion versions.minSdk
-    targetSdkVersion versions.compileSdk
-    versionCode versions.versionCode
-    versionName versions.versionName
+    minSdkVersion Configuration.minSdk
+    targetSdkVersion Configuration.targetSdk
+    versionCode Configuration.versionCode
+    versionName Configuration.versionName
     multiDexEnabled = true
     javaCompileOptions {
       annotationProcessorOptions {
@@ -47,7 +51,7 @@ android {
   }
 
   composeOptions {
-    kotlinCompilerExtensionVersion versions.composeVersion
+    kotlinCompilerExtensionVersion Versions.COMPOSE
   }
 
   buildFeatures {
@@ -62,29 +66,28 @@ android {
 
 dependencies {
   // material
-  implementation "com.google.android.material:material:$versions.materialVersion"
+  implementation Dependencies.material
 
   // androidx jetpack
-  implementation "androidx.core:core-ktx:$versions.coreKtxVersion"
+  implementation Dependencies.coreKtx
 
   // hilt
-  implementation "com.google.dagger:hilt-android:$versions.hiltCoreVersion"
-  kapt "com.google.dagger:hilt-compiler:$versions.hiltCoreVersion"
+  implementation Dependencies.hiltAndroid
+  kapt Dependencies.hiltCompiler
 
   // compose
-  implementation "androidx.compose.ui:ui:$versions.composeVersion"
-  implementation "androidx.activity:activity-compose:$versions.activityVersion"
-  implementation "androidx.compose.material:material:$versions.composeVersion"
-  implementation "androidx.compose.material:material-icons-extended:$versions.composeVersion"
-  implementation "androidx.compose.foundation:foundation:$versions.composeVersion"
-  implementation "androidx.compose.foundation:foundation-layout:$versions.composeVersion"
-  implementation "androidx.compose.animation:animation:$versions.composeVersion"
-  implementation "androidx.compose.runtime:runtime:$versions.composeVersion"
-  implementation "androidx.compose.runtime:runtime-livedata:$versions.composeVersion"
-  implementation "androidx.compose.ui:ui-tooling:$versions.composeVersion"
-  implementation "androidx.constraintlayout:constraintlayout-compose:$versions.constraintVersion"
+  implementation Dependencies.composeUI
+  implementation Dependencies.composeActivity
+  implementation Dependencies.composeMaterial
+  implementation Dependencies.composeMaterialIcon
+  implementation Dependencies.composeFoundation
+  implementation Dependencies.composeFoundationLayout
+  implementation Dependencies.composeAnimation
+  implementation Dependencies.composeRuntime
+  implementation Dependencies.composeTooling
+  implementation Dependencies.composeConstraintLayout
 
-  implementation "androidx.multidex:multidex:$versions.multidex"
+  implementation "androidx.multidex:multidex:2.0.1"
 
   // landscapist
   implementation project(":fresco")

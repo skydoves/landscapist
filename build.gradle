@@ -1,18 +1,22 @@
+import com.github.skydoves.landscapist.Dependencies
+
+apply plugin: 'io.github.gradle-nexus.publish-plugin'
 apply plugin: 'org.jetbrains.dokka'
+
 buildscript {
-  apply from: './dependencies.gradle'
   repositories {
     google()
     mavenCentral()
+    maven { url "https://plugins.gradle.org/m2/" }
   }
   dependencies {
-    classpath "com.android.tools.build:gradle:$versions.gradleBuildTool"
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:$versions.spotlessGradle"
-    classpath "com.vanniktech:gradle-maven-publish-plugin:$versions.mavenPublish"
-    classpath "org.jetbrains.dokka:dokka-gradle-plugin:$versions.dokkaGradle"
-    classpath "com.google.dagger:hilt-android-gradle-plugin:$versions.hiltCoreVersion"
-    classpath "org.jetbrains.kotlinx:binary-compatibility-validator:$versions.binaryValidator"
+    classpath Dependencies.androidGradlePlugin
+    classpath Dependencies.kotlinGradlePlugin
+    classpath Dependencies.spotlessGradlePlugin
+    classpath Dependencies.gradleNexusPublishPlugin
+    classpath Dependencies.dokka
+    classpath Dependencies.kotlinBinaryValidator
+    classpath Dependencies.hiltPlugin
   }
 }
 
@@ -24,7 +28,6 @@ allprojects {
 }
 
 subprojects {
-  apply from: "$rootDir/dependencies.gradle"
   apply from: "$rootDir/spotless.gradle"
 
   tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach { compile ->
@@ -47,3 +50,5 @@ subprojects {
 task clean(type: Delete) {
   delete rootProject.buildDir
 }
+
+apply from: "${rootDir}/scripts/publish-root.gradle"
