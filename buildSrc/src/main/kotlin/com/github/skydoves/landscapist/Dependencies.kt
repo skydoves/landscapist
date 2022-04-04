@@ -25,7 +25,7 @@ object Versions {
     internal const val HILT = "2.40.5"
     internal const val MATERIAL = "1.5.0"
     internal const val COMPOSE_ACTIVITY = "1.3.0-alpha08"
-    internal const val COMPOSE_CONSTRAINT = "1.0.0-alpha07"
+    internal const val COMPOSE_CONSTRAINT = "1.0.0"
 }
 
 object Dependencies {
@@ -37,6 +37,7 @@ object Dependencies {
     const val spotlessGradlePlugin =
         "com.diffplug.spotless:spotless-plugin-gradle:${Versions.ANDROID_GRADLE_SPOTLESS}"
     const val dokka = "org.jetbrains.dokka:dokka-gradle-plugin:${Versions.KOTLIN_GRADLE_DOKKA}"
+    const val hiltPlugin = "com.google.dagger:hilt-android-gradle-plugin:${Versions.HILT}"
     const val kotlinBinaryValidator =
         "org.jetbrains.kotlinx:binary-compatibility-validator:${Versions.KOTLIN_BINARY_VALIDATOR}"
 
@@ -45,6 +46,16 @@ object Dependencies {
     const val composeUI = "androidx.compose.ui:ui:${Versions.COMPOSE}"
     const val composeRuntime = "androidx.compose.runtime:runtime:${Versions.COMPOSE}"
     const val composeFoundation = "androidx.compose.foundation:foundation:${Versions.COMPOSE}"
+    const val composeFoundationLayout =
+        "androidx.compose.foundation:foundation-layout:${Versions.COMPOSE}"
+    const val composeActivity = "androidx.activity:activity-compose:${Versions.COMPOSE_ACTIVITY}"
+    const val composeMaterial = "androidx.compose.material:material:${Versions.COMPOSE}"
+    const val composeMaterialIcon =
+        "androidx.compose.material:material-icons-extended:${Versions.COMPOSE}"
+    const val composeAnimation = "androidx.compose.animation:animation:${Versions.COMPOSE}"
+    const val composeTooling = "androidx.compose.ui:ui-tooling:${Versions.COMPOSE}"
+    const val composeConstraintLayout =
+        "androidx.constraintlayout:constraintlayout-compose:${Versions.COMPOSE_CONSTRAINT}"
 
     const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}"
     const val palette = "androidx.palette:palette-ktx:${Versions.PALETTE}"
@@ -65,4 +76,7 @@ object Dependencies {
     const val androidTestRunner = "androidx.test:runner:${Versions.ANDROIDX_TEST}"
     const val androidTestJunit = "androidx.test.ext:junit-ktx:${Versions.ANDROIDX_JUNIT}"
     const val composeJunitTest = "androidx.compose.ui:ui-test-junit4:${Versions.COMPOSE}"
+
+    const val hiltAndroid = "com.google.dagger:hilt-android:${Versions.HILT}"
+    const val hiltCompiler = "com.google.dagger:hilt-compiler:${Versions.HILT}"
 }
