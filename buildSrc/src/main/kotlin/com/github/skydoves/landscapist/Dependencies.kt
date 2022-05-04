@@ -13,7 +13,7 @@ object Versions {
     internal const val COROUTINES = "1.6.0"
 
     internal const val FRESCO = "2.6.0"
-    internal const val GLIDE = "4.13.1"
+    internal const val GLIDE = "4.13.2"
     internal const val COIL = "1.4.0"
 
     internal const val PALETTE = "1.0.0"
