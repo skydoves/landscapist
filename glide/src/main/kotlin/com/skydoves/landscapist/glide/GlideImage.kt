@@ -93,7 +93,7 @@ public fun GlideImage(
   imageModel: Any?,
   modifier: Modifier = Modifier,
   requestBuilder: @Composable () -> RequestBuilder<Drawable> = {
-    LocalGlideProvider.getGlideRequestBuilder(imageModel)
+    LocalGlideProvider.getGlideRequestBuilder()
   },
   requestOptions: @Composable () -> RequestOptions = {
     LocalGlideProvider.getGlideRequestOptions()
@@ -196,7 +196,7 @@ public fun GlideImage(
   imageModel: Any?,
   modifier: Modifier = Modifier,
   requestBuilder: @Composable () -> RequestBuilder<Drawable> = {
-    LocalGlideProvider.getGlideRequestBuilder(imageModel)
+    LocalGlideProvider.getGlideRequestBuilder()
   },
   requestOptions: @Composable () -> RequestOptions = {
     LocalGlideProvider.getGlideRequestOptions()
@@ -289,7 +289,7 @@ public fun GlideImage(
   imageModel: Any?,
   modifier: Modifier = Modifier,
   requestBuilder: @Composable () -> RequestBuilder<Drawable> = {
-    LocalGlideProvider.getGlideRequestBuilder(imageModel)
+    LocalGlideProvider.getGlideRequestBuilder()
   },
   requestOptions: @Composable () -> RequestOptions = {
     LocalGlideProvider.getGlideRequestOptions()
@@ -412,7 +412,7 @@ public fun GlideImage(
   imageModel: Any?,
   modifier: Modifier = Modifier,
   requestBuilder: @Composable () -> RequestBuilder<Drawable> = {
-    LocalGlideProvider.getGlideRequestBuilder(imageModel)
+    LocalGlideProvider.getGlideRequestBuilder()
   },
   requestOptions: @Composable () -> RequestOptions = {
     LocalGlideProvider.getGlideRequestOptions()
