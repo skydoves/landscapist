@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
           val list = MockUtil.getMockPosters().toMutableList()
           list.addAll(MockUtil.getMockPosters())
           list.addAll(MockUtil.getMockPosters())
-          DisneyPosters(posters = list, vm)
+          DisneyPosters(posters = list, paddingValues = it, vm = vm)
         }
       }
     }

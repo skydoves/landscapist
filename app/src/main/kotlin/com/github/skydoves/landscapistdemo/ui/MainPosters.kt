@@ -23,6 +23,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,11 +76,16 @@ import com.skydoves.landscapist.palette.BitmapPalette
 @Composable
 fun DisneyPosters(
   posters: List<Poster>,
+  paddingValues: PaddingValues,
   vm: MainViewModel
 ) {
   val poster: Poster by vm.poster
 
-  Column(Modifier.verticalScroll(rememberScrollState())) {
+  Column(
+    Modifier
+      .verticalScroll(rememberScrollState())
+      .padding(paddingValues)
+  ) {
     LazyRow {
       item {
         Box(
@@ -98,7 +104,7 @@ fun DisneyPosters(
           )
         }
       }
-      items(posters) { poster ->
+      items(items = posters) { poster ->
         PosterItem(poster, vm)
       }
     }
