@@ -9,7 +9,7 @@ object Versions {
     internal const val KOTLIN_BINARY_VALIDATOR = "0.8.0"
 
     internal const val CORE_KTX = "1.7.0"
-    internal const val COMPOSE = "1.2.0-beta03"
+    internal const val COMPOSE = "1.2.0-rc01"
     internal const val COROUTINES = "1.6.0"
 
     internal const val FRESCO = "2.6.0"
