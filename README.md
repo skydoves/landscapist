@@ -72,7 +72,7 @@ dependencies {
 }
 ```
 
-> Note: `Landscapist-Glide` includes version `4.13.2` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
+> **Note**: `Landscapist-Glide` includes version `4.13.2` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### GlideImage
 You can load images simply by using `GlideImage` composable function as the following example below:
@@ -187,7 +187,7 @@ dependencies {
 }
 ```
 
-> Note: Please make sure your project uses the same Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
+> **Note**: Please make sure your project uses the same Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### CoilImage
 You can load images by using the `CoilImage` composable function as the following example below:
@@ -289,7 +289,7 @@ dependencies {
     implementation "com.github.skydoves:landscapist-fresco:<version>"
 }
 ```
-> Note: `Landscapist-Fresco` includes version `2.6.0` of Fresco. So please make sure your project is using the same Fresco version or exclude the Fresco dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
+> **Note**: `Landscapist-Fresco` includes version `2.6.0` of Fresco. So please make sure your project is using the same Fresco version or exclude the Fresco dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### Setup
 To get started, you should set up `Fresco` with [ImagePipelineConfig](https://frescolib.org/docs/configure-image-pipeline.html) in your `Application` class. Generally, it's recommended initializing with  `OkHttpImagePipelineConfigFactory`. Also, you can customize caching, networking, and thread pool strategies with your own `ImagePipelineConfig`. For more details, you can check out [Using Other Network Layers](https://frescolib.org/docs/using-other-network-layers.html#using-okhttp).
@@ -447,7 +447,7 @@ GlideImage( // CoilImage, FrescoImage
     // do something 
   })
 ```
-> Note: You can also use the custom Composables for **CoilImage** and **FrescoImage**.
+> **Note**: You can also use the custom Composables for **CoilImage** and **FrescoImage**.
 
 <img src="https://user-images.githubusercontent.com/24237865/148672035-6a82eba5-900c-44ee-a42c-acbf8038d0ab.png" align="right" width="46%">
 
@@ -462,7 +462,7 @@ GlideImage(
   previewPlaceholder = R.drawable.poster
 )
 ```
-> Note: You can also use the the `previewPlaceholder` parameter for **CoilImage** and **FrescoImage**.
+> **Note**: You can also use the the `previewPlaceholder` parameter for **CoilImage** and **FrescoImage**.
 
 <img src="https://user-images.githubusercontent.com/24237865/95812167-be3a4780-0d4f-11eb-9360-2a4a66a3fb46.gif" align="right" width="26%"/>
 
@@ -486,7 +486,7 @@ GlideImage( // CoilImage, FrescoImage
      Text(text = "image request failed.")
    })
  ```
- > Note: You can also use the Shimmer effect for **CoilImage** and **FrescoImage**.
+ > **Note**: You can also use the Shimmer effect for **CoilImage** and **FrescoImage**.
 
  <img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="26%"/>
 
@@ -508,7 +508,7 @@ GlideImage( // CoilImage, FrescoImage
 ```
 The default value of the `circularReveal` is `null`.
 
- > Note: You can also use the Circular Reveal Animation for **CoilImage** and **FrescoImage**.
+ > **Note**: You can also use the Circular Reveal Animation for **CoilImage** and **FrescoImage**.
 
 ## Palette
 You can extract primary (theme) color profiles with `BitmapPalette`. You can check out [Extract color profiles](https://developer.android.com/training/material/palette-colors#extract-color-profiles) to see what kinds of colors can be extracted.
@@ -562,7 +562,7 @@ GlideImage( // CoilImage, FrescoImage also can be used.
   )
 )
 ```
- > Note: You can also use the Palette for **CoilImage** and **FrescoImage**.
+ > **Note**: You can also use the Palette for **CoilImage** and **FrescoImage**.
 
 ## Who's using Landscapist?
 If your project uses Landscapist, please let me know by creating a new issue! 🤗
