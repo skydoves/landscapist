@@ -9,7 +9,7 @@ object Versions {
     internal const val KOTLIN_BINARY_VALIDATOR = "0.8.0"
 
     internal const val CORE_KTX = "1.7.0"
-    internal const val COMPOSE = "1.2.0-rc01"
+    internal const val COMPOSE = "1.2.0-rc02"
     internal const val COROUTINES = "1.6.0"
 
     internal const val FRESCO = "2.6.0"
@@ -22,9 +22,9 @@ object Versions {
     internal const val ANDROIDX_TEST = "1.4.0"
     internal const val ANDROIDX_JUNIT = "1.1.3"
 
-    internal const val HILT = "2.40.5"
+    internal const val HILT = "2.42"
     internal const val MATERIAL = "1.5.0"
-    internal const val COMPOSE_ACTIVITY = "1.3.0-alpha08"
+    internal const val COMPOSE_ACTIVITY = "1.4.0"
     internal const val COMPOSE_CONSTRAINT = "1.0.0"
 }
 
