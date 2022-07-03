@@ -143,7 +143,7 @@ GlideImage(
     }
 
     override fun onResourceReady(
-    resource: Drawable?,
+      resource: Drawable?,
       model: Any?,
       target: Target<Drawable>?,
       dataSource: DataSource?,
@@ -412,21 +412,22 @@ You can execute your own composable functions depending on the three request sta
 <img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="28%"/>
 
 ```kotlin
- GlideImage( // CoilImage, FrescoImage
-   imageModel = imageUrl,
-   modifier = modifier,
-   // shows an indicator while loading an image.
-   loading = {
-     Box(modifier = Modifier.matchParentSize()) {
-        CircularProgressIndicator(
-          modifier = Modifier.align(Alignment.Center)
-        )
-     }
-   },
-   // shows an error text if fail to load an image.
-   failure = {
-     Text(text = "image request failed.")
-   })
+GlideImage( // CoilImage, FrescoImage
+  imageModel = imageUrl,
+  modifier = modifier,
+  // shows an indicator while loading an image.
+  loading = {
+    Box(modifier = Modifier.matchParentSize()) {
+      CircularProgressIndicator(
+        modifier = Modifier.align(Alignment.Center)
+      )
+    }
+  },
+  // shows an error text if fail to load an image.
+  failure = {
+    Text(text = "image request failed.")
+  }
+)
 ```
 
 Also, you can customize the image content with our own composable function like the example below:
@@ -445,7 +446,8 @@ GlideImage( // CoilImage, FrescoImage
   },
   loading = { 
     // do something 
-  })
+  }
+)
 ```
 > **Note**: You can also use the custom Composables for **CoilImage** and **FrescoImage**.
 
@@ -471,20 +473,21 @@ You can implement a shimmering effect while loading an image by using the `Shimm
 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage
-   imageModel = imageUrl,
-   modifier = modifier,
-   // shows a shimmering effect when loading an image.
-   shimmerParams = ShimmerParams(
-       baseColor = MaterialTheme.colors.background,
-       highlightColor = shimmerHighLight,
-       durationMillis = 350,
-       dropOff = 0.65f,
-       tilt = 20f
-     ),
-   // shows an error text message when request failed.
-   failure = {
-     Text(text = "image request failed.")
-   })
+  imageModel = imageUrl,
+  modifier = modifier,
+  // shows a shimmering effect when loading an image.
+  shimmerParams = ShimmerParams(
+    baseColor = MaterialTheme.colors.background,
+    highlightColor = shimmerHighLight,
+    durationMillis = 350,
+    dropOff = 0.65f,
+     tilt = 20f
+  ),
+  // shows an error text message when request failed.
+  failure = {
+    Text(text = "image request failed.")
+  }
+)
  ```
  > **Note**: You can also use the Shimmer effect for **CoilImage** and **FrescoImage**.
 
