@@ -6,7 +6,7 @@
   <a href="https://devlibrary.withgoogle.com/products/android/repos/skydoves-Landscapist"><img alt="Google" src="https://skydoves.github.io/badges/google-devlib.svg"/></a><br>
   <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
   <a href="https://android-arsenal.com/api?level=21"><img alt="API" src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat"/></a>
-  <a href="https://github.com/skydoves/Landscapist/actions"><img alt="Build Status" src="https://github.com/skydoves/landscapist/workflows/Android%20CI/badge.svg"/></a>
+  <a href="https://github.com/skydoves/Landscapist/actions"><img alt="Build Status" src="https://github.com/skydoves/Frescomposable/workflows/Android%20CI/badge.svg"/></a>
   <a href="https://androidweekly.net/issues/issue-441"><img alt="Android Weekly" src="https://skydoves.github.io/badges/android-weekly.svg"/></a>
   <a href="https://proandroiddev.com/loading-images-for-jetpack-compose-using-glide-coil-and-fresco-1211261a296e"><img alt="Medium" src="https://skydoves.github.io/badges/Story-Medium.svg"/></a>
   <a href="https://github.com/skydoves"><img alt="Profile" src="https://skydoves.github.io/badges/skydoves.svg"/></a> 
@@ -143,7 +143,7 @@ GlideImage(
     }
 
     override fun onResourceReady(
-    resource: Drawable?,
+      resource: Drawable?,
       model: Any?,
       target: Target<Drawable>?,
       dataSource: DataSource?,
@@ -412,21 +412,22 @@ You can execute your own composable functions depending on the three request sta
 <img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="28%"/>
 
 ```kotlin
- GlideImage( // CoilImage, FrescoImage
-   imageModel = imageUrl,
-   modifier = modifier,
-   // shows an indicator while loading an image.
-   loading = {
-     Box(modifier = Modifier.matchParentSize()) {
-        CircularProgressIndicator(
-          modifier = Modifier.align(Alignment.Center)
-        )
-     }
-   },
-   // shows an error text if fail to load an image.
-   failure = {
-     Text(text = "image request failed.")
-   })
+GlideImage( // CoilImage, FrescoImage
+  imageModel = imageUrl,
+  modifier = modifier,
+  // shows an indicator while loading an image.
+  loading = {
+    Box(modifier = Modifier.matchParentSize()) {
+      CircularProgressIndicator(
+        modifier = Modifier.align(Alignment.Center)
+      )
+    }
+  },
+  // shows an error text if fail to load an image.
+  failure = {
+    Text(text = "image request failed.")
+  }
+)
 ```
 
 Also, you can customize the image content with our own composable function like the example below:
@@ -445,7 +446,8 @@ GlideImage( // CoilImage, FrescoImage
   },
   loading = { 
     // do something 
-  })
+  }
+)
 ```
 > **Note**: You can also use the custom Composables for **CoilImage** and **FrescoImage**.
 
@@ -471,20 +473,21 @@ You can implement a shimmering effect while loading an image by using the `Shimm
 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage
-   imageModel = imageUrl,
-   modifier = modifier,
-   // shows a shimmering effect when loading an image.
-   shimmerParams = ShimmerParams(
-       baseColor = MaterialTheme.colors.background,
-       highlightColor = shimmerHighLight,
-       durationMillis = 350,
-       dropOff = 0.65f,
-       tilt = 20f
-     ),
-   // shows an error text message when request failed.
-   failure = {
-     Text(text = "image request failed.")
-   })
+  imageModel = imageUrl,
+  modifier = modifier,
+  // shows a shimmering effect when loading an image.
+  shimmerParams = ShimmerParams(
+    baseColor = MaterialTheme.colors.background,
+    highlightColor = shimmerHighLight,
+    durationMillis = 350,
+    dropOff = 0.65f,
+     tilt = 20f
+  ),
+  // shows an error text message when request failed.
+  failure = {
+    Text(text = "image request failed.")
+  }
+)
  ```
  > **Note**: You can also use the Shimmer effect for **CoilImage** and **FrescoImage**.
 
