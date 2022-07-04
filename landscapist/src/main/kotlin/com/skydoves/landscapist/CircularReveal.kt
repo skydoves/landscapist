@@ -16,11 +16,14 @@
 
 package com.skydoves.landscapist
 
+import androidx.compose.runtime.Immutable
+
 /**
  * CircularReveal is attributes.
  *
  * @param duration milli-second times from start to finish animation.
  */
+@Immutable
 public data class CircularReveal(
   public val duration: Int = DefaultCircularRevealDuration,
   public val onFinishListener: CircularRevealFinishListener? = null
