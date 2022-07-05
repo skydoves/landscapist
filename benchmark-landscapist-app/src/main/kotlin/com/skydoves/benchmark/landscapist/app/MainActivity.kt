@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package com.skydoves.landscapist
+package com.skydoves.benchmark.landscapist.app
 
-import androidx.compose.runtime.Immutable
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 
-/**
- * CircularReveal is attributes.
- *
- * @param duration milli-second times from start to finish animation.
- */
-@Immutable
-public data class CircularReveal(
-  public val duration: Int = DefaultCircularRevealDuration,
-  public val onFinishListener: CircularRevealFinishListener? = null
-)
+class MainActivity : ComponentActivity() {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    setContent {
+      Column {
+        BitmapPaletteProfiles()
+        ImageLoadProfiles()
+        ShimmerProfiles()
+      }
+    }
+  }
+}

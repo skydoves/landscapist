@@ -1,5 +1,4 @@
 public final class com/skydoves/landscapist/CircularReveal {
-	public static final field $stable I
 	public fun <init> ()V
 	public fun <init> (ILcom/skydoves/landscapist/CircularRevealFinishListener;)V
 	public synthetic fun <init> (ILcom/skydoves/landscapist/CircularRevealFinishListener;ILkotlin/jvm/internal/DefaultConstructorMarker;)V

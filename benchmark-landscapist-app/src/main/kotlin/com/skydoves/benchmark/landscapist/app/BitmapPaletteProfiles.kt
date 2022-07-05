@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package com.skydoves.landscapist
+package com.skydoves.benchmark.landscapist.app
 
-import androidx.compose.runtime.Immutable
+import android.graphics.Bitmap
+import androidx.compose.runtime.Composable
+import com.skydoves.landscapist.palette.BitmapPalette
 
-/**
- * CircularReveal is attributes.
- *
- * @param duration milli-second times from start to finish animation.
- */
-@Immutable
-public data class CircularReveal(
-  public val duration: Int = DefaultCircularRevealDuration,
-  public val onFinishListener: CircularRevealFinishListener? = null
-)
+@Composable
+fun BitmapPaletteProfiles() {
+  BitmapPalette(
+    imageModel = null,
+    useCache = true,
+    interceptor = { it.clearTargets() },
+    paletteLoadedListener = { }
+  ).apply {
+    applyImageModel("https://avatars.githubusercontent.com/u/24237865?v=4")
+    generate(Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888))
+  }
+}

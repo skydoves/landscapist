@@ -140,13 +140,7 @@ private fun SelectedPoster(
     modifier = Modifier
       .aspectRatio(0.8f),
     circularReveal = CircularReveal(),
-    shimmerParams = ShimmerParams(
-      baseColor = background800,
-      highlightColor = shimmerHighLight
-    ),
-    bitmapPalette = BitmapPalette {
-      palette = it
-    },
+    bitmapPalette = BitmapPalette { palette = it },
     previewPlaceholder = R.drawable.poster
   )
 

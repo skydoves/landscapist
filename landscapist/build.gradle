@@ -67,4 +67,3 @@ dependencies {
   implementation Dependencies.coroutines
   api Dependencies.palette
 }
-

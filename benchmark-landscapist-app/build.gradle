@@ -1,0 +1,59 @@
+import com.github.skydoves.landscapist.Configuration
+import com.github.skydoves.landscapist.Dependencies
+import com.github.skydoves.landscapist.Versions
+
+plugins {
+  id 'com.android.application'
+  id 'org.jetbrains.kotlin.android'
+}
+
+android {
+  compileSdk 32
+  defaultConfig {
+    applicationId = "com.skydoves.benchmark.landscapist.app"
+    minSdkVersion Configuration.minSdk
+    targetSdkVersion Configuration.targetSdk
+    versionCode Configuration.versionCode
+    versionName Configuration.versionName
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  composeOptions {
+    kotlinCompilerExtensionVersion Versions.COMPOSE_COMPILER
+  }
+
+  buildFeatures {
+    compose true
+  }
+
+  kotlinOptions {
+    jvmTarget = '1.8'
+  }
+
+  packagingOptions {
+    excludes += "/META-INF/AL2.0"
+    excludes += "/META-INF/LGPL2.1"
+  }
+  buildTypes {
+    benchmark {
+      signingConfig signingConfigs.debug
+      matchingFallbacks = ['release']
+      debuggable false
+    }
+  }
+}
+
+dependencies {
+  implementation project(":landscapist")
+
+  implementation Dependencies.material
+  implementation Dependencies.composeUI
+  implementation Dependencies.composeMaterial
+  implementation Dependencies.composeRuntime
+  implementation Dependencies.composeTooling
+  implementation Dependencies.composeActivity
+}
