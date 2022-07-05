@@ -1,5 +1,6 @@
 import com.github.skydoves.landscapist.Configuration
 import com.github.skydoves.landscapist.Dependencies
+import com.github.skydoves.landscapist.Versions
 
 plugins {
   id 'com.android.application'
@@ -21,14 +22,28 @@ android {
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
+  composeOptions {
+    kotlinCompilerExtensionVersion Versions.COMPOSE_COMPILER
+  }
+
+  buildFeatures {
+    compose true
+  }
+
   kotlinOptions {
     jvmTarget = '1.8'
+  }
+
+  packagingOptions {
+    excludes += "/META-INF/AL2.0"
+    excludes += "/META-INF/LGPL2.1"
   }
 }
 
 dependencies {
   implementation project(":landscapist")
 
+  implementation Dependencies.material
   implementation Dependencies.composeUI
   implementation Dependencies.composeMaterial
   implementation Dependencies.composeRuntime

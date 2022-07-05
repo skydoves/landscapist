@@ -16,21 +16,19 @@
 
 package com.skydoves.benchmark.landscapist.app
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
+import android.graphics.Bitmap
+import androidx.compose.runtime.Composable
+import com.skydoves.landscapist.palette.BitmapPalette
 
-class MainActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-
-    setContent {
-      Column {
-        BitmapPaletteProfiles()
-        ImageLoadProfiles()
-        ShimmerProfiles()
-      }
-    }
+@Composable
+fun BitmapPaletteProfiles() {
+  BitmapPalette(
+    imageModel = null,
+    useCache = true,
+    interceptor = { it.clearTargets() },
+    paletteLoadedListener = { }
+  ).apply {
+    applyImageModel("https://avatars.githubusercontent.com/u/24237865?v=4")
+    generate(Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888))
   }
 }
