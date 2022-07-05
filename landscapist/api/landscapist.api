@@ -88,7 +88,6 @@ public final class com/skydoves/landscapist/Shimmer {
 }
 
 public final class com/skydoves/landscapist/ShimmerParams {
-	public static final field $stable I
 	public synthetic fun <init> (JJFFFIILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun <init> (JJFFFILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-0d7_KjU ()J

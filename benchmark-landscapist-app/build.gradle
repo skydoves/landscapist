@@ -8,10 +8,10 @@ plugins {
 }
 
 android {
-  compileSdk 32
+  compileSdk Configuration.compileSdk
   defaultConfig {
     applicationId = "com.skydoves.benchmark.landscapist.app"
-    minSdkVersion Configuration.minSdk
+    minSdkVersion 23
     targetSdkVersion Configuration.targetSdk
     versionCode Configuration.versionCode
     versionName Configuration.versionName
