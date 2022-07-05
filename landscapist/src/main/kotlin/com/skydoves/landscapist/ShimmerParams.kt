@@ -16,6 +16,7 @@
 
 package com.skydoves.landscapist
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
 /**
@@ -28,6 +29,7 @@ import androidx.compose.ui.graphics.Color
  * @param tilt adjust an angle at which the highlight is tilted and measured in degrees.
  * @param durationMillis a milli-second time to move the simmering effect from start to finish animation.
  */
+@Immutable
 public data class ShimmerParams(
   val baseColor: Color,
   val highlightColor: Color,
