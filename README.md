@@ -481,7 +481,7 @@ GlideImage( // CoilImage, FrescoImage
     highlightColor = shimmerHighLight,
     durationMillis = 350,
     dropOff = 0.65f,
-     tilt = 20f
+    tilt = 20f
   ),
   // shows an error text message when request failed.
   failure = {
