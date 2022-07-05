@@ -44,7 +44,7 @@ repositories {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.5.3-SNAPSHOT"
+    implementation "com.github.skydoves:landscapist-glide:1.5.4-SNAPSHOT"
 }
 ```
 </details>
@@ -68,7 +68,7 @@ allprojects {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.5.2"
+    implementation "com.github.skydoves:landscapist-glide:1.5.3"
 }
 ```
 
