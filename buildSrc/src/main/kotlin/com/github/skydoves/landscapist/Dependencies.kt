@@ -29,7 +29,7 @@ object Versions {
   internal const val COMPOSE_CONSTRAINT = "1.0.0"
 
   internal const val ANDROIDX_TEST_VERSION = "1.4.0"
-  internal const val BASE_PROFILE_VERSION = "1.2.0-beta01"
+  internal const val BASE_PROFILE_VERSION = "1.2.0-rc01"
   internal const val MACRO_BENCHMARK_VERSION = "1.1.0"
   internal const val ANDROIDX_UI_AUTOMATOR_VERSION = "2.2.0"
 }
