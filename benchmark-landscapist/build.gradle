@@ -1,6 +1,5 @@
 import com.github.skydoves.landscapist.Configuration
 import com.github.skydoves.landscapist.Dependencies
-import com.github.skydoves.landscapist.Versions
 
 plugins {
   id 'com.android.test'
