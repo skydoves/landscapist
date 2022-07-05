@@ -38,6 +38,13 @@ android {
     excludes += "/META-INF/AL2.0"
     excludes += "/META-INF/LGPL2.1"
   }
+  buildTypes {
+    benchmark {
+      signingConfig signingConfigs.debug
+      matchingFallbacks = ['release']
+      debuggable false
+    }
+  }
 }
 
 dependencies {
