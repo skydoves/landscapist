@@ -449,7 +449,7 @@ GlideImage( // CoilImage, FrescoImage
   }
 )
 ```
-> **Note**: You can also use the custom Composables for **CoilImage** and **FrescoImage**.
+> **Note**: You can also use the custom Composables for **`CoilImage`** and **`FrescoImage`**.
 
 <img src="https://user-images.githubusercontent.com/24237865/148672035-6a82eba5-900c-44ee-a42c-acbf8038d0ab.png" align="right" width="46%">
 
@@ -464,7 +464,7 @@ GlideImage(
   previewPlaceholder = R.drawable.poster
 )
 ```
-> **Note**: You can also use the the `previewPlaceholder` parameter for **CoilImage** and **FrescoImage**.
+> **Note**: You can also use the the `previewPlaceholder` parameter for **`CoilImage`** and **`FrescoImage`**.
 
 <img src="https://user-images.githubusercontent.com/24237865/95812167-be3a4780-0d4f-11eb-9360-2a4a66a3fb46.gif" align="right" width="26%"/>
 
@@ -481,7 +481,7 @@ GlideImage( // CoilImage, FrescoImage
     highlightColor = shimmerHighLight,
     durationMillis = 350,
     dropOff = 0.65f,
-     tilt = 20f
+    tilt = 20f
   ),
   // shows an error text message when request failed.
   failure = {
@@ -489,7 +489,7 @@ GlideImage( // CoilImage, FrescoImage
   }
 )
  ```
- > **Note**: You can also use the Shimmer effect for **CoilImage** and **FrescoImage**.
+ > **Note**: You can also use the Shimmer effect for **`CoilImage`** and **`FrescoImage`**.
 
  <img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="26%"/>
 
@@ -511,7 +511,7 @@ GlideImage( // CoilImage, FrescoImage
 ```
 The default value of the `circularReveal` is `null`.
 
- > **Note**: You can also use the Circular Reveal Animation for **CoilImage** and **FrescoImage**.
+ > **Note**: You can also use the Circular Reveal Animation for **`CoilImage`** and **`FrescoImage`**.
 
 ## Palette
 You can extract primary (theme) color profiles with `BitmapPalette`. You can check out [Extract color profiles](https://developer.android.com/training/material/palette-colors#extract-color-profiles) to see what kinds of colors can be extracted.
@@ -565,7 +565,7 @@ GlideImage( // CoilImage, FrescoImage also can be used.
   )
 )
 ```
- > **Note**: You can also use the Palette for **CoilImage** and **FrescoImage**.
+ > **Note**: You can also use the Palette for **`CoilImage`** and **`FrescoImage`**.
 
 ## Who's using Landscapist?
 If your project uses Landscapist, please let me know by creating a new issue! 🤗
