@@ -516,7 +516,7 @@ The default value of the `circularReveal` is `null`.
 ## Palette
 You can extract primary (theme) color profiles with `BitmapPalette`. You can check out [Extract color profiles](https://developer.android.com/training/material/palette-colors#extract-color-profiles) to see what kinds of colors can be extracted.
 
-<img src="https://user-images.githubusercontent.com/24237865/129226361-877689b8-a1ec-4f59-b8a6-e2efe33a8de7.gif" align="right" width="250px%"/>
+<img src="https://user-images.githubusercontent.com/24237865/129226361-877689b8-a1ec-4f59-b8a6-e2efe33a8de7.gif" align="right" width="250"/>
 
 ```kotlin
 var palette by remember { mutableStateOf<Palette?>(null) }
