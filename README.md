@@ -402,14 +402,14 @@ For more details, check out [DraweeController](https://frescolib.org/docs/animat
 
 </details>
 
+<img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="310px"/>
+
 ## Custom Composables
 You can execute your own composable functions depending on the three request states below:
 
 - **loading**: Executed when loading an image.
 - **success**: Executed when successful to load an image.
 - **failure**: Executed when failing to load an image (e.g. network error, wrong destination).
-
-<img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="28%"/>
 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage
@@ -466,7 +466,7 @@ GlideImage(
 ```
 > **Note**: You can also use the the `previewPlaceholder` parameter for **`CoilImage`** and **`FrescoImage`**.
 
-<img src="https://user-images.githubusercontent.com/24237865/95812167-be3a4780-0d4f-11eb-9360-2a4a66a3fb46.gif" align="right" width="26%"/>
+<img src="https://user-images.githubusercontent.com/24237865/95812167-be3a4780-0d4f-11eb-9360-2a4a66a3fb46.gif" align="right" width="250px"/>
 
 ## Shimmer Effect
 You can implement a shimmering effect while loading an image by using the `ShimmerParams` parameter as following the example below:
@@ -491,7 +491,7 @@ GlideImage( // CoilImage, FrescoImage
  ```
  > **Note**: You can also use the Shimmer effect for **`CoilImage`** and **`FrescoImage`**.
 
- <img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="26%"/>
+ <img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="250px"/>
 
 ## Circular Reveal Animation
 You can implement the circular reveal animation while drawing images with `CircularReveal` attribute as the following:
@@ -516,7 +516,7 @@ The default value of the `circularReveal` is `null`.
 ## Palette
 You can extract primary (theme) color profiles with `BitmapPalette`. You can check out [Extract color profiles](https://developer.android.com/training/material/palette-colors#extract-color-profiles) to see what kinds of colors can be extracted.
 
-<img src="https://user-images.githubusercontent.com/24237865/129226361-877689b8-a1ec-4f59-b8a6-e2efe33a8de7.gif" align="right" width="26%"/>
+<img src="https://user-images.githubusercontent.com/24237865/129226361-877689b8-a1ec-4f59-b8a6-e2efe33a8de7.gif" align="right" width="250"/>
 
 ```kotlin
 var palette by remember { mutableStateOf<Palette?>(null) }
