@@ -114,7 +114,7 @@ public fun CoilImage(
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   error: Any? = null,
-  @DrawableRes previewPlaceholder: Int = 0,
+  @DrawableRes previewPlaceholder: Int = 0
 ) {
   CoilImage(
     imageModel = imageModel,
@@ -199,7 +199,7 @@ public fun CoilImage(
   colorFilter: ColorFilter? = null,
   placeHolder: Any? = null,
   error: Any? = null,
-  @DrawableRes previewPlaceholder: Int = 0,
+  @DrawableRes previewPlaceholder: Int = 0
 ) {
   CoilImage(
     imageModel = imageModel,
@@ -237,7 +237,7 @@ public fun CoilImage(
           contentDescription = contentDescription,
           contentScale = contentScale,
           colorFilter = colorFilter,
-          alpha = alpha,
+          alpha = alpha
         )
       }
     }
@@ -295,7 +295,7 @@ public fun CoilImage(
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
   success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
 ) {
   CoilImage(
     imageRequest = ImageRequest.Builder(context)
@@ -374,7 +374,7 @@ public fun CoilImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
 ) {
   CoilImage(
     imageRequest = ImageRequest.Builder(context)
@@ -446,7 +446,7 @@ public fun CoilImage(
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
   success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -465,7 +465,7 @@ public fun CoilImage(
     recomposeKey = imageRequest,
     imageLoader = imageLoader.invoke(),
     modifier = modifier,
-    bitmapPalette = bitmapPalette,
+    bitmapPalette = bitmapPalette
   ) ImageRequest@{ imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
       is CoilImageState.None -> Unit
@@ -554,7 +554,7 @@ public fun CoilImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -573,7 +573,7 @@ public fun CoilImage(
     recomposeKey = imageRequest,
     imageLoader = imageLoader.invoke(),
     modifier = modifier,
-    bitmapPalette = bitmapPalette,
+    bitmapPalette = bitmapPalette
   ) ImageRequest@{ imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
       is CoilImageState.None -> Unit

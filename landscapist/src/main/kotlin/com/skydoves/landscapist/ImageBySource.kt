@@ -49,7 +49,7 @@ public fun ImageBySource(
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   colorFilter: ColorFilter? = null,
-  alpha: Float = DefaultAlpha,
+  alpha: Float = DefaultAlpha
 ) {
   when (source) {
     is ImageBitmap -> {
@@ -60,7 +60,7 @@ public fun ImageBySource(
         contentDescription = contentDescription,
         contentScale = contentScale,
         colorFilter = colorFilter,
-        alpha = alpha,
+        alpha = alpha
       )
     }
     is ImageVector -> {
@@ -71,7 +71,7 @@ public fun ImageBySource(
         contentDescription = contentDescription,
         contentScale = contentScale,
         colorFilter = colorFilter,
-        alpha = alpha,
+        alpha = alpha
       )
     }
     is Painter -> {
@@ -82,7 +82,7 @@ public fun ImageBySource(
         contentDescription = contentDescription,
         contentScale = contentScale,
         colorFilter = colorFilter,
-        alpha = alpha,
+        alpha = alpha
       )
     }
     else -> {

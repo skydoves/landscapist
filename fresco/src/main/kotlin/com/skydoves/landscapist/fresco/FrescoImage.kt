@@ -100,7 +100,7 @@ public fun FrescoImage(
   placeHolder: Any? = null,
   error: Any? = null,
   observeLoadingProcess: Boolean = false,
-  @DrawableRes previewPlaceholder: Int = 0,
+  @DrawableRes previewPlaceholder: Int = 0
 ) {
   FrescoImage(
     imageUrl = imageUrl,
@@ -137,7 +137,7 @@ public fun FrescoImage(
           contentDescription = contentDescription,
           contentScale = contentScale,
           colorFilter = colorFilter,
-          alpha = alpha,
+          alpha = alpha
         )
       }
     }
@@ -193,7 +193,7 @@ public fun FrescoImage(
   bitmapPalette: BitmapPalette? = null,
   error: ImageBitmap? = null,
   observeLoadingProcess: Boolean = false,
-  @DrawableRes previewPlaceholder: Int = 0,
+  @DrawableRes previewPlaceholder: Int = 0
 ) {
   FrescoImage(
     imageUrl = imageUrl,
@@ -218,7 +218,7 @@ public fun FrescoImage(
           contentDescription = contentDescription,
           contentScale = contentScale,
           colorFilter = colorFilter,
-          alpha = alpha,
+          alpha = alpha
         )
       }
     }
@@ -274,7 +274,7 @@ public fun FrescoImage(
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
   success: @Composable (BoxScope.(imageState: FrescoImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -294,7 +294,7 @@ public fun FrescoImage(
     imageRequest = imageRequest.invoke(),
     modifier = modifier,
     bitmapPalette = bitmapPalette,
-    observeLoadingProcess = observeLoadingProcess,
+    observeLoadingProcess = observeLoadingProcess
   ) ImageRequest@{ imageState ->
     when (val frescoImageState = imageState.toFrescoImageState()) {
       is FrescoImageState.None -> Unit
@@ -382,7 +382,7 @@ public fun FrescoImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: FrescoImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -402,7 +402,7 @@ public fun FrescoImage(
     imageRequest = imageRequest.invoke(),
     modifier = modifier,
     bitmapPalette = bitmapPalette,
-    observeLoadingProcess = observeLoadingProcess,
+    observeLoadingProcess = observeLoadingProcess
   ) ImageRequest@{ imageState ->
     when (val frescoImageState = imageState.toFrescoImageState()) {
       is FrescoImageState.None -> Unit
