@@ -55,7 +55,7 @@ public fun CircularRevealImage(
   contentDescription: String?,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
+  circularReveal: CircularReveal? = null
 ) {
   Image(
     painter = if (circularReveal != null) {

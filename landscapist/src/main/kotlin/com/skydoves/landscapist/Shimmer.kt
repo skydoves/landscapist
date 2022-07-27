@@ -79,7 +79,6 @@ public fun Shimmer(
   }
 
   Box(modifier) {
-
     Canvas(Modifier.fillMaxSize()) {
       val paint = paintPool.acquire() ?: Paint()
       val shaderMatrix = Matrix()

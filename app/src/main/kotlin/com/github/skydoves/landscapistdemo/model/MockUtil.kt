@@ -83,7 +83,7 @@ object MockUtil {
         "Zootopia (titled Zootropolis in the UK and Ireland)[6] is a 2016 American 3D computer-animated comedy film[7] produced by Walt Disney Animation Studios and released by Walt Disney Pictures. It is the 55th Disney animated feature film, directed by Byron Howard and Rich Moore, co-directed by Jared Bush, and stars the voices of Ginnifer Goodwin, Jason Bateman, Idris Elba, Jenny Slate, Nate Torrence, Bonnie Hunt, Don Lake, Tommy Chong, J. K. Simmons, Octavia Spencer, Alan Tudyk, and Shakira. It details the unlikely partnership between a rabbit police officer and a red fox con artist, as they uncover a criminal conspiracy involving the disappearance of predators.",
         "https://user-images.githubusercontent.com/24237865/75087937-5c1d9f80-553e-11ea-8fc9-a7e520addde0.jpg",
         "https://media3.giphy.com/media/26tPpStnC0XthM19u/giphy.gif?cid=ecf05e471xnhh2e78pvhmgegmc1y27f06qcfvbg326p98gup&rid=giphy.gif&ct=g"
-      ),
+      )
     )
   }
 

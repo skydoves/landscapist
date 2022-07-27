@@ -108,7 +108,7 @@ public fun GlideImage(
   bitmapPalette: BitmapPalette? = null,
   placeHolder: Any? = null,
   error: Any? = null,
-  @DrawableRes previewPlaceholder: Int = 0,
+  @DrawableRes previewPlaceholder: Int = 0
 ) {
   GlideImage(
     imageModel = imageModel,
@@ -211,7 +211,7 @@ public fun GlideImage(
   bitmapPalette: BitmapPalette? = null,
   shimmerParams: ShimmerParams,
   error: Any? = null,
-  @DrawableRes previewPlaceholder: Int = 0,
+  @DrawableRes previewPlaceholder: Int = 0
 ) {
   GlideImage(
     imageModel = imageModel,
@@ -305,7 +305,7 @@ public fun GlideImage(
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
   success: @Composable (BoxScope.(imageState: GlideImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -327,7 +327,7 @@ public fun GlideImage(
       .load(imageModel),
     requestListener = requestListener,
     bitmapPalette = bitmapPalette,
-    modifier = modifier,
+    modifier = modifier
   ) ImageRequest@{ imageState ->
     when (val glideImageState = imageState.toGlideImageState()) {
       is GlideImageState.None -> Unit
@@ -428,7 +428,7 @@ public fun GlideImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: GlideImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: GlideImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -526,7 +526,8 @@ private fun GlideImage(
         val target = FlowCustomTarget(this)
         val flowRequestListener =
           FlowRequestListener(
-            this, bitmapPalette?.applyImageModel(recomposeKey)
+            this,
+            bitmapPalette?.applyImageModel(recomposeKey)
           )
 
         // start the image request into the target.
