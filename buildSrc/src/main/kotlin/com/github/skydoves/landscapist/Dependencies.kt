@@ -4,14 +4,14 @@ object Versions {
   internal const val ANDROID_GRADLE_PLUGIN = "7.2.1"
   internal const val ANDROID_GRADLE_SPOTLESS = "6.7.0"
   internal const val GRADLE_NEXUS_PUBLISH_PLUGIN = "1.1.0"
-  internal const val KOTLIN = "1.7.0"
-  internal const val KOTLIN_GRADLE_DOKKA = "1.7.0"
+  internal const val KOTLIN = "1.7.10"
+  internal const val KOTLIN_GRADLE_DOKKA = "1.7.10"
   internal const val KOTLIN_BINARY_VALIDATOR = "0.11.0"
 
   internal const val CORE_KTX = "1.7.0"
-  internal const val COMPOSE = "1.2.0"
-  internal const val COMPOSE_COMPILER = "1.2.0"
-  internal const val COROUTINES = "1.6.0"
+  internal const val COMPOSE = "1.2.1"
+  internal const val COMPOSE_COMPILER = "1.3.0"
+  internal const val COROUTINES = "1.6.4"
 
   internal const val FRESCO = "2.6.0"
   internal const val GLIDE = "4.13.2"
@@ -29,7 +29,7 @@ object Versions {
   internal const val COMPOSE_CONSTRAINT = "1.0.0"
 
   internal const val ANDROIDX_TEST_VERSION = "1.4.0"
-  internal const val BASE_PROFILE_VERSION = "1.2.0-rc01"
+  internal const val BASE_PROFILE_VERSION = "1.2.0"
   internal const val MACRO_BENCHMARK_VERSION = "1.1.0"
   internal const val ANDROIDX_UI_AUTOMATOR_VERSION = "2.2.0"
 }
