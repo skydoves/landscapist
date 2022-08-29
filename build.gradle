@@ -20,13 +20,6 @@ buildscript {
   }
 }
 
-allprojects {
-  repositories {
-    google()
-    mavenCentral()
-  }
-}
-
 subprojects {
   apply from: "$rootDir/spotless.gradle"
 
@@ -45,10 +38,6 @@ subprojects {
     outputDirectory = rootProject.file('docs/api')
     failOnWarning = true
   }
-}
-
-task clean(type: Delete) {
-  delete rootProject.buildDir
 }
 
 apply from: "${rootDir}/scripts/publish-root.gradle"
