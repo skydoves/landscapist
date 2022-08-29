@@ -10,7 +10,7 @@ object Versions {
 
   internal const val CORE_KTX = "1.7.0"
   internal const val COMPOSE = "1.3.0-beta01"
-  internal const val COMPOSE_COMPILER = "1.3.0"
+  const val COMPOSE_COMPILER = "1.3.0"
   internal const val COROUTINES = "1.6.4"
 
   internal const val FRESCO = "2.6.0"
