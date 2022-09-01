@@ -15,7 +15,6 @@
  */
 
 import com.github.skydoves.landscapist.Configuration
-import com.github.skydoves.landscapist.Dependencies
 import com.github.skydoves.landscapist.Versions
 
 plugins {
@@ -67,17 +66,17 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 dependencies {
   api(project(":landscapist"))
-  api(Dependencies.coil)
-  api(Dependencies.coilGif)
+  api(libs.coil)
+  api(libs.coil.gif)
 
-  implementation(Dependencies.coreKtx)
-  implementation(Dependencies.composeUI)
-  implementation(Dependencies.composeRuntime)
-  implementation(Dependencies.composeFoundation)
+  implementation(libs.androidx.core.ktx)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.runtime)
+  implementation(libs.androidx.compose.foundation)
 
-  androidTestImplementation(Dependencies.testRules)
-  androidTestImplementation(Dependencies.androidTestRunner)
-  androidTestImplementation(Dependencies.androidTestJunit)
-  androidTestImplementation(Dependencies.composeUI)
-  androidTestImplementation(Dependencies.composeJunitTest)
+  androidTestImplementation(libs.androidx.test.rules)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.androidx.test.junit)
+  androidTestImplementation(libs.androidx.compose.ui)
+  androidTestImplementation(libs.androidx.compose.ui.test)
 }

@@ -66,19 +66,19 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 dependencies {
   api(project(":fresco"))
-  api(Dependencies.frescoWebp)
-  api(Dependencies.frescoGif)
-  api(Dependencies.frescoDrawable)
-  api(Dependencies.frescoWebSupport)
+  api(libs.fresco.webp)
+  api(libs.fresco.gif)
+  api(libs.fresco.drawable)
+  api(libs.fresco.websupport)
 
-    implementation(Dependencies.coreKtx)
-  implementation(Dependencies.composeUI)
-  implementation(Dependencies.composeRuntime)
-  implementation(Dependencies.composeFoundation)
+  implementation(libs.androidx.core.ktx)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.runtime)
+  implementation(libs.androidx.compose.foundation)
 
-  androidTestImplementation(Dependencies.testRules)
-  androidTestImplementation(Dependencies.androidTestRunner)
-  androidTestImplementation(Dependencies.androidTestJunit)
-  androidTestImplementation(Dependencies.composeUI)
-  androidTestImplementation(Dependencies.composeJunitTest)
+  androidTestImplementation(libs.androidx.test.rules)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.androidx.test.junit)
+  androidTestImplementation(libs.androidx.compose.ui)
+  androidTestImplementation(libs.androidx.compose.ui.test)
 }

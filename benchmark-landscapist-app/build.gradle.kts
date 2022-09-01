@@ -1,10 +1,10 @@
 import com.github.skydoves.landscapist.Configuration
-import com.github.skydoves.landscapist.Dependencies
 import com.github.skydoves.landscapist.Versions
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-  id("com.android.application")
-  id("org.jetbrains.kotlin.android")
+  id(libs.plugins.android.application.get().pluginId)
+  id(libs.plugins.kotlin.android.get().pluginId)
 }
 
 android {
@@ -52,10 +52,10 @@ android {
 dependencies {
   implementation(project(":landscapist"))
 
-  implementation(Dependencies.material)
-  implementation(Dependencies.composeUI)
-  implementation(Dependencies.composeActivity)
-  implementation(Dependencies.composeMaterial)
-  implementation(Dependencies.composeRuntime)
-  implementation(Dependencies.composeTooling)
+  implementation(libs.androidx.material)
+  implementation(libs.androidx.activity.compose)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.ui.tooling)
+  implementation(libs.androidx.compose.runtime)
+  implementation(libs.androidx.compose.material)
 }

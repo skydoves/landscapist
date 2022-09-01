@@ -65,10 +65,10 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 dependencies {
-  implementation(Dependencies.coreKtx)
-  implementation(Dependencies.composeUI)
-  implementation(Dependencies.composeRuntime)
-  implementation(Dependencies.composeFoundation)
-  implementation(Dependencies.coroutines)
-  api(Dependencies.palette)
+  implementation(libs.androidx.core.ktx)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.runtime)
+  implementation(libs.androidx.compose.foundation)
+  implementation(libs.kotlinx.coroutines.android)
+  api(libs.palette)
 }

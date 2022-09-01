@@ -1,0 +1,78 @@
+[versions]
+kotlin = "1.7.10"
+dokka = "1.7.10"
+jvmTarget = "1.8"
+nexusPlugin = "1.1.0"
+kotlinxCoroutines = "1.6.4"
+kotlinBinaryCompatibility = "0.11.0"
+androidGradlePlugin = "7.2.2"
+androidxActivity = "1.4.0"
+androidxMaterial = "1.6.0"
+androidxCompose = "1.3.0-beta01"
+androidxComposeCompiler = "1.3.0"
+androidxComposeConstraintLayout = "1.0.0"
+androidxCore = "1.8.0"
+androidxTest = "1.4.0"
+androidxJunit = "1.1.3"
+androidxMacroBenchmark = "1.1.0"
+androidxProfileinstaller = "1.2.0-rc01"
+androidxUiAutomator = "2.2.0"
+glide = "4.13.2"
+fresco = "2.6.0"
+coil = "2.1.0"
+palette = "1.0.0"
+hilt = "2.42"
+spotless = "6.7.2"
+
+[libraries]
+androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidxMaterial" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
+androidx-benchmark-macro = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "androidxMacroBenchmark" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "androidxCompose" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "androidxCompose" }
+androidx-compose-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "androidxCompose" }
+androidx-compose-material = { group = "androidx.compose.material", name = "material", version.ref = "androidxCompose" }
+androidx-compose-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "androidxComposeConstraintLayout" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "androidxCompose" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "androidxCompose" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "androidxCompose" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "androidxCompose" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "androidxCompose" }
+androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "androidxCompose" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
+androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "androidxProfileinstaller" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTest" }
+androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidxTest" }
+androidx-test-junit = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "androidxJunit" }
+androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "androidxUiAutomator" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+palette = { group = "androidx.palette", name = "palette-ktx", version.ref = "palette" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+fresco = { group = "com.facebook.fresco", name = "fresco", version.ref = "fresco" }
+fresco-okhttp3 = { group = "com.facebook.fresco", name = "imagepipeline-okhttp3", version.ref = "fresco" }
+fresco-webp = { group = "com.facebook.fresco", name = "animated-webp", version.ref = "fresco" }
+fresco-gif = { group = "com.facebook.fresco", name = "animated-gif", version.ref = "fresco" }
+fresco-drawable = { group = "com.facebook.fresco", name = "animated-drawable", version.ref = "fresco" }
+fresco-websupport = { group = "com.facebook.fresco", name = "webpsupport", version.ref = "fresco" }
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coil" }
+
+# Dependencies of the included build-logic
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+spotless-gradlePlugin = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotless" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+nexus-plugin = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPlugin" }
+kotlin-binary-compatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibility" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

@@ -15,13 +15,13 @@
  */
 
 import com.github.skydoves.landscapist.Configuration
-import com.github.skydoves.landscapist.Dependencies
 import com.github.skydoves.landscapist.Versions
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-  id("com.android.application")
-  id("kotlin-android")
-  id("kotlin-kapt")
+  id(libs.plugins.android.application.get().pluginId)
+  id(libs.plugins.kotlin.android.get().pluginId)
+  kotlin("kapt")
   id("dagger.hilt.android.plugin")
 }
 
@@ -62,26 +62,27 @@ android {
 
 dependencies {
   // material
-  implementation(Dependencies.material)
+  implementation(libs.androidx.material)
 
   // androidx jetpack
-  implementation(Dependencies.coreKtx)
+  implementation(libs.androidx.core.ktx)
 
   // hilt
-  implementation(Dependencies.hiltAndroid)
-  kapt(Dependencies.hiltCompiler)
+  implementation(libs.hilt.android)
+  kapt(libs.hilt.compiler)
 
   // compose
-  implementation(Dependencies.composeUI)
-  implementation(Dependencies.composeActivity)
-  implementation(Dependencies.composeMaterial)
-  implementation(Dependencies.composeMaterialIcon)
-  implementation(Dependencies.composeFoundation)
-  implementation(Dependencies.composeFoundationLayout)
-  implementation(Dependencies.composeAnimation)
-  implementation(Dependencies.composeRuntime)
-  implementation(Dependencies.composeTooling)
-  implementation(Dependencies.composeConstraintLayout)
+  implementation(libs.androidx.activity.compose)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.ui.tooling)
+  implementation(libs.androidx.compose.runtime)
+  implementation(libs.androidx.compose.material)
+  implementation(libs.androidx.compose.material.iconsExtended)
+
+
+  implementation(libs.androidx.compose.foundation.layout)
+  implementation(libs.androidx.compose.animation)
+  implementation(libs.androidx.compose.constraintlayout)
 
   implementation("androidx.multidex:multidex:2.0.1")
 
@@ -91,4 +92,3 @@ dependencies {
   implementation(project(":glide"))
   implementation(project(":coil"))
 }
-
