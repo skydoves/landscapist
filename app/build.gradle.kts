@@ -1,5 +1,5 @@
 /*
- * Designed and developed by 2020 skydoves (Jaewoong Eum)
+ * Designed and developed by 2020-2022 skydoves (Jaewoong Eum)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 
 import com.github.skydoves.landscapist.Configuration
-import com.github.skydoves.landscapist.Dependencies
-import com.github.skydoves.landscapist.Versions
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-  id("com.android.application")
-  id("kotlin-android")
-  id("kotlin-kapt")
-  id("dagger.hilt.android.plugin")
+  id("landscapist.application.compose")
+  id("landscapist.spotless")
+  id(libs.plugins.hilt.get().pluginId)
+  kotlin("kapt")
 }
 
 android {
@@ -35,53 +34,31 @@ android {
     versionName = Configuration.versionName
     multiDexEnabled = true
   }
-
-  lint {
-    abortOnError = false
-  }
-
-  compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = Versions.COMPOSE_COMPILER
-  }
-
-  buildFeatures {
-    compose = true
-  }
-
-  packagingOptions {
-    resources {
-      excludes.add("/META-INF/{AL2.0,LGPL2.1}")
-    }
-  }
 }
 
 dependencies {
   // material
-  implementation(Dependencies.material)
+  implementation(libs.androidx.material)
 
   // androidx jetpack
-  implementation(Dependencies.coreKtx)
+  implementation(libs.androidx.core.ktx)
 
   // hilt
-  implementation(Dependencies.hiltAndroid)
-  kapt(Dependencies.hiltCompiler)
+  implementation(libs.hilt.android)
+  kapt(libs.hilt.compiler)
 
   // compose
-  implementation(Dependencies.composeUI)
-  implementation(Dependencies.composeActivity)
-  implementation(Dependencies.composeMaterial)
-  implementation(Dependencies.composeMaterialIcon)
-  implementation(Dependencies.composeFoundation)
-  implementation(Dependencies.composeFoundationLayout)
-  implementation(Dependencies.composeAnimation)
-  implementation(Dependencies.composeRuntime)
-  implementation(Dependencies.composeTooling)
-  implementation(Dependencies.composeConstraintLayout)
+  implementation(libs.androidx.activity.compose)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.ui.tooling)
+  implementation(libs.androidx.compose.runtime)
+  implementation(libs.androidx.compose.material)
+  implementation(libs.androidx.compose.material.iconsExtended)
+
+
+  implementation(libs.androidx.compose.foundation.layout)
+  implementation(libs.androidx.compose.animation)
+  implementation(libs.androidx.compose.constraintlayout)
 
   implementation("androidx.multidex:multidex:2.0.1")
 
@@ -91,4 +68,3 @@ dependencies {
   implementation(project(":glide"))
   implementation(project(":coil"))
 }
-

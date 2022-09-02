@@ -1,5 +1,5 @@
 /*
- * Designed and developed by 2020 skydoves (Jaewoong Eum)
+ * Designed and developed by 2020-2022 skydoves (Jaewoong Eum)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.skydoves.landscapist.fresco
 
 import android.net.Uri
@@ -36,6 +35,8 @@ import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.skydoves.landscapist.ShimmerParams
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
@@ -43,8 +44,6 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)

@@ -1,5 +1,5 @@
 /*
- * Designed and developed by 2020 skydoves (Jaewoong Eum)
+ * Designed and developed by 2020-2022 skydoves (Jaewoong Eum)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.skydoves.landscapist.fresco
 
 internal const val TAG_FRESCO = "FrescoTag"
@@ -23,4 +22,5 @@ internal const val TAG_PROGRESS = "ProgressTag"
 internal const val TAG_ERROR = "ErrorTag"
 
 internal const val IMAGE =
-  "https://user-images.githubusercontent.com/24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg"
+  "https://user-images.githubusercontent.com/" +
+    "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg"

@@ -1,5 +1,5 @@
 /*
- * Designed and developed by 2020 skydoves (Jaewoong Eum)
+ * Designed and developed by 2020-2022 skydoves (Jaewoong Eum)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,10 @@
  */
 
 import com.github.skydoves.landscapist.Configuration
-import com.github.skydoves.landscapist.Dependencies
-import com.github.skydoves.landscapist.Versions
 
 plugins {
-  id("com.android.library")
-  id("kotlin-android")
-  id("org.jetbrains.dokka")
-  id("binary-compatibility-validator")
+  id("landscapist.library.compose")
+  id("landscapist.spotless")
 }
 
 rootProject.extra.apply {
@@ -39,46 +35,23 @@ android {
     minSdk = Configuration.minSdk
     targetSdk = Configuration.targetSdk
   }
-
-  compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = Versions.COMPOSE_COMPILER
-  }
-
-  buildFeatures {
-    compose = true
-  }
-
-  packagingOptions {
-    resources {
-      excludes.add("/META-INF/{AL2.0,LGPL2.1}")
-    }
-  }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-  kotlinOptions.freeCompilerArgs += listOf("-Xexplicit-api=strict")
 }
 
 dependencies {
   api(project(":fresco"))
-  api(Dependencies.frescoWebp)
-  api(Dependencies.frescoGif)
-  api(Dependencies.frescoDrawable)
-  api(Dependencies.frescoWebSupport)
+  api(libs.fresco.webp)
+  api(libs.fresco.gif)
+  api(libs.fresco.drawable)
+  api(libs.fresco.websupport)
 
-    implementation(Dependencies.coreKtx)
-  implementation(Dependencies.composeUI)
-  implementation(Dependencies.composeRuntime)
-  implementation(Dependencies.composeFoundation)
+  implementation(libs.androidx.core.ktx)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.runtime)
+  implementation(libs.androidx.compose.foundation)
 
-  androidTestImplementation(Dependencies.testRules)
-  androidTestImplementation(Dependencies.androidTestRunner)
-  androidTestImplementation(Dependencies.androidTestJunit)
-  androidTestImplementation(Dependencies.composeUI)
-  androidTestImplementation(Dependencies.composeJunitTest)
+  androidTestImplementation(libs.androidx.test.rules)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.androidx.test.junit)
+  androidTestImplementation(libs.androidx.compose.ui)
+  androidTestImplementation(libs.androidx.compose.ui.test)
 }
