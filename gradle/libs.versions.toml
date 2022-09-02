@@ -22,7 +22,7 @@ fresco = "2.6.0"
 coil = "2.1.0"
 palette = "1.0.0"
 hilt = "2.42"
-spotless = "6.7.2"
+spotless = "6.7.0"
 
 [libraries]
 androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidxMaterial" }

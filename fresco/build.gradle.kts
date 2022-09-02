@@ -1,5 +1,5 @@
 /*
- * Designed and developed by 2020 skydoves (Jaewoong Eum)
+ * Designed and developed by 2020-2022 skydoves (Jaewoong Eum)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,10 @@
  */
 
 import com.github.skydoves.landscapist.Configuration
-import com.github.skydoves.landscapist.Dependencies
-import com.github.skydoves.landscapist.Versions
 
 plugins {
-  id("com.android.library")
-  id("kotlin-android")
-  id("org.jetbrains.dokka")
-  id("binary-compatibility-validator")
+  id("landscapist.library.compose")
+  id("landscapist.spotless")
 }
 
 rootProject.extra.apply {
@@ -40,29 +36,6 @@ android {
     targetSdk = Configuration.targetSdk
     testInstrumentationRunner = "com.skydoves.landscapist.fresco.FrescoTestRunner"
   }
-
-  compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = Versions.COMPOSE_COMPILER
-  }
-
-  buildFeatures {
-    compose = true
-  }
-
-  packagingOptions {
-    resources {
-      excludes.add("/META-INF/{AL2.0,LGPL2.1}")
-    }
-  }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-  kotlinOptions.freeCompilerArgs += listOf("-Xexplicit-api=strict")
 }
 
 dependencies {

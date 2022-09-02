@@ -1,5 +1,5 @@
 /*
- * Designed and developed by 2020 skydoves (Jaewoong Eum)
+ * Designed and developed by 2020-2022 skydoves (Jaewoong Eum)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 
 import com.github.skydoves.landscapist.Configuration
-import com.github.skydoves.landscapist.Versions
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-  id(libs.plugins.android.application.get().pluginId)
-  id(libs.plugins.kotlin.android.get().pluginId)
+  id("landscapist.application.compose")
+  id("landscapist.spotless")
+  id(libs.plugins.hilt.get().pluginId)
   kotlin("kapt")
-  id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -34,29 +33,6 @@ android {
     versionCode = Configuration.versionCode
     versionName = Configuration.versionName
     multiDexEnabled = true
-  }
-
-  lint {
-    abortOnError = false
-  }
-
-  compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = Versions.COMPOSE_COMPILER
-  }
-
-  buildFeatures {
-    compose = true
-  }
-
-  packagingOptions {
-    resources {
-      excludes.add("/META-INF/{AL2.0,LGPL2.1}")
-    }
   }
 }
 
