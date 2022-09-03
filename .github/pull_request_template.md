@@ -1,16 +1,22 @@
-## How to contribute
-We'd love to accept your patches and contributions to this project. There are just a few small guidelines you need to follow.
+### 🎯 Goal
+Describe the big picture of your changes here to communicate to the maintainers why we should accept this pull request. If it fixes a bug or resolves a feature request, be sure to link to that issue.
 
-## Preparing a pull request for review
+### 🛠 Implementation details
+Describe the implementation details for this Pull Request.
+
+### ✍️ Explain examples
+Explain examples with code for this updates.
+
+### Preparing a pull request for review
 Ensure your change is properly formatted by running:
 
-```gradle
-./gradlew spotlessApply
+```bash
+$ ./gradlew spotlessApply
 ```
 
-Then dump binary API of this library that is public in sense of Kotlin visibilities and ensures that the public binary API wasn't changed in a way that make this change binary incompatible. 
+Then dump binary API of this library that is public in sense of Kotlin visibilities and ensures that the public binary API wasn't changed in a way that make this change binary incompatible.
 
-```gradle
+```bash
 ./gradlew apiDump
 ```
 
