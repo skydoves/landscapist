@@ -24,19 +24,19 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.skydoves.landscapist.CircularReveal
-import com.skydoves.landscapist.CircularRevealImage
-import com.skydoves.landscapist.DefaultCircularRevealDuration
+import com.skydoves.landscapist.animation.circular.CircularReveal
+import com.skydoves.landscapist.animation.circular.CircularRevealImage
+import com.skydoves.landscapist.animation.circular.DefaultCircularRevealDuration
 
 @Composable
 fun CircularRevealProfiles(
   imageBitmap: ImageBitmap
 ) {
-  val circularReveal = CircularReveal(
-    duration = DefaultCircularRevealDuration,
+  val circularReveal = com.skydoves.landscapist.animation.circular.CircularReveal(
+    duration = com.skydoves.landscapist.animation.circular.DefaultCircularRevealDuration,
     onFinishListener = { }
   )
-  CircularRevealImage(
+  com.skydoves.landscapist.animation.circular.CircularRevealImage(
     bitmap = imageBitmap,
     modifier = Modifier.size(100.dp),
     bitmapPainter = painterResource(R.drawable.poster),

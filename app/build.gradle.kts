@@ -37,6 +37,15 @@ android {
 }
 
 dependencies {
+  // landscapist
+  implementation(project(":landscapist"))
+  implementation(project(":landscapist-animation"))
+
+  implementation(project(":glide"))
+  implementation(project(":coil"))
+  implementation(project(":fresco"))
+  implementation(project(":fresco-websupport"))
+
   // material
   implementation(libs.androidx.material)
 
@@ -61,10 +70,4 @@ dependencies {
   implementation(libs.androidx.compose.constraintlayout)
 
   implementation("androidx.multidex:multidex:2.0.1")
-
-  // landscapist
-  implementation(project(":fresco"))
-  implementation(project(":fresco-websupport"))
-  implementation(project(":glide"))
-  implementation(project(":coil"))
 }

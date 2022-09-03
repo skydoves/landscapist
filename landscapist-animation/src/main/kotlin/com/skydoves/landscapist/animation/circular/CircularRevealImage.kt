@@ -16,7 +16,7 @@
 @file:JvmName("CircularRevealImage")
 @file:JvmMultifileClass
 
-package com.skydoves.landscapist
+package com.skydoves.landscapist.animation.circular
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
@@ -58,7 +58,7 @@ public fun CircularRevealImage(
 ) {
   Image(
     painter = if (circularReveal != null) {
-      bitmapPainter.circularReveal(
+      bitmapPainter.rememberCircularRevealPainter(
         bitmap,
         circularReveal.duration,
         circularReveal.onFinishListener

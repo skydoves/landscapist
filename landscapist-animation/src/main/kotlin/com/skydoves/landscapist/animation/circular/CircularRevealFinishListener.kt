@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist
+package com.skydoves.landscapist.animation.circular
 
 /**
  * A definition of the circular reveal animation finish listener.
  */
 public fun interface CircularRevealFinishListener {
+
   /** Invoked when the circular reveal animation is finished. */
   public fun onFinish()
 }

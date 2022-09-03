@@ -30,22 +30,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
-import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
-import com.skydoves.landscapist.CircularReveal
-import com.skydoves.landscapist.CircularRevealImage
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImagePlugin
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.palette.BitmapPalette
@@ -75,12 +72,12 @@ import kotlinx.coroutines.flow.callbackFlow
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
  * @param requestListener A class for monitoring the status of a request while images load.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
@@ -98,12 +95,12 @@ public fun GlideImage(
     LocalGlideProvider.getGlideRequestOptions()
   },
   requestListener: RequestListener<Drawable>? = null,
+  imagePlugins: List<ImagePlugin> = emptyList(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   placeHolder: Any? = null,
   error: Any? = null,
@@ -114,13 +111,13 @@ public fun GlideImage(
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
     requestListener = requestListener,
+    imagePlugins = imagePlugins,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
     colorFilter = colorFilter,
     alpha = alpha,
-    circularReveal = circularReveal,
     bitmapPalette = bitmapPalette,
     previewPlaceholder = previewPlaceholder,
     loading = {
@@ -178,12 +175,12 @@ public fun GlideImage(
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
  * @param requestListener A class for monitoring the status of a request while images load.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
@@ -201,12 +198,12 @@ public fun GlideImage(
     LocalGlideProvider.getGlideRequestOptions()
   },
   requestListener: RequestListener<Drawable>? = null,
+  imagePlugins: List<ImagePlugin> = emptyList(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   shimmerParams: ShimmerParams,
   error: Any? = null,
@@ -217,13 +214,13 @@ public fun GlideImage(
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
     requestListener = requestListener,
+    imagePlugins = imagePlugins,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
     colorFilter = colorFilter,
     alpha = alpha,
-    circularReveal = circularReveal,
     shimmerParams = shimmerParams,
     bitmapPalette = bitmapPalette,
     previewPlaceholder = previewPlaceholder,
@@ -270,12 +267,12 @@ public fun GlideImage(
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
  * @param requestListener A class for monitoring the status of a request while images load.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
@@ -294,12 +291,12 @@ public fun GlideImage(
     LocalGlideProvider.getGlideRequestOptions()
   },
   requestListener: RequestListener<Drawable>? = null,
+  imagePlugins: List<ImagePlugin> = emptyList(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
@@ -346,16 +343,18 @@ public fun GlideImage(
           success.invoke(this, glideImageState)
         } else {
           val drawable = glideImageState.drawable ?: return@ImageRequest
-          CircularRevealImage(
+
+          Image(
             modifier = Modifier.fillMaxSize(),
-            bitmap = drawable.toBitmap().asImageBitmap(),
-            bitmapPainter = rememberDrawablePainter(drawable),
+            painter = rememberDrawablePainter(
+              drawable = drawable,
+              imagePlugins = imagePlugins
+            ),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
             alpha = alpha,
-            colorFilter = colorFilter,
-            circularReveal = circularReveal
+            colorFilter = colorFilter
           )
         }
       }
@@ -393,12 +392,12 @@ public fun GlideImage(
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
  * @param requestListener A class for monitoring the status of a request while images load.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
@@ -417,12 +416,12 @@ public fun GlideImage(
     LocalGlideProvider.getGlideRequestOptions()
   },
   requestListener: RequestListener<Drawable>? = null,
+  imagePlugins: List<ImagePlugin> = emptyList(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: GlideImageState.Loading) -> Unit)? = null,
@@ -460,16 +459,17 @@ public fun GlideImage(
           success.invoke(this, glideImageState)
         } else {
           val drawable = glideImageState.drawable ?: return@ImageRequest
-          CircularRevealImage(
+          Image(
             modifier = Modifier.fillMaxSize(),
-            bitmap = drawable.toBitmap().asImageBitmap(),
-            bitmapPainter = rememberDrawablePainter(drawable),
+            painter = rememberDrawablePainter(
+              drawable = drawable,
+              imagePlugins = imagePlugins
+            ),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
             alpha = alpha,
-            colorFilter = colorFilter,
-            circularReveal = circularReveal
+            colorFilter = colorFilter
           )
         }
       }

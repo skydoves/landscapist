@@ -39,14 +39,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.palette.graphics.Palette
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
-import com.skydoves.landscapist.CircularReveal
-import com.skydoves.landscapist.CircularRevealImage
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImagePlugin
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.palette.BitmapPalette
+import com.skydoves.landscapist.rememberBitmapPainter
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
@@ -70,12 +70,12 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param imageUrl The target url to request image.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
@@ -89,12 +89,12 @@ public fun FrescoImage(
   imageRequest: @Composable () -> ImageRequest = {
     LocalFrescoProvider.getFrescoImageRequest(imageUrl)
   },
+  imagePlugins: List<ImagePlugin> = emptyList(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   placeHolder: Any? = null,
   error: Any? = null,
@@ -104,13 +104,13 @@ public fun FrescoImage(
   FrescoImage(
     imageUrl = imageUrl,
     imageRequest = imageRequest,
+    imagePlugins = imagePlugins,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
     colorFilter = colorFilter,
     alpha = alpha,
-    circularReveal = circularReveal,
     bitmapPalette = bitmapPalette,
     observeLoadingProcess = observeLoadingProcess,
     previewPlaceholder = previewPlaceholder,
@@ -168,7 +168,7 @@ public fun FrescoImage(
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
@@ -187,7 +187,7 @@ public fun FrescoImage(
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
+  imagePlugins: List<ImagePlugin> = emptyList(),
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   error: ImageBitmap? = null,
@@ -197,13 +197,13 @@ public fun FrescoImage(
   FrescoImage(
     imageUrl = imageUrl,
     imageRequest = imageRequest,
+    imagePlugins = imagePlugins,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
     colorFilter = colorFilter,
     alpha = alpha,
-    circularReveal = circularReveal,
     observeLoadingProcess = observeLoadingProcess,
     shimmerParams = shimmerParams,
     bitmapPalette = bitmapPalette,
@@ -243,12 +243,12 @@ public fun FrescoImage(
  * @param imageUrl The target url to request image.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param success Content to be displayed when the request is succeeded.
@@ -262,12 +262,12 @@ public fun FrescoImage(
   imageRequest: @Composable () -> ImageRequest = {
     LocalFrescoProvider.getFrescoImageRequest(imageUrl)
   },
+  imagePlugins: List<ImagePlugin> = emptyList(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
   observeLoadingProcess: Boolean = false,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
@@ -313,15 +313,18 @@ public fun FrescoImage(
           success.invoke(this, frescoImageState)
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
-          CircularRevealImage(
+
+          Image(
             modifier = Modifier.fillMaxSize(),
-            bitmap = imageBitmap,
+            painter = rememberBitmapPainter(
+              imagePlugins = imagePlugins,
+              imageBitmap = imageBitmap
+            ),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
             alpha = alpha,
-            colorFilter = colorFilter,
-            circularReveal = circularReveal
+            colorFilter = colorFilter
           )
         }
       }
@@ -351,12 +354,12 @@ public fun FrescoImage(
  * @param imageUrl The target url to request image.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
@@ -370,12 +373,12 @@ public fun FrescoImage(
   imageRequest: @Composable () -> ImageRequest = {
     LocalFrescoProvider.getFrescoImageRequest(imageUrl)
   },
+  imagePlugins: List<ImagePlugin> = emptyList(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   observeLoadingProcess: Boolean = false,
   @DrawableRes previewPlaceholder: Int = 0,
@@ -412,15 +415,18 @@ public fun FrescoImage(
           success.invoke(this, frescoImageState)
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
-          CircularRevealImage(
+
+          Image(
             modifier = Modifier.fillMaxSize(),
-            bitmap = imageBitmap,
+            painter = rememberBitmapPainter(
+              imagePlugins = imagePlugins,
+              imageBitmap = imageBitmap
+            ),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
             alpha = alpha,
-            colorFilter = colorFilter,
-            circularReveal = circularReveal
+            colorFilter = colorFilter
           )
         }
       }
