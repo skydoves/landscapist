@@ -13,40 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.github.skydoves.landscapist.Configuration
 
 plugins {
-  id("landscapist.application.compose")
+  id("landscapist.library.compose")
   id("landscapist.spotless")
 }
 
+rootProject.extra.apply {
+  set("PUBLISH_GROUP_ID", Configuration.artifactGroup)
+  set("PUBLISH_ARTIFACT_ID", "landscapist-animation")
+  set("PUBLISH_VERSION", rootProject.extra.get("rootVersionName"))
+}
+
+apply(from = "${rootDir}/scripts/publish-module.gradle")
+
 android {
   compileSdk = Configuration.compileSdk
-  defaultConfig {
-    applicationId = "com.skydoves.benchmark.landscapist.app"
-    minSdk = 23
-    targetSdk = Configuration.targetSdk
-    versionCode = Configuration.versionCode
-    versionName = Configuration.versionName
-  }
 
-  buildTypes {
-    create("benchmark") {
-      isDebuggable = true
-      signingConfig = getByName("debug").signingConfig
-      matchingFallbacks += listOf("release")
-    }
+  defaultConfig {
+    minSdk = Configuration.minSdk
+    targetSdk = Configuration.targetSdk
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 }
 
 dependencies {
-  implementation(project(":landscapist"))
+  api(project(":landscapist"))
 
-  implementation(libs.androidx.material)
-  implementation(libs.androidx.activity.compose)
+  implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.compose.ui)
-  implementation(libs.androidx.compose.ui.tooling)
   implementation(libs.androidx.compose.runtime)
-  implementation(libs.androidx.compose.material)
+  implementation(libs.androidx.compose.foundation)
+
+  androidTestImplementation(libs.androidx.test.rules)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.androidx.test.junit)
+  androidTestImplementation(libs.androidx.compose.ui)
+  androidTestImplementation(libs.androidx.compose.ui.test)
 }

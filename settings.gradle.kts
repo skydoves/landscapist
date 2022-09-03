@@ -21,9 +21,10 @@ dependencyResolutionManagement {
 rootProject.name = "LandscapistDemo"
 include(":app")
 include(":landscapist")
+include(":landscapist-animation")
 include(":coil")
 include(":glide")
 include(":fresco")
 include(":fresco-websupport")
-include(":benchmark-landscapist-app")
 include(":benchmark-landscapist")
+include(":benchmark-landscapist-app")
