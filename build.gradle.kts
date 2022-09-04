@@ -11,20 +11,3 @@ plugins {
 }
 
 apply(from = "${rootDir}/scripts/publish-root.gradle")
-
-subprojects {
-  tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = libs.versions.jvmTarget.get()
-    // set compiler options
-    kotlinOptions.freeCompilerArgs += listOf(
-      "-Xskip-prerelease-check",
-      "-Xopt-in=kotlin.RequiresOptIn",
-      "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
-    )
-  }
-
-  tasks.withType<org.jetbrains.dokka.gradle.DokkaMultiModuleTask> {
-    outputDirectory.set(rootProject.file("docs/api"))
-    failOnWarning.set(true)
-  }
-}

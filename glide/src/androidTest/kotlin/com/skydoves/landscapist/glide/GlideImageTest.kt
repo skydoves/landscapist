@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.bumptech.glide.Glide
-import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.ShimmerParams
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -77,7 +76,6 @@ internal class GlideImageTest {
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
-        circularReveal = CircularReveal(),
         shimmerParams = ShimmerParams(
           baseColor = Color.DarkGray,
           highlightColor = Color.LightGray
@@ -98,7 +96,6 @@ internal class GlideImageTest {
     composeTestRule.setContent {
       val glide = Glide.with(LocalView.current)
         .asDrawable()
-        .thumbnail(0.1f)
         .addListener(
           TestRequestListener {
             latch.countDown()

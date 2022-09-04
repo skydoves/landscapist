@@ -27,7 +27,6 @@ class MainActivity : ComponentActivity() {
     setContent {
       Column {
         BitmapPaletteProfiles()
-        ImageLoadProfiles()
         ShimmerProfiles()
       }
     }

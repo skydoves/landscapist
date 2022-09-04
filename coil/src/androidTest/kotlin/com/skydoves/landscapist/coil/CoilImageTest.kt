@@ -34,9 +34,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import coil.EventListener
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
-import coil.decode.Options
 import coil.fetch.Fetcher
 import coil.request.ImageRequest
+import coil.request.Options
 import com.skydoves.landscapist.ShimmerParams
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -123,7 +123,7 @@ internal class CoilImageTest {
     val eventListener = object : EventListener {
       val startCalled = AtomicInteger()
 
-      override fun fetchStart(request: ImageRequest, fetcher: Fetcher<*>, options: Options) {
+      override fun fetchStart(request: ImageRequest, fetcher: Fetcher, options: Options) {
         startCalled.incrementAndGet()
       }
     }

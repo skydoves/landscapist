@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist
+package com.skydoves.landscapist.animation.circular
 
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.painter.Painter
  * @param durationMs milli-second times from start to finish animation.
  */
 @Composable
-internal fun Painter.circularReveal(
+internal fun Painter.rememberCircularRevealPainter(
   imageBitmap: ImageBitmap,
   durationMs: Int,
   onFinishListener: CircularRevealFinishListener? = null

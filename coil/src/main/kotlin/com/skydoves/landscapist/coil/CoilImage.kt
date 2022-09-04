@@ -47,11 +47,10 @@ import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.request.Disposable
 import coil.request.ImageRequest
-import com.skydoves.landscapist.CircularReveal
-import com.skydoves.landscapist.CircularRevealImage
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImagePlugin
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.palette.BitmapPalette
@@ -84,12 +83,12 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
+ *
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
@@ -103,12 +102,12 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
+  imagePlugins: List<ImagePlugin> = emptyList(),
   requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
-  circularReveal: CircularReveal? = null,
   colorFilter: ColorFilter? = null,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
@@ -120,13 +119,13 @@ public fun CoilImage(
     context = context,
     lifecycleOwner = lifecycleOwner,
     imageLoader = imageLoader,
+    imagePlugins = imagePlugins,
     requestListener = requestListener,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     alpha = alpha,
     colorFilter = colorFilter,
-    circularReveal = circularReveal,
     shimmerParams = shimmerParams,
     bitmapPalette = bitmapPalette,
     previewPlaceholder = previewPlaceholder,
@@ -169,12 +168,12 @@ public fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
@@ -188,12 +187,12 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
+  imagePlugins: List<ImagePlugin> = emptyList(),
   requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
-  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   colorFilter: ColorFilter? = null,
   placeHolder: Any? = null,
@@ -205,13 +204,13 @@ public fun CoilImage(
     context = context,
     lifecycleOwner = lifecycleOwner,
     imageLoader = imageLoader,
+    imagePlugins = imagePlugins,
     requestListener = requestListener,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     alpha = alpha,
     colorFilter = colorFilter,
-    circularReveal = circularReveal,
     bitmapPalette = bitmapPalette,
     previewPlaceholder = previewPlaceholder,
     loading = {
@@ -264,12 +263,12 @@ public fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
@@ -283,13 +282,13 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
+  imagePlugins: List<ImagePlugin> = emptyList(),
   requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
@@ -303,13 +302,13 @@ public fun CoilImage(
       .lifecycle(lifecycleOwner)
       .build(),
     imageLoader = imageLoader,
+    imagePlugins = imagePlugins,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
     alpha = alpha,
     colorFilter = colorFilter,
-    circularReveal = circularReveal,
     shimmerParams = shimmerParams,
     bitmapPalette = bitmapPalette,
     previewPlaceholder = previewPlaceholder,
@@ -342,12 +341,12 @@ public fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
@@ -362,13 +361,13 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
+  imagePlugins: List<ImagePlugin> = emptyList(),
   requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
@@ -382,13 +381,13 @@ public fun CoilImage(
       .lifecycle(lifecycleOwner)
       .build(),
     imageLoader = imageLoader,
+    imagePlugins = imagePlugins,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
     contentDescription = contentDescription,
     alpha = alpha,
     colorFilter = colorFilter,
-    circularReveal = circularReveal,
     bitmapPalette = bitmapPalette,
     previewPlaceholder = previewPlaceholder,
     loading = loading,
@@ -419,11 +418,11 @@ public fun CoilImage(
  * @param imageRequest The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
@@ -435,12 +434,12 @@ public fun CoilImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
+  imagePlugins: List<ImagePlugin> = emptyList(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
@@ -484,16 +483,18 @@ public fun CoilImage(
           success.invoke(this, coilImageState)
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
-          CircularRevealImage(
+
+          Image(
             modifier = Modifier.fillMaxSize(),
-            bitmap = drawable.toBitmap().asImageBitmap(),
-            bitmapPainter = rememberDrawablePainter(drawable = drawable),
+            painter = rememberDrawablePainter(
+              drawable = drawable,
+              imagePlugins = imagePlugins
+            ),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
             alpha = alpha,
-            colorFilter = colorFilter,
-            circularReveal = circularReveal
+            colorFilter = colorFilter
           )
         }
       }
@@ -526,11 +527,11 @@ public fun CoilImage(
  * @param imageRequest The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
+ * @param imagePlugins A list of plugins to be executed for loading images.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param circularReveal circular reveal parameters for running reveal animation when images are successfully loaded.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
@@ -543,12 +544,12 @@ public fun CoilImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
+  imagePlugins: List<ImagePlugin> = emptyList(),
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularReveal? = null,
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
@@ -583,16 +584,18 @@ public fun CoilImage(
           success.invoke(this, coilImageState)
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
-          CircularRevealImage(
+
+          Image(
             modifier = Modifier.fillMaxSize(),
-            bitmap = drawable.toBitmap().asImageBitmap(),
-            bitmapPainter = rememberDrawablePainter(drawable = drawable),
+            painter = rememberDrawablePainter(
+              drawable = drawable,
+              imagePlugins = imagePlugins
+            ),
             alignment = alignment,
             contentScale = contentScale,
             contentDescription = contentDescription,
             alpha = alpha,
-            colorFilter = colorFilter,
-            circularReveal = circularReveal
+            colorFilter = colorFilter
           )
         }
       }
