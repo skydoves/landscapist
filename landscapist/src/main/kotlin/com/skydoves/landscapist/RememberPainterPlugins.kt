@@ -27,6 +27,8 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.core.graphics.drawable.toBitmap
+import com.skydoves.landscapist.plugins.ImagePlugin
+import com.skydoves.landscapist.plugins.composePlugins
 
 /**
  * Remembers [Drawable] wrapped up as a [Painter] with a given the list of [ImagePlugin].
