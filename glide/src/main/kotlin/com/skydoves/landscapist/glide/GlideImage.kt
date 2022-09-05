@@ -42,10 +42,13 @@ import com.bumptech.glide.request.RequestOptions
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
-import com.skydoves.landscapist.ImagePlugin
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.components.ImageComponent
+import com.skydoves.landscapist.components.imagePlugins
+import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.palette.BitmapPalette
+import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -72,7 +75,7 @@ import kotlinx.coroutines.flow.callbackFlow
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
  * @param requestListener A class for monitoring the status of a request while images load.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -95,7 +98,7 @@ public fun GlideImage(
     LocalGlideProvider.getGlideRequestOptions()
   },
   requestListener: RequestListener<Drawable>? = null,
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -111,7 +114,7 @@ public fun GlideImage(
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
     requestListener = requestListener,
-    imagePlugins = imagePlugins,
+    component = component,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -175,7 +178,7 @@ public fun GlideImage(
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
  * @param requestListener A class for monitoring the status of a request while images load.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -198,7 +201,7 @@ public fun GlideImage(
     LocalGlideProvider.getGlideRequestOptions()
   },
   requestListener: RequestListener<Drawable>? = null,
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -214,7 +217,7 @@ public fun GlideImage(
     requestBuilder = requestBuilder,
     requestOptions = requestOptions,
     requestListener = requestListener,
-    imagePlugins = imagePlugins,
+    component = component,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -267,7 +270,7 @@ public fun GlideImage(
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
  * @param requestListener A class for monitoring the status of a request while images load.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -291,7 +294,7 @@ public fun GlideImage(
     LocalGlideProvider.getGlideRequestOptions()
   },
   requestListener: RequestListener<Drawable>? = null,
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -348,7 +351,7 @@ public fun GlideImage(
             modifier = Modifier.fillMaxSize(),
             painter = rememberDrawablePainter(
               drawable = drawable,
-              imagePlugins = imagePlugins
+              imagePlugins = component.imagePlugins
             ),
             alignment = alignment,
             contentScale = contentScale,
@@ -392,7 +395,7 @@ public fun GlideImage(
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
  * @param requestListener A class for monitoring the status of a request while images load.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -416,7 +419,7 @@ public fun GlideImage(
     LocalGlideProvider.getGlideRequestOptions()
   },
   requestListener: RequestListener<Drawable>? = null,
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -463,7 +466,7 @@ public fun GlideImage(
             modifier = Modifier.fillMaxSize(),
             painter = rememberDrawablePainter(
               drawable = drawable,
-              imagePlugins = imagePlugins
+              imagePlugins = component.imagePlugins
             ),
             alignment = alignment,
             contentScale = contentScale,

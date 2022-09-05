@@ -50,10 +50,13 @@ import coil.request.ImageRequest
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
-import com.skydoves.landscapist.ImagePlugin
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.components.ImageComponent
+import com.skydoves.landscapist.components.imagePlugins
+import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.palette.BitmapPalette
+import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -102,7 +105,7 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
@@ -119,7 +122,7 @@ public fun CoilImage(
     context = context,
     lifecycleOwner = lifecycleOwner,
     imageLoader = imageLoader,
-    imagePlugins = imagePlugins,
+    component = component,
     requestListener = requestListener,
     modifier = modifier,
     alignment = alignment,
@@ -168,7 +171,7 @@ public fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
@@ -187,7 +190,7 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   alpha: Float = DefaultAlpha,
@@ -204,7 +207,7 @@ public fun CoilImage(
     context = context,
     lifecycleOwner = lifecycleOwner,
     imageLoader = imageLoader,
-    imagePlugins = imagePlugins,
+    component = component,
     requestListener = requestListener,
     modifier = modifier,
     alignment = alignment,
@@ -263,7 +266,7 @@ public fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
@@ -282,7 +285,7 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -302,7 +305,7 @@ public fun CoilImage(
       .lifecycle(lifecycleOwner)
       .build(),
     imageLoader = imageLoader,
-    imagePlugins = imagePlugins,
+    component = component,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -341,7 +344,7 @@ public fun CoilImage(
  * @param context The context for creating the [ImageRequest.Builder].
  * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
@@ -361,7 +364,7 @@ public fun CoilImage(
   context: Context = LocalContext.current,
   lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   requestListener: ImageRequest.Listener? = null,
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
@@ -381,7 +384,7 @@ public fun CoilImage(
       .lifecycle(lifecycleOwner)
       .build(),
     imageLoader = imageLoader,
-    imagePlugins = imagePlugins,
+    component = component,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -418,7 +421,7 @@ public fun CoilImage(
  * @param imageRequest The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
@@ -434,7 +437,7 @@ public fun CoilImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -488,7 +491,7 @@ public fun CoilImage(
             modifier = Modifier.fillMaxSize(),
             painter = rememberDrawablePainter(
               drawable = drawable,
-              imagePlugins = imagePlugins
+              imagePlugins = component.imagePlugins
             ),
             alignment = alignment,
             contentScale = contentScale,
@@ -527,7 +530,7 @@ public fun CoilImage(
  * @param imageRequest The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
@@ -544,7 +547,7 @@ public fun CoilImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -589,7 +592,7 @@ public fun CoilImage(
             modifier = Modifier.fillMaxSize(),
             painter = rememberDrawablePainter(
               drawable = drawable,
-              imagePlugins = imagePlugins
+              imagePlugins = component.imagePlugins
             ),
             alignment = alignment,
             contentScale = contentScale,

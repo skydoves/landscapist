@@ -19,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
-import com.skydoves.landscapist.ImagePlugin
+import com.skydoves.landscapist.plugins.ImagePlugin
 
 /**
  * An image plugin that extends [ImagePlugin.PainterPlugin] to be executed over the given painter.ø

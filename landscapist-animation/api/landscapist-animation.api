@@ -1,4 +1,4 @@
-public final class com/skydoves/landscapist/animation/circular/CircularReveal : com/skydoves/landscapist/ImagePlugin$PainterPlugin {
+public final class com/skydoves/landscapist/animation/circular/CircularReveal : com/skydoves/landscapist/plugins/ImagePlugin$PainterPlugin {
 	public fun <init> ()V
 	public fun <init> (ILcom/skydoves/landscapist/animation/circular/CircularRevealFinishListener;)V
 	public synthetic fun <init> (ILcom/skydoves/landscapist/animation/circular/CircularRevealFinishListener;ILkotlin/jvm/internal/DefaultConstructorMarker;)V

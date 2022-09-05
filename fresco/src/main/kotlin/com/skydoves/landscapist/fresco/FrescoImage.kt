@@ -42,10 +42,13 @@ import com.facebook.imagepipeline.request.ImageRequest
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
-import com.skydoves.landscapist.ImagePlugin
 import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.components.ImageComponent
+import com.skydoves.landscapist.components.imagePlugins
+import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.palette.BitmapPalette
+import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberBitmapPainter
 import kotlinx.coroutines.suspendCancellableCoroutine
 
@@ -70,7 +73,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param imageUrl The target url to request image.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageRequest The pipeline has to know about requested image to proceed.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -89,7 +92,7 @@ public fun FrescoImage(
   imageRequest: @Composable () -> ImageRequest = {
     LocalFrescoProvider.getFrescoImageRequest(imageUrl)
   },
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -104,7 +107,7 @@ public fun FrescoImage(
   FrescoImage(
     imageUrl = imageUrl,
     imageRequest = imageRequest,
-    imagePlugins = imagePlugins,
+    component = component,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -163,12 +166,12 @@ public fun FrescoImage(
  * @param imageUrl The target url to request image.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageRequest The pipeline has to know about requested image to proceed.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
  * used for the loaded [ImageBitmap].
  * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param imagePlugins A list of plugins to be executed for loading images.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
@@ -182,12 +185,12 @@ public fun FrescoImage(
   imageRequest: @Composable () -> ImageRequest = {
     LocalFrescoProvider.getFrescoImageRequest(imageUrl)
   },
+  component: ImageComponent = rememberImageComponent {},
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  imagePlugins: List<ImagePlugin> = emptyList(),
   shimmerParams: ShimmerParams,
   bitmapPalette: BitmapPalette? = null,
   error: ImageBitmap? = null,
@@ -197,7 +200,7 @@ public fun FrescoImage(
   FrescoImage(
     imageUrl = imageUrl,
     imageRequest = imageRequest,
-    imagePlugins = imagePlugins,
+    component = component,
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,
@@ -225,8 +228,8 @@ public fun FrescoImage(
 }
 
 /**
- * Requests loading an image and create some composables based on [FrescoImageState].
- *
+ * Requests loading an image and execute Composable depending on [FrescoImageState].
+ *ø
  * ```
  * FrescoImage(
  * imageUrl = stringImageUrl,
@@ -243,7 +246,7 @@ public fun FrescoImage(
  * @param imageUrl The target url to request image.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageRequest The pipeline has to know about requested image to proceed.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -262,7 +265,7 @@ public fun FrescoImage(
   imageRequest: @Composable () -> ImageRequest = {
     LocalFrescoProvider.getFrescoImageRequest(imageUrl)
   },
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -317,7 +320,7 @@ public fun FrescoImage(
           Image(
             modifier = Modifier.fillMaxSize(),
             painter = rememberBitmapPainter(
-              imagePlugins = imagePlugins,
+              imagePlugins = component.imagePlugins,
               imageBitmap = imageBitmap
             ),
             alignment = alignment,
@@ -333,7 +336,7 @@ public fun FrescoImage(
 }
 
 /**
- * Requests loading an image and create some composables based on [FrescoImageState].
+ * Requests loading an image and execute Composable depending on [FrescoImageState].
  *
  * ```
  * FrescoImage(
@@ -354,7 +357,7 @@ public fun FrescoImage(
  * @param imageUrl The target url to request image.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageRequest The pipeline has to know about requested image to proceed.
- * @param imagePlugins A list of plugins to be executed for loading images.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
  * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
@@ -373,7 +376,7 @@ public fun FrescoImage(
   imageRequest: @Composable () -> ImageRequest = {
     LocalFrescoProvider.getFrescoImageRequest(imageUrl)
   },
-  imagePlugins: List<ImagePlugin> = emptyList(),
+  component: ImageComponent = rememberImageComponent {},
   alignment: Alignment = Alignment.Center,
   contentScale: ContentScale = ContentScale.Crop,
   contentDescription: String? = null,
@@ -419,7 +422,7 @@ public fun FrescoImage(
           Image(
             modifier = Modifier.fillMaxSize(),
             painter = rememberBitmapPainter(
-              imagePlugins = imagePlugins,
+              imagePlugins = component.imagePlugins,
               imageBitmap = imageBitmap
             ),
             alignment = alignment,
