@@ -34,8 +34,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -47,11 +45,11 @@ import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.request.Disposable
 import coil.request.ImageRequest
-import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
-import com.skydoves.landscapist.Shimmer
-import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.components.ComposeFailureStatePlugins
+import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
+import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
 import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -60,265 +58,6 @@ import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
-
-/**
- * Requests loading an image with a loading placeholder and error image resource ([ImageBitmap], [ImageVector], [Painter]).
- *
- * ```
- * CoilImage(
- *   imageModel = imageModel,
- * shimmerParams = ShimmerParams (
- *  baseColor = backgroundColor,
- *  highlightColor = highlightColor
- * ),
- *  error = ImageBitmap.imageResource(R.drawable.error)
- * )
- * ```
- *
- * or we can use [ImageVector] or custom [Painter] like the below.
- *
- * ```
- * error = ImageVector.vectorResource(R.drawable.error)
- * ```
- *
- * @param imageModel The data model to request image. See [ImageRequest.Builder.data] for types allowed.
- * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param context The context for creating the [ImageRequest.Builder].
- * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
- * @param imageLoader The [ImageLoader] to use when requesting the image.
- *
- * @param requestListener A class for monitoring the status of a request while images load.
- * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
- * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
- * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
- * @param shimmerParams The shimmer related parameter used to determine constructions of the [Shimmer].
- * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
- * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
- * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
- */
-@Composable
-public fun CoilImage(
-  imageModel: Any?,
-  modifier: Modifier = Modifier,
-  context: Context = LocalContext.current,
-  lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-  imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
-  component: ImageComponent = rememberImageComponent {},
-  requestListener: ImageRequest.Listener? = null,
-  alignment: Alignment = Alignment.Center,
-  alpha: Float = DefaultAlpha,
-  contentScale: ContentScale = ContentScale.Crop,
-  contentDescription: String? = null,
-  colorFilter: ColorFilter? = null,
-  shimmerParams: ShimmerParams,
-  bitmapPalette: BitmapPalette? = null,
-  error: Any? = null,
-  @DrawableRes previewPlaceholder: Int = 0
-) {
-  CoilImage(
-    imageModel = imageModel,
-    context = context,
-    lifecycleOwner = lifecycleOwner,
-    imageLoader = imageLoader,
-    component = component,
-    requestListener = requestListener,
-    modifier = modifier,
-    alignment = alignment,
-    contentScale = contentScale,
-    alpha = alpha,
-    colorFilter = colorFilter,
-    shimmerParams = shimmerParams,
-    bitmapPalette = bitmapPalette,
-    previewPlaceholder = previewPlaceholder,
-    failure = {
-      error?.let {
-        ImageBySource(
-          source = it,
-          modifier = Modifier.matchParentSize(),
-          alignment,
-          contentScale,
-          contentDescription,
-          colorFilter,
-          alpha
-        )
-      }
-    }
-  )
-}
-
-/**
- * Requests loading an image with a loading placeholder and error image resource ([ImageBitmap], [ImageVector], [Painter]).
- *
- * ```
- * CoilImage(
- *   imageModel = imageModel,
- *   placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
- *   error = ImageBitmap.imageResource(R.drawable.error)
- * )
- * ```
- *
- * or we can use [ImageVector] or custom [Painter] like the below.
- *
- * ```
- * placeHolder = ImageVector.vectorResource(R.drawable.placeholder)
- * error = ImageVector.vectorResource(R.drawable.error)
- * ```
- *
- * @param imageModel The data model to request image. See [ImageRequest.Builder.data] for types allowed.
- * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param context The context for creating the [ImageRequest.Builder].
- * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
- * @param imageLoader The [ImageLoader] to use when requesting the image.
- * @param component An image component that conjuncts pluggable [ImagePlugin]s.
- * @param requestListener A class for monitoring the status of a request while images load.
- * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
- * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
- * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
- * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
- * @param placeHolder An [ImageBitmap], [ImageVector], or [Painter] to be displayed when the request is in progress.
- * @param error An [ImageBitmap], [ImageVector], or [Painter] for showing instead of the target image when images are failed to load.
- * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
- */
-@Composable
-public fun CoilImage(
-  imageModel: Any?,
-  modifier: Modifier = Modifier,
-  context: Context = LocalContext.current,
-  lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-  imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
-  component: ImageComponent = rememberImageComponent {},
-  requestListener: ImageRequest.Listener? = null,
-  alignment: Alignment = Alignment.Center,
-  alpha: Float = DefaultAlpha,
-  contentScale: ContentScale = ContentScale.Crop,
-  contentDescription: String? = null,
-  bitmapPalette: BitmapPalette? = null,
-  colorFilter: ColorFilter? = null,
-  placeHolder: Any? = null,
-  error: Any? = null,
-  @DrawableRes previewPlaceholder: Int = 0
-) {
-  CoilImage(
-    imageModel = imageModel,
-    context = context,
-    lifecycleOwner = lifecycleOwner,
-    imageLoader = imageLoader,
-    component = component,
-    requestListener = requestListener,
-    modifier = modifier,
-    alignment = alignment,
-    contentScale = contentScale,
-    alpha = alpha,
-    colorFilter = colorFilter,
-    bitmapPalette = bitmapPalette,
-    previewPlaceholder = previewPlaceholder,
-    loading = {
-      placeHolder?.let {
-        ImageBySource(
-          source = it,
-          modifier = Modifier.matchParentSize(),
-          alignment = alignment,
-          contentDescription = contentDescription,
-          contentScale = contentScale,
-          colorFilter = colorFilter,
-          alpha = alpha
-        )
-      }
-    },
-    failure = {
-      error?.let {
-        ImageBySource(
-          source = it,
-          modifier = Modifier.matchParentSize(),
-          alignment = alignment,
-          contentDescription = contentDescription,
-          contentScale = contentScale,
-          colorFilter = colorFilter,
-          alpha = alpha
-        )
-      }
-    }
-  )
-}
-
-/**
- * Requests loading an image and create some composables based on [CoilImageState].
- *
- * ```
- * CoilImage(
- * imageModel = imageModel,
- * modifier = modifier,
- * shimmerParams = ShimmerParams (
- *  baseColor = backgroundColor,
- *  highlightColor = highlightColor
- * ),
- * failure = {
- *   Text(text = "image request failed.")
- * })
- * ```
- *
- * @param imageModel The data model to request image. See [ImageRequest.Builder.data] for types allowed.
- * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param context The context for creating the [ImageRequest.Builder].
- * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
- * @param imageLoader The [ImageLoader] to use when requesting the image.
- * @param component An image component that conjuncts pluggable [ImagePlugin]s.
- * @param requestListener A class for monitoring the status of a request while images load.
- * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
- * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
- * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
- * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
- * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
- * @param success Content to be displayed when the request is succeeded.
- * @param failure Content to be displayed when the request is failed.
- */
-@Composable
-public fun CoilImage(
-  imageModel: Any?,
-  modifier: Modifier = Modifier,
-  context: Context = LocalContext.current,
-  lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-  imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
-  component: ImageComponent = rememberImageComponent {},
-  requestListener: ImageRequest.Listener? = null,
-  alignment: Alignment = Alignment.Center,
-  contentScale: ContentScale = ContentScale.Crop,
-  contentDescription: String? = null,
-  alpha: Float = DefaultAlpha,
-  colorFilter: ColorFilter? = null,
-  shimmerParams: ShimmerParams,
-  bitmapPalette: BitmapPalette? = null,
-  @DrawableRes previewPlaceholder: Int = 0,
-  success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
-) {
-  CoilImage(
-    imageRequest = ImageRequest.Builder(context)
-      .data(imageModel)
-      .listener(requestListener)
-      .lifecycle(lifecycleOwner)
-      .build(),
-    imageLoader = imageLoader,
-    component = component,
-    modifier = modifier,
-    alignment = alignment,
-    contentScale = contentScale,
-    contentDescription = contentDescription,
-    alpha = alpha,
-    colorFilter = colorFilter,
-    shimmerParams = shimmerParams,
-    bitmapPalette = bitmapPalette,
-    previewPlaceholder = previewPlaceholder,
-    success = success,
-    failure = failure
-  )
-}
 
 /**
  * Requests loading an image and create some composables based on [CoilImageState].
@@ -409,112 +148,6 @@ public fun CoilImage(
  *      .lifecycle(lifecycleOwner)
  *      .build(),
  * modifier = modifier,
- * shimmerParams = ShimmerParams (
- *  baseColor = backgroundColor,
- *  highlightColor = highlightColor
- * ),
- * failure = {
- *   Text(text = "image request failed.")
- * })
- * ```
- *
- * @param imageRequest The request to execute.
- * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param imageLoader The [ImageLoader] to use when requesting the image.
- * @param component An image component that conjuncts pluggable [ImagePlugin]s.
- * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
- * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
- * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
- * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
- * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
- * @param success Content to be displayed when the request is succeeded.
- * @param failure Content to be displayed when the request is failed.
- */
-@Composable
-public fun CoilImage(
-  imageRequest: ImageRequest,
-  modifier: Modifier = Modifier,
-  imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
-  component: ImageComponent = rememberImageComponent {},
-  alignment: Alignment = Alignment.Center,
-  contentScale: ContentScale = ContentScale.Crop,
-  contentDescription: String? = null,
-  alpha: Float = DefaultAlpha,
-  colorFilter: ColorFilter? = null,
-  shimmerParams: ShimmerParams,
-  bitmapPalette: BitmapPalette? = null,
-  @DrawableRes previewPlaceholder: Int = 0,
-  success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
-) {
-  if (LocalInspectionMode.current && previewPlaceholder != 0) {
-    Image(
-      modifier = modifier,
-      painter = painterResource(id = previewPlaceholder),
-      alignment = alignment,
-      contentScale = contentScale,
-      alpha = alpha,
-      colorFilter = colorFilter,
-      contentDescription = contentDescription
-    )
-    return
-  }
-
-  CoilImage(
-    recomposeKey = imageRequest,
-    imageLoader = imageLoader.invoke(),
-    modifier = modifier,
-    bitmapPalette = bitmapPalette
-  ) ImageRequest@{ imageState ->
-    when (val coilImageState = imageState.toCoilImageState()) {
-      is CoilImageState.None -> Unit
-      is CoilImageState.Loading -> {
-        Shimmer(
-          baseColor = shimmerParams.baseColor,
-          highlightColor = shimmerParams.highlightColor,
-          intensity = shimmerParams.intensity,
-          dropOff = shimmerParams.dropOff,
-          tilt = shimmerParams.tilt,
-          durationMillis = shimmerParams.durationMillis
-        )
-      }
-      is CoilImageState.Failure -> failure?.invoke(this, coilImageState)
-      is CoilImageState.Success -> {
-        if (success != null) {
-          success.invoke(this, coilImageState)
-        } else {
-          val drawable = coilImageState.drawable ?: return@ImageRequest
-
-          Image(
-            modifier = Modifier.fillMaxSize(),
-            painter = rememberDrawablePainter(
-              drawable = drawable,
-              imagePlugins = component.imagePlugins
-            ),
-            alignment = alignment,
-            contentScale = contentScale,
-            contentDescription = contentDescription,
-            alpha = alpha,
-            colorFilter = colorFilter
-          )
-        }
-      }
-    }
-  }
-}
-
-/**
- * Requests loading an image and create some composables based on [CoilImageState].
- *
- * ```
- * CoilImage(
- * imageRequest = ImageRequest.Builder(context)
- *      .data(imageModel)
- *      .lifecycle(lifecycleOwner)
- *      .build(),
- * modifier = modifier,
  * loading = {
  *   Box(modifier = Modifier.matchParentSize()) {
  *     CircularProgressIndicator(
@@ -580,14 +213,20 @@ public fun CoilImage(
   ) ImageRequest@{ imageState ->
     when (val coilImageState = imageState.toCoilImageState()) {
       is CoilImageState.None -> Unit
-      is CoilImageState.Loading -> loading?.invoke(this, coilImageState)
-      is CoilImageState.Failure -> failure?.invoke(this, coilImageState)
+      is CoilImageState.Loading -> {
+        component.ComposeLoadingStatePlugins()
+        loading?.invoke(this, coilImageState)
+      }
+      is CoilImageState.Failure -> {
+        component.ComposeFailureStatePlugins()
+        failure?.invoke(this, coilImageState)
+      }
       is CoilImageState.Success -> {
+        component.ComposeSuccessStatePlugins()
         if (success != null) {
           success.invoke(this, coilImageState)
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
-
           Image(
             modifier = Modifier.fillMaxSize(),
             painter = rememberDrawablePainter(
