@@ -16,6 +16,8 @@
 package com.skydoves.landscapist.components
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.InternalLandscapistApi
 import com.skydoves.landscapist.plugins.ImagePlugin
 
@@ -33,26 +35,35 @@ public inline val ImageComponent.imagePlugins: List<ImagePlugin>
 /** Runs image plugins from the given [ImageComponent] that will be run in a loading state. */
 @Composable
 @InternalLandscapistApi
-public fun ImageComponent.ComposeLoadingStatePlugins() {
+public fun ImageComponent.ComposeLoadingStatePlugins(
+  modifier: Modifier,
+  imageOptions: ImageOptions
+) {
   imagePlugins.filterIsInstance<ImagePlugin.LoadingStatePlugin>().forEach { plugin ->
-    plugin.compose()
+    plugin.compose(modifier = modifier, imageOptions = imageOptions)
   }
 }
 
 /** Runs image plugins from the given [ImageComponent] that will be run in a success state. */
 @Composable
 @InternalLandscapistApi
-public fun ImageComponent.ComposeSuccessStatePlugins() {
+public fun ImageComponent.ComposeSuccessStatePlugins(
+  modifier: Modifier,
+  imageOptions: ImageOptions
+) {
   imagePlugins.filterIsInstance<ImagePlugin.SuccessStatePlugin>().forEach { plugin ->
-    plugin.compose()
+    plugin.compose(modifier = modifier, imageOptions = imageOptions)
   }
 }
 
 /** Runs image plugins from the given [ImageComponent] that will be run in a failure state. */
 @Composable
 @InternalLandscapistApi
-public fun ImageComponent.ComposeFailureStatePlugins() {
+public fun ImageComponent.ComposeFailureStatePlugins(
+  modifier: Modifier,
+  imageOptions: ImageOptions
+) {
   imagePlugins.filterIsInstance<ImagePlugin.FailureStatePlugin>().forEach { plugin ->
-    plugin.compose()
+    plugin.compose(modifier = modifier, imageOptions = imageOptions)
   }
 }

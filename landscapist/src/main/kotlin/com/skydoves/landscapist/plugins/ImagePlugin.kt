@@ -17,9 +17,11 @@ package com.skydoves.landscapist.plugins
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageOptions
 
 /**
  * A pluggable compose interface that will be executed for loading images.
@@ -40,7 +42,10 @@ public sealed interface ImagePlugin {
 
     /** A composable that will be executed depending on the loading states. */
     @Composable
-    public fun compose(): ImagePlugin
+    public fun compose(
+      modifier: Modifier,
+      imageOptions: ImageOptions?
+    ): ImagePlugin
   }
 
   /** A pluggable image loading state plugin that will be composed when the state is [ImageLoadState.Success]. */
@@ -48,7 +53,10 @@ public sealed interface ImagePlugin {
 
     /** A composable that will be executed depending on the loading states. */
     @Composable
-    public fun compose(): ImagePlugin
+    public fun compose(
+      modifier: Modifier,
+      imageOptions: ImageOptions?
+    ): ImagePlugin
   }
 
   /** A pluggable image loading state plugin that will be composed when the state is [ImageLoadState.Failure]. */
@@ -56,7 +64,10 @@ public sealed interface ImagePlugin {
 
     /** A composable that will be executed depending on the loading states. */
     @Composable
-    public fun compose(): ImagePlugin
+    public fun compose(
+      modifier: Modifier,
+      imageOptions: ImageOptions?
+    ): ImagePlugin
   }
 }
 

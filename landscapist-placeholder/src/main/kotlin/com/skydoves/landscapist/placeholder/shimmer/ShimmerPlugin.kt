@@ -17,8 +17,10 @@ package com.skydoves.landscapist.placeholder.shimmer
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.plugins.ImagePlugin
 
 /**
@@ -43,8 +45,12 @@ public data class ShimmerPlugin(
 ) : ImagePlugin.LoadingStatePlugin {
 
   @Composable
-  override fun compose(): ImagePlugin = apply {
+  override fun compose(
+    modifier: Modifier,
+    imageOptions: ImageOptions?
+  ): ImagePlugin = apply {
     Shimmer(
+      modifier = modifier,
       baseColor = baseColor,
       highlightColor = highlightColor,
       shimmerWidth = width,
