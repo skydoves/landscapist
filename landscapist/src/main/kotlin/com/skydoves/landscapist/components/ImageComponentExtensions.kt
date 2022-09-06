@@ -16,6 +16,7 @@
 package com.skydoves.landscapist.components
 
 import androidx.compose.runtime.Composable
+import com.skydoves.landscapist.InternalLandscapistApi
 import com.skydoves.landscapist.plugins.ImagePlugin
 
 /**
@@ -29,30 +30,27 @@ public inline val ImageComponent.imagePlugins: List<ImagePlugin>
     emptyList()
   }
 
-/**
- * Runs image plugins from the given [ImageComponent] that will be run in a loading state.
- */
+/** Runs image plugins from the given [ImageComponent] that will be run in a loading state. */
 @Composable
+@InternalLandscapistApi
 public fun ImageComponent.ComposeLoadingStatePlugins() {
   imagePlugins.filterIsInstance<ImagePlugin.LoadingStatePlugin>().forEach { plugin ->
     plugin.compose()
   }
 }
 
-/**
- * Runs image plugins from the given [ImageComponent] that will be run in a success state.
- */
+/** Runs image plugins from the given [ImageComponent] that will be run in a success state. */
 @Composable
+@InternalLandscapistApi
 public fun ImageComponent.ComposeSuccessStatePlugins() {
   imagePlugins.filterIsInstance<ImagePlugin.SuccessStatePlugin>().forEach { plugin ->
     plugin.compose()
   }
 }
 
-/**
- * Runs image plugins from the given [ImageComponent] that will be run in a failure state.
- */
+/** Runs image plugins from the given [ImageComponent] that will be run in a failure state. */
 @Composable
+@InternalLandscapistApi
 public fun ImageComponent.ComposeFailureStatePlugins() {
   imagePlugins.filterIsInstance<ImagePlugin.FailureStatePlugin>().forEach { plugin ->
     plugin.compose()

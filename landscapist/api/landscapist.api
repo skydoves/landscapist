@@ -58,6 +58,9 @@ public final class com/skydoves/landscapist/ImageWithSource {
 	public static final fun ImageBySource (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;Landroidx/compose/ui/graphics/ColorFilter;FLandroidx/compose/runtime/Composer;II)V
 }
 
+public abstract interface annotation class com/skydoves/landscapist/InternalLandscapistApi : java/lang/annotation/Annotation {
+}
+
 public final class com/skydoves/landscapist/RememberPainterPluginsKt {
 	public static final fun rememberBitmapPainter (Ljava/util/List;Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
 	public static final fun rememberDrawablePainter (Landroid/graphics/drawable/Drawable;Ljava/util/List;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
