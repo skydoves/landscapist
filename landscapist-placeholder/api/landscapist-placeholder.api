@@ -1,3 +1,33 @@
+public abstract class com/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin {
+	public static final field $stable I
+}
+
+public final class com/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Failure : com/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin, com/skydoves/landscapist/plugins/ImagePlugin$FailureStatePlugin {
+	public static final field $stable I
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+	public final fun copy (Ljava/lang/Object;)Lcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Failure;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Failure;Ljava/lang/Object;ILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Failure;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSource ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Loading : com/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin, com/skydoves/landscapist/plugins/ImagePlugin$LoadingStatePlugin {
+	public static final field $stable I
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+	public final fun copy (Ljava/lang/Object;)Lcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Loading;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Loading;Ljava/lang/Object;ILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Loading;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSource ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class com/skydoves/landscapist/placeholder/shimmer/LocalShimmerParams {
 	public static final fun getLocalShimmerPlugin ()Landroidx/compose/runtime/ProvidableCompositionLocal;
 }
@@ -12,7 +42,7 @@ public final class com/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin : 
 	public final fun component5 ()F
 	public final fun component6 ()F
 	public final fun component7 ()I
-	public fun compose (Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
 	public final fun copy-EsoZhhI (JJLandroidx/compose/ui/unit/Dp;FFFI)Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin;
 	public static synthetic fun copy-EsoZhhI$default (Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin;JJLandroidx/compose/ui/unit/Dp;FFFIILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin;
 	public fun equals (Ljava/lang/Object;)Z
