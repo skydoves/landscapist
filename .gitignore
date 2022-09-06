@@ -14,13 +14,8 @@ gen/
 out/
 
 # Gradle files
-/.idea
 .gradle/
 build/
-
-# DS_Store
-*.DS_Store
-**/DS_Store
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -39,11 +34,13 @@ captures/
 
 # Intellij
 *.iml
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/dictionaries
-.idea/libraries
+/.idea/*
+!.idea/codeInsightSettings.xml
+app/.idea/
+
+# DS_Store
+*.DS_Store
+**/DS_Store
 
 # Keystore files
 *.jks
