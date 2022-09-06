@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaProjectCodeInsightSettings">
+    <excluded-names>
+      <name>java.lang.reflect.Modifier</name>
+      <name>java.nio.file.WatchEvent.Modifier</name>
+      <name>android.view.Surface</name>
+      <name>androidx.core.content.pm.ShortcutInfoCompat.Surface</name>
+      <name>org.w3c.dom.Text</name>
+      <name>android.widget.Button</name>
+      <name>android.graphics.drawable.Icon</name>
+      <name>android.inputmethodservice.Keyboard.Row</name>
+      <name>java.time.format.TextStyle</name>
+      <name>org.threeten.bp.format.TextStyle</name>
+      <name>android.text.Layout.Alignment</name>
+      <name>android.widget.GridLayout.Alignment</name>
+      <name>android.graphics.Canvas</name>
+      <name>android.graphics.Color</name>
+      <name>android.graphics.Paint</name>
+    </excluded-names>
+  </component>
+</project>
