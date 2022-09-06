@@ -43,6 +43,7 @@ import com.skydoves.landscapist.plugins.composePlugins
  * @param imagePlugins A list of [ImagePlugin] that will be applied to the drawable painter.
  */
 @Composable
+@InternalLandscapistApi
 public fun rememberDrawablePainter(
   drawable: Drawable,
   imagePlugins: List<ImagePlugin>
@@ -64,6 +65,7 @@ public fun rememberDrawablePainter(
  * @param imagePlugins A list of [ImagePlugin] that will be applied to the drawable painter.
  */
 @Composable
+@InternalLandscapistApi
 public fun rememberBitmapPainter(
   imagePlugins: List<ImagePlugin>,
   imageBitmap: ImageBitmap
