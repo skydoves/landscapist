@@ -16,7 +16,7 @@
 @file:JvmName("Shimmer")
 @file:JvmMultifileClass
 
-package com.skydoves.landscapist
+package com.skydoves.landscapist.placeholder.shimmer
 
 import android.graphics.Matrix
 import android.graphics.PorterDuff
@@ -41,6 +41,8 @@ import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.core.util.Pools
 import kotlin.math.max
 import kotlin.math.min
@@ -58,15 +60,17 @@ import kotlin.math.tan
  * @param durationMillis animation duration of the shimmering start to end.
  */
 @Composable
-public fun Shimmer(
+internal fun Shimmer(
   modifier: Modifier = Modifier,
   baseColor: Color,
   highlightColor: Color,
+  shimmerWidth: Dp? = null,
   intensity: Float = DefaultShimmerIntensity,
   dropOff: Float = DefaultShimmerDropOff,
   tilt: Float = DefaultShimmerTilt,
   durationMillis: Int = DefaultDurationMillis
 ) {
+  val shimmerWidthPx = with(LocalDensity.current) { shimmerWidth?.toPx() }
   val animatedProgress = remember { Animatable(0f) }
   LaunchedEffect(key1 = baseColor) {
     animatedProgress.animateTo(
@@ -82,7 +86,7 @@ public fun Shimmer(
       val paint = paintPool.acquire() ?: Paint()
       val shaderMatrix = Matrix()
       val tiltTan = tan(Math.toRadians(tilt.toDouble()))
-      val width = (size.width + tiltTan * size.height).toFloat()
+      val width = shimmerWidthPx ?: (size.width + tiltTan * size.height).toFloat()
 
       try {
         val dx = offset(-width, width, animatedProgress.value)
@@ -135,6 +139,18 @@ public fun Shimmer(
 private fun offset(start: Float, end: Float, percent: Float): Float {
   return start + (end - start) * percent
 }
+
+/** A definition of the default intensity. */
+internal const val DefaultShimmerIntensity = 0f
+
+/** A definition of the default dropOff. */
+internal const val DefaultShimmerDropOff = 0.5f
+
+/** A definition of the default tilt. */
+internal const val DefaultShimmerTilt = 20f
+
+/** A definition of the default duration. */
+internal const val DefaultDurationMillis = 650
 
 /** paint pool which caching and reusing [Paint] instances. */
 private val paintPool = Pools.SimplePool<Paint>(2)

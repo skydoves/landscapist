@@ -40,6 +40,7 @@ dependencies {
   // landscapist
   implementation(project(":landscapist"))
   implementation(project(":landscapist-animation"))
+  implementation(project(":landscapist-placeholder"))
 
   implementation(project(":glide"))
   implementation(project(":coil"))

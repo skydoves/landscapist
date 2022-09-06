@@ -17,25 +17,25 @@
 @file:JvmMultifileClass
 @file:Suppress("unused")
 
-package com.skydoves.landscapist
+package com.skydoves.landscapist.placeholder.shimmer
 
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.skydoves.landscapist.LocalShimmerProvider.defaultShimmerParams
+import com.skydoves.landscapist.placeholder.shimmer.LocalShimmerProvider.defaultShimmerPlugin
 
 /**
- * Local containing the preferred [ShimmerParams] for providing the same instance
+ * Local containing the preferred [ShimmerPlugin] for providing the same instance
  * in the composable hierarchy.
  */
-public val LocalShimmerParams: ProvidableCompositionLocal<ShimmerParams> =
-  compositionLocalOf { defaultShimmerParams() }
+public val LocalShimmerPlugin: ProvidableCompositionLocal<ShimmerPlugin> =
+  compositionLocalOf { defaultShimmerPlugin() }
 
 /** A provider for taking the local instances related to the [Shimmer]. */
 internal object LocalShimmerProvider {
 
-  /** Returns the current or default [ShimmerParams] for the `shimmerParams` parameter. */
-  fun defaultShimmerParams(): ShimmerParams {
-    return ShimmerParams(baseColor = Color.DarkGray, highlightColor = Color.LightGray)
+  /** Returns the current or default [ShimmerPlugin] for the `shimmerParams` parameter. */
+  fun defaultShimmerPlugin(): ShimmerPlugin {
+    return ShimmerPlugin(baseColor = Color.DarkGray, highlightColor = Color.LightGray)
   }
 }

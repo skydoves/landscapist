@@ -18,9 +18,10 @@ package com.skydoves.landscapist.glide
 import android.graphics.drawable.Drawable
 import androidx.compose.ui.graphics.ImageBitmap
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageState
 
-/** GlideImageState is a state of the glide image requesting. */
-public sealed class GlideImageState {
+/** GlideImageState represents the image loading states for Glide. */
+public sealed class GlideImageState : ImageState {
 
   /** Request not started. */
   public object None : GlideImageState()

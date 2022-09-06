@@ -20,9 +20,10 @@ import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
 import com.facebook.imagepipeline.image.CloseableImage
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageState
 
-/** FrescoImageState is a state of the fresco image requesting. */
-public sealed class FrescoImageState {
+/** GlideImageState represents the image loading states for Fresco. */
+public sealed class FrescoImageState : ImageState {
 
   /** Request not started. */
   public object None : FrescoImageState()

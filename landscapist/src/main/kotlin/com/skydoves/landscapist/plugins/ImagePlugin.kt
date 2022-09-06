@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
+import com.skydoves.landscapist.ImageLoadState
 
 /**
  * A pluggable compose interface that will be executed for loading images.
@@ -26,23 +27,37 @@ import androidx.compose.ui.graphics.painter.Painter
 @Immutable
 public sealed interface ImagePlugin {
 
-  /**
-   * A pinter plugin interface to be composed with the given [Painter].
-   */
+  /** A pinter plugin interface to be composed with the given [Painter]. */
   public interface PainterPlugin : ImagePlugin {
 
-    /**
-     * Compose the given [painter] with an [imageBitmap].
-     */
+    /** Compose the given [painter] with an [imageBitmap]. */
     @Composable
     public fun compose(imageBitmap: ImageBitmap, painter: Painter): Painter
   }
 
-  public interface LoadingPlugin : ImagePlugin
+  /** A pluggable image loading state plugin that will be composed when the state is [ImageLoadState.Loading]. */
+  public interface LoadingStatePlugin : ImagePlugin {
 
-  public interface SuccessPlugin : ImagePlugin
+    /** A composable that will be executed depending on the loading states. */
+    @Composable
+    public fun compose(): ImagePlugin
+  }
 
-  public interface FailurePlugin : ImagePlugin
+  /** A pluggable image loading state plugin that will be composed when the state is [ImageLoadState.Success]. */
+  public interface SuccessStatePlugin : ImagePlugin {
+
+    /** A composable that will be executed depending on the loading states. */
+    @Composable
+    public fun compose(): ImagePlugin
+  }
+
+  /** A pluggable image loading state plugin that will be composed when the state is [ImageLoadState.Failure]. */
+  public interface FailureStatePlugin : ImagePlugin {
+
+    /** A composable that will be executed depending on the loading states. */
+    @Composable
+    public fun compose(): ImagePlugin
+  }
 }
 
 /**

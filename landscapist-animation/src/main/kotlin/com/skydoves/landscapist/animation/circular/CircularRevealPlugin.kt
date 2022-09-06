@@ -28,7 +28,7 @@ import com.skydoves.landscapist.plugins.ImagePlugin
  * @property onFinishListener A finish listener of the circular reveal animation.
  */
 @Immutable
-public data class CircularReveal(
+public data class CircularRevealPlugin(
   public val duration: Int = DefaultCircularRevealDuration,
   public val onFinishListener: CircularRevealFinishListener? = null
 ) : ImagePlugin.PainterPlugin {

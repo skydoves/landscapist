@@ -18,9 +18,10 @@ package com.skydoves.landscapist.coil
 import android.graphics.drawable.Drawable
 import androidx.compose.ui.graphics.ImageBitmap
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageState
 
-/** CoilImageState is a state of the coil image requesting. */
-public sealed class CoilImageState {
+/** GlideImageState represents the image loading states for Coil. */
+public sealed class CoilImageState : ImageState {
 
   /** Request not started. */
   public object None : CoilImageState()

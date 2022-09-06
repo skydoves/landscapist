@@ -16,7 +16,6 @@
 package com.github.skydoves.landscapistdemo.ui
 
 import android.os.Build.VERSION.SDK_INT
-import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,7 +36,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -54,7 +52,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.decode.GifDecoder
@@ -65,13 +62,13 @@ import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background800
 import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
-import com.skydoves.landscapist.ShimmerParams
-import com.skydoves.landscapist.animation.circular.CircularReveal
+import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.palette.BitmapPalette
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @Composable
 fun DisneyPosters(
@@ -140,7 +137,7 @@ private fun SelectedPoster(
     modifier = Modifier
       .aspectRatio(0.8f),
     component = rememberImageComponent {
-      add(CircularReveal())
+      +CircularRevealPlugin()
     },
     bitmapPalette = BitmapPalette { palette = it },
     previewPlaceholder = R.drawable.poster
@@ -183,10 +180,12 @@ private fun SelectedPoster(
   CoilImage(
     imageModel = poster.gif,
     imageLoader = { imageLoader },
-    shimmerParams = ShimmerParams(
-      baseColor = background800,
-      highlightColor = shimmerHighLight
-    ),
+    component = rememberImageComponent {
+      +ShimmerPlugin(
+        baseColor = background800,
+        highlightColor = shimmerHighLight
+      )
+    },
     modifier = Modifier
       .height(500.dp)
       .padding(8.dp)
@@ -222,99 +221,10 @@ private fun ColorPalettes(palette: Palette?) {
   }
 }
 
-@Composable
-private fun HomePoster(
-  poster: Poster,
-  modifier: Modifier = Modifier
-) {
-  val context = LocalContext.current
-  Surface(
-    modifier = modifier
-      .padding(4.dp)
-      .clickable(
-        onClick = { }
-      ),
-    color = MaterialTheme.colors.onBackground,
-    elevation = 8.dp,
-    shape = RoundedCornerShape(8.dp)
-  ) {
-    ConstraintLayout {
-      val (image, title, content) = createRefs()
-
-      FrescoImage(
-        imageUrl = poster.poster,
-        modifier = Modifier
-          .constrainAs(image) {
-            centerHorizontallyTo(parent)
-            top.linkTo(parent.top)
-          }
-          .clickable {
-            Toast
-              .makeText(context, poster.name, Toast.LENGTH_SHORT)
-              .show()
-          },
-        component = rememberImageComponent {
-          +CircularReveal()
-        },
-        shimmerParams = ShimmerParams(
-          baseColor = background800,
-          highlightColor = shimmerHighLight
-        ),
-        previewPlaceholder = R.drawable.poster
-      )
-
-      Text(
-        text = poster.name,
-        style = MaterialTheme.typography.h2,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-          .constrainAs(title) {
-            centerHorizontallyTo(parent)
-            top.linkTo(image.bottom)
-          }
-          .padding(8.dp)
-      )
-
-      Text(
-        text = poster.playtime,
-        style = MaterialTheme.typography.body1,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-          .constrainAs(content) {
-            centerHorizontallyTo(parent)
-            top.linkTo(title.bottom)
-          }
-          .padding(horizontal = 8.dp)
-          .padding(bottom = 12.dp)
-      )
-    }
-  }
-}
-
 @Preview
 @Composable
 private fun SelectedPosterPreview() {
   DisneyComposeTheme(darkTheme = false) {
     SelectedPoster(poster = MockUtil.getMockPoster())
-  }
-}
-
-@Preview
-@Composable
-private fun HomePosterPreviewLight() {
-  DisneyComposeTheme(darkTheme = false) {
-    HomePoster(
-      poster = MockUtil.getMockPoster()
-    )
-  }
-}
-
-@Preview
-@Composable
-private fun HomePosterPreviewDark() {
-  DisneyComposeTheme(darkTheme = true) {
-    HomePoster(
-      poster = MockUtil.getMockPoster()
-    )
   }
 }

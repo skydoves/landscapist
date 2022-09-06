@@ -13,21 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.benchmark.landscapist.app
+package com.skydoves.landscapist
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-
-class MainActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-
-    setContent {
-      Column {
-        BitmapPaletteProfiles()
-      }
-    }
-  }
-}
+/** The highest level interface of the image loading states. */
+public interface ImageState

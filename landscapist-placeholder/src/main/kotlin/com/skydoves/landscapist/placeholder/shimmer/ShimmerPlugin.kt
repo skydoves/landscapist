@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist
+package com.skydoves.landscapist.placeholder.shimmer
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import com.skydoves.landscapist.plugins.ImagePlugin
 
 /**
  * Shimmer params holds attributes of the [Shimmer] composable.
@@ -29,23 +32,26 @@ import androidx.compose.ui.graphics.Color
  * @param durationMillis a milli-second time to move the simmering effect from start to finish animation.
  */
 @Immutable
-public data class ShimmerParams(
+public data class ShimmerPlugin(
   val baseColor: Color,
   val highlightColor: Color,
+  val width: Dp? = null,
   val intensity: Float = DefaultShimmerIntensity,
   val dropOff: Float = DefaultShimmerDropOff,
   val tilt: Float = DefaultShimmerTilt,
   val durationMillis: Int = DefaultDurationMillis
-)
+) : ImagePlugin.LoadingStatePlugin {
 
-/** A definition of the default intensity. */
-internal const val DefaultShimmerIntensity = 0f
-
-/** A definition of the default dropOff. */
-internal const val DefaultShimmerDropOff = 0.5f
-
-/** A definition of the default tilt. */
-internal const val DefaultShimmerTilt = 20f
-
-/** A definition of the default duration. */
-internal const val DefaultDurationMillis = 650
+  @Composable
+  override fun compose(): ImagePlugin = apply {
+    Shimmer(
+      baseColor = baseColor,
+      highlightColor = highlightColor,
+      shimmerWidth = width,
+      intensity = intensity,
+      dropOff = dropOff,
+      tilt = tilt,
+      durationMillis = durationMillis
+    )
+  }
+}
