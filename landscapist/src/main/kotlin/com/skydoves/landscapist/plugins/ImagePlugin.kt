@@ -67,7 +67,7 @@ public sealed interface ImagePlugin {
  * @param imageBitmap A target [imageBitmap] to be composed of the given [Painter]
  */
 @Composable
-public fun Painter.composePlugins(
+internal fun Painter.composePlugins(
   imagePlugins: List<ImagePlugin>,
   imageBitmap: ImageBitmap
 ): Painter {
