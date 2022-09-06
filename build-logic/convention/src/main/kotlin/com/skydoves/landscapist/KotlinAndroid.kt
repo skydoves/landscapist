@@ -45,7 +45,8 @@ internal fun Project.configureKotlinAndroid(
       jvmTarget = libs.findVersion("jvmTarget").get().toString()
       freeCompilerArgs = freeCompilerArgs + listOf(
         "-opt-in=kotlin.RequiresOptIn",
-        "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+        "-opt-in=com.skydoves.landscapist.InternalLandscapistApi",
       )
     }
 
