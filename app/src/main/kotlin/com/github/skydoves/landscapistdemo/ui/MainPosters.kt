@@ -62,6 +62,7 @@ import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background800
 import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -120,7 +121,7 @@ private fun PosterItem(
       modifier = Modifier
         .size(50.dp)
         .clickable { vm.poster.value = poster },
-      contentScale = ContentScale.Crop,
+      imageOptions = ImageOptions(contentScale = ContentScale.Crop),
       previewPlaceholder = R.drawable.poster
     )
   }

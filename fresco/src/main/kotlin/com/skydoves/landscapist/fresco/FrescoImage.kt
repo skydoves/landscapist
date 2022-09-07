@@ -25,12 +25,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.DefaultAlpha
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
@@ -39,6 +34,7 @@ import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
 import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
@@ -73,12 +69,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageRequest The pipeline has to know about requested image to proceed.
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
- * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
- * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageBitmap].
- * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
@@ -92,11 +83,7 @@ public fun FrescoImage(
     LocalFrescoProvider.getFrescoImageRequest(imageUrl)
   },
   component: ImageComponent = rememberImageComponent {},
-  alignment: Alignment = Alignment.Center,
-  contentScale: ContentScale = ContentScale.Crop,
-  contentDescription: String? = null,
-  alpha: Float = DefaultAlpha,
-  colorFilter: ColorFilter? = null,
+  imageOptions: ImageOptions = ImageOptions(),
   bitmapPalette: BitmapPalette? = null,
   observeLoadingProcess: Boolean = false,
   @DrawableRes previewPlaceholder: Int = 0,
@@ -104,7 +91,7 @@ public fun FrescoImage(
   success: @Composable (BoxScope.(imageState: FrescoImageState.Success) -> Unit)? = null,
   failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null
 ) {
-  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+  if (LocalInspectionMode.current && previewPlaceholder != 0) with(imageOptions) {
     Image(
       modifier = modifier,
       painter = painterResource(id = previewPlaceholder),
@@ -127,18 +114,27 @@ public fun FrescoImage(
     when (val frescoImageState = imageState.toFrescoImageState()) {
       is FrescoImageState.None -> Unit
       is FrescoImageState.Loading -> {
-        component.ComposeLoadingStatePlugins()
+        component.ComposeLoadingStatePlugins(
+          modifier = modifier,
+          imageOptions = imageOptions
+        )
         loading?.invoke(this, frescoImageState)
       }
       is FrescoImageState.Failure -> {
-        component.ComposeFailureStatePlugins()
+        component.ComposeFailureStatePlugins(
+          modifier = modifier,
+          imageOptions = imageOptions
+        )
         failure?.invoke(this, frescoImageState)
       }
       is FrescoImageState.Success -> {
-        component.ComposeSuccessStatePlugins()
+        component.ComposeSuccessStatePlugins(
+          modifier = modifier,
+          imageOptions = imageOptions
+        )
         if (success != null) {
           success.invoke(this, frescoImageState)
-        } else {
+        } else with(imageOptions) {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
 
           Image(

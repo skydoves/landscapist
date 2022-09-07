@@ -25,12 +25,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.DefaultAlpha
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.palette.graphics.Palette
@@ -39,6 +34,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
 import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
@@ -82,12 +78,7 @@ import kotlinx.coroutines.flow.callbackFlow
  * @param requestOptions Provides type independent options to customize loads with Glide.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
- * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
- * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be
- * used for the loaded [ImageBitmap].
- * @param contentDescription The content description used to provide accessibility to describe the image.
- * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
+ * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param loading Content to be displayed when the request is in progress.
@@ -106,18 +97,14 @@ public fun GlideImage(
   },
   requestListener: RequestListener<Drawable>? = null,
   component: ImageComponent = rememberImageComponent {},
-  alignment: Alignment = Alignment.Center,
-  contentScale: ContentScale = ContentScale.Crop,
-  contentDescription: String? = null,
-  alpha: Float = DefaultAlpha,
-  colorFilter: ColorFilter? = null,
+  imageOptions: ImageOptions = ImageOptions(),
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: GlideImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: GlideImageState.Success) -> Unit)? = null,
   failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null
 ) {
-  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+  if (LocalInspectionMode.current && previewPlaceholder != 0) with(imageOptions) {
     Image(
       modifier = modifier,
       painter = painterResource(id = previewPlaceholder),
@@ -142,18 +129,27 @@ public fun GlideImage(
     when (val glideImageState = imageState.toGlideImageState()) {
       is GlideImageState.None -> Unit
       is GlideImageState.Loading -> {
-        component.ComposeLoadingStatePlugins()
+        component.ComposeLoadingStatePlugins(
+          modifier = modifier,
+          imageOptions = imageOptions
+        )
         loading?.invoke(this, glideImageState)
       }
       is GlideImageState.Failure -> {
-        component.ComposeFailureStatePlugins()
+        component.ComposeFailureStatePlugins(
+          modifier = modifier,
+          imageOptions = imageOptions
+        )
         failure?.invoke(this, glideImageState)
       }
       is GlideImageState.Success -> {
-        component.ComposeSuccessStatePlugins()
+        component.ComposeSuccessStatePlugins(
+          modifier = modifier,
+          imageOptions = imageOptions
+        )
         if (success != null) {
           success.invoke(this, glideImageState)
-        } else {
+        } else with(imageOptions) {
           val drawable = glideImageState.drawable ?: return@ImageRequest
           Image(
             modifier = Modifier.fillMaxSize(),

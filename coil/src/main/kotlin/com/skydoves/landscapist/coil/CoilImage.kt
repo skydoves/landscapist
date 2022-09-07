@@ -28,13 +28,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.DefaultAlpha
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -47,6 +42,7 @@ import coil.request.Disposable
 import coil.request.ImageRequest
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
 import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
@@ -85,12 +81,8 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param requestListener A class for monitoring the status of a request while images load.
- * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
- * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
- * @param contentDescription The content description used to provide accessibility to describe the image.
+ * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
- * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
@@ -105,11 +97,7 @@ public fun CoilImage(
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   component: ImageComponent = rememberImageComponent {},
   requestListener: ImageRequest.Listener? = null,
-  alignment: Alignment = Alignment.Center,
-  contentScale: ContentScale = ContentScale.Crop,
-  contentDescription: String? = null,
-  alpha: Float = DefaultAlpha,
-  colorFilter: ColorFilter? = null,
+  imageOptions: ImageOptions = ImageOptions(),
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
@@ -125,11 +113,7 @@ public fun CoilImage(
     imageLoader = imageLoader,
     component = component,
     modifier = modifier,
-    alignment = alignment,
-    contentScale = contentScale,
-    contentDescription = contentDescription,
-    alpha = alpha,
-    colorFilter = colorFilter,
+    imageOptions = imageOptions,
     bitmapPalette = bitmapPalette,
     previewPlaceholder = previewPlaceholder,
     loading = loading,
@@ -164,13 +148,9 @@ public fun CoilImage(
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
- * @param alignment The alignment parameter used to place the loaded [ImageBitmap] in the image container.
- * @param alpha The alpha parameter used to apply for the image when it is rendered onscreen.
- * @param contentScale The scale parameter used to determine the aspect ratio scaling to be used for the loaded [ImageBitmap].
- * @param contentDescription The content description used to provide accessibility to describe the image.
+ * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
- * @param colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
@@ -181,18 +161,14 @@ public fun CoilImage(
   modifier: Modifier = Modifier,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   component: ImageComponent = rememberImageComponent {},
-  alignment: Alignment = Alignment.Center,
-  contentScale: ContentScale = ContentScale.Crop,
-  contentDescription: String? = null,
-  alpha: Float = DefaultAlpha,
-  colorFilter: ColorFilter? = null,
+  imageOptions: ImageOptions = ImageOptions(),
   bitmapPalette: BitmapPalette? = null,
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
 ) {
-  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+  if (LocalInspectionMode.current && previewPlaceholder != 0) with(imageOptions) {
     Image(
       modifier = modifier,
       painter = painterResource(id = previewPlaceholder),
@@ -214,18 +190,27 @@ public fun CoilImage(
     when (val coilImageState = imageState.toCoilImageState()) {
       is CoilImageState.None -> Unit
       is CoilImageState.Loading -> {
-        component.ComposeLoadingStatePlugins()
+        component.ComposeLoadingStatePlugins(
+          modifier = modifier,
+          imageOptions = imageOptions
+        )
         loading?.invoke(this, coilImageState)
       }
       is CoilImageState.Failure -> {
-        component.ComposeFailureStatePlugins()
+        component.ComposeFailureStatePlugins(
+          modifier = modifier,
+          imageOptions = imageOptions
+        )
         failure?.invoke(this, coilImageState)
       }
       is CoilImageState.Success -> {
-        component.ComposeSuccessStatePlugins()
+        component.ComposeSuccessStatePlugins(
+          modifier = modifier,
+          imageOptions = imageOptions
+        )
         if (success != null) {
           success.invoke(this, coilImageState)
-        } else {
+        } else with(imageOptions) {
           val drawable = coilImageState.drawable ?: return@ImageRequest
           Image(
             modifier = Modifier.fillMaxSize(),
