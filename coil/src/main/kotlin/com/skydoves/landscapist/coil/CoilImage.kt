@@ -26,8 +26,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -83,6 +86,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
+ * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
@@ -99,6 +103,7 @@ public fun CoilImage(
   requestListener: ImageRequest.Listener? = null,
   imageOptions: ImageOptions = ImageOptions(),
   bitmapPalette: BitmapPalette? = null,
+  onImageStateChanged: (CoilImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
@@ -115,6 +120,7 @@ public fun CoilImage(
     modifier = modifier,
     imageOptions = imageOptions,
     bitmapPalette = bitmapPalette,
+    onImageStateChanged = onImageStateChanged,
     previewPlaceholder = previewPlaceholder,
     loading = loading,
     success = success,
@@ -150,6 +156,7 @@ public fun CoilImage(
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
+ * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
@@ -163,6 +170,7 @@ public fun CoilImage(
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
   bitmapPalette: BitmapPalette? = null,
+  onImageStateChanged: (CoilImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
@@ -181,13 +189,19 @@ public fun CoilImage(
     return
   }
 
+  var internalState: CoilImageState by remember { mutableStateOf(CoilImageState.None) }
+
+  LaunchedEffect(key1 = internalState) {
+    onImageStateChanged.invoke(internalState)
+  }
+
   CoilImage(
     recomposeKey = imageRequest,
     imageLoader = imageLoader.invoke(),
     modifier = modifier,
     bitmapPalette = bitmapPalette
   ) ImageRequest@{ imageState ->
-    when (val coilImageState = imageState.toCoilImageState()) {
+    when (val coilImageState = imageState.toCoilImageState().apply { internalState = this }) {
       is CoilImageState.None -> Unit
       is CoilImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
@@ -277,7 +291,7 @@ private fun CoilImage(
         disposable.value = imageLoader.enqueue(
           recomposeKey.newBuilder(context).target(
             onStart = {
-              imageLoadStateFlow.value = ImageLoadState.Loading(0f)
+              imageLoadStateFlow.value = ImageLoadState.Loading
             },
             onSuccess = {
               imageLoadStateFlow.value = ImageLoadState.Success(it)

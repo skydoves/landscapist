@@ -24,7 +24,7 @@ public sealed class ImageLoadState {
   public object None : ImageLoadState()
 
   /** Request is currently in progress. */
-  public data class Loading(val progress: Float) : ImageLoadState()
+  public object Loading : ImageLoadState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
   public data class Success(val data: Any?) : ImageLoadState()

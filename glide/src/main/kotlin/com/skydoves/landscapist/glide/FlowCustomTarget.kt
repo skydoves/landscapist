@@ -35,7 +35,7 @@ internal class FlowCustomTarget constructor(
 
   override fun onLoadStarted(placeholder: Drawable?) {
     super.onLoadStarted(placeholder)
-    producerScope.trySendBlocking(ImageLoadState.Loading(0f))
+    producerScope.trySendBlocking(ImageLoadState.Loading)
   }
 
   override fun onLoadFailed(errorDrawable: Drawable?) {
