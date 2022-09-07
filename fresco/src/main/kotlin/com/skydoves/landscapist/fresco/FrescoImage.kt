@@ -24,7 +24,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -73,6 +77,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
+ * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.ø
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  */
 @Composable
@@ -85,7 +90,7 @@ public fun FrescoImage(
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
   bitmapPalette: BitmapPalette? = null,
-  observeLoadingProcess: Boolean = false,
+  onImageStateChanged: (FrescoImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: FrescoImageState.Success) -> Unit)? = null,
@@ -104,14 +109,19 @@ public fun FrescoImage(
     return
   }
 
+  var internalState: FrescoImageState by remember { mutableStateOf(FrescoImageState.None) }
+
+  LaunchedEffect(key1 = internalState) {
+    onImageStateChanged.invoke(internalState)
+  }
+
   FrescoImage(
     recomposeKey = imageUrl,
     imageRequest = imageRequest.invoke(),
     modifier = modifier,
-    bitmapPalette = bitmapPalette,
-    observeLoadingProcess = observeLoadingProcess
+    bitmapPalette = bitmapPalette
   ) ImageRequest@{ imageState ->
-    when (val frescoImageState = imageState.toFrescoImageState()) {
+    when (val frescoImageState = imageState.toFrescoImageState().apply { internalState = this }) {
       is FrescoImageState.None -> Unit
       is FrescoImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
@@ -185,7 +195,6 @@ private fun FrescoImage(
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
   bitmapPalette: BitmapPalette? = null,
-  observeLoadingProcess: Boolean = false,
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
@@ -196,10 +205,7 @@ private fun FrescoImage(
     recomposeKey = recomposeKey,
     executeImageRequest = {
       suspendCancellableCoroutine { cont ->
-        val subscriber = FlowBaseBitmapDataSubscriber(
-          observeLoadingProcess,
-          bitmapPalette?.applyImageModel(recomposeKey)
-        )
+        val subscriber = FlowBaseBitmapDataSubscriber(bitmapPalette?.applyImageModel(recomposeKey))
         datasource.subscribe(subscriber, CallerThreadExecutor.getInstance())
 
         cont.resume(subscriber.imageLoadStateFlow) {

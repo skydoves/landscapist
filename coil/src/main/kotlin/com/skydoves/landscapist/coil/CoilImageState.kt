@@ -27,7 +27,7 @@ public sealed class CoilImageState : ImageState {
   public object None : CoilImageState()
 
   /** Request is currently in progress. */
-  public data class Loading(val progress: Float) : CoilImageState()
+  public object Loading : CoilImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
   public data class Success(val drawable: Drawable?) : CoilImageState()
@@ -40,7 +40,7 @@ public sealed class CoilImageState : ImageState {
 public fun ImageLoadState.toCoilImageState(): CoilImageState {
   return when (this) {
     is ImageLoadState.None -> CoilImageState.None
-    is ImageLoadState.Loading -> CoilImageState.Loading(progress)
+    is ImageLoadState.Loading -> CoilImageState.Loading
     is ImageLoadState.Success -> CoilImageState.Success(data as? Drawable)
     is ImageLoadState.Failure -> CoilImageState.Failure(data as? Drawable)
   }

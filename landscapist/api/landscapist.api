@@ -24,14 +24,7 @@ public final class com/skydoves/landscapist/ImageLoadState$Failure : com/skydove
 
 public final class com/skydoves/landscapist/ImageLoadState$Loading : com/skydoves/landscapist/ImageLoadState {
 	public static final field $stable I
-	public fun <init> (F)V
-	public final fun component1 ()F
-	public final fun copy (F)Lcom/skydoves/landscapist/ImageLoadState$Loading;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/ImageLoadState$Loading;FILjava/lang/Object;)Lcom/skydoves/landscapist/ImageLoadState$Loading;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getProgress ()F
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
+	public static final field INSTANCE Lcom/skydoves/landscapist/ImageLoadState$Loading;
 }
 
 public final class com/skydoves/landscapist/ImageLoadState$None : com/skydoves/landscapist/ImageLoadState {

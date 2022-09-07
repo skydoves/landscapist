@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.StateFlow
  * [ImageLoadState] as a stateFlow.
  */
 internal class FlowBaseBitmapDataSubscriber(
-  private val observeLoadingProcess: Boolean,
   private val bitmapPalette: BitmapPalette?
 ) : BaseBitmapReferenceDataSubscriber() {
 
@@ -50,9 +49,8 @@ internal class FlowBaseBitmapDataSubscriber(
   override fun onProgressUpdate(dataSource: DataSource<CloseableReference<CloseableImage>>) {
     super.onProgressUpdate(dataSource)
 
-    /** collect progress values whenever progress is changed if the [observeLoadingProcess] is true. */
-    if (internalStateFlow.value == ImageLoadState.None || observeLoadingProcess) {
-      this.internalStateFlow.value = ImageLoadState.Loading(dataSource.progress)
+    if (internalStateFlow.value == ImageLoadState.None) {
+      this.internalStateFlow.value = ImageLoadState.Loading
     }
   }
 }

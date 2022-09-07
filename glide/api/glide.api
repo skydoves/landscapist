@@ -1,5 +1,5 @@
 public final class com/skydoves/landscapist/glide/GlideImage {
-	public static final fun GlideImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lcom/bumptech/glide/request/RequestListener;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lcom/skydoves/landscapist/palette/BitmapPalette;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
+	public static final fun GlideImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lcom/bumptech/glide/request/RequestListener;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lcom/skydoves/landscapist/palette/BitmapPalette;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
 }
 
 public abstract class com/skydoves/landscapist/glide/GlideImageState : com/skydoves/landscapist/ImageState {
@@ -20,14 +20,7 @@ public final class com/skydoves/landscapist/glide/GlideImageState$Failure : com/
 
 public final class com/skydoves/landscapist/glide/GlideImageState$Loading : com/skydoves/landscapist/glide/GlideImageState {
 	public static final field $stable I
-	public fun <init> (F)V
-	public final fun component1 ()F
-	public final fun copy (F)Lcom/skydoves/landscapist/glide/GlideImageState$Loading;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/glide/GlideImageState$Loading;FILjava/lang/Object;)Lcom/skydoves/landscapist/glide/GlideImageState$Loading;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getProgress ()F
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
+	public static final field INSTANCE Lcom/skydoves/landscapist/glide/GlideImageState$Loading;
 }
 
 public final class com/skydoves/landscapist/glide/GlideImageState$None : com/skydoves/landscapist/glide/GlideImageState {

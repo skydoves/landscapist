@@ -29,7 +29,7 @@ public sealed class FrescoImageState : ImageState {
   public object None : FrescoImageState()
 
   /** Request is currently in progress. */
-  public data class Loading(val progress: Float) : FrescoImageState()
+  public object Loading : FrescoImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
   public data class Success(val imageBitmap: ImageBitmap?) : FrescoImageState()
@@ -44,7 +44,7 @@ public sealed class FrescoImageState : ImageState {
 public fun ImageLoadState.toFrescoImageState(): FrescoImageState {
   return when (this) {
     is ImageLoadState.None -> FrescoImageState.None
-    is ImageLoadState.Loading -> FrescoImageState.Loading(progress)
+    is ImageLoadState.Loading -> FrescoImageState.Loading
     is ImageLoadState.Success -> FrescoImageState.Success(data as? ImageBitmap)
     is ImageLoadState.Failure -> FrescoImageState.Failure(
       data as? DataSource<CloseableReference<CloseableImage>>

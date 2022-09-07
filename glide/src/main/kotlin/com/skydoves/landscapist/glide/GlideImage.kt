@@ -25,6 +25,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
@@ -80,6 +85,7 @@ import kotlinx.coroutines.flow.callbackFlow
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
+ * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
@@ -99,6 +105,7 @@ public fun GlideImage(
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
   bitmapPalette: BitmapPalette? = null,
+  onImageStateChanged: (GlideImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: GlideImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: GlideImageState.Success) -> Unit)? = null,
@@ -117,6 +124,12 @@ public fun GlideImage(
     return
   }
 
+  var internalState: GlideImageState by remember { mutableStateOf(GlideImageState.None) }
+
+  LaunchedEffect(key1 = internalState) {
+    onImageStateChanged.invoke(internalState)
+  }
+
   GlideImage(
     recomposeKey = imageModel,
     builder = requestBuilder.invoke()
@@ -126,7 +139,7 @@ public fun GlideImage(
     modifier = modifier,
     bitmapPalette = bitmapPalette
   ) ImageRequest@{ imageState ->
-    when (val glideImageState = imageState.toGlideImageState()) {
+    when (val glideImageState = imageState.toGlideImageState().apply { internalState = this }) {
       is GlideImageState.None -> Unit
       is GlideImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
