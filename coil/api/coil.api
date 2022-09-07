@@ -1,6 +1,6 @@
 public final class com/skydoves/landscapist/coil/CoilImage {
-	public static final fun CoilImage (Lcoil/request/ImageRequest;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lcom/skydoves/landscapist/palette/BitmapPalette;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
-	public static final fun CoilImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Landroid/content/Context;Landroidx/lifecycle/LifecycleOwner;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcoil/request/ImageRequest$Listener;Lcom/skydoves/landscapist/ImageOptions;Lcom/skydoves/landscapist/palette/BitmapPalette;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
+	public static final fun CoilImage (Lcoil/request/ImageRequest;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lcom/skydoves/landscapist/palette/BitmapPalette;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
+	public static final fun CoilImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Landroid/content/Context;Landroidx/lifecycle/LifecycleOwner;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcoil/request/ImageRequest$Listener;Lcom/skydoves/landscapist/ImageOptions;Lcom/skydoves/landscapist/palette/BitmapPalette;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
 }
 
 public abstract class com/skydoves/landscapist/coil/CoilImageState : com/skydoves/landscapist/ImageState {
@@ -21,14 +21,7 @@ public final class com/skydoves/landscapist/coil/CoilImageState$Failure : com/sk
 
 public final class com/skydoves/landscapist/coil/CoilImageState$Loading : com/skydoves/landscapist/coil/CoilImageState {
 	public static final field $stable I
-	public fun <init> (F)V
-	public final fun component1 ()F
-	public final fun copy (F)Lcom/skydoves/landscapist/coil/CoilImageState$Loading;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/coil/CoilImageState$Loading;FILjava/lang/Object;)Lcom/skydoves/landscapist/coil/CoilImageState$Loading;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getProgress ()F
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
+	public static final field INSTANCE Lcom/skydoves/landscapist/coil/CoilImageState$Loading;
 }
 
 public final class com/skydoves/landscapist/coil/CoilImageState$None : com/skydoves/landscapist/coil/CoilImageState {
