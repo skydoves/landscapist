@@ -25,6 +25,10 @@ import com.skydoves.landscapist.ImageOptions
 
 /**
  * A pluggable compose interface that will be executed for loading images.
+ *
+ * You can implement your own image plugin that will be composed with Image Composable functions
+ * by implementing one of [ImagePlugin.PainterPlugin], [ImagePlugin.LoadingStatePlugin],
+ * [ImagePlugin.SuccessStatePlugin], or [ImagePlugin.FailureStatePlugin]
  */
 @Immutable
 public sealed interface ImagePlugin {

@@ -15,8 +15,8 @@
  */
 package com.skydoves.landscapist.components
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 
 /** The highest level component of the image components. */
-@Immutable
+@Stable
 public interface ImageComponent
