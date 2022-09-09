@@ -64,6 +64,7 @@ import com.github.skydoves.landscapistdemo.theme.background800
 import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
+import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.fresco.FrescoImage
@@ -122,6 +123,9 @@ private fun PosterItem(
         .size(50.dp)
         .clickable { vm.poster.value = poster },
       imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+      component = rememberImageComponent {
+        +CrossfadePlugin()
+      },
       previewPlaceholder = R.drawable.poster
     )
   }

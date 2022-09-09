@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 
 /**
- * circularReveal is an extension of the [Painter] for animating a clipping circle to reveal an image.
+ * This is an extension of the [Painter] for animating a clipping circle to reveal an image.
  * The animation has two states [CircularRevealState.None], [CircularRevealState.Finished].
  *
  * @param imageBitmap an image bitmap for loading the content.

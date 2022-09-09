@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import com.skydoves.landscapist.plugins.ImagePlugin
 
 /**
- * An image plugin that extends [ImagePlugin.PainterPlugin] to be executed over the given painter.ø
+ * An image plugin that extends [ImagePlugin.PainterPlugin] to be executed while rendering painters.
  *
  * @property duration milli-second times from start to finish animation.
  * @property onFinishListener A finish listener of the circular reveal animation.

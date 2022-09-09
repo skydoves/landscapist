@@ -34,7 +34,6 @@ import androidx.compose.ui.graphics.ColorMatrix
  * Update fadeIn transition.
  *
  * Originally written by [Chris banes](https://twitter.com/chrisbanes)
- *
  */
 @Composable
 internal fun updateFadeInTransition(key: Any, durationMs: Int): FadeInTransition {
