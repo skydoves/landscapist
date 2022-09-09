@@ -50,61 +50,57 @@ internal class CircularRevealPainter(
   var radius by mutableStateOf(0f, policy = neverEqualPolicy())
 
   override fun DrawScope.onDraw() {
-    val paint = paintPool.acquire() ?: Paint()
-    val shaderMatrix = Matrix()
-    var scale: Float
     var dx = 0f
     var dy = 0f
+    var scale: Float
+    val shaderMatrix = Matrix()
+    val shader = ImageShader(imageBitmap, TileMode.Clamp)
+    val brush = ShaderBrush(shader)
+    val paint = paintPool.acquire() ?: Paint()
+    paint.asFrameworkPaint().apply {
+      isAntiAlias = true
+      isDither = true
+      isFilterBitmap = true
+    }
 
-    try {
-      val shader = ImageShader(imageBitmap, TileMode.Clamp)
-      val brush = ShaderBrush(shader)
+    drawIntoCanvas { canvas ->
+      // cache the paint in the internal stack.
+      canvas.saveLayer(size.toRect(), paint)
 
-      paint.asFrameworkPaint().apply {
-        isAntiAlias = true
-        isDither = true
-        isFilterBitmap = true
+      val mDrawableRect = RectF(0f, 0f, size.width, size.height)
+      val bitmapWidth: Int = imageBitmap.asAndroidBitmap().width
+      val bitmapHeight: Int = imageBitmap.asAndroidBitmap().height
+
+      if (bitmapWidth * mDrawableRect.height() > mDrawableRect.width() * bitmapHeight) {
+        scale = mDrawableRect.height() / bitmapHeight.toFloat()
+        dx = (mDrawableRect.width() - bitmapWidth * scale) * 0.5f
+      } else {
+        scale = mDrawableRect.width() / bitmapWidth.toFloat()
+        dy = (mDrawableRect.height() - bitmapHeight * scale) * 0.5f
       }
 
-      drawIntoCanvas { canvas ->
-        canvas.saveLayer(size.toRect(), paint)
+      // resize the matrix to scale by sx and sy.
+      shaderMatrix.setScale(scale, scale)
 
-        val mDrawableRect = RectF(0f, 0f, size.width, size.height)
-        val bitmapWidth: Int = imageBitmap.asAndroidBitmap().width
-        val bitmapHeight: Int = imageBitmap.asAndroidBitmap().height
-
-        if (bitmapWidth * mDrawableRect.height() > mDrawableRect.width() * bitmapHeight) {
-          scale = mDrawableRect.height() / bitmapHeight.toFloat()
-          dx = (mDrawableRect.width() - bitmapWidth * scale) * 0.5f
-        } else {
-          scale = mDrawableRect.width() / bitmapWidth.toFloat()
-          dy = (mDrawableRect.height() - bitmapHeight * scale) * 0.5f
-        }
-
-        // resize the matrix to scale by sx and sy.
-        shaderMatrix.setScale(scale, scale)
-
-        // post translate the matrix with the specified translation.
-        shaderMatrix.postTranslate(
-          (dx + 0.5f) + mDrawableRect.left,
-          (dy + 0.5f) + mDrawableRect.top
-        )
-
-        shader.setLocalMatrix(shaderMatrix)
-
-        val calculatedRadius = size.width.coerceAtLeast(size.height) * radius
-        drawCircle(brush, calculatedRadius, Offset(size.width / 2, size.height / 2))
-
-        canvas.restore()
-      }
-    } finally {
+      // post translate the matrix with the specified translation.
+      shaderMatrix.postTranslate(
+        (dx + 0.5f) + mDrawableRect.left,
+        (dy + 0.5f) + mDrawableRect.top
+      )
+      // apply the scaled matrix to the shader.
+      shader.setLocalMatrix(shaderMatrix)
+      // calculate radius and draw an image bitmap as a circle.
+      val calculatedRadius = size.width.coerceAtLeast(size.height) * radius
+      drawCircle(brush, calculatedRadius, Offset(size.width / 2, size.height / 2))
+      // restore canvas.
+      canvas.restore()
       // resets the paint and release to the pool.
       paint.asFrameworkPaint().reset()
       paintPool.release(paint)
     }
   }
 
-  /** return the dimension size of the [ImageBitmap]'s intrinsic width and height. */
+  /** return the dimension size of the [painter]'s intrinsic width and height. */
   override val intrinsicSize: Size get() = painter.intrinsicSize
 }
 

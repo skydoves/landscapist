@@ -39,8 +39,11 @@ internal fun Painter.rememberCircularRevealPainter(
   onFinishListener: CircularRevealFinishListener? = null
 ): Painter {
   // Defines a transition of `CircularRevealState`, and updates the transition when the provided state changes.
-  val transitionState = remember { MutableTransitionState(CircularRevealState.None) }
-  transitionState.targetState = CircularRevealState.Finished
+  val transitionState = remember {
+    MutableTransitionState(CircularRevealState.None).apply {
+      targetState = CircularRevealState.Finished
+    }
+  }
 
   // Our actual transition, which reads our transitionState
   val transition = updateTransition(transitionState, label = null)
