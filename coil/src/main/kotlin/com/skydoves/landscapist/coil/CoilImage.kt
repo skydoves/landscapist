@@ -283,13 +283,10 @@ private fun CoilImage(
       suspendCancellableCoroutine { cont ->
         disposable.value = imageLoader.enqueue(
           recomposeKey.newBuilder(context).target(
-            onStart = {
-              imageLoadStateFlow.value = ImageLoadState.Loading
-            },
+            onStart = { imageLoadStateFlow.value = ImageLoadState.Loading },
             onSuccess = { imageLoadStateFlow.value = ImageLoadState.Success(it) },
             onError = {
-              imageLoadStateFlow.value =
-                ImageLoadState.Failure(it?.toBitmap()?.asImageBitmap())
+              imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageBitmap())
             }
           ).build()
         )
