@@ -91,7 +91,6 @@ public final class com/skydoves/landscapist/components/ImageComponentExtensionsK
 }
 
 public final class com/skydoves/landscapist/components/ImagePluginComponent : com/skydoves/landscapist/components/ImageComponent {
-	public static final field $stable I
 	public fun <init> ()V
 	public fun <init> (Ljava/util/List;)V
 	public synthetic fun <init> (Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V

@@ -23,3 +23,10 @@ public final class com/skydoves/landscapist/animation/circular/CircularRevealPlu
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class com/skydoves/landscapist/animation/crossfade/CrossfadePlugin : com/skydoves/landscapist/plugins/ImagePlugin$PainterPlugin {
+	public fun <init> ()V
+	public fun <init> (I)V
+	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun compose (Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/ui/graphics/painter/Painter;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
+}
+

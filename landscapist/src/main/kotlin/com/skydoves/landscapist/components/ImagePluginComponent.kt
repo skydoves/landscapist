@@ -15,6 +15,7 @@
  */
 package com.skydoves.landscapist.components
 
+import androidx.compose.runtime.Stable
 import com.skydoves.landscapist.plugins.ImagePlugin
 
 /** An explicit domain-specific language marker to prevent belonging to another DSL. */
@@ -32,6 +33,7 @@ public inline fun imageComponent(block: ImagePluginComponent.() -> Unit): ImageP
  *
  * @property mutablePlugins A mutable list of [ImagePlugin] that could be modified by internal functions.
  */
+@Stable
 public class ImagePluginComponent(
   @PublishedApi internal val mutablePlugins: MutableList<ImagePlugin> = mutableListOf()
 ) : ImageComponent {

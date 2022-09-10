@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist.animation.circular
+package com.skydoves.landscapist.animation.crossfade
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -25,26 +25,17 @@ import com.skydoves.landscapist.plugins.ImagePlugin
  * An image plugin that extends [ImagePlugin.PainterPlugin] to be executed while rendering painters.
  *
  * @property duration milli-second times from start to finish animation.
- * @property onFinishListener A finish listener of the circular reveal animation.
  */
 @Immutable
-public data class CircularRevealPlugin(
-  public val duration: Int = DefaultCircularRevealDuration,
-  public val onFinishListener: CircularRevealFinishListener? = null
+public class CrossfadePlugin(
+  private val duration: Int = 700
 ) : ImagePlugin.PainterPlugin {
 
-  /**
-   * Compose circular reveal painter with an [imageBitmap] to the given [painter].
-   *
-   * @param imageBitmap A target [ImageBitmap] to be drawn on the painter.
-   * @param painter A given painter to be executed circular reveal animation.
-   */
   @Composable
   override fun compose(imageBitmap: ImageBitmap, painter: Painter): Painter {
-    return painter.rememberCircularRevealPainter(
+    return painter.rememberCrossfadePainter(
       imageBitmap = imageBitmap,
-      durationMs = duration,
-      onFinishListener = onFinishListener
+      durationMs = duration
     )
   }
 }

@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 
 /**
- * circularReveal is an extension of the [Painter] for animating a clipping circle to reveal an image.
+ * This is an extension of the [Painter] for animating a clipping circle to reveal an image.
  * The animation has two states [CircularRevealState.None], [CircularRevealState.Finished].
  *
  * @param imageBitmap an image bitmap for loading the content.
@@ -39,8 +39,11 @@ internal fun Painter.rememberCircularRevealPainter(
   onFinishListener: CircularRevealFinishListener? = null
 ): Painter {
   // Defines a transition of `CircularRevealState`, and updates the transition when the provided state changes.
-  val transitionState = remember { MutableTransitionState(CircularRevealState.None) }
-  transitionState.targetState = CircularRevealState.Finished
+  val transitionState = remember {
+    MutableTransitionState(CircularRevealState.None).apply {
+      targetState = CircularRevealState.Finished
+    }
+  }
 
   // Our actual transition, which reads our transitionState
   val transition = updateTransition(transitionState, label = null)
