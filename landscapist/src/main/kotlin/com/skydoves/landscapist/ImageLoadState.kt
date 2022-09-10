@@ -27,7 +27,7 @@ public sealed class ImageLoadState {
   public object Loading : ImageLoadState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
-  public data class Success(val data: Any?) : ImageLoadState()
+  public data class Success(val data: Any?, val dataSource: DataSource) : ImageLoadState()
 
   /** Request failed. */
   public data class Failure(val data: Any?, val reason: Throwable?) : ImageLoadState()

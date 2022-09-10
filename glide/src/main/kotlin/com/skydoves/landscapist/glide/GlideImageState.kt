@@ -17,6 +17,7 @@ package com.skydoves.landscapist.glide
 
 import android.graphics.drawable.Drawable
 import androidx.compose.ui.graphics.ImageBitmap
+import com.skydoves.landscapist.DataSource
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageState
 
@@ -30,7 +31,7 @@ public sealed class GlideImageState : ImageState {
   public object Loading : GlideImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
-  public data class Success(val drawable: Drawable?) : GlideImageState()
+  public data class Success(val drawable: Drawable?, val dataSource: DataSource) : GlideImageState()
 
   /** Request failed. */
   public data class Failure(val errorDrawable: Drawable?, val reason: Throwable?) :
@@ -42,7 +43,10 @@ public fun ImageLoadState.toGlideImageState(): GlideImageState {
   return when (this) {
     is ImageLoadState.None -> GlideImageState.None
     is ImageLoadState.Loading -> GlideImageState.Loading
-    is ImageLoadState.Success -> GlideImageState.Success(data as? Drawable)
+    is ImageLoadState.Success -> GlideImageState.Success(
+      drawable = data as? Drawable,
+      dataSource = dataSource
+    )
     is ImageLoadState.Failure -> GlideImageState.Failure(
       errorDrawable = data as? Drawable,
       reason = reason
