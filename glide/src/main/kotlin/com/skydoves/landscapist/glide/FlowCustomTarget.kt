@@ -30,6 +30,8 @@ internal class FlowCustomTarget constructor(
   private val producerScope: ProducerScope<ImageLoadState>
 ) : CustomTarget<Drawable>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
 
+  private var failException: Throwable? = null
+
   /** onResourceReady will be handled by [FlowRequestListener]. */
   override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) = Unit
 
@@ -40,7 +42,12 @@ internal class FlowCustomTarget constructor(
 
   override fun onLoadFailed(errorDrawable: Drawable?) {
     super.onLoadFailed(errorDrawable)
-    producerScope.trySendBlocking(ImageLoadState.Failure(errorDrawable))
+    producerScope.trySendBlocking(
+      ImageLoadState.Failure(
+        data = errorDrawable,
+        reason = failException
+      )
+    )
     producerScope.channel.close()
   }
 
@@ -49,5 +56,9 @@ internal class FlowCustomTarget constructor(
     // the result, otherwise we might draw a recycled bitmap later.
     producerScope.trySendBlocking(ImageLoadState.None)
     producerScope.channel.close()
+  }
+
+  fun updateFailException(throwable: Throwable?) {
+    failException = throwable
   }
 }

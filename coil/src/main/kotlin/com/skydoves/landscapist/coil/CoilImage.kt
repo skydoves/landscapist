@@ -40,8 +40,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import coil.ImageLoader
-import coil.request.Disposable
 import coil.request.ImageRequest
+import coil.request.ImageResult
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
@@ -53,8 +53,8 @@ import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.channelFlow
 
 /**
  * Requests loading an image and create some composables based on [CoilImageState].
@@ -273,31 +273,32 @@ private fun CoilImage(
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
-  val imageLoadStateFlow =
-    remember(recomposeKey) { MutableStateFlow<ImageLoadState>(ImageLoadState.None) }
-  val disposable = remember(recomposeKey) { mutableStateOf<Disposable?>(null) }
 
   ImageLoad(
     recomposeKey = recomposeKey,
     executeImageRequest = {
-      suspendCancellableCoroutine { cont ->
-        disposable.value = imageLoader.enqueue(
-          recomposeKey.newBuilder(context).target(
-            onStart = { imageLoadStateFlow.value = ImageLoadState.Loading },
-            onSuccess = { imageLoadStateFlow.value = ImageLoadState.Success(it) },
-            onError = {
-              imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageBitmap())
-            }
-          ).build()
-        )
+      channelFlow {
+        recomposeKey.newBuilder(context).target(
+          onStart = { trySendBlocking(ImageLoadState.Loading) }
+        ).build()
 
-        cont.resume(imageLoadStateFlow) {
-          // dispose the coil disposable request if cancelled.
-          disposable.value?.dispose()
-        }
+        val result = imageLoader.execute(recomposeKey).toResult()
+        send(result)
       }
     },
     modifier = modifier,
     content = content
   )
+}
+
+private fun ImageResult.toResult(): ImageLoadState = when (this) {
+  is coil.request.SuccessResult -> {
+    ImageLoadState.Success(drawable)
+  }
+  is coil.request.ErrorResult -> {
+    ImageLoadState.Failure(
+      data = drawable?.toBitmap()?.asImageBitmap(),
+      reason = throwable
+    )
+  }
 }

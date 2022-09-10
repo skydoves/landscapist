@@ -225,7 +225,9 @@ private fun GlideImage(
     executeImageRequest = {
       callbackFlow {
         val target = FlowCustomTarget(this)
-        val flowRequestListener = FlowRequestListener(this)
+        val flowRequestListener = FlowRequestListener(this) {
+          target.updateFailException(it)
+        }
 
         // start the image request into the target.
         requestManager

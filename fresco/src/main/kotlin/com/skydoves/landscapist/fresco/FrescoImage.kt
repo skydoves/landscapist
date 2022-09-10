@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
-import androidx.palette.graphics.Palette
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
 import com.skydoves.landscapist.ImageLoad
@@ -185,7 +184,6 @@ public fun FrescoImage(
  *
  * @param imageRequest The pipeline has to know about requested image to proceed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param content Content to be displayed for the given state.
  */
 @Composable
