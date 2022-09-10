@@ -28,18 +28,18 @@ import androidx.palette.graphics.Palette
  * @param interceptor A custom interceptor before generating colors.
  * @param paletteLoadedListener A listener for listening to the loaded palette.
  */
-public class BitmapPalette constructor(
+internal class BitmapPalette constructor(
   private var imageModel: Any? = null,
   private val useCache: Boolean = true,
   private val interceptor: PaletteBuilderInterceptor? = null,
   private val paletteLoadedListener: PaletteLoadedListener? = null
 ) {
 
-  public fun applyImageModel(imageModel: Any?): BitmapPalette = apply {
+  fun applyImageModel(imageModel: Any?): BitmapPalette = apply {
     this.imageModel = imageModel
   }
 
-  public fun generate(bitmap: Bitmap?) {
+  fun generate(bitmap: Bitmap?) {
     val target = bitmap ?: return
     val model = imageModel ?: return
     if (useCache) {

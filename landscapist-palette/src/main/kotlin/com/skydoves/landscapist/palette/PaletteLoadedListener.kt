@@ -17,10 +17,9 @@ package com.skydoves.landscapist.palette
 
 import androidx.palette.graphics.Palette
 
-/**
- * A definition for intercepting [Palette.Builder] before loading.
- */
-public fun interface PaletteBuilderInterceptor {
-  /** Invoked when before loading palette. */
-  public fun intercept(builder: Palette.Builder): Palette.Builder
+/** A definition for listening to the palette loaded. */
+public fun interface PaletteLoadedListener {
+
+  /** Invoked when the palette loaded. */
+  public fun onPaletteLoaded(palette: Palette)
 }
