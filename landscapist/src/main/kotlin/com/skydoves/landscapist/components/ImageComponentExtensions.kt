@@ -17,6 +17,7 @@ package com.skydoves.landscapist.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.InternalLandscapistApi
 import com.skydoves.landscapist.plugins.ImagePlugin
@@ -49,10 +50,17 @@ public fun ImageComponent.ComposeLoadingStatePlugins(
 @InternalLandscapistApi
 public fun ImageComponent.ComposeSuccessStatePlugins(
   modifier: Modifier,
-  imageOptions: ImageOptions
+  imageModel: Any?,
+  imageOptions: ImageOptions,
+  imageBitmap: ImageBitmap?
 ) {
   imagePlugins.filterIsInstance<ImagePlugin.SuccessStatePlugin>().forEach { plugin ->
-    plugin.compose(modifier = modifier, imageOptions = imageOptions)
+    plugin.compose(
+      modifier = modifier,
+      imageModel = imageModel,
+      imageOptions = imageOptions,
+      imageBitmap = imageBitmap
+    )
   }
 }
 
