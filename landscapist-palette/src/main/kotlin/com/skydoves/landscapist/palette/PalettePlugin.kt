@@ -55,7 +55,7 @@ public data class PalettePlugin(
   ): ImagePlugin =
     apply {
       imageBitmap?.let {
-        bitmapPalette.applyImageModel(imageModel)
+        bitmapPalette.applyImageModel(this.imageModel ?: imageModel)
         bitmapPalette.generate(it.asAndroidBitmap())
       }
     }
