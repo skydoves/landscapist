@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.core.graphics.drawable.toBitmap
 import com.skydoves.landscapist.plugins.ImagePlugin
-import com.skydoves.landscapist.plugins.composePlugins
+import com.skydoves.landscapist.plugins.composePainterPlugins
 
 /**
  * Remembers [Drawable] wrapped up as a [Painter] with a given the list of [ImagePlugin].
@@ -56,7 +56,10 @@ public fun rememberDrawablePainter(
       // will receive the necessary events
       else -> DrawablePainter(drawable.mutate())
     }
-  }.composePlugins(imagePlugins = imagePlugins, imageBitmap = drawable.toBitmap().asImageBitmap())
+  }.composePainterPlugins(
+    imagePlugins = imagePlugins,
+    imageBitmap = drawable.toBitmap().asImageBitmap()
+  )
 
 /**
  * Remembers [ImageBitmap] wrapped up as a [Painter] with a given the list of [ImagePlugin].
@@ -71,4 +74,4 @@ public fun rememberBitmapPainter(
   imageBitmap: ImageBitmap
 ): Painter = remember(imageBitmap, imagePlugins) {
   BitmapPainter(imageBitmap)
-}.composePlugins(imagePlugins = imagePlugins, imageBitmap = imageBitmap)
+}.composePainterPlugins(imagePlugins = imagePlugins, imageBitmap = imageBitmap)

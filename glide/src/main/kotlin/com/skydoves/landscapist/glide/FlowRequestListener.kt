@@ -16,13 +16,11 @@
 package com.skydoves.landscapist.glide
 
 import android.graphics.drawable.Drawable
-import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.skydoves.landscapist.ImageLoadState
-import com.skydoves.landscapist.palette.BitmapPalette
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.trySendBlocking
 
@@ -30,8 +28,7 @@ import kotlinx.coroutines.channels.trySendBlocking
  * FlowRequestListener is a [RequestListener] for receiving Glide image results from network and handle states.
  */
 internal class FlowRequestListener constructor(
-  private val producerScope: ProducerScope<ImageLoadState>,
-  private val bitmapPalette: BitmapPalette?
+  private val producerScope: ProducerScope<ImageLoadState>
 ) : RequestListener<Drawable> {
 
   override fun onLoadFailed(
@@ -53,7 +50,6 @@ internal class FlowRequestListener constructor(
   ): Boolean {
     producerScope.trySendBlocking(ImageLoadState.Success(resource))
     producerScope.channel.close()
-    bitmapPalette?.generate(resource?.toBitmap())
     // return true so that the target doesn't receive the drawable.
     return true
   }

@@ -45,7 +45,6 @@ import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
 import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.palette.BitmapPalette
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberBitmapPainter
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -89,7 +88,6 @@ public fun FrescoImage(
   },
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
-  bitmapPalette: BitmapPalette? = null,
   onImageStateChanged: (FrescoImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: FrescoImageState.Loading) -> Unit)? = null,
@@ -118,8 +116,7 @@ public fun FrescoImage(
   FrescoImage(
     recomposeKey = imageUrl,
     imageRequest = imageRequest.invoke(),
-    modifier = modifier,
-    bitmapPalette = bitmapPalette
+    modifier = modifier
   ) ImageRequest@{ imageState ->
     when (val frescoImageState = imageState.toFrescoImageState().apply { internalState = this }) {
       is FrescoImageState.None -> Unit
@@ -140,7 +137,9 @@ public fun FrescoImage(
       is FrescoImageState.Success -> {
         component.ComposeSuccessStatePlugins(
           modifier = modifier,
-          imageOptions = imageOptions
+          imageModel = imageUrl,
+          imageOptions = imageOptions,
+          imageBitmap = frescoImageState.imageBitmap
         )
         if (success != null) {
           success.invoke(this, frescoImageState)
@@ -194,7 +193,6 @@ private fun FrescoImage(
   recomposeKey: Any?,
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
-  bitmapPalette: BitmapPalette? = null,
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
@@ -205,7 +203,7 @@ private fun FrescoImage(
     recomposeKey = recomposeKey,
     executeImageRequest = {
       suspendCancellableCoroutine { cont ->
-        val subscriber = FlowBaseBitmapDataSubscriber(bitmapPalette?.applyImageModel(recomposeKey))
+        val subscriber = FlowBaseBitmapDataSubscriber()
         datasource.subscribe(subscriber, CallerThreadExecutor.getInstance())
 
         cont.resume(subscriber.imageLoadStateFlow) {

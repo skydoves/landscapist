@@ -22,7 +22,6 @@ import com.facebook.datasource.DataSource
 import com.facebook.imagepipeline.datasource.BaseBitmapReferenceDataSubscriber
 import com.facebook.imagepipeline.image.CloseableImage
 import com.skydoves.landscapist.ImageLoadState
-import com.skydoves.landscapist.palette.BitmapPalette
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -30,16 +29,13 @@ import kotlinx.coroutines.flow.StateFlow
  * FlowBaseBitmapDataSubscriber is a fresco bitmap subscriber which collects
  * [ImageLoadState] as a stateFlow.
  */
-internal class FlowBaseBitmapDataSubscriber(
-  private val bitmapPalette: BitmapPalette?
-) : BaseBitmapReferenceDataSubscriber() {
+internal class FlowBaseBitmapDataSubscriber : BaseBitmapReferenceDataSubscriber() {
 
   private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.None)
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
   override fun onNewResultImpl(bitmapReference: CloseableReference<Bitmap>?) {
     this.internalStateFlow.value = ImageLoadState.Success(bitmapReference?.get()?.asImageBitmap())
-    this.bitmapPalette?.generate(bitmapReference?.get())
   }
 
   override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {

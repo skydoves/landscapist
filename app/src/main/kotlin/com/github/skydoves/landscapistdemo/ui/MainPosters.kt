@@ -69,7 +69,7 @@ import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
-import com.skydoves.landscapist.palette.BitmapPalette
+import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @Composable
@@ -143,8 +143,10 @@ private fun SelectedPoster(
       .aspectRatio(0.8f),
     component = rememberImageComponent {
       +CircularRevealPlugin()
+      +PalettePlugin {
+        palette = it
+      }
     },
-    bitmapPalette = BitmapPalette { palette = it },
     previewPlaceholder = R.drawable.poster
   )
 
