@@ -33,11 +33,13 @@ public final class com/skydoves/landscapist/coil/CoilImageState$None : com/skydo
 
 public final class com/skydoves/landscapist/coil/CoilImageState$Success : com/skydoves/landscapist/coil/CoilImageState {
 	public static final field $stable I
-	public fun <init> (Landroid/graphics/drawable/Drawable;)V
+	public fun <init> (Landroid/graphics/drawable/Drawable;Lcom/skydoves/landscapist/DataSource;)V
 	public final fun component1 ()Landroid/graphics/drawable/Drawable;
-	public final fun copy (Landroid/graphics/drawable/Drawable;)Lcom/skydoves/landscapist/coil/CoilImageState$Success;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/coil/CoilImageState$Success;Landroid/graphics/drawable/Drawable;ILjava/lang/Object;)Lcom/skydoves/landscapist/coil/CoilImageState$Success;
+	public final fun component2 ()Lcom/skydoves/landscapist/DataSource;
+	public final fun copy (Landroid/graphics/drawable/Drawable;Lcom/skydoves/landscapist/DataSource;)Lcom/skydoves/landscapist/coil/CoilImageState$Success;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/coil/CoilImageState$Success;Landroid/graphics/drawable/Drawable;Lcom/skydoves/landscapist/DataSource;ILjava/lang/Object;)Lcom/skydoves/landscapist/coil/CoilImageState$Success;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDataSource ()Lcom/skydoves/landscapist/DataSource;
 	public final fun getDrawable ()Landroid/graphics/drawable/Drawable;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

@@ -32,11 +32,13 @@ public final class com/skydoves/landscapist/fresco/FrescoImageState$None : com/s
 
 public final class com/skydoves/landscapist/fresco/FrescoImageState$Success : com/skydoves/landscapist/fresco/FrescoImageState {
 	public static final field $stable I
-	public fun <init> (Landroidx/compose/ui/graphics/ImageBitmap;)V
+	public fun <init> (Landroidx/compose/ui/graphics/ImageBitmap;Lcom/skydoves/landscapist/DataSource;)V
 	public final fun component1 ()Landroidx/compose/ui/graphics/ImageBitmap;
-	public final fun copy (Landroidx/compose/ui/graphics/ImageBitmap;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Success;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/fresco/FrescoImageState$Success;Landroidx/compose/ui/graphics/ImageBitmap;ILjava/lang/Object;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Success;
+	public final fun component2 ()Lcom/skydoves/landscapist/DataSource;
+	public final fun copy (Landroidx/compose/ui/graphics/ImageBitmap;Lcom/skydoves/landscapist/DataSource;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Success;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/fresco/FrescoImageState$Success;Landroidx/compose/ui/graphics/ImageBitmap;Lcom/skydoves/landscapist/DataSource;ILjava/lang/Object;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Success;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDataSource ()Lcom/skydoves/landscapist/DataSource;
 	public final fun getImageBitmap ()Landroidx/compose/ui/graphics/ImageBitmap;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
