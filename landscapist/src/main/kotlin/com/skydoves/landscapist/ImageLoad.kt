@@ -71,5 +71,5 @@ private suspend fun executeImageLoading(
   emitAll(executeImageRequest())
 }.catch {
   // emit a failure loading state
-  emit(ImageLoadState.Failure(null))
+  emit(ImageLoadState.Failure(null, null))
 }.distinctUntilChanged().flowOn(Dispatchers.IO)
