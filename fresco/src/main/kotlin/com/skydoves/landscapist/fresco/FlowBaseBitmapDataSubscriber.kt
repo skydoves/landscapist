@@ -19,6 +19,7 @@ import android.graphics.Bitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
+import com.facebook.drawee.backends.pipeline.info.ImageOrigin
 import com.facebook.imagepipeline.datasource.BaseBitmapReferenceDataSubscriber
 import com.facebook.imagepipeline.image.CloseableImage
 import com.skydoves.landscapist.ImageLoadState
@@ -34,8 +35,13 @@ internal class FlowBaseBitmapDataSubscriber : BaseBitmapReferenceDataSubscriber(
   private val internalStateFlow = MutableStateFlow<ImageLoadState>(ImageLoadState.None)
   val imageLoadStateFlow: StateFlow<ImageLoadState> get() = internalStateFlow
 
+  private var imageOrigin: Int = ImageOrigin.UNKNOWN
+
   override fun onNewResultImpl(bitmapReference: CloseableReference<Bitmap>?) {
-    this.internalStateFlow.value = ImageLoadState.Success(bitmapReference?.get()?.asImageBitmap())
+    this.internalStateFlow.value = ImageLoadState.Success(
+      data = bitmapReference?.get()?.asImageBitmap(),
+      dataSource = imageOrigin.toDataSource()
+    )
   }
 
   override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
@@ -52,4 +58,19 @@ internal class FlowBaseBitmapDataSubscriber : BaseBitmapReferenceDataSubscriber(
       this.internalStateFlow.value = ImageLoadState.Loading
     }
   }
+
+  fun updateImageOrigin(imageOrigin: Int) {
+    this.imageOrigin = imageOrigin
+  }
+}
+
+private fun Int.toDataSource(): com.skydoves.landscapist.DataSource = when (this) {
+  ImageOrigin.DISK -> com.skydoves.landscapist.DataSource.DISK
+  ImageOrigin.NETWORK -> com.skydoves.landscapist.DataSource.NETWORK
+  ImageOrigin.LOCAL -> com.skydoves.landscapist.DataSource.DISK
+  ImageOrigin.MEMORY_BITMAP -> com.skydoves.landscapist.DataSource.MEMORY
+  ImageOrigin.MEMORY_BITMAP_SHORTCUT -> com.skydoves.landscapist.DataSource.MEMORY
+  ImageOrigin.MEMORY_ENCODED -> com.skydoves.landscapist.DataSource.MEMORY
+  ImageOrigin.UNKNOWN -> com.skydoves.landscapist.DataSource.UNKNOWN
+  else -> com.skydoves.landscapist.DataSource.UNKNOWN
 }
