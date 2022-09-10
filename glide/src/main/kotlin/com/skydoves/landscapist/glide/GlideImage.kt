@@ -53,7 +53,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
 /**
- * Requests loading an image and create some composables based on [GlideImageState].
+ * Load and render an image with the given [imageModel] from the network or local storage.
  *
  * ```
  * GlideImage(
@@ -148,7 +148,8 @@ public fun GlideImage(
       is GlideImageState.Failure -> {
         component.ComposeFailureStatePlugins(
           modifier = modifier,
-          imageOptions = imageOptions
+          imageOptions = imageOptions,
+          reason = glideImageState.reason
         )
         failure?.invoke(this, glideImageState)
       }
@@ -182,8 +183,7 @@ public fun GlideImage(
 }
 
 /**
- * Requests loading an image and create a composable that provides
- * the current state [ImageLoadState] of the content.
+ * Requests loading an image and create a composable that provides the current state [ImageLoadState] of the content.
  *
  * ```
  * GlideImage(

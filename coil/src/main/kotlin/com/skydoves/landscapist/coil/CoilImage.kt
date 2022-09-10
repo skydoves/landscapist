@@ -21,6 +21,8 @@ package com.skydoves.landscapist.coil
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
@@ -53,16 +55,23 @@ import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
+import java.io.File
+import java.nio.ByteBuffer
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.channelFlow
+import okhttp3.HttpUrl
 
 /**
- * Requests loading an image and create some composables based on [CoilImageState].
+ * Load and render an image with the given [imageModel] from the network or local storage.
+ *
+ * Supported types for the [imageModel] are the below:
+ * [String], [Uri], [HttpUrl], [File], [DrawableRes], [Drawable], [Bitmap], [ByteArray], [ByteBuffer]
  *
  * ```
  * CoilImage(
  * imageModel = imageModel,
  * modifier = modifier,
+ * imageOptions = ImageOptions(contentScale = ContentScale.Crop),
  * loading = {
  *   Box(modifier = Modifier.matchParentSize()) {
  *     CircularProgressIndicator(
@@ -124,7 +133,7 @@ public fun CoilImage(
 }
 
 /**
- * Requests loading an image and create some composables based on [CoilImageState].
+ * Load and render an image with the given [imageRequest] from the network or local storage.
  *
  * ```
  * CoilImage(
@@ -205,7 +214,8 @@ public fun CoilImage(
       is CoilImageState.Failure -> {
         component.ComposeFailureStatePlugins(
           modifier = modifier,
-          imageOptions = imageOptions
+          imageOptions = imageOptions,
+          reason = coilImageState.reason
         )
         failure?.invoke(this, coilImageState)
       }
@@ -240,8 +250,7 @@ public fun CoilImage(
 }
 
 /**
- * Requests loading an image and create a composable that provides
- * the current state [ImageLoadState] of the content.
+ * Requests loading an image and create a composable that provides the current state [ImageLoadState] of the content.
  *
  * ```
  * CoilImage(

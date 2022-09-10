@@ -33,7 +33,7 @@ public sealed class CoilImageState : ImageState {
   public data class Success(val drawable: Drawable?) : CoilImageState()
 
   /** Request failed. */
-  public data class Failure(val errorDrawable: Drawable?) : CoilImageState()
+  public data class Failure(val errorDrawable: Drawable?, val reason: Throwable?) : CoilImageState()
 }
 
 /** casts an [ImageLoadState] type to a [CoilImageState]. */
@@ -42,6 +42,9 @@ public fun ImageLoadState.toCoilImageState(): CoilImageState {
     is ImageLoadState.None -> CoilImageState.None
     is ImageLoadState.Loading -> CoilImageState.Loading
     is ImageLoadState.Success -> CoilImageState.Success(data as? Drawable)
-    is ImageLoadState.Failure -> CoilImageState.Failure(data as? Drawable)
+    is ImageLoadState.Failure -> CoilImageState.Failure(
+      errorDrawable = data as? Drawable,
+      reason = reason
+    )
   }
 }

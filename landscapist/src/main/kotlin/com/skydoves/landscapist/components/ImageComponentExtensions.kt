@@ -69,9 +69,10 @@ public fun ImageComponent.ComposeSuccessStatePlugins(
 @InternalLandscapistApi
 public fun ImageComponent.ComposeFailureStatePlugins(
   modifier: Modifier,
-  imageOptions: ImageOptions
+  imageOptions: ImageOptions,
+  reason: Throwable?
 ) {
   imagePlugins.filterIsInstance<ImagePlugin.FailureStatePlugin>().forEach { plugin ->
-    plugin.compose(modifier = modifier, imageOptions = imageOptions)
+    plugin.compose(modifier = modifier, imageOptions = imageOptions, reason = reason)
   }
 }

@@ -49,7 +49,7 @@ import com.skydoves.landscapist.rememberBitmapPainter
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
- * Requests loading an image and execute Composable depending on [FrescoImageState].
+ * Load and render an image with the given [imageUrl] from the network or local storage.
  *
  * ```
  * FrescoImage(
@@ -129,7 +129,8 @@ public fun FrescoImage(
       is FrescoImageState.Failure -> {
         component.ComposeFailureStatePlugins(
           modifier = modifier,
-          imageOptions = imageOptions
+          imageOptions = imageOptions,
+          reason = frescoImageState.reason
         )
         failure?.invoke(this, frescoImageState)
       }
@@ -164,8 +165,7 @@ public fun FrescoImage(
 }
 
 /**
- * Requests loading an image and create a composable that provides
- * the current state [ImageLoadState] of the content.
+ * Requests loading an image and create a composable that provides the current state [ImageLoadState] of the content.
  *
  * ```
  * FrescoImage(
