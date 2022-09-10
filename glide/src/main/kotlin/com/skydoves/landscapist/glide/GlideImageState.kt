@@ -33,7 +33,8 @@ public sealed class GlideImageState : ImageState {
   public data class Success(val drawable: Drawable?) : GlideImageState()
 
   /** Request failed. */
-  public data class Failure(val errorDrawable: Drawable?) : GlideImageState()
+  public data class Failure(val errorDrawable: Drawable?, val reason: Throwable?) :
+    GlideImageState()
 }
 
 /** casts an [ImageLoadState] type to a [GlideImageState]. */
@@ -42,6 +43,9 @@ public fun ImageLoadState.toGlideImageState(): GlideImageState {
     is ImageLoadState.None -> GlideImageState.None
     is ImageLoadState.Loading -> GlideImageState.Loading
     is ImageLoadState.Success -> GlideImageState.Success(data as? Drawable)
-    is ImageLoadState.Failure -> GlideImageState.Failure(data as? Drawable)
+    is ImageLoadState.Failure -> GlideImageState.Failure(
+      errorDrawable = data as? Drawable,
+      reason = reason
+    )
   }
 }

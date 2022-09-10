@@ -12,12 +12,14 @@ public abstract class com/skydoves/landscapist/ImageLoadState {
 
 public final class com/skydoves/landscapist/ImageLoadState$Failure : com/skydoves/landscapist/ImageLoadState {
 	public static final field $stable I
-	public fun <init> (Ljava/lang/Object;)V
+	public fun <init> (Ljava/lang/Object;Ljava/lang/Throwable;)V
 	public final fun component1 ()Ljava/lang/Object;
-	public final fun copy (Ljava/lang/Object;)Lcom/skydoves/landscapist/ImageLoadState$Failure;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/ImageLoadState$Failure;Ljava/lang/Object;ILjava/lang/Object;)Lcom/skydoves/landscapist/ImageLoadState$Failure;
+	public final fun component2 ()Ljava/lang/Throwable;
+	public final fun copy (Ljava/lang/Object;Ljava/lang/Throwable;)Lcom/skydoves/landscapist/ImageLoadState$Failure;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/ImageLoadState$Failure;Ljava/lang/Object;Ljava/lang/Throwable;ILjava/lang/Object;)Lcom/skydoves/landscapist/ImageLoadState$Failure;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getData ()Ljava/lang/Object;
+	public final fun getReason ()Ljava/lang/Throwable;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -84,7 +86,7 @@ public abstract interface class com/skydoves/landscapist/components/ImageCompone
 }
 
 public final class com/skydoves/landscapist/components/ImageComponentExtensionsKt {
-	public static final fun ComposeFailureStatePlugins (Lcom/skydoves/landscapist/components/ImageComponent;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/runtime/Composer;I)V
+	public static final fun ComposeFailureStatePlugins (Lcom/skydoves/landscapist/components/ImageComponent;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Ljava/lang/Throwable;Landroidx/compose/runtime/Composer;I)V
 	public static final fun ComposeLoadingStatePlugins (Lcom/skydoves/landscapist/components/ImageComponent;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/runtime/Composer;I)V
 	public static final fun ComposeSuccessStatePlugins (Lcom/skydoves/landscapist/components/ImageComponent;Landroidx/compose/ui/Modifier;Ljava/lang/Object;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/runtime/Composer;I)V
 	public static final fun getImagePlugins (Lcom/skydoves/landscapist/components/ImageComponent;)Ljava/util/List;
@@ -119,7 +121,7 @@ public abstract interface class com/skydoves/landscapist/plugins/ImagePlugin {
 }
 
 public abstract interface class com/skydoves/landscapist/plugins/ImagePlugin$FailureStatePlugin : com/skydoves/landscapist/plugins/ImagePlugin {
-	public abstract fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+	public abstract fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Ljava/lang/Throwable;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
 }
 
 public abstract interface class com/skydoves/landscapist/plugins/ImagePlugin$LoadingStatePlugin : com/skydoves/landscapist/plugins/ImagePlugin {

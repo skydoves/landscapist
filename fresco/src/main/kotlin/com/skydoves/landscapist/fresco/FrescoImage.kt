@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
-import androidx.palette.graphics.Palette
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.imagepipeline.request.ImageRequest
 import com.skydoves.landscapist.ImageLoad
@@ -50,7 +49,7 @@ import com.skydoves.landscapist.rememberBitmapPainter
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
- * Requests loading an image and execute Composable depending on [FrescoImageState].
+ * Load and render an image with the given [imageUrl] from the network or local storage.
  *
  * ```
  * FrescoImage(
@@ -130,7 +129,8 @@ public fun FrescoImage(
       is FrescoImageState.Failure -> {
         component.ComposeFailureStatePlugins(
           modifier = modifier,
-          imageOptions = imageOptions
+          imageOptions = imageOptions,
+          reason = frescoImageState.reason
         )
         failure?.invoke(this, frescoImageState)
       }
@@ -165,8 +165,7 @@ public fun FrescoImage(
 }
 
 /**
- * Requests loading an image and create a composable that provides
- * the current state [ImageLoadState] of the content.
+ * Requests loading an image and create a composable that provides the current state [ImageLoadState] of the content.
  *
  * ```
  * FrescoImage(
@@ -185,7 +184,6 @@ public fun FrescoImage(
  *
  * @param imageRequest The pipeline has to know about requested image to proceed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param content Content to be displayed for the given state.
  */
 @Composable

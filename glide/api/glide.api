@@ -8,12 +8,14 @@ public abstract class com/skydoves/landscapist/glide/GlideImageState : com/skydo
 
 public final class com/skydoves/landscapist/glide/GlideImageState$Failure : com/skydoves/landscapist/glide/GlideImageState {
 	public static final field $stable I
-	public fun <init> (Landroid/graphics/drawable/Drawable;)V
+	public fun <init> (Landroid/graphics/drawable/Drawable;Ljava/lang/Throwable;)V
 	public final fun component1 ()Landroid/graphics/drawable/Drawable;
-	public final fun copy (Landroid/graphics/drawable/Drawable;)Lcom/skydoves/landscapist/glide/GlideImageState$Failure;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/glide/GlideImageState$Failure;Landroid/graphics/drawable/Drawable;ILjava/lang/Object;)Lcom/skydoves/landscapist/glide/GlideImageState$Failure;
+	public final fun component2 ()Ljava/lang/Throwable;
+	public final fun copy (Landroid/graphics/drawable/Drawable;Ljava/lang/Throwable;)Lcom/skydoves/landscapist/glide/GlideImageState$Failure;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/glide/GlideImageState$Failure;Landroid/graphics/drawable/Drawable;Ljava/lang/Throwable;ILjava/lang/Object;)Lcom/skydoves/landscapist/glide/GlideImageState$Failure;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getErrorDrawable ()Landroid/graphics/drawable/Drawable;
+	public final fun getReason ()Ljava/lang/Throwable;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

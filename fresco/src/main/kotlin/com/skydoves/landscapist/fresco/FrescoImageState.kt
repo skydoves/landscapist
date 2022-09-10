@@ -35,7 +35,10 @@ public sealed class FrescoImageState : ImageState {
   public data class Success(val imageBitmap: ImageBitmap?) : FrescoImageState()
 
   /** Request failed. */
-  public data class Failure(val dataSource: DataSource<CloseableReference<CloseableImage>>?) :
+  public data class Failure(
+    val dataSource: DataSource<CloseableReference<CloseableImage>>?,
+    val reason: Throwable?
+  ) :
     FrescoImageState()
 }
 
@@ -47,7 +50,8 @@ public fun ImageLoadState.toFrescoImageState(): FrescoImageState {
     is ImageLoadState.Loading -> FrescoImageState.Loading
     is ImageLoadState.Success -> FrescoImageState.Success(data as? ImageBitmap)
     is ImageLoadState.Failure -> FrescoImageState.Failure(
-      data as? DataSource<CloseableReference<CloseableImage>>
+      dataSource = data as? DataSource<CloseableReference<CloseableImage>>,
+      reason = reason
     )
   }
 }
