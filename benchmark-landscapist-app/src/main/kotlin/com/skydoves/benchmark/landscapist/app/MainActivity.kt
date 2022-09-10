@@ -26,7 +26,6 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       Column {
-        BitmapPaletteProfiles()
       }
     }
   }

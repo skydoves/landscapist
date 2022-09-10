@@ -31,9 +31,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
-import androidx.palette.graphics.Palette
+import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
@@ -46,7 +47,6 @@ import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
 import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.palette.BitmapPalette
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
 import kotlinx.coroutines.channels.awaitClose
@@ -84,7 +84,6 @@ import kotlinx.coroutines.flow.callbackFlow
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
- * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param loading Content to be displayed when the request is in progress.
@@ -104,7 +103,6 @@ public fun GlideImage(
   requestListener: RequestListener<Drawable>? = null,
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
-  bitmapPalette: BitmapPalette? = null,
   onImageStateChanged: (GlideImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: GlideImageState.Loading) -> Unit)? = null,
@@ -136,8 +134,7 @@ public fun GlideImage(
       .apply(requestOptions.invoke())
       .load(imageModel),
     requestListener = requestListener,
-    modifier = modifier,
-    bitmapPalette = bitmapPalette
+    modifier = modifier
   ) ImageRequest@{ imageState ->
     when (val glideImageState = imageState.toGlideImageState().apply { internalState = this }) {
       is GlideImageState.None -> Unit
@@ -158,7 +155,9 @@ public fun GlideImage(
       is GlideImageState.Success -> {
         component.ComposeSuccessStatePlugins(
           modifier = modifier,
-          imageOptions = imageOptions
+          imageModel = imageModel,
+          imageOptions = imageOptions,
+          imageBitmap = glideImageState.drawable?.toBitmap()?.asImageBitmap()
         )
         if (success != null) {
           success.invoke(this, glideImageState)
@@ -208,7 +207,6 @@ public fun GlideImage(
  *
  * @param builder The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param content Content to be displayed for the given state.
  */
@@ -218,7 +216,6 @@ private fun GlideImage(
   builder: RequestBuilder<Drawable>,
   modifier: Modifier = Modifier,
   requestListener: RequestListener<Drawable>? = null,
-  bitmapPalette: BitmapPalette? = null,
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   val requestManager = LocalGlideProvider.getGlideRequestManager()
@@ -228,11 +225,7 @@ private fun GlideImage(
     executeImageRequest = {
       callbackFlow {
         val target = FlowCustomTarget(this)
-        val flowRequestListener =
-          FlowRequestListener(
-            this,
-            bitmapPalette?.applyImageModel(recomposeKey)
-          )
+        val flowRequestListener = FlowRequestListener(this)
 
         // start the image request into the target.
         requestManager

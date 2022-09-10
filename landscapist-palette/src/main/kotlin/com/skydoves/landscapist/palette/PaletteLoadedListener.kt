@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.benchmark.landscapist.app
+package com.skydoves.landscapist.palette
 
-import android.graphics.Bitmap
-import androidx.compose.runtime.Composable
-import com.skydoves.landscapist.palette.BitmapPalette
+import androidx.palette.graphics.Palette
 
-@Composable
-fun BitmapPaletteProfiles() {
-  BitmapPalette(
-    imageModel = null,
-    useCache = true,
-    interceptor = { it.clearTargets() },
-    paletteLoadedListener = { }
-  ).apply {
-    applyImageModel("https://avatars.githubusercontent.com/u/24237865?v=4")
-    generate(Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888))
-  }
+/** A definition for listening to the palette loaded. */
+public fun interface PaletteLoadedListener {
+
+  /** Invoked when the palette loaded. */
+  public fun onPaletteLoaded(palette: Palette)
 }

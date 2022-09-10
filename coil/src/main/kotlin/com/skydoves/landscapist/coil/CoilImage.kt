@@ -39,7 +39,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
-import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.request.Disposable
 import coil.request.ImageRequest
@@ -52,7 +51,6 @@ import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
 import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.palette.BitmapPalette
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -85,7 +83,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
- * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param loading Content to be displayed when the request is in progress.
@@ -102,7 +99,6 @@ public fun CoilImage(
   component: ImageComponent = rememberImageComponent {},
   requestListener: ImageRequest.Listener? = null,
   imageOptions: ImageOptions = ImageOptions(),
-  bitmapPalette: BitmapPalette? = null,
   onImageStateChanged: (CoilImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
@@ -119,7 +115,6 @@ public fun CoilImage(
     component = component,
     modifier = modifier,
     imageOptions = imageOptions,
-    bitmapPalette = bitmapPalette,
     onImageStateChanged = onImageStateChanged,
     previewPlaceholder = previewPlaceholder,
     loading = loading,
@@ -155,7 +150,6 @@ public fun CoilImage(
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
- * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param loading Content to be displayed when the request is in progress.
@@ -169,7 +163,6 @@ public fun CoilImage(
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
-  bitmapPalette: BitmapPalette? = null,
   onImageStateChanged: (CoilImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
@@ -198,8 +191,7 @@ public fun CoilImage(
   CoilImage(
     recomposeKey = imageRequest,
     imageLoader = imageLoader.invoke(),
-    modifier = modifier,
-    bitmapPalette = bitmapPalette
+    modifier = modifier
   ) ImageRequest@{ imageState ->
     when (val coilImageState = imageState.toCoilImageState().apply { internalState = this }) {
       is CoilImageState.None -> Unit
@@ -220,7 +212,10 @@ public fun CoilImage(
       is CoilImageState.Success -> {
         component.ComposeSuccessStatePlugins(
           modifier = modifier,
-          imageOptions = imageOptions
+          imageModel = imageRequest.data,
+          imageOptions = imageOptions,
+          imageBitmap = coilImageState.drawable?.toBitmap()
+            ?.copy(Bitmap.Config.ARGB_8888, true)?.asImageBitmap()
         )
         if (success != null) {
           success.invoke(this, coilImageState)
@@ -268,7 +263,6 @@ public fun CoilImage(
  * @param recomposeKey The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
- * @param bitmapPalette A [Palette] generator for extracting major (theme) colors from images.
  * @param content Content to be displayed for the given state.
  */
 @Composable
@@ -276,7 +270,6 @@ private fun CoilImage(
   recomposeKey: ImageRequest,
   modifier: Modifier = Modifier,
   imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
-  bitmapPalette: BitmapPalette? = null,
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
@@ -290,17 +283,10 @@ private fun CoilImage(
       suspendCancellableCoroutine { cont ->
         disposable.value = imageLoader.enqueue(
           recomposeKey.newBuilder(context).target(
-            onStart = {
-              imageLoadStateFlow.value = ImageLoadState.Loading
-            },
-            onSuccess = {
-              imageLoadStateFlow.value = ImageLoadState.Success(it)
-              bitmapPalette?.applyImageModel(recomposeKey.data)
-                ?.generate(it.toBitmap().copy(Bitmap.Config.ARGB_8888, true))
-            },
+            onStart = { imageLoadStateFlow.value = ImageLoadState.Loading },
+            onSuccess = { imageLoadStateFlow.value = ImageLoadState.Success(it) },
             onError = {
-              imageLoadStateFlow.value =
-                ImageLoadState.Failure(it?.toBitmap()?.asImageBitmap())
+              imageLoadStateFlow.value = ImageLoadState.Failure(it?.toBitmap()?.asImageBitmap())
             }
           ).build()
         )
