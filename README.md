@@ -394,7 +394,7 @@ For more details, check out [DraweeController](https://frescolib.org/docs/animat
 
 ## ImageOptions
 
-You can give image options to your image composable functions by passing `ImageOptions` class like below:
+You can give image options to your image composable functions by passing `ImageOptions` instance like the below:
 
 ```kotlin
 GlideImage(
