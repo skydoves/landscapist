@@ -429,6 +429,15 @@ GlideImage(
 
 > **Note**: You can use `CoilImageState` for `CoilImage` and `FrescoImageState` for `FrescoImage`.
 
+### DataSource
+
+For the success state, you can trace the origin of the image with the `DataSource` parameter. `DataSource` represents the following source origins below:
+
+- **Memory**: Represents an in-memory data source or cache (e.g. bitmap, ByteBuffer).
+- **Disk**: Represents a disk-based data source (e.g. drawable resource, or File).
+- **Network**: Represents a network-based data source.
+- **Unknown**: Represents an unknown data source.
+
 <img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="310px"/>
 
 ## Custom Composables
