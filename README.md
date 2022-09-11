@@ -499,9 +499,9 @@ You can compose supported image plugins by Landscapist or you can create your ow
 `ImagePlugin` is a pluggable compose interface that will be executed for loading images. `ImagePlugin` provides following types below:
 
 - **PainterPlugin**: A pinter plugin interface to be composed with the given `Painter`.
-- **LoadingStatePlugin**: A pluggable image loading state plugin that will be composed when the state is `ImageLoadState.Loading`.
-- **SuccessStatePlugin**: A pluggable image loading state plugin that will be composed when the state is `ImageLoadState.Success`.
-- **FailureStatePlugin**: A pluggable image loading state plugin that will be composed when the state is `ImageLoadState.Failure`.
+- **LoadingStatePlugin**: A pluggable state plugin that will be composed while the state is `ImageLoadState.Loading`.
+- **SuccessStatePlugin**: A pluggable state plugin that will be composed when the state is `ImageLoadState.Success`.
+- **FailureStatePlugin**: A pluggable state plugin that will be composed when the state is `ImageLoadState.Failure`.
 
 For example, you can implement your own `LoadingStatePlugin` that will be composed while loading an image like the below:
 
@@ -636,7 +636,7 @@ dependencies {
 
 ### Crossfade Animation
 
-You can implement the circular reveal animation while drawing images with `CrossfadePlugin` as the following:
+You can implement the crossfade animation while drawing images with `CrossfadePlugin` as the following:
 
 ```kotlin
 GlideImage(
@@ -651,7 +651,7 @@ GlideImage(
 )
 ```
 
- > **Note**: You can also use the Crossfade animation for **`CoilImage`** and **`FrescoImage`**.
+ > **Note**: You can also use the crossfade animation for **`CoilImage`** and **`FrescoImage`**.
 
 ### Circular Reveal Animation
 You can implement the circular reveal animation while drawing images with `CircularRevealplugin` as the following:
@@ -726,7 +726,7 @@ GlideImage( // CoilImage, FrescoImage also can be used.
   component = rememberImageComponent {
     +PalettePlugin(
       imageModel = poster.image,
-      useCache = true,
+      useCache = true, // use cache strategies for the same image model.
       interceptor = {
         it.addFilter { rgb, hsl ->
           // here edit to add the filter colors.
