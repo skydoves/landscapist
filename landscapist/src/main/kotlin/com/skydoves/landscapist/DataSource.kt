@@ -15,20 +15,24 @@
  */
 package com.skydoves.landscapist
 
-import androidx.compose.ui.graphics.ImageBitmap
+public enum class DataSource {
+  /**
+   * Represents an in-memory data source or cache (e.g. bitmap, ByteBuffer).
+   */
+  MEMORY,
 
-/** ImageLoadState is a generic interface that represents image loading states. */
-public sealed class ImageLoadState {
+  /**
+   * Represents a disk-based data source (e.g. drawable resource, or File).
+   */
+  DISK,
 
-  /** Request not started. */
-  public object None : ImageLoadState()
+  /**
+   * Represents a network-based data source.
+   */
+  NETWORK,
 
-  /** Request is currently in progress. */
-  public object Loading : ImageLoadState()
-
-  /** Request is completed successfully and ready to use an [ImageBitmap]. */
-  public data class Success(val data: Any?, val dataSource: DataSource) : ImageLoadState()
-
-  /** Request failed. */
-  public data class Failure(val data: Any?, val reason: Throwable?) : ImageLoadState()
+  /**
+   * Represents an unknown data source.
+   */
+  UNKNOWN,
 }

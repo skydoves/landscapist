@@ -44,6 +44,7 @@ import androidx.lifecycle.LifecycleOwner
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.ImageResult
+import com.skydoves.landscapist.DataSource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
@@ -302,7 +303,10 @@ private fun CoilImage(
 
 private fun ImageResult.toResult(): ImageLoadState = when (this) {
   is coil.request.SuccessResult -> {
-    ImageLoadState.Success(drawable)
+    ImageLoadState.Success(
+      data = drawable,
+      dataSource = dataSource.toDataSource()
+    )
   }
   is coil.request.ErrorResult -> {
     ImageLoadState.Failure(
@@ -310,4 +314,11 @@ private fun ImageResult.toResult(): ImageLoadState = when (this) {
       reason = throwable
     )
   }
+}
+
+private fun coil.decode.DataSource.toDataSource(): DataSource = when (this) {
+  coil.decode.DataSource.NETWORK -> DataSource.NETWORK
+  coil.decode.DataSource.MEMORY -> DataSource.MEMORY
+  coil.decode.DataSource.MEMORY_CACHE -> DataSource.MEMORY
+  coil.decode.DataSource.DISK -> DataSource.DISK
 }

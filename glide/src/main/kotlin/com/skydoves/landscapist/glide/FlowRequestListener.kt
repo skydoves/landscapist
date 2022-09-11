@@ -47,12 +47,25 @@ internal class FlowRequestListener constructor(
     resource: Drawable?,
     model: Any?,
     target: Target<Drawable>?,
-    dataSource: DataSource?,
+    dataSource: DataSource,
     isFirstResource: Boolean
   ): Boolean {
-    producerScope.trySendBlocking(ImageLoadState.Success(resource))
+    producerScope.trySendBlocking(
+      ImageLoadState.Success(
+        data = resource,
+        dataSource = dataSource.toDataSource()
+      )
+    )
     producerScope.channel.close()
     // return true so that the target doesn't receive the drawable.
     return true
   }
+}
+
+private fun DataSource.toDataSource(): com.skydoves.landscapist.DataSource = when (this) {
+  DataSource.LOCAL -> com.skydoves.landscapist.DataSource.DISK
+  DataSource.REMOTE -> com.skydoves.landscapist.DataSource.NETWORK
+  DataSource.DATA_DISK_CACHE -> com.skydoves.landscapist.DataSource.DISK
+  DataSource.RESOURCE_DISK_CACHE -> com.skydoves.landscapist.DataSource.DISK
+  DataSource.MEMORY_CACHE -> com.skydoves.landscapist.DataSource.MEMORY
 }

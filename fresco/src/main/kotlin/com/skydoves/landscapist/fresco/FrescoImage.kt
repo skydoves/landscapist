@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import com.facebook.common.executors.CallerThreadExecutor
+import com.facebook.drawee.backends.pipeline.info.ImageOriginRequestListener
 import com.facebook.imagepipeline.request.ImageRequest
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
@@ -188,20 +189,32 @@ public fun FrescoImage(
  */
 @Composable
 private fun FrescoImage(
-  recomposeKey: Any?,
+  recomposeKey: String?,
   imageRequest: ImageRequest,
   modifier: Modifier = Modifier,
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
+  val subscriber = remember(recomposeKey) { FlowBaseBitmapDataSubscriber() }
+  val imageOriginRequestListener = ImageOriginRequestListener(
+    recomposeKey
+  ) { _, imageOrigin, _, _ ->
+    subscriber.updateImageOrigin(imageOrigin)
+  }
+
   val context = LocalContext.current
   val datasource =
-    remember(recomposeKey) { imagePipeline.fetchDecodedImage(imageRequest, context) }
+    remember(recomposeKey) {
+      imagePipeline.fetchDecodedImage(
+        imageRequest,
+        context,
+        imageOriginRequestListener
+      )
+    }
 
   ImageLoad(
     recomposeKey = recomposeKey,
     executeImageRequest = {
       suspendCancellableCoroutine { cont ->
-        val subscriber = FlowBaseBitmapDataSubscriber()
         datasource.subscribe(subscriber, CallerThreadExecutor.getInstance())
 
         cont.resume(subscriber.imageLoadStateFlow) {

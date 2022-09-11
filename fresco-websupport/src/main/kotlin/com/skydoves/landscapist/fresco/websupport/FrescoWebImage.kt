@@ -44,7 +44,7 @@ import com.skydoves.landscapist.rememberDrawablePainter
  *
  * ```
  * FrescoWebImage(
- *  controller = Fresco.newDraweeControllerBuilder()
+ *  controllerBuilder = Fresco.newDraweeControllerBuilder()
  *    .setUri("asset:///animatable.webp")
  *    .setAutoPlayAnimations(true),
  *  modifier = Modifier
@@ -57,7 +57,7 @@ import com.skydoves.landscapist.rememberDrawablePainter
  *
  * ```
  * FrescoWebImage(
- *  controller = Fresco.newDraweeControllerBuilder()
+ *  controllerBuilder = Fresco.newDraweeControllerBuilder()
  *   .setUri("https://user-images.githubusercontent.com/24237865/75088201-0ba84100-5542-11ea-8587-0c2823b05351.jpg"),
  *  modifier = Modifier
  *    .width(300.dp)

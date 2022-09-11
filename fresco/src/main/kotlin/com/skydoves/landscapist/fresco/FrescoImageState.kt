@@ -32,7 +32,10 @@ public sealed class FrescoImageState : ImageState {
   public object Loading : FrescoImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
-  public data class Success(val imageBitmap: ImageBitmap?) : FrescoImageState()
+  public data class Success(
+    val imageBitmap: ImageBitmap?,
+    val dataSource: com.skydoves.landscapist.DataSource
+  ) : FrescoImageState()
 
   /** Request failed. */
   public data class Failure(
@@ -48,7 +51,10 @@ public fun ImageLoadState.toFrescoImageState(): FrescoImageState {
   return when (this) {
     is ImageLoadState.None -> FrescoImageState.None
     is ImageLoadState.Loading -> FrescoImageState.Loading
-    is ImageLoadState.Success -> FrescoImageState.Success(data as? ImageBitmap)
+    is ImageLoadState.Success -> FrescoImageState.Success(
+      imageBitmap = data as? ImageBitmap,
+      dataSource = dataSource
+    )
     is ImageLoadState.Failure -> FrescoImageState.Failure(
       dataSource = data as? DataSource<CloseableReference<CloseableImage>>,
       reason = reason

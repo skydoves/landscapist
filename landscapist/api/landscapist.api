@@ -1,3 +1,12 @@
+public final class com/skydoves/landscapist/DataSource : java/lang/Enum {
+	public static final field DISK Lcom/skydoves/landscapist/DataSource;
+	public static final field MEMORY Lcom/skydoves/landscapist/DataSource;
+	public static final field NETWORK Lcom/skydoves/landscapist/DataSource;
+	public static final field UNKNOWN Lcom/skydoves/landscapist/DataSource;
+	public static fun valueOf (Ljava/lang/String;)Lcom/skydoves/landscapist/DataSource;
+	public static fun values ()[Lcom/skydoves/landscapist/DataSource;
+}
+
 public final class com/skydoves/landscapist/DrawablePainterKt {
 	public static final fun rememberDrawablePainter (Landroid/graphics/drawable/Drawable;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
 }
@@ -36,12 +45,14 @@ public final class com/skydoves/landscapist/ImageLoadState$None : com/skydoves/l
 
 public final class com/skydoves/landscapist/ImageLoadState$Success : com/skydoves/landscapist/ImageLoadState {
 	public static final field $stable I
-	public fun <init> (Ljava/lang/Object;)V
+	public fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;)V
 	public final fun component1 ()Ljava/lang/Object;
-	public final fun copy (Ljava/lang/Object;)Lcom/skydoves/landscapist/ImageLoadState$Success;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/ImageLoadState$Success;Ljava/lang/Object;ILjava/lang/Object;)Lcom/skydoves/landscapist/ImageLoadState$Success;
+	public final fun component2 ()Lcom/skydoves/landscapist/DataSource;
+	public final fun copy (Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;)Lcom/skydoves/landscapist/ImageLoadState$Success;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/ImageLoadState$Success;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;ILjava/lang/Object;)Lcom/skydoves/landscapist/ImageLoadState$Success;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getData ()Ljava/lang/Object;
+	public final fun getDataSource ()Lcom/skydoves/landscapist/DataSource;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
