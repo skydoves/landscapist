@@ -19,13 +19,38 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
+import com.skydoves.landscapist.components.LocalImageComponent
+import com.skydoves.landscapist.components.imageComponent
+import com.skydoves.landscapist.palette.PalettePlugin
+import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     setContent {
-      Column {
+      val imageComponent = imageComponent {
+        +PlaceholderPlugin.Loading(painterResource(id = R.drawable.poster))
+        +PlaceholderPlugin.Failure(painterResource(id = R.drawable.poster))
+        +ShimmerPlugin(
+          baseColor = Color.Transparent,
+          highlightColor = Color.Transparent
+        )
+        +CrossfadePlugin()
+        +PalettePlugin()
+      }
+
+      CompositionLocalProvider(LocalImageComponent provides imageComponent) {
+        Column {
+          CoilImageProfiles()
+          GlideImageProfiles()
+          FrescoImageProfiles()
+        }
       }
     }
   }
