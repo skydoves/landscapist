@@ -48,6 +48,7 @@ import com.skydoves.landscapist.DataSource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.LandscapistImage
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
 import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
@@ -230,19 +231,14 @@ public fun CoilImage(
         )
         if (success != null) {
           success.invoke(this, coilImageState)
-        } else with(imageOptions) {
+        } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
-          Image(
+          imageOptions.LandscapistImage(
             modifier = Modifier.fillMaxSize(),
             painter = rememberDrawablePainter(
               drawable = drawable,
               imagePlugins = component.imagePlugins
-            ),
-            alignment = alignment,
-            contentScale = contentScale,
-            contentDescription = contentDescription,
-            alpha = alpha,
-            colorFilter = colorFilter
+            )
           )
         }
       }
