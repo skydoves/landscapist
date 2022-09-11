@@ -627,6 +627,8 @@ GlideImage(
 )
 ```
 
+> **Note**: The source should be one of `ImageBitmap`, `ImageVector`, or `Painter`.
+
 ## Animation
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
