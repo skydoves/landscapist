@@ -42,6 +42,13 @@ android {
 
 dependencies {
   implementation(project(":landscapist"))
+  implementation(project(":landscapist-animation"))
+  implementation(project(":landscapist-placeholder"))
+  implementation(project(":landscapist-palette"))
+
+  implementation(project(":glide"))
+  implementation(project(":coil"))
+  implementation(project(":fresco"))
 
   implementation(libs.androidx.material)
   implementation(libs.androidx.activity.compose)
