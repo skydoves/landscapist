@@ -631,7 +631,11 @@ dependencies {
 }
 ```
 
-<img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="250px"/>
+### Preview
+
+| Circular Reveal | Crossfade |
+| :---------------: | :---------------: |
+| <img src="https://user-images.githubusercontent.com/24237865/189552544-5f8e1209-4930-45e6-a050-3a0cda088e9f.gif" align="center" width="100%"/> | <img src="https://user-images.githubusercontent.com/24237865/189552547-d933cee7-e811-4170-a806-1ac165e8f055.gif" align="center" width="100%"/> | 
 
 
 ### Crossfade Animation
