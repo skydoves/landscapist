@@ -39,6 +39,7 @@ import com.facebook.imagepipeline.request.ImageRequest
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.LandscapistImage
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
 import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
@@ -144,20 +145,14 @@ public fun FrescoImage(
         )
         if (success != null) {
           success.invoke(this, frescoImageState)
-        } else with(imageOptions) {
+        } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
-
-          Image(
+          imageOptions.LandscapistImage(
             modifier = Modifier.fillMaxSize(),
             painter = rememberBitmapPainter(
               imagePlugins = component.imagePlugins,
               imageBitmap = imageBitmap
-            ),
-            alignment = alignment,
-            contentScale = contentScale,
-            contentDescription = contentDescription,
-            alpha = alpha,
-            colorFilter = colorFilter
+            )
           )
         }
       }
