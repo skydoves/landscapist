@@ -23,6 +23,6 @@ data class Poster(
   val release: String,
   val playtime: String,
   val description: String,
-  val poster: String?,
+  val image: String?,
   val gif: String?
 )

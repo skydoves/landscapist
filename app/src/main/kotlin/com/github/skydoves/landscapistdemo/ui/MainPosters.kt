@@ -118,7 +118,7 @@ private fun PosterItem(
 ) {
   Card(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
     FrescoImage(
-      imageUrl = poster.poster,
+      imageUrl = poster.image,
       modifier = Modifier
         .size(50.dp)
         .clickable { vm.poster.value = poster },
@@ -138,7 +138,7 @@ private fun SelectedPoster(
   var palette by remember { mutableStateOf<Palette?>(null) }
 
   GlideImage(
-    imageModel = poster.poster,
+    imageModel = poster.image,
     modifier = Modifier
       .aspectRatio(0.8f),
     component = rememberImageComponent {
