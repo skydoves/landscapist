@@ -143,19 +143,7 @@ private fun SelectedPoster(
       .aspectRatio(0.8f),
     component = rememberImageComponent {
       +CircularRevealPlugin()
-      +PalettePlugin(
-        imageModel = poster.image,
-        useCache = true,
-        interceptor = {
-          it.addFilter { rgb, hsl ->
-            // here edit to add the filter colors.
-            false
-          }
-        },
-        paletteLoadedListener = {
-          palette = it
-        }
-      )
+      +PalettePlugin { palette = it }
     },
     previewPlaceholder = R.drawable.poster
   )
