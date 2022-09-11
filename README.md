@@ -44,7 +44,7 @@ repositories {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.6.2-SNAPSHOT"
+    implementation "com.github.skydoves:landscapist-glide:2.0.1-SNAPSHOT"
 }
 ```
 </details>
@@ -68,7 +68,7 @@ allprojects {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:1.6.1"
+    implementation "com.github.skydoves:landscapist-glide:2.0.0"
 }
 ```
 
@@ -79,13 +79,11 @@ You can load images simply by using `GlideImage` composable function as the foll
 
 ```kotlin
 GlideImage(
-  imageModel = imageUrl,
-  // Crop, Fit, Inside, FillHeight, FillWidth, None
-  contentScale = ContentScale.Crop,
-  // shows a placeholder while loading the image.
-  placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
-  // shows an error ImageBitmap when the request failed.
-  error = ImageBitmap.imageResource(R.drawable.error)
+  imageModel = imageUrl, // loading a network image using an URL.
+  imageOptions = ImageOptions(
+    contentScale = ContentScale.Crop,
+    alignment = Alignment.Center
+  )
 )
 ```
 
@@ -98,16 +96,13 @@ You can customize your request-options with your own [RequestOptions](https://bu
 
 ```kotlin
 GlideImage(
-  imageModel = poster.poster,
+  imageModel = imageUrl,
   requestOptions = {
     RequestOptions()
         .override(256, 256)
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .centerCrop()
-  },
-  contentScale = ContentScale.Crop,
-  modifier = modifier,
-  alignment = Alignment.Center,
+  }
 )
 ```
 
@@ -116,7 +111,7 @@ You can request image with your own [RequestBuilder](https://bumptech.github.io/
 
 ```kotlin
 GlideImage(
-  imageModel = poster.poster,
+  imageModel = imageUrl,
   requestBuilder = { Glide.with(LocalContext.current.applicationContext).asDrawable() },
   modifier = Modifier.constrainAs(image) {
     centerHorizontallyTo(parent)
@@ -130,7 +125,7 @@ You can register your own [RequestListener](https://bumptech.github.io/glide/jav
 
 ```kotlin
 GlideImage(
-  imageModel = poster.poster,
+  imageModel = imageUrl,
   requestListener = object: RequestListener<Drawable> {
     override fun onLoadFailed(
       e: GlideException?,
@@ -194,13 +189,11 @@ You can load images by using the `CoilImage` composable function as the followin
 
 ```kotlin
 CoilImage(
-  imageModel = imageUrl,
-  // Crop, Fit, Inside, FillHeight, FillWidth, None
-  contentScale = ContentScale.Crop,
-  // shows a placeholder while loading the image.
-  placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
-  // shows an error ImageBitmap when the request failed.
-  error = ImageBitmap.imageResource(R.drawable.error)
+  imageModel = imageUrl, // loading a network image or local resource using an URL.
+  imageOptions = ImageOptions(
+    contentScale = ContentScale.Crop,
+    alignment = Alignment.Center
+  )
 )
 ```
 
@@ -223,9 +216,7 @@ CoilImage(
         .availableMemoryPercentage(0.25)
         .crossfade(true)
         .build() },
-  contentScale = ContentScale.Crop,
   modifier = modifier,
-  alignment = Alignment.Center,
 )
 ```
 
@@ -235,6 +226,7 @@ CoilImage(
  ```kotlin
  val imageLoader = ImageLoader.Builder(context).build()
 CompositionLocalProvider(LocalCoilImageLoader provides imageLoader) {
+  
    // This will automatically use the value of current imageLoader in the hierarchy.
    CoilImage(
      imageModel = ...
@@ -317,13 +309,11 @@ You can load images by using the `FrescoImage` composable function as the follow
 
 ```kotlin
 FrescoImage(
-  imageUrl = stringImageUrl,
-  // Crop, Fit, Inside, FillHeight, FillWidth, None
-  contentScale = ContentScale.Crop,
-  // shows a placeholder while loading the image.
-  placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
-  // shows an error ImageBitmap when the request failed.
-  error = ImageBitmap.imageResource(R.drawable.error)
+  imageUrl = stringImageUrl, // loading a network image using an URL.
+  imageOptions = ImageOptions(
+    contentScale = ContentScale.Crop,
+    alignment = Alignment.Center
+  )
 )
 ```
 
@@ -346,8 +336,8 @@ val imageRequest = ImageRequestBuilder
 
 FrescoImage(
   imageUrl = stringImageUrl,
-  imageRequest = { imageRequest },
-  contentScale = ContentScale.Crop)
+  imageRequest = { imageRequest }
+)
 ```
 
 ### LocalFrescoImageRequest
@@ -367,7 +357,7 @@ val imageRequest = ImageRequestBuilder
 CompositionLocalProvider(LocalFrescoImageRequest provides imageRequest) {
   // This will automatically use the value of current ImageRequest in the hierarchy.
   FrescoImage(
-    imageurl = ...
+    imageUrl = ...
   )
 }
 ```
@@ -402,14 +392,51 @@ For more details, check out [DraweeController](https://frescolib.org/docs/animat
 
 </details>
 
+## ImageOptions
+
+You can give image options to your image composable functions by passing `ImageOptions` class like below:
+
+```kotlin
+GlideImage(
+  ..
+  imageOptions = ImageOptions(
+      contentScale = ContentScale.Crop,
+      alignment = Alignment.Center,
+      contentDescription = "main image",
+      colorFilter = null,
+      alpha = 1f
+    )
+)
+```
+
+## Listening image state changes
+
+You can listen the image state changes by giving `onImageStateChanged` parameter to your image composable functions like the below:
+
+```kotlin
+GlideImage(
+  ..
+  onImageStateChanged = {
+    when (it) {
+      GlideImageState.None -> ..
+      GlideImageState.Loading -> ..
+      is GlideImageState.Success -> ..
+      is GlideImageState.Failure -> ..
+    }
+  }
+)
+```
+
+> **Note**: You can use `CoilImageState` for `CoilImage` and `FrescoImageState` for `FrescoImage`.
+
 <img src="https://user-images.githubusercontent.com/24237865/94174882-d6e1db00-fed0-11ea-86ec-671b5039b1b9.gif" align="right" width="310px"/>
 
 ## Custom Composables
 You can execute your own composable functions depending on the three request states below:
 
-- **loading**: Executed when loading an image.
-- **success**: Executed when successful to load an image.
-- **failure**: Executed when failing to load an image (e.g. network error, wrong destination).
+- **loading**: Executed while loading an image.
+- **success**: Executed if loading an image successfully.
+- **failure**: Executed if fails to load an image (e.g. network error, wrong destination).
 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage
@@ -466,23 +493,109 @@ GlideImage(
 ```
 > **Note**: You can also use the the `previewPlaceholder` parameter for **`CoilImage`** and **`FrescoImage`**.
 
+## ImageComponent and ImagePlugin
+
+You can compose supported image plugins by Landscapist or you can create your own image plugin that will be composed following the image loading state.
+`ImagePlugin` is a pluggable compose interface that will be executed for loading images. `ImagePlugin` provides following types below:
+
+- **PainterPlugin**: A pinter plugin interface to be composed with the given `Painter`.
+- **LoadingStatePlugin**: A pluggable image loading state plugin that will be composed when the state is `ImageLoadState.Loading`.
+- **SuccessStatePlugin**: A pluggable image loading state plugin that will be composed when the state is `ImageLoadState.Success`.
+- **FailureStatePlugin**: A pluggable image loading state plugin that will be composed when the state is `ImageLoadState.Failure`.
+
+For example, you can implement your own `LoadingStatePlugin` that will be composed while loading an image like the below:
+
+```kotlin
+public data class LoadingPlugin(val source: Any?) : ImagePlugin.LoadingStatePlugin {
+
+  @Composable
+  override fun compose(
+    modifier: Modifier,
+    imageOptions: ImageOptions?
+  ): ImagePlugin = apply {
+    if (source != null && imageOptions != null) {
+      ImageBySource(
+        source = source,
+        modifier = modifier,
+        alignment = imageOptions.alignment,
+        contentDescription = imageOptions.contentDescription,
+        contentScale = imageOptions.contentScale,
+        colorFilter = imageOptions.colorFilter,
+        alpha = imageOptions.alpha
+      )
+    }
+  }
+}
+```
+
+Next, you can compose plugins by adding them in the `rememberImageComponent` like the below:
+
+```kotlin
+GlideImage(
+  imageModel = poster.image,
+  component = rememberImageComponent {
+    add(CircularRevealPlugin())
+    add(LoadingPlugin(source))
+  },
+)
+```
+
+or you can just add plugins by using the **+** expression like the below:
+
+```kotlin
+GlideImage(
+  imageModel = poster.image,
+  component = rememberImageComponent {
+    +CircularRevealPlugin()
+    +LoadingPlugin(source)
+  },
+)
+```
+
+### LocalImageComponent
+
+You can provide the same `ImageComponent` instance in the composable hierarchy by using `imageComponent` extension and `LocalImageComponent` like the below:
+
+```kotlin
+val imageComponent = imageComponent {
+  +CrossfadePlugin()
+  +PalettePlugin()
+}
+
+CompositionLocalProvider(LocalImageComponent provides imageComponent) {
+  ..
+}
+```
+
+## Placeholder
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+
+The `landscapist-placeholder` package provides useful image plugins, such as loading & failure placeholder supports and shimmering animation.
+To use placeholder supports, add the dependency below:
+
+```groovy
+dependencies {
+    implementation "com.github.skydoves:landscapist-placeholder:$version"
+}
+```
+
 <img src="https://user-images.githubusercontent.com/24237865/95812167-be3a4780-0d4f-11eb-9360-2a4a66a3fb46.gif" align="right" width="250px"/>
 
-## Shimmer Effect
-You can implement a shimmering effect while loading an image by using the `ShimmerParams` parameter as following the example below:
+### ShimmerPlugin
+You can implement a shimmering effect while loading an image by using the `ShimmerPlugin` as following the example below:
 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage
   imageModel = imageUrl,
   modifier = modifier,
-  // shows a shimmering effect when loading an image.
-  shimmerParams = ShimmerParams(
-    baseColor = MaterialTheme.colors.background,
-    highlightColor = shimmerHighLight,
-    durationMillis = 350,
-    dropOff = 0.65f,
-    tilt = 20f
-  ),
+  component = rememberImageComponent {
+    // shows a shimmering effect when loading an image.
+    +ShimmerPlugin(
+      baseColor = background800,
+      highlightColor = shimmerHighLight
+    )
+  },
   // shows an error text message when request failed.
   failure = {
     Text(text = "image request failed.")
@@ -491,30 +604,87 @@ GlideImage( // CoilImage, FrescoImage
  ```
  > **Note**: You can also use the Shimmer effect for **`CoilImage`** and **`FrescoImage`**.
 
- <img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="250px"/>
+### PlaceholderPlugin
 
-## Circular Reveal Animation
-You can implement the circular reveal animation while drawing images with `CircularReveal` attribute as the following:
+You can show your own placeholder while loading an image or when fails to load an image with `PlaceholderPlugin.Loading` and `PlaceholderPlugin.Failure`.
 
 ```kotlin
-GlideImage( // CoilImage, FrescoImage
-  imageModel = imageUrl,
-  // Crop, Fit, Inside, FillHeight, FillWidth, None
-  contentScale = ContentScale.Crop,
-  // shows an image with the circular reveal animation.
-  circularReveal = CircularReveal(duration = 350),
-  // shows a placeholder ImageBitmap when loading.
-  placeHolder = ImageBitmap.imageResource(R.drawable.placeholder),
-  // shows an error ImageBitmap when the request failed.
-  error = ImageBitmap.imageResource(R.drawable.error)
+GlideImage(
+  ..
+  component = imageComponent {
+      +PlaceholderPlugin.Loading(painterResource(id = R.drawable.placeholder_loading))
+      +PlaceholderPlugin.Failure(painterResource(id = R.drawable.placeholder_failure))
+    },
 )
 ```
-The default value of the `circularReveal` is `null`.
 
- > **Note**: You can also use the Circular Reveal Animation for **`CoilImage`** and **`FrescoImage`**.
+## Animation
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+
+The `landscapist-animation` package provides useful image plugins related to animations, such as crossfade and circular reveal animation.
+To use animation supports, add the dependency below:
+
+```groovy
+dependencies {
+    implementation "com.github.skydoves:landscapist-animation:$version"
+}
+```
+
+<img src="https://user-images.githubusercontent.com/24237865/95661452-6abad480-0b6a-11eb-91c4-7cbe40b77927.gif" align="right" width="250px"/>
+
+
+### Crossfade Animation
+
+You can implement the circular reveal animation while drawing images with `CrossfadePlugin` as the following:
+
+```kotlin
+GlideImage(
+  imageModel = poster.image,
+  modifier = Modifier
+    .aspectRatio(0.8f),
+  component = rememberImageComponent {
+    +CrossfadePlugin(
+      duration = 550
+    )
+  }
+)
+```
+
+ > **Note**: You can also use the Crossfade animation for **`CoilImage`** and **`FrescoImage`**.
+
+### Circular Reveal Animation
+You can implement the circular reveal animation while drawing images with `CircularRevealplugin` as the following:
+
+```kotlin
+GlideImage(
+  imageModel = poster.image,
+  modifier = Modifier
+    .aspectRatio(0.8f),
+  component = rememberImageComponent {
+    +CircularRevealPlugin(
+      duration = 350
+    )
+  }
+)
+```
+
+ > **Note**: You can also use the Circular Reveal animation for **`CoilImage`** and **`FrescoImage`**.
 
 ## Palette
-You can extract primary (theme) color profiles with `BitmapPalette`. You can check out [Extract color profiles](https://developer.android.com/training/material/palette-colors#extract-color-profiles) to see what kinds of colors can be extracted.
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+
+The `landscapist-palette` package provides useful image plugins related to palette, such as extracting primary color sets.
+To use palette supports, add the dependency below:
+
+```groovy
+dependencies {
+    implementation "com.github.skydoves:landscapist-palette:$version"
+}
+```
+
+You can extract primary (theme) color profiles with `PalettePlugin`. You can check out [Extract color profiles](https://developer.android.com/training/material/palette-colors#extract-color-profiles) to see what kinds of colors can be extracted.
 
 <img src="https://user-images.githubusercontent.com/24237865/129226361-877689b8-a1ec-4f59-b8a6-e2efe33a8de7.gif" align="right" width="250"/>
 
@@ -522,9 +692,11 @@ You can extract primary (theme) color profiles with `BitmapPalette`. You can che
 var palette by remember { mutableStateOf<Palette?>(null) }
 
 GlideImage( // CoilImage, FrescoImage also can be used.
-  imageModel = imageUrl,
-  bitmapPalette = BitmapPalette {
-    palette = it
+  imageModel = poster.image,
+  modifier = Modifier
+    .aspectRatio(0.8f),
+  component = rememberImageComponent {
+      +PalettePlugin { palette = it }
   }
 )
 
@@ -541,28 +713,31 @@ Crossfade(
   )
 }
 ```
-Also, you can customize attributes of `BitmapPalette` like the example below:
+
+Also, you can customize attributes of `PalettePlugin` like the example below:
 
 ```kotlin
 var palette by remember { mutableStateOf<Palette?>(null) }
 
 GlideImage( // CoilImage, FrescoImage also can be used.
-  imageModel = imageUrl,
+  imageModel = poster.image,
   modifier = Modifier
     .aspectRatio(0.8f),
-  bitmapPalette = BitmapPalette(
-    imageModel = poster.poster,
-    useCache = true,
-    interceptor = {
-      it.addFilter { rgb, hsl ->
-        // here edit to add the filter colors.
-        false
+  component = rememberImageComponent {
+    +PalettePlugin(
+      imageModel = poster.image,
+      useCache = true,
+      interceptor = {
+        it.addFilter { rgb, hsl ->
+          // here edit to add the filter colors.
+          false
+        }
+      },
+      paletteLoadedListener = {
+        palette = it
       }
-    },
-    paletteLoadedListener = {
-      palette = it
-    }
-  )
+    )
+  }
 )
 ```
  > **Note**: You can also use the Palette for **`CoilImage`** and **`FrescoImage`**.
