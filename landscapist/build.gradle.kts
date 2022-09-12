@@ -43,5 +43,4 @@ dependencies {
   implementation(libs.androidx.compose.runtime)
   implementation(libs.androidx.compose.foundation)
   implementation(libs.kotlinx.coroutines.android)
-  api(libs.palette)
 }

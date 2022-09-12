@@ -65,8 +65,6 @@ dependencies {
   implementation(libs.androidx.compose.runtime)
   implementation(libs.androidx.compose.material)
   implementation(libs.androidx.compose.material.iconsExtended)
-
-
   implementation(libs.androidx.compose.foundation.layout)
   implementation(libs.androidx.compose.animation)
   implementation(libs.androidx.compose.constraintlayout)
