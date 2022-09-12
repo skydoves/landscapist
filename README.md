@@ -566,12 +566,12 @@ GlideImage(
 You can provide the same `ImageComponent` instance in the composable hierarchy by using `imageComponent` extension and `LocalImageComponent` like the below:
 
 ```kotlin
-val imageComponent = imageComponent {
+val component = imageComponent {
   +CrossfadePlugin()
   +PalettePlugin()
 }
 
-CompositionLocalProvider(LocalImageComponent provides imageComponent) {
+CompositionLocalProvider(LocalImageComponent provides component) {
   ..
 }
 ```
