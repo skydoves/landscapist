@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-🍂 Jetpack Compose image loading library which fetches and displays network images with <a href="https://github.com/bumptech/glide" target="_blank"> Glide</a>, <a href="https://github.com/coil-kt/coil" target="_blank"> Coil</a>, and <a href="https://github.com/facebook/fresco" target="_blank"> Fresco</a>
+🍂 Landscapist is a Jetpack Compose image loading solution that fetches and displays network images with <a href="https://github.com/bumptech/glide" target="_blank"> Glide</a>, <a href="https://github.com/coil-kt/coil" target="_blank"> Coil</a>, and <a href="https://github.com/facebook/fresco" target="_blank"> Fresco.</a> This library supports tracing image loading states, composing custom implementations, and some useful animations, such as crossfades and circular reveals. Also, with image plugins, you can configure and attach image loading behaviors more easily and fast.
 </p>
 
 ## Who's using Landscapist?
@@ -566,12 +566,12 @@ GlideImage(
 You can provide the same `ImageComponent` instance in the composable hierarchy by using `imageComponent` extension and `LocalImageComponent` like the below:
 
 ```kotlin
-val imageComponent = imageComponent {
+val component = imageComponent {
   +CrossfadePlugin()
   +PalettePlugin()
 }
 
-CompositionLocalProvider(LocalImageComponent provides imageComponent) {
+CompositionLocalProvider(LocalImageComponent provides component) {
   ..
 }
 ```
