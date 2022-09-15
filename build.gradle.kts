@@ -11,3 +11,19 @@ plugins {
 }
 
 apply(from = "${rootDir}/scripts/publish-root.gradle")
+
+subprojects {
+  tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
+    kotlinOptions.freeCompilerArgs += listOf(
+      "-P",
+      "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+        project.buildDir.absolutePath + "/compose_metrics"
+    )
+    kotlinOptions.freeCompilerArgs += listOf(
+      "-P",
+      "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+        project.buildDir.absolutePath + "/compose_metrics"
+    )
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+  }
+}

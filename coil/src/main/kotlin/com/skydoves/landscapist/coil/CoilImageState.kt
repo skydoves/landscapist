@@ -16,24 +16,30 @@
 package com.skydoves.landscapist.coil
 
 import android.graphics.drawable.Drawable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.ImageBitmap
 import com.skydoves.landscapist.DataSource
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageState
 
 /** GlideImageState represents the image loading states for Coil. */
+@Immutable
 public sealed class CoilImageState : ImageState {
 
   /** Request not started. */
+  @Immutable
   public object None : CoilImageState()
 
   /** Request is currently in progress. */
+  @Immutable
   public object Loading : CoilImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
+  @Immutable
   public data class Success(val drawable: Drawable?, val dataSource: DataSource) : CoilImageState()
 
   /** Request failed. */
+  @Immutable
   public data class Failure(val errorDrawable: Drawable?, val reason: Throwable?) : CoilImageState()
 }
 

@@ -15,20 +15,26 @@
  */
 package com.skydoves.landscapist
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.ImageBitmap
 
 /** ImageLoadState is a generic interface that represents image loading states. */
+@Immutable
 public sealed class ImageLoadState {
 
   /** Request not started. */
+  @Immutable
   public object None : ImageLoadState()
 
   /** Request is currently in progress. */
+  @Immutable
   public object Loading : ImageLoadState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
+  @Immutable
   public data class Success(val data: Any?, val dataSource: DataSource) : ImageLoadState()
 
   /** Request failed. */
+  @Immutable
   public data class Failure(val data: Any?, val reason: Throwable?) : ImageLoadState()
 }
