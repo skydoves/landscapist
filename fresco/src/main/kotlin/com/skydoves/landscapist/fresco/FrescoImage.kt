@@ -40,6 +40,7 @@ import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.LandscapistImage
+import com.skydoves.landscapist.StableHolder
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
 import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
@@ -116,7 +117,7 @@ public fun FrescoImage(
 
   FrescoImage(
     recomposeKey = imageUrl,
-    imageRequest = imageRequest.invoke(),
+    imageRequest = StableHolder(imageRequest.invoke()),
     modifier = modifier
   ) ImageRequest@{ imageState ->
     when (val frescoImageState = imageState.toFrescoImageState().apply { internalState = this }) {
@@ -185,7 +186,7 @@ public fun FrescoImage(
 @Composable
 private fun FrescoImage(
   recomposeKey: String?,
-  imageRequest: ImageRequest,
+  imageRequest: StableHolder<ImageRequest>,
   modifier: Modifier = Modifier,
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
@@ -200,7 +201,7 @@ private fun FrescoImage(
   val datasource =
     remember(recomposeKey) {
       imagePipeline.fetchDecodedImage(
-        imageRequest,
+        imageRequest.value,
         context,
         imageOriginRequestListener
       )

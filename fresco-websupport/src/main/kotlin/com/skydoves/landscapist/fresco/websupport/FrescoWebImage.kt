@@ -44,9 +44,11 @@ import com.skydoves.landscapist.rememberDrawablePainter
  *
  * ```
  * FrescoWebImage(
- *  controllerBuilder = Fresco.newDraweeControllerBuilder()
+ *  controllerBuilder = {
+ *   Fresco.newDraweeControllerBuilder()
  *    .setUri("asset:///animatable.webp")
- *    .setAutoPlayAnimations(true),
+ *    .setAutoPlayAnimations(true)
+ *  },
  *  modifier = Modifier
  *    .width(300.dp)
  *     .height(300.dp)
@@ -77,7 +79,7 @@ import com.skydoves.landscapist.rememberDrawablePainter
  */
 @Composable
 public fun FrescoWebImage(
-  controllerBuilder: PipelineDraweeControllerBuilder,
+  controllerBuilder: () -> PipelineDraweeControllerBuilder,
   modifier: Modifier = Modifier,
   contentDescription: String? = null,
   alignment: Alignment = Alignment.Center,
@@ -102,8 +104,8 @@ public fun FrescoWebImage(
   val context = LocalContext.current
   val hierarchy = GenericDraweeHierarchyInflater.inflateBuilder(context, null).build()
   val holder: DraweeHolder<GenericDraweeHierarchy> = DraweeHolder.create(hierarchy, context)
-  controllerBuilder.oldController = holder.controller
-  holder.controller = controllerBuilder.build()
+  controllerBuilder().oldController = holder.controller
+  holder.controller = controllerBuilder().build()
 
   val topLevelDrawable = holder.topLevelDrawable
   Box(modifier = modifier) {

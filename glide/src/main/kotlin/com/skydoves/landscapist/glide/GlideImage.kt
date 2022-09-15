@@ -42,6 +42,7 @@ import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.LandscapistImage
+import com.skydoves.landscapist.StableHolder
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
 import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
@@ -59,12 +60,14 @@ import kotlinx.coroutines.flow.callbackFlow
  * ```
  * GlideImage(
  * imageModel = imageUrl,
- * requestBuilder = Glide
+ * requestBuilder = {
+ *  Glide
  *   .with(LocalContext.current)
  *   .asBitmap()
  *   .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
  *   .thumbnail(0.6f)
- *   .transition(withCrossFade()),
+ *   .transition(withCrossFade())
+ * },
  * modifier = modifier,
  * loading = {
  *   Box(modifier = Modifier.matchParentSize()) {
@@ -101,7 +104,7 @@ public fun GlideImage(
   requestOptions: @Composable () -> RequestOptions = {
     LocalGlideProvider.getGlideRequestOptions()
   },
-  requestListener: RequestListener<Drawable>? = null,
+  requestListener: (() -> RequestListener<Drawable>)? = null,
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
   onImageStateChanged: (GlideImageState) -> Unit = {},
@@ -130,11 +133,13 @@ public fun GlideImage(
   }
 
   GlideImage(
-    recomposeKey = imageModel,
-    builder = requestBuilder.invoke()
-      .apply(requestOptions.invoke())
-      .load(imageModel),
-    requestListener = requestListener,
+    recomposeKey = StableHolder(imageModel ?: return),
+    builder = StableHolder(
+      requestBuilder.invoke()
+        .apply(requestOptions.invoke())
+        .load(imageModel)
+    ),
+    requestListener = StableHolder(requestListener?.invoke()),
     modifier = modifier
   ) ImageRequest@{ imageState ->
     when (val glideImageState = imageState.toGlideImageState().apply { internalState = this }) {
@@ -208,16 +213,16 @@ public fun GlideImage(
  */
 @Composable
 private fun GlideImage(
-  recomposeKey: Any?,
-  builder: RequestBuilder<Drawable>,
+  recomposeKey: StableHolder<Any>,
   modifier: Modifier = Modifier,
-  requestListener: RequestListener<Drawable>? = null,
+  builder: StableHolder<RequestBuilder<Drawable>>,
+  requestListener: StableHolder<RequestListener<Drawable>?> = StableHolder(null),
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   val requestManager = LocalGlideProvider.getGlideRequestManager()
 
   ImageLoad(
-    recomposeKey = recomposeKey,
+    recomposeKey = recomposeKey.value,
     executeImageRequest = {
       callbackFlow {
         val target = FlowCustomTarget(this)
@@ -227,10 +232,10 @@ private fun GlideImage(
 
         // start the image request into the target.
         requestManager
-          .load(recomposeKey)
-          .apply(builder)
+          .load(recomposeKey.value)
+          .apply(builder.value)
           .addListener(flowRequestListener)
-          .addListener(requestListener)
+          .addListener(requestListener.value)
           .into(target)
 
         awaitClose {

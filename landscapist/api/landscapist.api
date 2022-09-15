@@ -92,6 +92,12 @@ public final class com/skydoves/landscapist/RememberPainterPluginsKt {
 	public static final fun rememberDrawablePainter (Landroid/graphics/drawable/Drawable;Ljava/util/List;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
 }
 
+public final class com/skydoves/landscapist/StableHolder {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun getValue ()Ljava/lang/Object;
+}
+
 public abstract interface class com/skydoves/landscapist/components/ImageComponent {
 }
 
