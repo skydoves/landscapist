@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
@@ -32,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.bumptech.glide.Glide
-import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.ImageOptions
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.hamcrest.CoreMatchers.instanceOf
@@ -54,33 +53,11 @@ internal class GlideImageTest {
   fun requestSuccess_withoutComposables() {
     composeTestRule.setContent {
       GlideImage(
-        imageModel = IMAGE,
+        imageModel = { IMAGE },
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
-        contentScale = ContentScale.Crop
-      )
-    }
-
-    composeTestRule.onNodeWithTag(TAG_GLIDE)
-      .assertIsDisplayed()
-      .assertWidthIsAtLeast(128.dp)
-      .assertHeightIsAtLeast(128.dp)
-  }
-
-  @Test
-  fun requestSuccess_shimmer_withoutComposables() {
-    composeTestRule.setContent {
-      GlideImage(
-        imageModel = IMAGE,
-        modifier = Modifier
-          .size(128.dp, 128.dp)
-          .testTag(TAG_GLIDE),
-        shimmerParams = ShimmerParams(
-          baseColor = Color.DarkGray,
-          highlightColor = Color.LightGray
-        ),
-        contentScale = ContentScale.Crop
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop)
       )
     }
 
@@ -104,11 +81,11 @@ internal class GlideImageTest {
 
       CompositionLocalProvider(LocalGlideRequestBuilder provides glide) {
         GlideImage(
-          imageModel = IMAGE,
+          imageModel = { IMAGE },
           modifier = Modifier
             .size(128.dp, 128.dp)
             .testTag(TAG_GLIDE),
-          contentScale = ContentScale.Crop
+          imageOptions = ImageOptions(contentScale = ContentScale.Crop)
         )
       }
 
@@ -128,11 +105,11 @@ internal class GlideImageTest {
   fun requestSuccess_withLoadingComposables() {
     composeTestRule.setContent {
       GlideImage(
-        imageModel = IMAGE,
+        imageModel = { IMAGE },
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
-        contentScale = ContentScale.Crop,
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))
           composeTestRule.onNodeWithTag(TAG_PROGRESS)
@@ -153,11 +130,11 @@ internal class GlideImageTest {
 
     composeTestRule.setContent {
       GlideImage(
-        imageModel = IMAGE,
+        imageModel = { IMAGE },
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
-        contentScale = ContentScale.Crop,
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         success = {
           state.add(it)
           assertThat(it.drawable, `is`(notNullValue()))
@@ -188,11 +165,11 @@ internal class GlideImageTest {
 
     composeTestRule.setContent {
       GlideImage(
-        imageModel = "",
+        imageModel = { "" },
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
-        contentScale = ContentScale.Crop,
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         failure = {
           Box(modifier = Modifier.testTag(TAG_ERROR))
           state.add(it)

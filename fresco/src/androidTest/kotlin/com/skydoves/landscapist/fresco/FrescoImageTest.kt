@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsAtLeast
@@ -34,7 +33,7 @@ import androidx.test.filters.LargeTest
 import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
-import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.ImageOptions
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.hamcrest.CoreMatchers.instanceOf
@@ -60,31 +59,7 @@ internal class FrescoImageTest {
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_FRESCO),
-        contentScale = ContentScale.Crop,
-        observeLoadingProcess = false
-      )
-    }
-
-    composeTestRule.onNodeWithTag(TAG_FRESCO)
-      .assertIsDisplayed()
-      .assertWidthIsAtLeast(128.dp)
-      .assertHeightIsAtLeast(128.dp)
-  }
-
-  @Test
-  fun requestSuccess_shimmer_withoutComposables() {
-    composeTestRule.setContent {
-      FrescoImage(
-        imageUrl = IMAGE,
-        modifier = Modifier
-          .size(128.dp, 128.dp)
-          .testTag(TAG_FRESCO),
-        shimmerParams = ShimmerParams(
-          baseColor = Color.DarkGray,
-          highlightColor = Color.LightGray
-        ),
-        contentScale = ContentScale.Crop,
-        observeLoadingProcess = false
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop)
       )
     }
 
@@ -112,7 +87,7 @@ internal class FrescoImageTest {
           modifier = Modifier
             .size(128.dp, 128.dp)
             .testTag(TAG_FRESCO),
-          contentScale = ContentScale.Crop
+          imageOptions = ImageOptions(contentScale = ContentScale.Crop)
         )
       }
 
@@ -131,8 +106,7 @@ internal class FrescoImageTest {
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_FRESCO),
-        contentScale = ContentScale.Crop,
-        observeLoadingProcess = true,
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))
           composeTestRule.onNodeWithTag(TAG_PROGRESS)
@@ -157,8 +131,7 @@ internal class FrescoImageTest {
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_FRESCO),
-        contentScale = ContentScale.Crop,
-        observeLoadingProcess = true,
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         success = {
           state.add(it)
           assertThat(it.imageBitmap, `is`(notNullValue()))
@@ -193,8 +166,7 @@ internal class FrescoImageTest {
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_FRESCO),
-        contentScale = ContentScale.Crop,
-        observeLoadingProcess = true,
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         failure = {
           Box(modifier = Modifier.testTag(TAG_ERROR))
           state.add(it)

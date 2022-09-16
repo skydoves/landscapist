@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsAtLeast
@@ -37,7 +36,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.fetch.Fetcher
 import coil.request.ImageRequest
 import coil.request.Options
-import com.skydoves.landscapist.ShimmerParams
+import com.skydoves.landscapist.ImageOptions
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
@@ -59,33 +58,11 @@ internal class CoilImageTest {
   fun requestSuccess_withoutComposables() {
     composeTestRule.setContent {
       CoilImage(
-        imageModel = IMAGE,
+        imageModel = { IMAGE },
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_COIL),
-        contentScale = ContentScale.Crop
-      )
-    }
-
-    composeTestRule.onNodeWithTag(TAG_COIL)
-      .assertIsDisplayed()
-      .assertWidthIsAtLeast(128.dp)
-      .assertHeightIsAtLeast(128.dp)
-  }
-
-  @Test
-  fun requestSuccess_shimmer_withoutComposables() {
-    composeTestRule.setContent {
-      CoilImage(
-        imageModel = IMAGE,
-        modifier = Modifier
-          .size(128.dp, 128.dp)
-          .testTag(TAG_COIL),
-        shimmerParams = ShimmerParams(
-          baseColor = Color.DarkGray,
-          highlightColor = Color.LightGray
-        ),
-        contentScale = ContentScale.Crop
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop)
       )
     }
 
@@ -99,11 +76,11 @@ internal class CoilImageTest {
   fun requestSuccess_withLoadingComposables() {
     composeTestRule.setContent {
       CoilImage(
-        imageModel = IMAGE,
+        imageModel = { IMAGE },
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_COIL),
-        contentScale = ContentScale.Crop,
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         loading = { Box(modifier = Modifier) }
       )
     }
@@ -135,9 +112,9 @@ internal class CoilImageTest {
     composeTestRule.setContent {
       CompositionLocalProvider(LocalCoilImageLoader provides imageLoader) {
         CoilImage(
-          imageModel = IMAGE,
+          imageModel = { IMAGE },
           modifier = Modifier.size(128.dp, 128.dp),
-          contentScale = ContentScale.Crop,
+          imageOptions = ImageOptions(contentScale = ContentScale.Crop),
           loading = { Box(modifier = Modifier) }
         )
       }
@@ -155,11 +132,11 @@ internal class CoilImageTest {
 
     composeTestRule.setContent {
       CoilImage(
-        imageModel = IMAGE,
+        imageModel = { IMAGE },
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_COIL),
-        contentScale = ContentScale.Crop,
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         success = {
           state.add(it)
           assertThat(it.drawable, `is`(CoreMatchers.notNullValue()))
@@ -190,11 +167,11 @@ internal class CoilImageTest {
 
     composeTestRule.setContent {
       CoilImage(
-        imageModel = "",
+        imageModel = { "" },
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_COIL),
-        contentScale = ContentScale.Crop,
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         failure = {
           Box(modifier = Modifier.testTag(TAG_ERROR))
           state.add(it)
