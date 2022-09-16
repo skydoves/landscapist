@@ -203,10 +203,12 @@ public fun CoilImage(
  *
  * ```
  * CoilImage(
- * imageRequest = ImageRequest.Builder(context)
+ * imageRequest = {
+ *   ImageRequest.Builder(context)
  *      .data(imageModel)
  *      .lifecycle(lifecycleOwner)
- *      .build(),
+ *      .build()
+ * },
  * modifier = modifier,
  * loading = {
  *   Box(modifier = Modifier.matchParentSize()) {
