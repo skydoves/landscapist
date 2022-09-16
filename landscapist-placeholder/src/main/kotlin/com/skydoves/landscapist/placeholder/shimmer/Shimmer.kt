@@ -60,7 +60,7 @@ import kotlin.math.tan
  * @param durationMillis animation duration of the shimmering start to end.
  */
 @Composable
-internal fun Shimmer(
+public fun Shimmer(
   modifier: Modifier = Modifier,
   baseColor: Color,
   highlightColor: Color,

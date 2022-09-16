@@ -16,6 +16,7 @@
 package com.github.skydoves.landscapistdemo.model
 
 import androidx.compose.runtime.Immutable
+import java.util.UUID
 
 @Immutable
 data class Poster(
@@ -24,5 +25,6 @@ data class Poster(
   val playtime: String,
   val description: String,
   val image: String?,
-  val gif: String?
+  val gif: String?,
+  val id: String = UUID.randomUUID().toString()
 )

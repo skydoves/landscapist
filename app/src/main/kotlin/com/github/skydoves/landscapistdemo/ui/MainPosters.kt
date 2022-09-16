@@ -15,7 +15,6 @@
  */
 package com.github.skydoves.landscapistdemo.ui
 
-import android.os.Build.VERSION.SDK_INT
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,29 +47,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
-import coil.ImageLoader
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
 import com.github.skydoves.landscapistdemo.R
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
-import com.github.skydoves.landscapistdemo.theme.background800
-import com.github.skydoves.landscapistdemo.theme.shimmerHighLight
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
-import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.palette.PalettePlugin
-import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @Composable
 fun DisneyPosters(
@@ -103,7 +94,7 @@ fun DisneyPosters(
           )
         }
       }
-      items(items = posters) { poster ->
+      items(items = posters, key = { it.id }) { poster ->
         PosterItem(poster, vm)
       }
     }
@@ -138,9 +129,8 @@ private fun SelectedPoster(
   var palette by remember { mutableStateOf<Palette?>(null) }
 
   GlideImage(
-    imageModel = poster.image,
-    modifier = Modifier
-      .aspectRatio(0.8f),
+    imageModel = { poster.image },
+    modifier = Modifier.aspectRatio(0.8f),
     component = rememberImageComponent {
       +CircularRevealPlugin()
       +PalettePlugin { palette = it }
@@ -171,26 +161,8 @@ private fun SelectedPoster(
     modifier = Modifier.padding(8.dp)
   )
 
-  val context = LocalContext.current
-  val imageLoader = ImageLoader.Builder(context)
-    .components {
-      if (SDK_INT >= 28) {
-        add(ImageDecoderDecoder.Factory())
-      } else {
-        add(GifDecoder.Factory())
-      }
-    }
-    .build()
-
-  CoilImage(
-    imageModel = poster.gif,
-    imageLoader = { imageLoader },
-    component = rememberImageComponent {
-      +ShimmerPlugin(
-        baseColor = background800,
-        highlightColor = shimmerHighLight
-      )
-    },
+  GlideImage(
+    imageModel = { poster.gif },
     modifier = Modifier
       .height(500.dp)
       .padding(8.dp)
