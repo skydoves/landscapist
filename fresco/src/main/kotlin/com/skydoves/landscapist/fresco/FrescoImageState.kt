@@ -15,6 +15,7 @@
  */
 package com.skydoves.landscapist.fresco
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.ImageBitmap
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
@@ -23,21 +24,26 @@ import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageState
 
 /** GlideImageState represents the image loading states for Fresco. */
+@Immutable
 public sealed class FrescoImageState : ImageState {
 
   /** Request not started. */
+  @Immutable
   public object None : FrescoImageState()
 
   /** Request is currently in progress. */
+  @Immutable
   public object Loading : FrescoImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
+  @Immutable
   public data class Success(
     val imageBitmap: ImageBitmap?,
     val dataSource: com.skydoves.landscapist.DataSource
   ) : FrescoImageState()
 
   /** Request failed. */
+  @Immutable
   public data class Failure(
     val dataSource: DataSource<CloseableReference<CloseableImage>>?,
     val reason: Throwable?

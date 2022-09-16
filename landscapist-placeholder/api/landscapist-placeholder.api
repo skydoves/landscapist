@@ -32,6 +32,10 @@ public final class com/skydoves/landscapist/placeholder/shimmer/LocalShimmerPara
 	public static final fun getLocalShimmerPlugin ()Landroidx/compose/runtime/ProvidableCompositionLocal;
 }
 
+public final class com/skydoves/landscapist/placeholder/shimmer/Shimmer {
+	public static final fun Shimmer-0Cdfkco (Landroidx/compose/ui/Modifier;JJLandroidx/compose/ui/unit/Dp;FFFILandroidx/compose/runtime/Composer;II)V
+}
+
 public final class com/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin : com/skydoves/landscapist/plugins/ImagePlugin$LoadingStatePlugin {
 	public synthetic fun <init> (JJLandroidx/compose/ui/unit/Dp;FFFIILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun <init> (JJLandroidx/compose/ui/unit/Dp;FFFILkotlin/jvm/internal/DefaultConstructorMarker;)V

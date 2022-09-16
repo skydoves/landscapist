@@ -1,13 +1,12 @@
 public final class com/skydoves/landscapist/glide/GlideImage {
-	public static final fun GlideImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lcom/bumptech/glide/request/RequestListener;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
+	public static final fun GlideImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
+	public static final fun GlideImage (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
 }
 
 public abstract class com/skydoves/landscapist/glide/GlideImageState : com/skydoves/landscapist/ImageState {
-	public static final field $stable I
 }
 
 public final class com/skydoves/landscapist/glide/GlideImageState$Failure : com/skydoves/landscapist/glide/GlideImageState {
-	public static final field $stable I
 	public fun <init> (Landroid/graphics/drawable/Drawable;Ljava/lang/Throwable;)V
 	public final fun component1 ()Landroid/graphics/drawable/Drawable;
 	public final fun component2 ()Ljava/lang/Throwable;
@@ -21,17 +20,14 @@ public final class com/skydoves/landscapist/glide/GlideImageState$Failure : com/
 }
 
 public final class com/skydoves/landscapist/glide/GlideImageState$Loading : com/skydoves/landscapist/glide/GlideImageState {
-	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/glide/GlideImageState$Loading;
 }
 
 public final class com/skydoves/landscapist/glide/GlideImageState$None : com/skydoves/landscapist/glide/GlideImageState {
-	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/glide/GlideImageState$None;
 }
 
 public final class com/skydoves/landscapist/glide/GlideImageState$Success : com/skydoves/landscapist/glide/GlideImageState {
-	public static final field $stable I
 	public fun <init> (Landroid/graphics/drawable/Drawable;Lcom/skydoves/landscapist/DataSource;)V
 	public final fun component1 ()Landroid/graphics/drawable/Drawable;
 	public final fun component2 ()Lcom/skydoves/landscapist/DataSource;

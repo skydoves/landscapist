@@ -16,11 +16,9 @@ public final class com/skydoves/landscapist/ImageLoad {
 }
 
 public abstract class com/skydoves/landscapist/ImageLoadState {
-	public static final field $stable I
 }
 
 public final class com/skydoves/landscapist/ImageLoadState$Failure : com/skydoves/landscapist/ImageLoadState {
-	public static final field $stable I
 	public fun <init> (Ljava/lang/Object;Ljava/lang/Throwable;)V
 	public final fun component1 ()Ljava/lang/Object;
 	public final fun component2 ()Ljava/lang/Throwable;
@@ -34,17 +32,14 @@ public final class com/skydoves/landscapist/ImageLoadState$Failure : com/skydove
 }
 
 public final class com/skydoves/landscapist/ImageLoadState$Loading : com/skydoves/landscapist/ImageLoadState {
-	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/ImageLoadState$Loading;
 }
 
 public final class com/skydoves/landscapist/ImageLoadState$None : com/skydoves/landscapist/ImageLoadState {
-	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/ImageLoadState$None;
 }
 
 public final class com/skydoves/landscapist/ImageLoadState$Success : com/skydoves/landscapist/ImageLoadState {
-	public static final field $stable I
 	public fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;)V
 	public final fun component1 ()Ljava/lang/Object;
 	public final fun component2 ()Lcom/skydoves/landscapist/DataSource;
@@ -95,6 +90,12 @@ public final class com/skydoves/landscapist/LandscapistImageKt {
 public final class com/skydoves/landscapist/RememberPainterPluginsKt {
 	public static final fun rememberBitmapPainter (Ljava/util/List;Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
 	public static final fun rememberDrawablePainter (Landroid/graphics/drawable/Drawable;Ljava/util/List;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
+}
+
+public final class com/skydoves/landscapist/StableHolder {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun getValue ()Ljava/lang/Object;
 }
 
 public abstract interface class com/skydoves/landscapist/components/ImageComponent {

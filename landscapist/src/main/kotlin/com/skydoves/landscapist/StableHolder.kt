@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.skydoves.landscapistdemo.model
+package com.skydoves.landscapist
 
-import androidx.compose.runtime.Immutable
-import java.util.UUID
+import androidx.compose.runtime.Stable
 
-@Immutable
-data class Poster(
-  val name: String,
-  val release: String,
-  val playtime: String,
-  val description: String,
-  val image: String?,
-  val gif: String?,
-  val id: String = UUID.randomUUID().toString()
-)
+@Stable
+@InternalLandscapistApi
+public class StableHolder<T>(public val value: T) {
+  public operator fun component1(): T = value
+}

@@ -19,7 +19,6 @@
 
 package com.skydoves.landscapist.coil
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -40,7 +39,6 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.drawable.toBitmap
-import androidx.lifecycle.LifecycleOwner
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.ImageResult
@@ -49,6 +47,7 @@ import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.LandscapistImage
+import com.skydoves.landscapist.StableHolder
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
 import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
@@ -66,12 +65,77 @@ import okhttp3.HttpUrl
 /**
  * Load and render an image with the given [imageModel] from the network or local storage.
  *
+ *
+ * @param imageModel The data model to request image. See [ImageRequest.Builder.data] for types allowed.
+ * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param imageLoader The [ImageLoader] to use when requesting the image.
+ * @param component An image component that conjuncts pluggable [ImagePlugin]s.
+ * @param requestListener A class for monitoring the status of a request while images load.
+ * @param imageOptions Represents parameters to load generic [Image] Composable.
+ * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
+ * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
+ * @param loading Content to be displayed when the request is in progress.
+ * @param success Content to be displayed when the request is succeeded.
+ * @param failure Content to be displayed when the request is failed.
+ */
+@Composable
+@Deprecated(
+  message = "Use CoilImage(imageModel = { imageModel }..) " +
+    "for improving recomposition performance.",
+  replaceWith = ReplaceWith(
+    "" +
+      "CoilImage(\n" +
+      "    imageModel = { imageModel },\n" +
+      "    modifier = modifier,\n" +
+      "    imageLoader = imageLoader,\n" +
+      "    component = component,\n" +
+      "    requestListener = requestListener,\n" +
+      "    imageOptions = imageOptions,\n" +
+      "    onImageStateChanged = onImageStateChanged,\n" +
+      "    previewPlaceholder = previewPlaceholder,\n" +
+      "    loading = loading,\n" +
+      "    success = success,\n" +
+      "    failure = failure\n" +
+      "  )"
+  )
+)
+public fun CoilImage(
+  imageModel: Any?,
+  modifier: Modifier = Modifier,
+  imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
+  component: ImageComponent = rememberImageComponent {},
+  requestListener: (() -> ImageRequest.Listener)? = null,
+  imageOptions: ImageOptions = ImageOptions(),
+  onImageStateChanged: (CoilImageState) -> Unit = {},
+  @DrawableRes previewPlaceholder: Int = 0,
+  loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
+  success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
+  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
+) {
+  CoilImage(
+    imageModel = { imageModel },
+    modifier = modifier,
+    imageLoader = imageLoader,
+    component = component,
+    requestListener = requestListener,
+    imageOptions = imageOptions,
+    onImageStateChanged = onImageStateChanged,
+    previewPlaceholder = previewPlaceholder,
+    loading = loading,
+    success = success,
+    failure = failure
+  )
+}
+
+/**
+ * Load and render an image with the given [imageModel] from the network or local storage.
+ *
  * Supported types for the [imageModel] are the below:
  * [String], [Uri], [HttpUrl], [File], [DrawableRes], [Drawable], [Bitmap], [ByteArray], [ByteBuffer]
  *
  * ```
  * CoilImage(
- * imageModel = imageModel,
+ * imageModel = { imageModel },
  * modifier = modifier,
  * imageOptions = ImageOptions(contentScale = ContentScale.Crop),
  * loading = {
@@ -88,8 +152,6 @@ import okhttp3.HttpUrl
  *
  * @param imageModel The data model to request image. See [ImageRequest.Builder.data] for types allowed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
- * @param context The context for creating the [ImageRequest.Builder].
- * @param lifecycleOwner The [LifecycleOwner] for constructing the [ImageRequest.Builder].
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param requestListener A class for monitoring the status of a request while images load.
@@ -102,13 +164,11 @@ import okhttp3.HttpUrl
  */
 @Composable
 public fun CoilImage(
-  imageModel: Any?,
+  imageModel: () -> Any?,
   modifier: Modifier = Modifier,
-  context: Context = LocalContext.current,
-  lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   component: ImageComponent = rememberImageComponent {},
-  requestListener: ImageRequest.Listener? = null,
+  requestListener: (() -> ImageRequest.Listener)? = null,
   imageOptions: ImageOptions = ImageOptions(),
   onImageStateChanged: (CoilImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
@@ -116,12 +176,16 @@ public fun CoilImage(
   success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
 ) {
+  val context = LocalContext.current
+  val lifecycleOwner = LocalLifecycleOwner.current
   CoilImage(
-    imageRequest = ImageRequest.Builder(context)
-      .data(imageModel)
-      .listener(requestListener)
-      .lifecycle(lifecycleOwner)
-      .build(),
+    imageRequest = {
+      ImageRequest.Builder(context)
+        .data(imageModel.invoke())
+        .listener(requestListener?.invoke())
+        .lifecycle(lifecycleOwner)
+        .build()
+    },
     imageLoader = imageLoader,
     component = component,
     modifier = modifier,
@@ -169,7 +233,7 @@ public fun CoilImage(
  */
 @Composable
 public fun CoilImage(
-  imageRequest: ImageRequest,
+  imageRequest: () -> ImageRequest,
   modifier: Modifier = Modifier,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   component: ImageComponent = rememberImageComponent {},
@@ -200,8 +264,8 @@ public fun CoilImage(
   }
 
   CoilImage(
-    recomposeKey = imageRequest,
-    imageLoader = imageLoader.invoke(),
+    recomposeKey = StableHolder(imageRequest.invoke()),
+    imageLoader = StableHolder(imageLoader.invoke()),
     modifier = modifier
   ) ImageRequest@{ imageState ->
     when (val coilImageState = imageState.toCoilImageState().apply { internalState = this }) {
@@ -224,7 +288,7 @@ public fun CoilImage(
       is CoilImageState.Success -> {
         component.ComposeSuccessStatePlugins(
           modifier = modifier,
-          imageModel = imageRequest.data,
+          imageModel = imageRequest.invoke().data,
           imageOptions = imageOptions,
           imageBitmap = coilImageState.drawable?.toBitmap()
             ?.copy(Bitmap.Config.ARGB_8888, true)?.asImageBitmap()
@@ -251,7 +315,7 @@ public fun CoilImage(
  *
  * ```
  * CoilImage(
- * imageRequest = ImageRequest.Builder(context)
+ * recomposeKey = ImageRequest.Builder(context)
  *      .data(imageModel)
  *      .lifecycle(lifecycleOwner)
  *      .build(),
@@ -273,22 +337,22 @@ public fun CoilImage(
  */
 @Composable
 private fun CoilImage(
-  recomposeKey: ImageRequest,
+  recomposeKey: StableHolder<ImageRequest>,
   modifier: Modifier = Modifier,
-  imageLoader: ImageLoader = LocalCoilProvider.getCoilImageLoader(),
+  imageLoader: StableHolder<ImageLoader> = StableHolder(LocalCoilProvider.getCoilImageLoader()),
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
 
   ImageLoad(
-    recomposeKey = recomposeKey,
+    recomposeKey = recomposeKey.value,
     executeImageRequest = {
       channelFlow {
-        recomposeKey.newBuilder(context).target(
+        recomposeKey.value.newBuilder(context).target(
           onStart = { trySendBlocking(ImageLoadState.Loading) }
         ).build()
 
-        val result = imageLoader.execute(recomposeKey).toResult()
+        val result = imageLoader.value.execute(recomposeKey.value).toResult()
         send(result)
       }
     },
