@@ -23,6 +23,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.palette.graphics.Palette
 
+/**
+ * Create a mutable state and remember the new instance of [Palette] that is wrapped by [MutableState]
+ * on the memory.
+ *
+ * @param value The initial value for the [MutableState].
+ * @param policy A policy to controls how changes are handled in mutable snapshots.
+ */
 @Composable
 public fun rememberPaletteState(
   value: Palette?,
