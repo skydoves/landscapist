@@ -18,3 +18,7 @@ public final class com/skydoves/landscapist/palette/PalettePlugin : com/skydoves
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class com/skydoves/landscapist/palette/RememberPaletteStateKt {
+	public static final fun rememberPaletteState (Landroidx/palette/graphics/Palette;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Landroidx/compose/runtime/MutableState;
+}
+

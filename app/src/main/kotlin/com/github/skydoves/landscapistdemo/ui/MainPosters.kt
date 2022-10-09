@@ -40,8 +40,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,6 +60,7 @@ import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.palette.PalettePlugin
+import com.skydoves.landscapist.palette.rememberPaletteState
 
 @Composable
 fun DisneyPosters(
@@ -126,7 +125,7 @@ private fun PosterItem(
 private fun SelectedPoster(
   poster: Poster
 ) {
-  var palette by remember { mutableStateOf<Palette?>(null) }
+  var palette by rememberPaletteState(null)
 
   GlideImage(
     imageModel = { poster.image },
