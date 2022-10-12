@@ -44,7 +44,7 @@ repositories {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.0.1-SNAPSHOT"
+    implementation "com.github.skydoves:landscapist-glide:2.0.2-SNAPSHOT"
 }
 ```
 </details>
@@ -68,7 +68,7 @@ allprojects {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.0.0"
+    implementation "com.github.skydoves:landscapist-glide:2.0.1"
 }
 ```
 
@@ -79,7 +79,7 @@ You can load images simply by using `GlideImage` composable function as the foll
 
 ```kotlin
 GlideImage(
-  imageModel = imageUrl, // loading a network image using an URL.
+  imageModel = { imageUrl }, // loading a network image using an URL.
   imageOptions = ImageOptions(
     contentScale = ContentScale.Crop,
     alignment = Alignment.Center
@@ -96,7 +96,7 @@ You can customize your request-options with your own [RequestOptions](https://bu
 
 ```kotlin
 GlideImage(
-  imageModel = imageUrl,
+  imageModel = { imageUrl },
   requestOptions = {
     RequestOptions()
         .override(256, 256)
@@ -111,7 +111,7 @@ You can request image with your own [RequestBuilder](https://bumptech.github.io/
 
 ```kotlin
 GlideImage(
-  imageModel = imageUrl,
+  imageModel = { imageUrl },
   requestBuilder = { Glide.with(LocalContext.current.applicationContext).asDrawable() },
   modifier = Modifier.constrainAs(image) {
     centerHorizontallyTo(parent)
@@ -125,7 +125,7 @@ You can register your own [RequestListener](https://bumptech.github.io/glide/jav
 
 ```kotlin
 GlideImage(
-  imageModel = imageUrl,
+  imageModel = { imageUrl },
   requestListener = object: RequestListener<Drawable> {
     override fun onLoadFailed(
       e: GlideException?,
@@ -189,7 +189,7 @@ You can load images by using the `CoilImage` composable function as the followin
 
 ```kotlin
 CoilImage(
-  imageModel = imageUrl, // loading a network image or local resource using an URL.
+  imageModel = { imageUrl }, // loading a network image or local resource using an URL.
   imageOptions = ImageOptions(
     contentScale = ContentScale.Crop,
     alignment = Alignment.Center
@@ -252,7 +252,7 @@ val imageLoader = ImageLoader.Builder(context)
   .build()
 
 CoilImage(
-    imageModel = poster.gif, // URL of an animated image.
+    imageModel = { poster.gif }, // URL of an animated image.
     imageLoader = { imageLoader },
     shimmerParams = ShimmerParams(
       baseColor = background800,
@@ -449,7 +449,7 @@ You can execute your own composable functions depending on the three request sta
 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage
-  imageModel = imageUrl,
+  imageModel = { imageUrl },
   modifier = modifier,
   // shows an indicator while loading an image.
   loading = {
@@ -470,7 +470,7 @@ Also, you can customize the image content with our own composable function like 
 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage
-  imageModel = imageUrl,
+  imageModel = { imageUrl },
   // draw a resized image.
   success = { imageState ->
     imageState.imageBitmap?.let {
@@ -495,7 +495,7 @@ Landscapist supports preview mode for each image library; **Glide**, **Coil**, a
 
 ```kotlin
 GlideImage(
-  imageModel = poster.poster,
+  imageModel = { imageUrl },
   modifier = Modifier.aspectRatio(0.8f),
   previewPlaceholder = R.drawable.poster
 )
@@ -541,7 +541,7 @@ Next, you can compose plugins by adding them in the `rememberImageComponent` lik
 
 ```kotlin
 GlideImage(
-  imageModel = poster.image,
+  imageModel = { poster.image },
   component = rememberImageComponent {
     add(CircularRevealPlugin())
     add(LoadingPlugin(source))
@@ -553,7 +553,7 @@ or you can just add plugins by using the **+** expression like the below:
 
 ```kotlin
 GlideImage(
-  imageModel = poster.image,
+  imageModel = { poster.image },
   component = rememberImageComponent {
     +CircularRevealPlugin()
     +LoadingPlugin(source)
@@ -596,7 +596,7 @@ You can implement a shimmering effect while loading an image by using the `Shimm
 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage
-  imageModel = imageUrl,
+  imageModel = { imageUrl },
   modifier = modifier,
   component = rememberImageComponent {
     // shows a shimmering effect when loading an image.
@@ -655,7 +655,7 @@ You can implement the crossfade animation while drawing images with `CrossfadePl
 
 ```kotlin
 GlideImage(
-  imageModel = poster.image,
+  imageModel = { poster.image },
   modifier = Modifier
     .aspectRatio(0.8f),
   component = rememberImageComponent {
@@ -673,7 +673,7 @@ You can implement the circular reveal animation while drawing images with `Circu
 
 ```kotlin
 GlideImage(
-  imageModel = poster.image,
+  imageModel = { poster.image },
   modifier = Modifier
     .aspectRatio(0.8f),
   component = rememberImageComponent {
@@ -707,7 +707,7 @@ You can extract primary (theme) color profiles with `PalettePlugin`. You can che
 var palette by remember { mutableStateOf<Palette?>(null) }
 
 GlideImage( // CoilImage, FrescoImage also can be used.
-  imageModel = poster.image,
+  imageModel = { poster.image },
   modifier = Modifier
     .aspectRatio(0.8f),
   component = rememberImageComponent {
@@ -735,7 +735,7 @@ Also, you can customize attributes of `PalettePlugin` like the example below:
 var palette by remember { mutableStateOf<Palette?>(null) }
 
 GlideImage( // CoilImage, FrescoImage also can be used.
-  imageModel = poster.image,
+  imageModel = { poster.image },
   modifier = Modifier
     .aspectRatio(0.8f),
   component = rememberImageComponent {
