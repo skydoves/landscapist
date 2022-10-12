@@ -15,6 +15,7 @@
  */
 package com.skydoves.landscapist.components
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import com.skydoves.landscapist.plugins.ImagePlugin
 
@@ -24,9 +25,12 @@ internal annotation class LandscapistImagePluginComponentDSL
 
 /** A factory extension for creating a new instance of [ImagePluginComponent] and running
  * [ImagePluginComponent.compose] with the [block] receiver. */
+@Stable
+@Composable
 @LandscapistImagePluginComponentDSL
-public inline fun imageComponent(block: ImagePluginComponent.() -> Unit): ImagePluginComponent =
-  ImagePluginComponent(mutableListOf()).compose { block() }
+public inline fun imageComponent(
+  block: @Composable ImagePluginComponent.() -> Unit
+): ImagePluginComponent = ImagePluginComponent(mutableListOf()).compose { block() }
 
 /**
  * A pluggable image component that extends [ImageComponent] and includes a collection of [ImagePlugin].
