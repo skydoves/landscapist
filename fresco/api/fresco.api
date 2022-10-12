@@ -54,3 +54,7 @@ public final class com/skydoves/landscapist/fresco/LocalFrescoProviderKt {
 	public static final fun getLocalFrescoImageRequest ()Landroidx/compose/runtime/ProvidableCompositionLocal;
 }
 
+public final class com/skydoves/landscapist/fresco/RememberFrescoImageStateKt {
+	public static final fun rememberFrescoImageState (Lcom/skydoves/landscapist/fresco/FrescoImageState;Ljava/lang/Object;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/fresco/FrescoImageState;
+}
+

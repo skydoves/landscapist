@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist.components
+package com.skydoves.landscapist.fresco
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 
 /**
- * Create and remember a new instance of [ImageComponent] that implements [ImagePluginComponent]
- * on the memory.
+ * Create and remember [FrescoImageState].
  *
- * @param block The receiver of an instance of [ImagePluginComponent].
+ * @param initialState The initial state of [FrescoImageState].
+ * @param key The key that may trigger recomposition.
  */
 @Composable
-public fun rememberImageComponent(
-  block: @Composable ImagePluginComponent.() -> Unit
-): ImagePluginComponent {
-  val imageComponent = imageComponent(block)
-  return remember { imageComponent }
-}
+public fun rememberFrescoImageState(
+  initialState: FrescoImageState = FrescoImageState.None,
+  key: Any?
+): FrescoImageState = remember(key1 = key) { initialState }
