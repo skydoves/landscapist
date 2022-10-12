@@ -379,9 +379,11 @@ You can load animated GIFs and WebP Images with `FrescoWebImage` composable func
 
 ```kotlin
 FrescoWebImage(
-  controllerBuilder = Fresco.newDraweeControllerBuilder()
-    .setUri(poster.gif) // GIF or Webp image url.
-    .setAutoPlayAnimations(true),
+  controllerBuilder = {
+      Fresco.newDraweeControllerBuilder()
+          .setUri(poster.gif) // GIF or Webp image url.
+          .setAutoPlayAnimations(true)
+  },
   modifier = Modifier
     .fillMaxWidth()
     .height(300.dp)
