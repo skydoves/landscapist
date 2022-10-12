@@ -1,3 +1,10 @@
+public final class com/skydoves/landscapist/fresco/ComposableSingletons$FrescoImageKt {
+	public static final field INSTANCE Lcom/skydoves/landscapist/fresco/ComposableSingletons$FrescoImageKt;
+	public static field lambda-1 Lkotlin/jvm/functions/Function3;
+	public fun <init> ()V
+	public final fun getLambda-1$fresco_release ()Lkotlin/jvm/functions/Function3;
+}
+
 public final class com/skydoves/landscapist/fresco/FrescoImage {
 	public static final fun FrescoImage (Ljava/lang/String;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
 }

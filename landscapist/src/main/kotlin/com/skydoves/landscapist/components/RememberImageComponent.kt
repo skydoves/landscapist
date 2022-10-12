@@ -21,7 +21,13 @@ import androidx.compose.runtime.remember
 /**
  * Create and remember the new instance of [ImageComponent] that implements [ImagePluginComponent]
  * on the memory.
+ *
+ * @param block The receiver of an instance of [ImagePluginComponent].
  */
 @Composable
-public fun rememberImageComponent(block: ImagePluginComponent.() -> Unit): ImagePluginComponent =
-  remember { imageComponent(block) }
+public fun rememberImageComponent(
+  block: @Composable ImagePluginComponent.() -> Unit
+): ImagePluginComponent {
+  val imageComponent = imageComponent(block)
+  return remember { imageComponent }
+}

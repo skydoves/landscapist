@@ -1,3 +1,12 @@
+public final class com/skydoves/landscapist/glide/ComposableSingletons$GlideImageKt {
+	public static final field INSTANCE Lcom/skydoves/landscapist/glide/ComposableSingletons$GlideImageKt;
+	public static field lambda-1 Lkotlin/jvm/functions/Function3;
+	public static field lambda-2 Lkotlin/jvm/functions/Function3;
+	public fun <init> ()V
+	public final fun getLambda-1$glide_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda-2$glide_release ()Lkotlin/jvm/functions/Function3;
+}
+
 public final class com/skydoves/landscapist/glide/GlideImage {
 	public static final fun GlideImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
 	public static final fun GlideImage (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V

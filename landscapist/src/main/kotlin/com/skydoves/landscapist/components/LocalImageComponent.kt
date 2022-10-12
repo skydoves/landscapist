@@ -30,6 +30,6 @@ internal object LocalImageComponentProvider {
 
   /** Returns the current or default [ImageComponent] for the `shimmerParams` parameter. */
   fun defaultImageComponent(): ImageComponent {
-    return imageComponent { }
+    return ImagePluginComponent()
   }
 }

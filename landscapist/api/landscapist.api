@@ -122,7 +122,7 @@ public final class com/skydoves/landscapist/components/ImagePluginComponent : co
 }
 
 public final class com/skydoves/landscapist/components/ImagePluginComponentKt {
-	public static final fun imageComponent (Lkotlin/jvm/functions/Function1;)Lcom/skydoves/landscapist/components/ImagePluginComponent;
+	public static final fun imageComponent (Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/components/ImagePluginComponent;
 }
 
 public final class com/skydoves/landscapist/components/LocalImageComponentKt {
@@ -130,7 +130,7 @@ public final class com/skydoves/landscapist/components/LocalImageComponentKt {
 }
 
 public final class com/skydoves/landscapist/components/RememberImageComponentKt {
-	public static final fun rememberImageComponent (Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/components/ImagePluginComponent;
+	public static final fun rememberImageComponent (Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/components/ImagePluginComponent;
 }
 
 public abstract interface class com/skydoves/landscapist/plugins/ImagePlugin {
