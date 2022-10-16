@@ -324,7 +324,7 @@ private fun GlideImage(
         }
 
         // start the image request into the target.
-        requestManager.buildRequestManager(
+        requestManager.buildRequestBuilder(
           glideRequestType = glideRequestType,
           recomposeKey = recomposeKey,
           flowRequestListener = flowRequestListener,
@@ -342,7 +342,7 @@ private fun GlideImage(
   )
 }
 
-private fun RequestManager.buildRequestManager(
+private fun RequestManager.buildRequestBuilder(
   glideRequestType: GlideRequestType,
   recomposeKey: StableHolder<Any?>,
   flowRequestListener: FlowRequestListener,
