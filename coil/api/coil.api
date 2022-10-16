@@ -37,6 +37,7 @@ public final class com/skydoves/landscapist/coil/CoilImageState$Success : com/sk
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDataSource ()Lcom/skydoves/landscapist/DataSource;
 	public final fun getDrawable ()Landroid/graphics/drawable/Drawable;
+	public final fun getImageBitmap ()Landroidx/compose/ui/graphics/ImageBitmap;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
