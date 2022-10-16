@@ -688,11 +688,11 @@ GlideImage(
 
  > **Note**: You can also use the Circular Reveal animation for **`CoilImage`** and **`FrescoImage`**.
 
-<img src="https://user-images.githubusercontent.com/24237865/196038507-54a3a79c-2e8e-45ec-b5e8-5de65cd50248.png" align="right" width="250"/>
-
  ## Transformation
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+
+<img src="https://user-images.githubusercontent.com/24237865/196038507-54a3a79c-2e8e-45ec-b5e8-5de65cd50248.png" align="right" width="250"/>
 
 The `landscapist-transformation` package provides useful image transformation plugins, such as the blur effect.
 To use transformation supports, add the dependency below:
