@@ -28,12 +28,12 @@ import kotlinx.coroutines.channels.trySendBlocking
  */
 internal class FlowCustomTarget constructor(
   private val producerScope: ProducerScope<ImageLoadState>
-) : CustomTarget<Drawable>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+) : CustomTarget<Any>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
 
   private var failException: Throwable? = null
 
   /** onResourceReady will be handled by [FlowRequestListener]. */
-  override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) = Unit
+  override fun onResourceReady(resource: Any, transition: Transition<in Any>?) = Unit
 
   override fun onLoadStarted(placeholder: Drawable?) {
     super.onLoadStarted(placeholder)
