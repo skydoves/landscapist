@@ -157,6 +157,7 @@ public fun GlideImage(
  *
  * @param imageModel The data model to request image. See [RequestBuilder.load] for types allowed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param glideRequestType Glide image request type, which decides the result of image data.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
  * @param requestListener A class for monitoring the status of a request while images load.
@@ -295,8 +296,10 @@ public fun GlideImage(
  * }
  * ```
  *
- * @param builder The request to execute.
+ * @param recomposeKey request to execute image loading asynchronously.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param glideRequestType Glide image request type, which decides the result of image data.
+ * @param builder The request to execute.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param content Content to be displayed for the given state.
  */
