@@ -19,6 +19,10 @@
 ## Who's using Landscapist?
 👉 [Check out who's using Landscapist](/usecases.md).
 
+Landscapist hits **+300,000 downloads every month** around the globe! 🚀
+
+![globe](https://user-images.githubusercontent.com/24237865/196018576-a9c87534-81a2-4618-8519-0024b67964bf.png)
+
 ## Demo projects
 You can see the use cases of this library in the repositories below:
 - [google/modernstorage](https://github.com/google/modernstorage/tree/e62cda539ca75884dd49df3bcf8629751f0a91e6/sample) - ModernStorage is a group of libraries that provide an abstraction layer over storage on Android to simplify its interactions.
