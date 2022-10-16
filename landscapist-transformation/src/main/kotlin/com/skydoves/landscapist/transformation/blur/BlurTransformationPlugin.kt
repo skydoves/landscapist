@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist.animation.crossfade
+package com.skydoves.landscapist.transformation.blur
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -22,21 +22,27 @@ import androidx.compose.ui.graphics.painter.Painter
 import com.skydoves.landscapist.plugins.ImagePlugin
 
 /**
- * CrossfadePlugin adds crossfade animation while rendering an image.
+ * BlurTransformationPlugin adds blur transformation effect while rendering an image.
  * An image plugin that extends [ImagePlugin.PainterPlugin] to be executed while rendering painters.
  *
- * @property duration milli-second times from start to finish animation.
+ * @property radius The radius of the pixels used to blur, a value from 1 to 25. Default is 10.
  */
 @Immutable
-public class CrossfadePlugin(
-  private val duration: Int = 550
+public data class BlurTransformationPlugin(
+  public val radius: Int = 10
 ) : ImagePlugin.PainterPlugin {
 
+  /**
+   * Compose circular reveal painter with an [imageBitmap] to the given [painter].
+   *
+   * @param imageBitmap A target [ImageBitmap] to be drawn on the painter.
+   * @param painter A given painter to be executed circular reveal animation.
+   */
   @Composable
   override fun compose(imageBitmap: ImageBitmap, painter: Painter): Painter {
-    return painter.rememberCrossfadePainter(
+    return painter.rememberBlurPainter(
       imageBitmap = imageBitmap,
-      durationMs = duration
+      radius = radius
     )
   }
 }
