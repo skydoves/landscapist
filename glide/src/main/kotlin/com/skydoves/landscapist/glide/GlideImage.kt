@@ -15,7 +15,7 @@
  */
 @file:JvmMultifileClass
 @file:JvmName("GlideImage")
-@file:Suppress("unused")
+@file:Suppress("unused", "UNCHECKED_CAST")
 
 package com.skydoves.landscapist.glide
 
@@ -218,7 +218,11 @@ public fun GlideImage(
     requestListener = StableHolder(requestListener?.invoke()),
     modifier = modifier
   ) ImageRequest@{ imageState ->
-    when (val glideImageState = imageState.toGlideImageState().apply { internalState = this }) {
+    when (
+      val glideImageState = imageState.toGlideImageState(
+        glideRequestType = glideRequestType
+      ).apply { internalState = this }
+    ) {
       is GlideImageState.None -> Unit
       is GlideImageState.Loading -> {
         component.ComposeLoadingStatePlugins(

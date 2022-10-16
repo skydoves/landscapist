@@ -36,7 +36,16 @@ public sealed class GlideImageState : ImageState {
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
   @Immutable
-  public data class Success(val data: Any?, val dataSource: DataSource) : GlideImageState()
+  public data class Success(
+    val data: Any?,
+    val dataSource: DataSource,
+    val glideRequestType: GlideRequestType
+  ) : GlideImageState() {
+
+    /** Get [ImageBitmap] from the succeed image [data]. */
+    public val imageBitmap: ImageBitmap?
+      get() = data?.toImageBitmap(glideRequestType)
+  }
 
   /** Request failed. */
   @Immutable
@@ -45,13 +54,14 @@ public sealed class GlideImageState : ImageState {
 }
 
 /** casts an [ImageLoadState] type to a [GlideImageState]. */
-public fun ImageLoadState.toGlideImageState(): GlideImageState {
+public fun ImageLoadState.toGlideImageState(glideRequestType: GlideRequestType): GlideImageState {
   return when (this) {
     is ImageLoadState.None -> GlideImageState.None
     is ImageLoadState.Loading -> GlideImageState.Loading
     is ImageLoadState.Success -> GlideImageState.Success(
       data = data,
-      dataSource = dataSource
+      dataSource = dataSource,
+      glideRequestType = glideRequestType
     )
     is ImageLoadState.Failure -> GlideImageState.Failure(
       errorDrawable = data as? Drawable,
