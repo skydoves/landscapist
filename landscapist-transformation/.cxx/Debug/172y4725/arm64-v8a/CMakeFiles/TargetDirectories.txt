@@ -1,0 +1,4 @@
+/Users/jaewoongeum/Desktop/landscapists/landscapist-transformation/.cxx/Debug/172y4725/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/jaewoongeum/Desktop/landscapists/landscapist-transformation/.cxx/Debug/172y4725/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/jaewoongeum/Desktop/landscapists/landscapist-transformation/.cxx/Debug/172y4725/arm64-v8a/CMakeFiles/cpufeatures.dir
+/Users/jaewoongeum/Desktop/landscapists/landscapist-transformation/.cxx/Debug/172y4725/arm64-v8a/CMakeFiles/renderscript-toolkit.dir

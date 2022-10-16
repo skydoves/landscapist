@@ -1,0 +1,68 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.6.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "RenderScript Toolkit",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "cpufeatures::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cpufeatures-Debug-4c30d4aa4909e07a48fb.json",
+					"name" : "cpufeatures",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "renderscript-toolkit::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-renderscript-toolkit-Debug-a1931caacb5bd3a08690.json",
+					"name" : "renderscript-toolkit",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/jaewoongeum/Desktop/landscapists/landscapist-transformation/.cxx/Debug/172y4725/arm64-v8a",
+		"source" : "/Users/jaewoongeum/Desktop/landscapists/landscapist-transformation/src/main/cpp"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 1
+	}
+}

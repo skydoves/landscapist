@@ -1,0 +1,46 @@
+{
+  "buildFiles": [
+    "/Users/jaewoongeum/Desktop/landscapists/landscapist-transformation/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/jaewoongeum/Library/Android/sdk/cmake/3.18.1/bin/ninja",
+      "-C",
+      "/Users/jaewoongeum/Desktop/landscapists/landscapist-transformation/.cxx/Debug/172y4725/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/jaewoongeum/Library/Android/sdk/cmake/3.18.1/bin/ninja",
+    "-C",
+    "/Users/jaewoongeum/Desktop/landscapists/landscapist-transformation/.cxx/Debug/172y4725/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "cpufeatures::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "cpufeatures",
+      "output": "/Users/jaewoongeum/Desktop/landscapists/landscapist-transformation/.cxx/Debug/172y4725/x86/libcpufeatures.a"
+    },
+    "renderscript-toolkit::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "renderscript-toolkit",
+      "output": "/Users/jaewoongeum/Desktop/landscapists/landscapist-transformation/build/intermediates/cxx/Debug/172y4725/obj/x86/librenderscript-toolkit.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/Users/jaewoongeum/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/Users/jaewoongeum/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [
+    "c"
+  ],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}
