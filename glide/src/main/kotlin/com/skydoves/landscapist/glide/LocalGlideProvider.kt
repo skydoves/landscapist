@@ -15,7 +15,6 @@
  */
 package com.skydoves.landscapist.glide
 
-import android.graphics.drawable.Drawable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -36,7 +35,7 @@ public val LocalGlideRequestOptions: ProvidableCompositionLocal<RequestOptions?>
  * Local containing the preferred [RequestBuilder] for providing the same instance
  * in our composable hierarchy.staticCompositionLocalOf
  */
-public val LocalGlideRequestBuilder: ProvidableCompositionLocal<RequestBuilder<Drawable>?> =
+public val LocalGlideRequestBuilder: ProvidableCompositionLocal<RequestBuilder<*>?> =
   staticCompositionLocalOf { null }
 
 /**
@@ -57,10 +56,10 @@ internal object LocalGlideProvider {
 
   /** Returns the current or default [RequestBuilder] for the `GlideImage` parameter. */
   @Composable
-  fun getGlideRequestBuilder(): RequestBuilder<Drawable> {
+  fun getGlideRequestBuilder(): RequestBuilder<*> {
     return LocalGlideRequestBuilder.current
       ?: getGlideRequestManager()
-        .asDrawable()
+        .`as`(Any::class.java)
   }
 
   /** Returns the current or default [RequestManager] for the `GlideImage` processor. */

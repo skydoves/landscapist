@@ -9,7 +9,7 @@ public final class com/skydoves/landscapist/glide/ComposableSingletons$GlideImag
 
 public final class com/skydoves/landscapist/glide/GlideImage {
 	public static final fun GlideImage (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
-	public static final fun GlideImage (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
+	public static final fun GlideImage (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/glide/GlideRequestType;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
 }
 
 public abstract class com/skydoves/landscapist/glide/GlideImageState : com/skydoves/landscapist/ImageState {
@@ -37,20 +37,31 @@ public final class com/skydoves/landscapist/glide/GlideImageState$None : com/sky
 }
 
 public final class com/skydoves/landscapist/glide/GlideImageState$Success : com/skydoves/landscapist/glide/GlideImageState {
-	public fun <init> (Landroid/graphics/drawable/Drawable;Lcom/skydoves/landscapist/DataSource;)V
-	public final fun component1 ()Landroid/graphics/drawable/Drawable;
+	public fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lcom/skydoves/landscapist/glide/GlideRequestType;)V
+	public final fun component1 ()Ljava/lang/Object;
 	public final fun component2 ()Lcom/skydoves/landscapist/DataSource;
-	public final fun copy (Landroid/graphics/drawable/Drawable;Lcom/skydoves/landscapist/DataSource;)Lcom/skydoves/landscapist/glide/GlideImageState$Success;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/glide/GlideImageState$Success;Landroid/graphics/drawable/Drawable;Lcom/skydoves/landscapist/DataSource;ILjava/lang/Object;)Lcom/skydoves/landscapist/glide/GlideImageState$Success;
+	public final fun component3 ()Lcom/skydoves/landscapist/glide/GlideRequestType;
+	public final fun copy (Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lcom/skydoves/landscapist/glide/GlideRequestType;)Lcom/skydoves/landscapist/glide/GlideImageState$Success;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/glide/GlideImageState$Success;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lcom/skydoves/landscapist/glide/GlideRequestType;ILjava/lang/Object;)Lcom/skydoves/landscapist/glide/GlideImageState$Success;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getData ()Ljava/lang/Object;
 	public final fun getDataSource ()Lcom/skydoves/landscapist/DataSource;
-	public final fun getDrawable ()Landroid/graphics/drawable/Drawable;
+	public final fun getGlideRequestType ()Lcom/skydoves/landscapist/glide/GlideRequestType;
+	public final fun getImageBitmap ()Landroidx/compose/ui/graphics/ImageBitmap;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/skydoves/landscapist/glide/GlideImageStateKt {
-	public static final fun toGlideImageState (Lcom/skydoves/landscapist/ImageLoadState;)Lcom/skydoves/landscapist/glide/GlideImageState;
+	public static final fun toGlideImageState (Lcom/skydoves/landscapist/ImageLoadState;Lcom/skydoves/landscapist/glide/GlideRequestType;)Lcom/skydoves/landscapist/glide/GlideImageState;
+}
+
+public final class com/skydoves/landscapist/glide/GlideRequestType : java/lang/Enum {
+	public static final field BITMAP Lcom/skydoves/landscapist/glide/GlideRequestType;
+	public static final field DRAWABLE Lcom/skydoves/landscapist/glide/GlideRequestType;
+	public static final field GIF Lcom/skydoves/landscapist/glide/GlideRequestType;
+	public static fun valueOf (Ljava/lang/String;)Lcom/skydoves/landscapist/glide/GlideRequestType;
+	public static fun values ()[Lcom/skydoves/landscapist/glide/GlideRequestType;
 }
 
 public final class com/skydoves/landscapist/glide/LocalGlideProviderKt {

@@ -137,7 +137,7 @@ internal class GlideImageTest {
         imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         success = {
           state.add(it)
-          assertThat(it.drawable, `is`(notNullValue()))
+          assertThat(it.data, `is`(notNullValue()))
         },
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))

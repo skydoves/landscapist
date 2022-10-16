@@ -15,7 +15,6 @@
  */
 package com.skydoves.landscapist.glide
 
-import android.graphics.drawable.Drawable
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -30,12 +29,12 @@ import kotlinx.coroutines.channels.trySendBlocking
 internal class FlowRequestListener constructor(
   private val producerScope: ProducerScope<ImageLoadState>,
   private val failException: (Throwable?) -> Unit
-) : RequestListener<Drawable> {
+) : RequestListener<Any> {
 
   override fun onLoadFailed(
     e: GlideException?,
     model: Any?,
-    target: Target<Drawable>?,
+    target: Target<Any>?,
     isFirstResource: Boolean
   ): Boolean {
     failException.invoke(e)
@@ -44,9 +43,9 @@ internal class FlowRequestListener constructor(
   }
 
   override fun onResourceReady(
-    resource: Drawable?,
+    resource: Any?,
     model: Any?,
-    target: Target<Drawable>?,
+    target: Target<Any>?,
     dataSource: DataSource,
     isFirstResource: Boolean
   ): Boolean {

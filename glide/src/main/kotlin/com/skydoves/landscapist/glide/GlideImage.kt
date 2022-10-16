@@ -15,10 +15,11 @@
  */
 @file:JvmMultifileClass
 @file:JvmName("GlideImage")
-@file:Suppress("unused")
+@file:Suppress("unused", "UNCHECKED_CAST")
 
 package com.skydoves.landscapist.glide
 
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -31,11 +32,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
-import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.skydoves.landscapist.ImageLoad
@@ -50,6 +51,7 @@ import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.plugins.ImagePlugin
+import com.skydoves.landscapist.rememberBitmapPainter
 import com.skydoves.landscapist.rememberDrawablePainter
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -95,13 +97,13 @@ import kotlinx.coroutines.flow.callbackFlow
 public fun GlideImage(
   imageModel: Any?,
   modifier: Modifier = Modifier,
-  requestBuilder: @Composable () -> RequestBuilder<Drawable> = {
+  requestBuilder: @Composable () -> RequestBuilder<*> = {
     LocalGlideProvider.getGlideRequestBuilder()
   },
   requestOptions: @Composable () -> RequestOptions = {
     LocalGlideProvider.getGlideRequestOptions()
   },
-  requestListener: (() -> RequestListener<Drawable>)? = null,
+  requestListener: (() -> RequestListener<Any>)? = null,
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
   onImageStateChanged: (GlideImageState) -> Unit = {},
@@ -155,6 +157,7 @@ public fun GlideImage(
  *
  * @param imageModel The data model to request image. See [RequestBuilder.load] for types allowed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param glideRequestType Glide image request type, which decides the result of image data.
  * @param requestBuilder Most options in Glide can be applied directly on the RequestBuilder object returned by Glide.with().
  * @param requestOptions Provides type independent options to customize loads with Glide.
  * @param requestListener A class for monitoring the status of a request while images load.
@@ -170,13 +173,14 @@ public fun GlideImage(
 public fun GlideImage(
   imageModel: () -> Any?,
   modifier: Modifier = Modifier,
-  requestBuilder: @Composable () -> RequestBuilder<Drawable> = {
+  glideRequestType: GlideRequestType = GlideRequestType.DRAWABLE,
+  requestBuilder: @Composable () -> RequestBuilder<*> = {
     LocalGlideProvider.getGlideRequestBuilder()
   },
   requestOptions: @Composable () -> RequestOptions = {
     LocalGlideProvider.getGlideRequestOptions()
   },
-  requestListener: (() -> RequestListener<Drawable>)? = null,
+  requestListener: (() -> RequestListener<Any>)? = null,
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
   onImageStateChanged: (GlideImageState) -> Unit = {},
@@ -209,12 +213,17 @@ public fun GlideImage(
     builder = StableHolder(
       requestBuilder.invoke()
         .apply(requestOptions.invoke())
-        .load(imageModel.invoke())
+        .load(imageModel.invoke()) as RequestBuilder<Any>
     ),
+    glideRequestType = glideRequestType,
     requestListener = StableHolder(requestListener?.invoke()),
     modifier = modifier
   ) ImageRequest@{ imageState ->
-    when (val glideImageState = imageState.toGlideImageState().apply { internalState = this }) {
+    when (
+      val glideImageState = imageState.toGlideImageState(
+        glideRequestType = glideRequestType
+      ).apply { internalState = this }
+    ) {
       is GlideImageState.None -> Unit
       is GlideImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
@@ -236,18 +245,27 @@ public fun GlideImage(
           modifier = modifier,
           imageModel = imageModel,
           imageOptions = imageOptions,
-          imageBitmap = glideImageState.drawable?.toBitmap()?.asImageBitmap()
+          imageBitmap = glideImageState.data.toImageBitmap(
+            glideRequestType = glideRequestType
+          )
         )
         if (success != null) {
           success.invoke(this, glideImageState)
         } else {
-          val drawable = glideImageState.drawable ?: return@ImageRequest
+          val data = glideImageState.data ?: return@ImageRequest
           imageOptions.LandscapistImage(
             modifier = Modifier.fillMaxSize(),
-            painter = rememberDrawablePainter(
-              drawable = drawable,
-              imagePlugins = component.imagePlugins
-            )
+            painter = if (data is Drawable) {
+              rememberDrawablePainter(
+                drawable = data,
+                imagePlugins = component.imagePlugins
+              )
+            } else {
+              rememberBitmapPainter(
+                imageBitmap = data.toImageBitmap(glideRequestType = glideRequestType),
+                imagePlugins = component.imagePlugins
+              )
+            }
           )
         }
       }
@@ -278,8 +296,10 @@ public fun GlideImage(
  * }
  * ```
  *
- * @param builder The request to execute.
+ * @param recomposeKey request to execute image loading asynchronously.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param glideRequestType Glide image request type, which decides the result of image data.
+ * @param builder The request to execute.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param content Content to be displayed for the given state.
  */
@@ -287,8 +307,9 @@ public fun GlideImage(
 private fun GlideImage(
   recomposeKey: StableHolder<Any?>,
   modifier: Modifier = Modifier,
-  builder: StableHolder<RequestBuilder<Drawable>>,
-  requestListener: StableHolder<RequestListener<Drawable>?> = StableHolder(null),
+  glideRequestType: GlideRequestType,
+  builder: StableHolder<RequestBuilder<Any>>,
+  requestListener: StableHolder<RequestListener<Any>?> = StableHolder(null),
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
   val requestManager = LocalGlideProvider.getGlideRequestManager()
@@ -303,12 +324,13 @@ private fun GlideImage(
         }
 
         // start the image request into the target.
-        requestManager
-          .load(recomposeKey.value)
-          .apply(builder.value)
-          .addListener(flowRequestListener)
-          .addListener(requestListener.value)
-          .into(target)
+        requestManager.buildRequestBuilder(
+          glideRequestType = glideRequestType,
+          recomposeKey = recomposeKey,
+          flowRequestListener = flowRequestListener,
+          requestListener = requestListener,
+          builder = builder
+        ).into(target)
 
         awaitClose {
           // intentionally do not clear using the Glide.clear for recycling internal bitmaps.
@@ -318,4 +340,30 @@ private fun GlideImage(
     modifier = modifier,
     content = content
   )
+}
+
+private fun RequestManager.buildRequestBuilder(
+  glideRequestType: GlideRequestType,
+  recomposeKey: StableHolder<Any?>,
+  flowRequestListener: FlowRequestListener,
+  builder: StableHolder<RequestBuilder<Any>>,
+  requestListener: StableHolder<RequestListener<Any>?> = StableHolder(null)
+): RequestBuilder<Any> {
+  return when (glideRequestType) {
+    GlideRequestType.DRAWABLE -> asDrawable()
+      .load(recomposeKey.value)
+      .apply(builder.value)
+      .addListener(flowRequestListener as RequestListener<Drawable>)
+      .addListener(requestListener.value as RequestListener<Drawable>?)
+    GlideRequestType.GIF -> asGif()
+      .load(recomposeKey.value)
+      .apply(builder.value)
+      .addListener(flowRequestListener as RequestListener<GifDrawable>)
+      .addListener(requestListener.value as RequestListener<GifDrawable>?)
+    GlideRequestType.BITMAP -> asBitmap()
+      .load(recomposeKey.value)
+      .apply(builder.value)
+      .addListener(flowRequestListener as RequestListener<Bitmap>)
+      .addListener(requestListener.value as RequestListener<Bitmap>?)
+  } as RequestBuilder<Any>
 }

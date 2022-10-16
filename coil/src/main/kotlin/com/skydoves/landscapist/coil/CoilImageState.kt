@@ -18,6 +18,8 @@ package com.skydoves.landscapist.coil
 import android.graphics.drawable.Drawable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.graphics.drawable.toBitmap
 import com.skydoves.landscapist.DataSource
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageState
@@ -36,7 +38,13 @@ public sealed class CoilImageState : ImageState {
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
   @Immutable
-  public data class Success(val drawable: Drawable?, val dataSource: DataSource) : CoilImageState()
+  public data class Success(val drawable: Drawable?, val dataSource: DataSource) :
+    CoilImageState() {
+
+    /** Get [ImageBitmap] from the succeed image [drawable]. */
+    public val imageBitmap: ImageBitmap?
+      get() = drawable?.toBitmap()?.asImageBitmap()
+  }
 
   /** Request failed. */
   @Immutable

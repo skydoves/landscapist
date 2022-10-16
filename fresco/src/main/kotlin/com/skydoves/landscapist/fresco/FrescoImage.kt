@@ -179,6 +179,7 @@ public fun FrescoImage(
  * }
  * ```
  *
+ * @param recomposeKey request to execute image loading asynchronously.
  * @param imageRequest The pipeline has to know about requested image to proceed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param content Content to be displayed for the given state.
