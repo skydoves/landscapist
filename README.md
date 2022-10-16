@@ -705,7 +705,7 @@ dependencies {
 
 ### BlurTransformationPlugin
 
-You can give implement the blur effect with `BlurTransformationPlugin` as the following:
+You can implement the blur effect with `BlurTransformationPlugin` as the following:
 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage also can be used.
