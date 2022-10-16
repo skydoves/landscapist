@@ -43,11 +43,7 @@ if(CMAKE_SYSTEM_PROCESSOR STREQUAL armv7-a)
     set(ASM_SOURCES
         Blend_neon.S
         Blur_neon.S
-        ColorMatrix_neon.S
-        Convolve_neon.S
-        Lut3d_neon.S
-        Resize_neon.S
-        YuvToRgb_neon.S)
+        Resize_neon.S)
 endif()
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64)
@@ -55,11 +51,7 @@ if(CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64)
     set(ASM_SOURCES
         Blend_advsimd.S
         Blur_advsimd.S
-        ColorMatrix_advsimd.S
-        Convolve_advsimd.S
-        Lut3d_advsimd.S
-        Resize_advsimd.S
-        YuvToRgb_advsimd.S)
+        Resize_advsimd.S)
 endif()
 # TODO add also for x86
 
@@ -75,18 +67,12 @@ add_library(# Sets the name of the library.
             # Provides a relative path to your source file(s).
             Blend.cpp
             Blur.cpp
-            ColorMatrix.cpp
-            Convolve3x3.cpp
-            Convolve5x5.cpp
             Histogram.cpp
             JniEntryPoints.cpp
-            Lut.cpp
-            Lut3d.cpp
             RenderScriptToolkit.cpp
             Resize.cpp
             TaskProcessor.cpp
             Utils.cpp
-            YuvToRgb.cpp
             ${ASM_SOURCES})
 
 # Searches for a specified prebuilt library and stores the path as a
