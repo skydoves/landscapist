@@ -48,7 +48,7 @@ repositories {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.0.2-SNAPSHOT"
+    implementation "com.github.skydoves:landscapist-glide:2.0.3-SNAPSHOT"
 }
 ```
 </details>
@@ -72,11 +72,11 @@ allprojects {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.0.1"
+    implementation "com.github.skydoves:landscapist-glide:2.0.2"
 }
 ```
 
-> **Note**: `Landscapist-Glide` includes version `4.13.2` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
+> **Note**: `Landscapist-Glide` includes version `4.14.2` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### GlideImage
 You can load images simply by using `GlideImage` composable function as the following example below:
@@ -662,8 +662,6 @@ You can implement the crossfade animation while drawing images with `CrossfadePl
 ```kotlin
 GlideImage(
   imageModel = { poster.image },
-  modifier = Modifier
-    .aspectRatio(0.8f),
   component = rememberImageComponent {
     +CrossfadePlugin(
       duration = 550
@@ -680,8 +678,6 @@ You can implement the circular reveal animation while drawing images with `Circu
 ```kotlin
 GlideImage(
   imageModel = { poster.image },
-  modifier = Modifier
-    .aspectRatio(0.8f),
   component = rememberImageComponent {
     +CircularRevealPlugin(
       duration = 350
@@ -691,6 +687,34 @@ GlideImage(
 ```
 
  > **Note**: You can also use the Circular Reveal animation for **`CoilImage`** and **`FrescoImage`**.
+
+<img src="https://user-images.githubusercontent.com/24237865/196038507-54a3a79c-2e8e-45ec-b5e8-5de65cd50248.png" align="right" width="250"/>
+
+ ## Transformation
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+
+The `landscapist-transformation` package provides useful image transformation plugins, such as the blur effect.
+To use transformation supports, add the dependency below:
+
+```groovy
+dependencies {
+    implementation "com.github.skydoves:landscapist-transformation:$version"
+}
+```
+
+### BlurTransformationPlugin
+
+You can give implement the blur effect with `BlurTransformationPlugin` as the following:
+
+```kotlin
+GlideImage( // CoilImage, FrescoImage also can be used.
+  imageModel = { poster.image },
+  component = rememberImageComponent {
+      +BlurTransformationPlugin(radius = 10)
+  }
+)
+```
 
 ## Palette
 
@@ -714,8 +738,6 @@ var palette by remember { mutableStateOf<Palette?>(null) }
 
 GlideImage( // CoilImage, FrescoImage also can be used.
   imageModel = { poster.image },
-  modifier = Modifier
-    .aspectRatio(0.8f),
   component = rememberImageComponent {
       +PalettePlugin { palette = it }
   }
@@ -742,8 +764,6 @@ var palette by remember { mutableStateOf<Palette?>(null) }
 
 GlideImage( // CoilImage, FrescoImage also can be used.
   imageModel = { poster.image },
-  modifier = Modifier
-    .aspectRatio(0.8f),
   component = rememberImageComponent {
     +PalettePlugin(
       imageModel = poster.image,
