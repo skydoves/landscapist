@@ -15,6 +15,7 @@
  */
 package com.skydoves.landscapist.transformation.blur
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
@@ -35,7 +36,16 @@ internal fun Painter.rememberBlurPainter(
   imageBitmap: ImageBitmap,
   radius: Int
 ): Painter {
-  val androidBitmap = imageBitmap.asAndroidBitmap()
+  var androidBitmap = imageBitmap.asAndroidBitmap()
+
+  if (!(
+    androidBitmap.config == Bitmap.Config.ARGB_8888 ||
+      androidBitmap.config == Bitmap.Config.ALPHA_8
+    )
+  ) {
+    androidBitmap = androidBitmap.copy(Bitmap.Config.ARGB_8888, false)
+  }
+
   val blurredBitmap = remember(imageBitmap, radius) {
     RenderScriptToolkit.blur(
       inputBitmap = androidBitmap,
