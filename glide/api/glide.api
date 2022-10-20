@@ -71,6 +71,6 @@ public final class com/skydoves/landscapist/glide/LocalGlideProviderKt {
 }
 
 public final class com/skydoves/landscapist/glide/RememberGlideImageStateKt {
-	public static final fun rememberGlideImageState (Lcom/skydoves/landscapist/glide/GlideImageState;Ljava/lang/Object;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/glide/GlideImageState;
+	public static final fun rememberGlideImageState (Lcom/skydoves/landscapist/glide/GlideImageState;Ljava/lang/Object;Landroidx/compose/runtime/Composer;II)Landroidx/compose/runtime/MutableState;
 }
 
