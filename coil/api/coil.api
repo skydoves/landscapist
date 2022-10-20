@@ -62,6 +62,6 @@ public final class com/skydoves/landscapist/coil/LocalCoilProviderKt {
 }
 
 public final class com/skydoves/landscapist/coil/RememberCoilImageStateKt {
-	public static final fun rememberCoilImageState (Lcom/skydoves/landscapist/coil/CoilImageState;Ljava/lang/Object;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/coil/CoilImageState;
+	public static final fun rememberCoilImageState (Lcom/skydoves/landscapist/coil/CoilImageState;Ljava/lang/Object;Landroidx/compose/runtime/Composer;II)Landroidx/compose/runtime/MutableState;
 }
 

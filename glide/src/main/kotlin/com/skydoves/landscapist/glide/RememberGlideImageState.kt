@@ -16,6 +16,8 @@
 package com.skydoves.landscapist.glide
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 
 /**
@@ -27,5 +29,5 @@ import androidx.compose.runtime.remember
 @Composable
 public fun rememberGlideImageState(
   initialState: GlideImageState = GlideImageState.None,
-  key: Any?
-): GlideImageState = remember(key1 = key) { initialState }
+  key: Any? = null
+): MutableState<GlideImageState> = remember(key1 = key) { mutableStateOf(initialState) }
