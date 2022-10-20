@@ -16,6 +16,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3.5.1
         with:
+          distribution: adopt
           java-version: 11
       - name: spotless
         run: ./gradlew spotlessCheck
@@ -29,6 +30,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3.5.1
         with:
+          distribution: adopt
           java-version: 11
       - name: API check
         run: ./gradlew apiCheck
@@ -41,6 +43,7 @@ jobs:
       - name: set up JDK
         uses: actions/setup-java@v3.5.1
         with:
+          distribution: adopt
           java-version: 11
 
       - name: Cache Gradle and wrapper
