@@ -48,7 +48,7 @@ repositories {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.0.4-SNAPSHOT"
+    implementation "com.github.skydoves:landscapist-glide:2.1.1-SNAPSHOT"
 }
 ```
 </details>
@@ -72,7 +72,7 @@ allprojects {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.0.3"
+    implementation "com.github.skydoves:landscapist-glide:2.1.0"
 }
 ```
 
@@ -345,20 +345,19 @@ FrescoImage(
 ```
 
 ### LocalFrescoImageRequest
-You can pass the same instance of your `ImageRequest` down through the Composition in your composable hierarchy as following the example below:
+You can pass the same instance of your `imageRequestBuilder` down through the Composition in your composable hierarchy as following the example below:
 
 ```kotlin
 // customize the ImageRequest as needed
-val imageRequest = ImageRequestBuilder
+val imageRequestBuilder = ImageRequestBuilder
   .newBuilderWithSource(uri)
   .setImageDecodeOptions(decodeOptions)
   .setLocalThumbnailPreviewsEnabled(true)
   .setLowestPermittedRequestLevel(RequestLevel.FULL_FETCH)
   .setProgressiveRenderingEnabled(false)
   .setResizeOptions(ResizeOptions(width, height))
-  .build()
 
-CompositionLocalProvider(LocalFrescoImageRequest provides imageRequest) {
+CompositionLocalProvider(LocalFrescoImageRequest provides imageRequestBuilder) {
   // This will automatically use the value of current ImageRequest in the hierarchy.
   FrescoImage(
     imageUrl = ...
@@ -412,6 +411,17 @@ GlideImage(
       colorFilter = null,
       alpha = 1f
     )
+)
+```
+
+### RequestSize
+
+You can set the request size of your image by giving `requestSize` property as seen in the below:
+
+```kotlin
+GlideImage(
+  ..
+  imageOptions = ImageOptions(requestSize = IntSize(800, 600)),
 )
 ```
 
@@ -782,6 +792,27 @@ GlideImage( // CoilImage, FrescoImage also can be used.
 )
 ```
  > **Note**: You can also use the Palette for **`CoilImage`** and **`FrescoImage`**.
+
+ ## BOM
+
+ [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+
+ The landscapist Bill of Materials (BOM) lets you manage all of your landscapist library versions by specifying only the BOM’s version.
+
+ ```groovy
+dependencies {
+    // Import the landscapist BOM
+    implementation platform("com.github.skydoves:landscapist-bom:$version")
+
+    // Import landscapist libraries
+    implementation "com.github.skydoves:landscapist-glide" // fresco or coil
+    implementation "com.github.skydoves:landscapist-placeholder"
+    implementation "com.github.skydoves:landscapist-palette"
+    implementation "com.github.skydoves:landscapist-transformation"
+}
+ ```
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
 
 ## Who's using Landscapist?
 If your project uses Landscapist, please let me know by creating a new issue! 🤗
