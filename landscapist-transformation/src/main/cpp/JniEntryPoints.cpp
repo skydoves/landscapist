@@ -212,32 +212,6 @@ Java_com_skydoves_landscapist_transformation_RenderScriptToolkit_destroyNative(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_skydoves_landscapist_transformation_RenderScriptToolkit_nativeBlend(
-        JNIEnv *env, jobject /*thiz*/, jlong native_handle, jint jmode, jbyteArray source_array,
-        jbyteArray dest_array, jint size_x, jint size_y, jobject restriction) {
-    auto toolkit = reinterpret_cast<RenderScriptToolkit *>(native_handle);
-    auto mode = static_cast<RenderScriptToolkit::BlendingMode>(jmode);
-    RestrictionParameter restrict{env, restriction};
-    ByteArrayGuard source{env, source_array};
-    ByteArrayGuard dest{env, dest_array};
-
-    toolkit->blend(mode, source.get(), dest.get(), size_x, size_y, restrict.get());
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_skydoves_landscapist_transformation_RenderScriptToolkit_nativeBlendBitmap(
-        JNIEnv *env, jobject /*thiz*/, jlong native_handle, jint jmode, jobject source_bitmap,
-        jobject dest_bitmap, jobject restriction) {
-    auto toolkit = reinterpret_cast<RenderScriptToolkit *>(native_handle);
-    auto mode = static_cast<RenderScriptToolkit::BlendingMode>(jmode);
-    RestrictionParameter restrict{env, restriction};
-    BitmapGuard source{env, source_bitmap};
-    BitmapGuard dest{env, dest_bitmap};
-
-    toolkit->blend(mode, source.get(), dest.get(), source.width(), source.height(), restrict.get());
-}
-
-extern "C" JNIEXPORT void JNICALL
 Java_com_skydoves_landscapist_transformation_RenderScriptToolkit_nativeBlur(
         JNIEnv *env, jobject /*thiz*/, jlong native_handle, jbyteArray input_array, jint vectorSize,
         jint size_x, jint size_y, jint radius, jbyteArray output_array, jobject restriction) {
@@ -260,61 +234,6 @@ Java_com_skydoves_landscapist_transformation_RenderScriptToolkit_nativeBlurBitma
 
     toolkit->blur(input.get(), output.get(), input.width(), input.height(), input.vectorSize(),
                   radius, restrict.get());
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_skydoves_landscapist_transformation_RenderScriptToolkit_nativeHistogram(
-        JNIEnv *env, jobject /*thiz*/, jlong native_handle, jbyteArray input_array,
-        jint vector_size, jint size_x, jint size_y, jintArray output_array, jobject restriction) {
-    RenderScriptToolkit *toolkit = reinterpret_cast<RenderScriptToolkit *>(native_handle);
-    RestrictionParameter restrict{env, restriction};
-    ByteArrayGuard input{env, input_array};
-    IntArrayGuard output{env, output_array};
-
-    toolkit->histogram(input.get(), output.get(), size_x, size_y, vector_size, restrict.get());
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_skydoves_landscapist_transformation_RenderScriptToolkit_nativeHistogramBitmap(
-        JNIEnv *env, jobject /*thiz*/, jlong native_handle, jobject input_bitmap,
-        jintArray output_array, jobject restriction) {
-    RenderScriptToolkit *toolkit = reinterpret_cast<RenderScriptToolkit *>(native_handle);
-    RestrictionParameter restrict{env, restriction};
-    BitmapGuard input{env, input_bitmap};
-    IntArrayGuard output{env, output_array};
-
-    toolkit->histogram(input.get(), output.get(), input.width(), input.height(), input.vectorSize(),
-                       restrict.get());
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_skydoves_landscapist_transformation_RenderScriptToolkit_nativeHistogramDot(
-        JNIEnv *env, jobject /*thiz*/, jlong native_handle, jbyteArray input_array,
-        jint vector_size, jint size_x, jint size_y, jintArray output_array,
-        jfloatArray coefficients, jobject restriction) {
-    RenderScriptToolkit *toolkit = reinterpret_cast<RenderScriptToolkit *>(native_handle);
-    RestrictionParameter restrict{env, restriction};
-    ByteArrayGuard input{env, input_array};
-    IntArrayGuard output{env, output_array};
-    FloatArrayGuard coeffs{env, coefficients};
-
-    toolkit->histogramDot(input.get(), output.get(), size_x, size_y, vector_size, coeffs.get(),
-                          restrict.get());
-}
-
-extern "C" JNIEXPORT
-void JNICALL
-Java_com_skydoves_landscapist_transformation_RenderScriptToolkit_nativeHistogramDotBitmap(
-        JNIEnv *env, jobject /*thiz*/, jlong native_handle, jobject input_bitmap,
-        jintArray output_array, jfloatArray coefficients, jobject restriction) {
-    RenderScriptToolkit *toolkit = reinterpret_cast<RenderScriptToolkit *>(native_handle);
-    RestrictionParameter restrict{env, restriction};
-    BitmapGuard input{env, input_bitmap};
-    IntArrayGuard output{env, output_array};
-    FloatArrayGuard coeffs{env, coefficients};
-
-    toolkit->histogramDot(input.get(), output.get(), input.width(), input.height(),
-                          input.vectorSize(), coeffs.get(), restrict.get());
 }
 
 extern "C" JNIEXPORT void JNICALL
