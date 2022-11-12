@@ -802,7 +802,7 @@ GlideImage( // CoilImage, FrescoImage also can be used.
  ```groovy
 dependencies {
     // Import the landscapist BOM
-    implementation platform("com.github.skydoves:landscapist-bom:$version")
+    implementation "com.github.skydoves:landscapist-bom:$version"
 
     // Import landscapist libraries
     implementation "com.github.skydoves:landscapist-glide" // fresco or coil
