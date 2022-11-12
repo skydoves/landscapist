@@ -28,6 +28,7 @@ import com.skydoves.landscapist.components.imageComponent
 import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import com.skydoves.landscapist.transformation.blur.BlurTransformationPlugin
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +43,7 @@ class MainActivity : ComponentActivity() {
           highlightColor = Color.Transparent
         )
         +CrossfadePlugin()
+        +BlurTransformationPlugin()
         +PalettePlugin()
       }
 
