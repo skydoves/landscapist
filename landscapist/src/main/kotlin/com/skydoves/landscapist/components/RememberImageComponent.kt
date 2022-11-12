@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
  * @param block The receiver of an instance of [ImagePluginComponent].
  */
 @Composable
+@LandscapistImagePluginComponentDSL
 public fun rememberImageComponent(
   block: @Composable ImagePluginComponent.() -> Unit
 ): ImagePluginComponent {
