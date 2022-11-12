@@ -16,6 +16,7 @@
 package com.skydoves.landscapist.glide
 
 import android.graphics.drawable.Drawable
+import androidx.compose.ui.unit.IntSize
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
@@ -27,8 +28,12 @@ import kotlinx.coroutines.channels.trySendBlocking
  * FlowCustomTarget is a [CustomTarget] for receiving Glide image results from network and handle states.
  */
 internal class FlowCustomTarget constructor(
+  requestSize: IntSize,
   private val producerScope: ProducerScope<ImageLoadState>
-) : CustomTarget<Any>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+) : CustomTarget<Any>(
+  requestSize.width.takeIf { it > 0 } ?: Target.SIZE_ORIGINAL,
+  requestSize.height.takeIf { it > 0 } ?: Target.SIZE_ORIGINAL
+) {
 
   private var failException: Throwable? = null
 
