@@ -16,7 +16,6 @@
 package com.skydoves.landscapist.fresco
 
 import android.graphics.Bitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
 import com.facebook.drawee.backends.pipeline.info.ImageOrigin
@@ -39,7 +38,7 @@ internal class FlowBaseBitmapDataSubscriber : BaseBitmapReferenceDataSubscriber(
 
   override fun onNewResultImpl(bitmapReference: CloseableReference<Bitmap>?) {
     this.internalStateFlow.value = ImageLoadState.Success(
-      data = bitmapReference?.get()?.asImageBitmap(),
+      data = bitmapReference?.cloneOrNull(),
       dataSource = imageOrigin.toDataSource()
     )
   }

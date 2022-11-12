@@ -47,7 +47,7 @@ public final class com/skydoves/landscapist/fresco/FrescoImageState$Success : co
 }
 
 public final class com/skydoves/landscapist/fresco/FrescoImageStateKt {
-	public static final fun toFrescoImageState (Lcom/skydoves/landscapist/ImageLoadState;)Lcom/skydoves/landscapist/fresco/FrescoImageState;
+	public static final fun toFrescoImageState (Lcom/skydoves/landscapist/ImageLoadState;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/fresco/FrescoImageState;
 }
 
 public final class com/skydoves/landscapist/fresco/LocalFrescoProviderKt {

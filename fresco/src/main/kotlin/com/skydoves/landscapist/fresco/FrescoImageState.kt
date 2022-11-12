@@ -15,8 +15,11 @@
  */
 package com.skydoves.landscapist.fresco
 
+import android.graphics.Bitmap
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
 import com.facebook.imagepipeline.image.CloseableImage
@@ -53,14 +56,21 @@ public sealed class FrescoImageState : ImageState {
 
 /** casts an [ImageLoadState] type to a [FrescoImageState]. */
 @Suppress("UNCHECKED_CAST")
+@Composable
 public fun ImageLoadState.toFrescoImageState(): FrescoImageState {
   return when (this) {
     is ImageLoadState.None -> FrescoImageState.None
     is ImageLoadState.Loading -> FrescoImageState.Loading
-    is ImageLoadState.Success -> FrescoImageState.Success(
-      imageBitmap = data as? ImageBitmap,
-      dataSource = dataSource
-    )
+    is ImageLoadState.Success -> {
+      val bitmapRef = data as? CloseableReference<Bitmap>
+      val imageBitmap = if (bitmapRef != null) {
+        rememberCloseableRef(bitmapRef).asImageBitmap()
+      } else null
+      FrescoImageState.Success(
+        imageBitmap = imageBitmap,
+        dataSource = dataSource
+      )
+    }
     is ImageLoadState.Failure -> FrescoImageState.Failure(
       dataSource = data as? DataSource<CloseableReference<CloseableImage>>,
       reason = reason
