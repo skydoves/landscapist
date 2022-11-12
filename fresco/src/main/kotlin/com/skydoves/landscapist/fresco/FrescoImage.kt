@@ -22,7 +22,6 @@ package com.skydoves.landscapist.fresco
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -149,7 +148,7 @@ public fun FrescoImage(
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           imageOptions.LandscapistImage(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier,
             painter = rememberBitmapPainter(
               imagePlugins = component.imagePlugins,
               imageBitmap = imageBitmap

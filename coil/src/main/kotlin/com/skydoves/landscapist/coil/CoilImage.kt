@@ -25,7 +25,6 @@ import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -300,7 +299,7 @@ public fun CoilImage(
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
           imageOptions.LandscapistImage(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier,
             painter = rememberDrawablePainter(
               drawable = drawable,
               imagePlugins = component.imagePlugins

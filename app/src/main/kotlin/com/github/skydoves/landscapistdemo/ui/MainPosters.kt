@@ -163,7 +163,7 @@ private fun SelectedPoster(
   GlideImage(
     imageModel = { poster.gif },
     modifier = Modifier
-      .height(500.dp)
+      .fillMaxSize()
       .padding(8.dp)
       .clip(RoundedCornerShape(8.dp)),
     previewPlaceholder = R.drawable.poster
