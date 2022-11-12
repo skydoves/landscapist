@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -163,7 +164,7 @@ private fun SelectedPoster(
   GlideImage(
     imageModel = { poster.gif },
     modifier = Modifier
-      .height(500.dp)
+      .fillMaxWidth()
       .padding(8.dp)
       .clip(RoundedCornerShape(8.dp)),
     previewPlaceholder = R.drawable.poster

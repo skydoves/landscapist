@@ -25,7 +25,6 @@ import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +41,7 @@ import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.ImageResult
+import coil.size.Precision
 import com.skydoves.landscapist.DataSource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
@@ -268,6 +268,7 @@ public fun CoilImage(
   CoilImage(
     recomposeKey = StableHolder(imageRequest.invoke()),
     imageLoader = StableHolder(imageLoader.invoke()),
+    imageOptions = imageOptions,
     modifier = modifier
   ) ImageRequest@{ imageState ->
     when (val coilImageState = imageState.toCoilImageState().apply { internalState = this }) {
@@ -300,7 +301,7 @@ public fun CoilImage(
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
           imageOptions.LandscapistImage(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier,
             painter = rememberDrawablePainter(
               drawable = drawable,
               imagePlugins = component.imagePlugins
@@ -334,6 +335,7 @@ public fun CoilImage(
  *
  * @param recomposeKey The request to execute.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param imageLoader The [ImageLoader] to use when requesting the image.
  * @param content Content to be displayed for the given state.
  */
@@ -341,6 +343,7 @@ public fun CoilImage(
 private fun CoilImage(
   recomposeKey: StableHolder<ImageRequest>,
   modifier: Modifier = Modifier,
+  imageOptions: ImageOptions,
   imageLoader: StableHolder<ImageLoader> = StableHolder(LocalCoilProvider.getCoilImageLoader()),
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
@@ -350,11 +353,16 @@ private fun CoilImage(
     recomposeKey = recomposeKey.value,
     executeImageRequest = {
       channelFlow {
-        recomposeKey.value.newBuilder(context).target(
+        val request = recomposeKey.value.newBuilder(context).apply {
+          if (imageOptions.isValidSize) {
+            size(imageOptions.requestSize.width, imageOptions.requestSize.height)
+            precision(Precision.EXACT)
+          }
+        }.target(
           onStart = { trySendBlocking(ImageLoadState.Loading) }
         ).build()
 
-        val result = imageLoader.value.execute(recomposeKey.value).toResult()
+        val result = imageLoader.value.execute(request).toResult()
         send(result)
       }
     },

@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.IntSize
 
 /**
  * Represents parameters to load generic [Image] Composable.
@@ -32,6 +33,7 @@ import androidx.compose.ui.layout.ContentScale
  * used for the loaded [ImageBitmap].
  * @property colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @property alpha The alpha parameter used to apply for the image when it is rendered onscreen.
+ * @property requestSize The [IntSize] that will be used to request remote images.
  */
 @Immutable
 public data class ImageOptions(
@@ -39,5 +41,14 @@ public data class ImageOptions(
   public val contentDescription: String? = null,
   public val contentScale: ContentScale = ContentScale.Crop,
   public val colorFilter: ColorFilter? = null,
-  public val alpha: Float = DefaultAlpha
-)
+  public val alpha: Float = DefaultAlpha,
+  public val requestSize: IntSize = IntSize(DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE)
+) {
+  /** Returns true if the [requestSize] is valid. */
+  public val isValidSize: Boolean
+    inline get() = requestSize.width > 0 && requestSize.height > 0
+
+  private companion object {
+    const val DEFAULT_IMAGE_SIZE: Int = -1
+  }
+}

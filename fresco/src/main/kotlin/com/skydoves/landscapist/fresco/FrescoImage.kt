@@ -22,7 +22,6 @@ package com.skydoves.landscapist.fresco
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,7 +34,8 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.drawee.backends.pipeline.info.ImageOriginRequestListener
-import com.facebook.imagepipeline.request.ImageRequest
+import com.facebook.imagepipeline.common.ResizeOptions
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
@@ -85,7 +85,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 public fun FrescoImage(
   imageUrl: String?,
   modifier: Modifier = Modifier,
-  imageRequest: @Composable () -> ImageRequest = {
+  imageRequest: @Composable () -> ImageRequestBuilder = {
     LocalFrescoProvider.getFrescoImageRequest(imageUrl)
   },
   component: ImageComponent = rememberImageComponent {},
@@ -117,6 +117,7 @@ public fun FrescoImage(
 
   FrescoImage(
     recomposeKey = imageUrl,
+    imageOptions = imageOptions,
     imageRequest = StableHolder(imageRequest.invoke()),
     modifier = modifier
   ) ImageRequest@{ imageState ->
@@ -149,7 +150,7 @@ public fun FrescoImage(
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           imageOptions.LandscapistImage(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier,
             painter = rememberBitmapPainter(
               imagePlugins = component.imagePlugins,
               imageBitmap = imageBitmap
@@ -180,6 +181,7 @@ public fun FrescoImage(
  * ```
  *
  * @param recomposeKey request to execute image loading asynchronously.
+ * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param imageRequest The pipeline has to know about requested image to proceed.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param content Content to be displayed for the given state.
@@ -187,7 +189,8 @@ public fun FrescoImage(
 @Composable
 private fun FrescoImage(
   recomposeKey: String?,
-  imageRequest: StableHolder<ImageRequest>,
+  imageOptions: ImageOptions,
+  imageRequest: StableHolder<ImageRequestBuilder>,
   modifier: Modifier = Modifier,
   content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
 ) {
@@ -199,14 +202,18 @@ private fun FrescoImage(
   }
 
   val context = LocalContext.current
-  val datasource =
-    remember(recomposeKey) {
-      imagePipeline.fetchDecodedImage(
-        imageRequest.value,
-        context,
-        imageOriginRequestListener
-      )
-    }
+  val datasource = remember(recomposeKey) {
+    imagePipeline.fetchDecodedImage(
+      imageRequest.value.apply {
+        if (imageOptions.isValidSize) {
+          resizeOptions =
+            ResizeOptions(imageOptions.requestSize.width, imageOptions.requestSize.height)
+        }
+      }.build(),
+      context,
+      imageOriginRequestListener
+    )
+  }
 
   ImageLoad(
     recomposeKey = recomposeKey,

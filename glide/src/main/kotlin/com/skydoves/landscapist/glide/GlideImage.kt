@@ -24,7 +24,6 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -210,6 +209,7 @@ public fun GlideImage(
 
   GlideImage(
     recomposeKey = StableHolder(imageModel.invoke()),
+    imageOptions = imageOptions,
     builder = StableHolder(
       requestBuilder.invoke()
         .apply(requestOptions.invoke())
@@ -254,7 +254,7 @@ public fun GlideImage(
         } else {
           val data = glideImageState.data ?: return@ImageRequest
           imageOptions.LandscapistImage(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier,
             painter = if (data is Drawable) {
               rememberDrawablePainter(
                 drawable = data,
@@ -298,6 +298,7 @@ public fun GlideImage(
  *
  * @param recomposeKey request to execute image loading asynchronously.
  * @param modifier [Modifier] used to adjust the layout or drawing content.
+ * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param glideRequestType Glide image request type, which decides the result of image data.
  * @param builder The request to execute.
  * @param requestListener A class for monitoring the status of a request while images load.
@@ -307,6 +308,7 @@ public fun GlideImage(
 private fun GlideImage(
   recomposeKey: StableHolder<Any?>,
   modifier: Modifier = Modifier,
+  imageOptions: ImageOptions,
   glideRequestType: GlideRequestType,
   builder: StableHolder<RequestBuilder<Any>>,
   requestListener: StableHolder<RequestListener<Any>?> = StableHolder(null),
@@ -318,7 +320,7 @@ private fun GlideImage(
     recomposeKey = recomposeKey.value,
     executeImageRequest = {
       callbackFlow {
-        val target = FlowCustomTarget(this)
+        val target = FlowCustomTarget(requestSize = imageOptions.requestSize, producerScope = this)
         val flowRequestListener = FlowRequestListener(this) {
           target.updateFailException(it)
         }
