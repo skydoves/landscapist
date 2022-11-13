@@ -25,10 +25,11 @@ Landscapist hits **+300,000 downloads every month** around the globe! 🚀
 
 ## Demo projects
 You can see the use cases of this library in the repositories below:
-- [google/modernstorage](https://github.com/google/modernstorage/tree/e62cda539ca75884dd49df3bcf8629751f0a91e6/sample) - ModernStorage is a group of libraries that provide an abstraction layer over storage on Android to simplify its interactions.
-- [android/storage-samples](https://github.com/android/storage-samples/tree/main/ScopedStorage) - Multiple samples showing the best practices in storage APIs on Android.
-- [skydoves/DisneyCompose](https://github.com/skydoves/disneycompose) - 🧸 A demo Disney app using Jetpack Compose and Hilt based on modern Android tech-stacks and MVVM architecture.
-- [skydoves/MovieCompose](https://github.com/skydoves/MovieCompose) - 🎞 A demo movie app using Jetpack Compose and Hilt based on modern Android tech stacks. <br>
+- [google/modernstorage](https://github.com/google/modernstorage/tree/e62cda539ca75884dd49df3bcf8629751f0a91e6/sample): ModernStorage is a group of libraries that provide an abstraction layer over storage on Android to simplify its interactions.
+- [GetStream/WhatsApp-Clone-Compose](https://github.com/getStream/whatsApp-clone-compose): 📱 WhatsApp clone project demonstrates modern Android development built with Jetpack Compose and Stream Chat SDK for Compose.
+- [android/storage-samples](https://github.com/android/storage-samples/tree/main/ScopedStorage): Multiple samples showing the best practices in storage APIs on Android.
+- [skydoves/DisneyCompose](https://github.com/skydoves/disneycompose): 🧸 A demo Disney app using Jetpack Compose and Hilt based on modern Android tech-stacks and MVVM architecture.
+- [skydoves/MovieCompose](https://github.com/skydoves/MovieCompose): 🎞 A demo movie app using Jetpack Compose and Hilt based on modern Android tech stacks. <br>
 
 ## SNAPSHOT
 <details>
