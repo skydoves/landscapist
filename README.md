@@ -31,7 +31,19 @@ You can see the use cases of this library in the repositories below:
 - [skydoves/DisneyCompose](https://github.com/skydoves/disneycompose): 🧸 A demo Disney app using Jetpack Compose and Hilt based on modern Android tech-stacks and MVVM architecture.
 - [skydoves/MovieCompose](https://github.com/skydoves/MovieCompose): 🎞 A demo movie app using Jetpack Compose and Hilt based on modern Android tech stacks. <br>
 
+## Why Landscapist?
+
+Landscapist is built with a lot of consideration to improve the performance of image loadings in Jetpack Compose. Most composable functions of Landscapist are **Restartable** and **Skippable** according to the Compose compiler metrics, which fairly improves recomposition performance. Also, the library perfornace was improved with [Baseline Profiles](https://android-developers.googleblog.com/2022/01/improving-app-performance-with-baseline.html). 
+
+<details>
+ <summary>See the Compose compiler metrics for Landscapist</summary>
+ 
+![metrics](https://user-images.githubusercontent.com/24237865/201906004-f4490bdf-7af9-4ad6-b586-7dcc6f07d0c8.png)
+
+</details>
+
 ## SNAPSHOT
+
 <details>
  <summary>See how to import the snapshot</summary>
 
