@@ -825,8 +825,6 @@ dependencies {
 }
  ```
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
-
 ## Who's using Landscapist?
 If your project uses Landscapist, please let me know by creating a new issue! 🤗
 
