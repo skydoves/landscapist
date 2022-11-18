@@ -25,7 +25,7 @@ Landscapist hits **+300,000 downloads every month** around the globe! 🚀
 
 ## Why Landscapist?
 
-Landscapist is built with a lot of consideration to improve the performance of image loadings in Jetpack Compose. Most composable functions of Landscapist are **Restartable** and **Skippable** according to the Compose compiler metrics, which fairly improves recomposition performance. Also, the library performance was improved with [Baseline Profiles](https://android-developers.googleblog.com/2022/01/improving-app-performance-with-baseline.html). 
+Landscapist is built with a lot of consideration to improve the performance of image loadings in Jetpack Compose. Most composable functions of Landscapist are Restartable and Skippable, which indicates fairly improved recomposition performance according to the Compose compiler metrics. Also, the library performance was improved with [Baseline Profiles](https://android-developers.googleblog.com/2022/01/improving-app-performance-with-baseline.html). 
 
 <details>
  <summary>See the Compose compiler metrics for Landscapist</summary>
