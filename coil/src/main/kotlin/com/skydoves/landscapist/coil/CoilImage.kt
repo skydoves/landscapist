@@ -56,11 +56,11 @@ import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
-import java.io.File
-import java.nio.ByteBuffer
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.channelFlow
 import okhttp3.HttpUrl
+import java.io.File
+import java.nio.ByteBuffer
 
 /**
  * Load and render an image with the given [imageModel] from the network or local storage.
@@ -181,17 +181,19 @@ public fun CoilImage(
   success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
 ) {
-  if (LocalInspectionMode.current && previewPlaceholder != 0) with(imageOptions) {
-    Image(
-      modifier = modifier,
-      painter = painterResource(id = previewPlaceholder),
-      alignment = alignment,
-      contentScale = contentScale,
-      alpha = alpha,
-      colorFilter = colorFilter,
-      contentDescription = contentDescription
-    )
-    return
+  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+    with(imageOptions) {
+      Image(
+        modifier = modifier,
+        painter = painterResource(id = previewPlaceholder),
+        alignment = alignment,
+        contentScale = contentScale,
+        alpha = alpha,
+        colorFilter = colorFilter,
+        contentDescription = contentDescription
+      )
+      return
+    }
   }
 
   var internalState: CoilImageState by remember { mutableStateOf(CoilImageState.None) }

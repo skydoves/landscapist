@@ -30,7 +30,6 @@ class SpotlessConventionPlugin : Plugin<Project> {
           targetExclude("**/build/**/*.kt")
           ktlint()
             .setUseExperimental(true)
-            .userData(mapOf("android" to "true"))
             .editorConfigOverride(mapOf("indent_size" to 2, "continuation_indent_size" to 2))
           licenseHeaderFile(rootProject.file("$rootDir/spotless/copyright.kt"))
         }

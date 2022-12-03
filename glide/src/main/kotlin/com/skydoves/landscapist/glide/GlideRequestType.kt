@@ -26,7 +26,7 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 public enum class GlideRequestType {
   DRAWABLE,
   BITMAP,
-  GIF,
+  GIF
 }
 
 internal fun Any?.toImageBitmap(glideRequestType: GlideRequestType): ImageBitmap {

@@ -65,7 +65,9 @@ public fun ImageLoadState.toFrescoImageState(): FrescoImageState {
       val bitmapRef = data as? CloseableReference<Bitmap>
       val imageBitmap = if (bitmapRef != null) {
         rememberCloseableRef(bitmapRef).asImageBitmap()
-      } else null
+      } else {
+        null
+      }
       FrescoImageState.Success(
         imageBitmap = imageBitmap,
         dataSource = dataSource

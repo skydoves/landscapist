@@ -96,17 +96,19 @@ public fun FrescoImage(
   success: @Composable (BoxScope.(imageState: FrescoImageState.Success) -> Unit)? = null,
   failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null
 ) {
-  if (LocalInspectionMode.current && previewPlaceholder != 0) with(imageOptions) {
-    Image(
-      modifier = modifier,
-      painter = painterResource(id = previewPlaceholder),
-      alignment = alignment,
-      contentScale = contentScale,
-      alpha = alpha,
-      colorFilter = colorFilter,
-      contentDescription = contentDescription
-    )
-    return
+  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+    with(imageOptions) {
+      Image(
+        modifier = modifier,
+        painter = painterResource(id = previewPlaceholder),
+        alignment = alignment,
+        contentScale = contentScale,
+        alpha = alpha,
+        colorFilter = colorFilter,
+        contentDescription = contentDescription
+      )
+      return
+    }
   }
 
   var internalState: FrescoImageState by remember { mutableStateOf(FrescoImageState.None) }
