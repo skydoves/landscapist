@@ -739,6 +739,8 @@ GlideImage( // CoilImage, FrescoImage also can be used.
 )
 ```
 
+>**Note**: Landscapist's blur transformation falls back onto a CPU-based implementation to support older API levels. So you don't need to worry about API compatibilities and performance issues.
+
 ## Palette
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
