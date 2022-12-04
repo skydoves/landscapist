@@ -34,5 +34,5 @@ public enum class DataSource {
   /**
    * Represents an unknown data source.
    */
-  UNKNOWN,
+  UNKNOWN
 }

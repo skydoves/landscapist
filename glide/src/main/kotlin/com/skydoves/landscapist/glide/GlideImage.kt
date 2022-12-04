@@ -116,17 +116,19 @@ public fun GlideImage(
   success: @Composable (BoxScope.(imageState: GlideImageState.Success) -> Unit)? = null,
   failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null
 ) {
-  if (LocalInspectionMode.current && previewPlaceholder != 0) with(imageOptions) {
-    Image(
-      modifier = modifier,
-      painter = painterResource(id = previewPlaceholder),
-      alignment = alignment,
-      contentScale = contentScale,
-      alpha = alpha,
-      colorFilter = colorFilter,
-      contentDescription = contentDescription
-    )
-    return
+  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+    with(imageOptions) {
+      Image(
+        modifier = modifier,
+        painter = painterResource(id = previewPlaceholder),
+        alignment = alignment,
+        contentScale = contentScale,
+        alpha = alpha,
+        colorFilter = colorFilter,
+        contentDescription = contentDescription
+      )
+      return
+    }
   }
 
   var internalState: GlideImageState by remember { mutableStateOf(GlideImageState.None) }

@@ -37,15 +37,15 @@ import coil.fetch.Fetcher
 import coil.request.ImageRequest
 import coil.request.Options
 import com.skydoves.landscapist.ImageOptions
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)

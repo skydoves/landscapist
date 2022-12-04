@@ -359,7 +359,7 @@ internal class LookupTable {
  */
 internal enum class YuvFormat(val value: Int) {
   NV21(0x11),
-  YV12(0x32315659),
+  YV12(0x32315659)
 }
 
 /**
