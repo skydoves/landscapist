@@ -8,6 +8,7 @@ public final class com/skydoves/landscapist/animation/circular/CircularRevealIma
 }
 
 public final class com/skydoves/landscapist/animation/circular/CircularRevealPlugin : com/skydoves/landscapist/plugins/ImagePlugin$PainterPlugin {
+	public static final field $stable I
 	public fun <init> ()V
 	public fun <init> (ILcom/skydoves/landscapist/animation/circular/CircularRevealFinishListener;)V
 	public synthetic fun <init> (ILcom/skydoves/landscapist/animation/circular/CircularRevealFinishListener;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -24,6 +25,7 @@ public final class com/skydoves/landscapist/animation/circular/CircularRevealPlu
 }
 
 public final class com/skydoves/landscapist/animation/crossfade/CrossfadePlugin : com/skydoves/landscapist/plugins/ImagePlugin$PainterPlugin {
+	public static final field $stable I
 	public fun <init> ()V
 	public fun <init> (I)V
 	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V

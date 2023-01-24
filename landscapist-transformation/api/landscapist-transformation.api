@@ -1,4 +1,5 @@
 public final class com/skydoves/landscapist/transformation/blur/BlurTransformationPlugin : com/skydoves/landscapist/plugins/ImagePlugin$PainterPlugin {
+	public static final field $stable I
 	public fun <init> ()V
 	public fun <init> (I)V
 	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V

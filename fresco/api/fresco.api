@@ -10,9 +10,11 @@ public final class com/skydoves/landscapist/fresco/FrescoImage {
 }
 
 public abstract class com/skydoves/landscapist/fresco/FrescoImageState : com/skydoves/landscapist/ImageState {
+	public static final field $stable I
 }
 
 public final class com/skydoves/landscapist/fresco/FrescoImageState$Failure : com/skydoves/landscapist/fresco/FrescoImageState {
+	public static final field $stable I
 	public fun <init> (Lcom/facebook/datasource/DataSource;Ljava/lang/Throwable;)V
 	public final fun component1 ()Lcom/facebook/datasource/DataSource;
 	public final fun component2 ()Ljava/lang/Throwable;
@@ -26,14 +28,17 @@ public final class com/skydoves/landscapist/fresco/FrescoImageState$Failure : co
 }
 
 public final class com/skydoves/landscapist/fresco/FrescoImageState$Loading : com/skydoves/landscapist/fresco/FrescoImageState {
+	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/fresco/FrescoImageState$Loading;
 }
 
 public final class com/skydoves/landscapist/fresco/FrescoImageState$None : com/skydoves/landscapist/fresco/FrescoImageState {
+	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/fresco/FrescoImageState$None;
 }
 
 public final class com/skydoves/landscapist/fresco/FrescoImageState$Success : com/skydoves/landscapist/fresco/FrescoImageState {
+	public static final field $stable I
 	public fun <init> (Landroidx/compose/ui/graphics/ImageBitmap;Lcom/skydoves/landscapist/DataSource;)V
 	public final fun component1 ()Landroidx/compose/ui/graphics/ImageBitmap;
 	public final fun component2 ()Lcom/skydoves/landscapist/DataSource;
