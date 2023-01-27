@@ -25,6 +25,7 @@ plugins {
 
 android {
   compileSdk = Configuration.compileSdk
+
   defaultConfig {
     minSdk = 23
     targetSdk = Configuration.targetSdk
@@ -34,6 +35,21 @@ android {
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+  }
+
+  testOptions {
+    managedDevices {
+      devices {
+        maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel2api31").apply {
+          // Use device profiles you typically see in Android Studio.
+          device = "Pixel 2"
+          // Use only API levels 27 and higher.
+          apiLevel = 31
+          // To include Google services, use "google".
+          systemImageSource = "aosp"
+        }
+      }
+    }
   }
 
   kotlinOptions {
