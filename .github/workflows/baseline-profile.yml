@@ -69,6 +69,11 @@ jobs:
         run: |
           mv -f benchmark-landscapist/build/outputs/managed_device_android_test_additional_output/pixel2Api31/BaselineProfileGenerator_startup-baseline-prof.txt app/src/main/baseline-prof.txt
 
+      # Run bash for baseline profile
+      - name: Run Bash for Baseline Profile Amender
+        run: |
+          ./bash/baseline-profile-amender.sh
+
       # Create Pull Request
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
