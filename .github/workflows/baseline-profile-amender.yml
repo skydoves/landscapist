@@ -1,4 +1,4 @@
-name: Run Bash for Baseline Profile Amender
+name: Bash for Baseline Profile Amender
 
 on:
   workflow_dispatch:
