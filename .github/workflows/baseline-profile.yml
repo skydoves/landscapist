@@ -54,7 +54,7 @@ jobs:
       # This allows us to build most of what we need without the emulator running
       # and using resources
       - name: Build app and benchmark
-        run: ./gradlew :benchmark:assembleBenchmark :app:assembleBenchmark
+        run: ./gradlew :benchmark-landscapist:assembleBenchmark :benchmark-landscapist-app:assembleBenchmark
 
       # Cleans managed device if previously settle and space currently is not available
       - name: Clean Managed Devices
@@ -62,7 +62,7 @@ jobs:
 
       # Generates Baseline Profile
       - name: Generate Baseline Profile
-        run: ./gradlew :benchmark:pixel2Api31BenchmarkAndroidTest -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules=BaselineProfile -Dorg.gradle.workers.max=4
+        run: ./gradlew :benchmark-landscapist:pixel2Api31BenchmarkAndroidTest -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules=BaselineProfile -Dorg.gradle.workers.max=4
 
       # Sets the Baseline Profile on its proper place so it gets correctly bundled into Play Store
       - name: Move & Rename Baseline Profiles
