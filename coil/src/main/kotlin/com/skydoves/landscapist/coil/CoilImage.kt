@@ -26,10 +26,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -196,19 +193,17 @@ public fun CoilImage(
     }
   }
 
-  var internalState: CoilImageState by remember { mutableStateOf(CoilImageState.None) }
-
-  LaunchedEffect(key1 = internalState) {
-    onImageStateChanged.invoke(internalState)
-  }
-
   CoilImage(
     recomposeKey = StableHolder(imageRequest.invoke()),
     imageLoader = StableHolder(imageLoader.invoke()),
     imageOptions = imageOptions,
     modifier = modifier
   ) ImageRequest@{ imageState ->
-    when (val coilImageState = imageState.toCoilImageState().apply { internalState = this }) {
+    when (
+      val coilImageState = imageState.toCoilImageState().apply {
+        onImageStateChanged.invoke(this)
+      }
+    ) {
       is CoilImageState.None -> Unit
       is CoilImageState.Loading -> {
         component.ComposeLoadingStatePlugins(

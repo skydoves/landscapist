@@ -23,9 +23,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -111,19 +109,17 @@ public fun FrescoImage(
     }
   }
 
-  var internalState: FrescoImageState by remember { mutableStateOf(FrescoImageState.None) }
-
-  LaunchedEffect(key1 = internalState) {
-    onImageStateChanged.invoke(internalState)
-  }
-
   FrescoImage(
     recomposeKey = imageUrl,
     imageOptions = imageOptions,
     imageRequest = StableHolder(imageRequest.invoke()),
     modifier = modifier
   ) ImageRequest@{ imageState ->
-    when (val frescoImageState = imageState.toFrescoImageState().apply { internalState = this }) {
+    when (
+      val frescoImageState = imageState.toFrescoImageState().apply {
+        onImageStateChanged.invoke(this)
+      }
+    ) {
       is FrescoImageState.None -> Unit
       is FrescoImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
