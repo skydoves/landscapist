@@ -25,10 +25,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -131,12 +128,6 @@ public fun GlideImage(
     }
   }
 
-  var internalState: GlideImageState by remember { mutableStateOf(GlideImageState.None) }
-
-  LaunchedEffect(key1 = internalState) {
-    onImageStateChanged.invoke(internalState)
-  }
-
   GlideImage(
     recomposeKey = StableHolder(imageModel.invoke()),
     imageOptions = imageOptions,
@@ -152,7 +143,7 @@ public fun GlideImage(
     when (
       val glideImageState = imageState.toGlideImageState(
         glideRequestType = glideRequestType
-      ).apply { internalState = this }
+      ).apply { onImageStateChanged.invoke(this) }
     ) {
       is GlideImageState.None -> Unit
       is GlideImageState.Loading -> {
