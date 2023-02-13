@@ -12,6 +12,9 @@ If your product uses landscapist, welcome to contribute by creating a pull reque
 
 [![Azar](https://user-images.githubusercontent.com/24237865/155271118-2bbd5087-58b3-4360-a545-8fe4fc42efc8.jpg)](https://play.google.com/store/apps/details?id=com.azarlive.android)
 
+## [Hakuna: Live Streams and Chat](https://play.google.com/store/apps/details?id=com.movefastcompany.bora)
+<img src="https://user-images.githubusercontent.com/24237865/218469230-64747182-cda3-443c-b90f-b43728d63ffa.png" width="17%" />
+
 ## [Faire for Android](https://play.google.com/store/apps/details?id=com.faire.retailer&hl=en_CA&gl=US)
 
 [![Faire](https://user-images.githubusercontent.com/24237865/158280614-2740e38d-ca47-49f8-a493-3eb98d7e6b27.png)](https://play.google.com/store/apps/details?id=com.faire.retailer&hl=en_CA&gl=US)
