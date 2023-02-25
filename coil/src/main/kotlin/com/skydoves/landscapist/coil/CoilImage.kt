@@ -25,9 +25,10 @@ import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -233,7 +234,9 @@ public fun CoilImage(
         } else {
           val drawable = coilImageState.drawable ?: return@ImageRequest
           imageOptions.LandscapistImage(
-            modifier = modifier,
+            modifier = Modifier
+              .widthIn(min = minWidth, max = maxWidth)
+              .heightIn(min = minHeight, max = maxHeight),
             painter = rememberDrawablePainter(
               drawable = drawable,
               imagePlugins = component.imagePlugins
@@ -277,7 +280,7 @@ private fun CoilImage(
   modifier: Modifier = Modifier,
   imageOptions: ImageOptions,
   imageLoader: StableHolder<ImageLoader> = StableHolder(LocalCoilProvider.getCoilImageLoader()),
-  content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
+  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
 

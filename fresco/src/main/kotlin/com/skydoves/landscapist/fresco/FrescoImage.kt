@@ -22,6 +22,9 @@ package com.skydoves.landscapist.fresco
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -148,7 +151,9 @@ public fun FrescoImage(
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           imageOptions.LandscapistImage(
-            modifier = modifier,
+            modifier = Modifier
+              .widthIn(min = minWidth, max = maxWidth)
+              .heightIn(min = minHeight, max = maxHeight),
             painter = rememberBitmapPainter(
               imagePlugins = component.imagePlugins,
               imageBitmap = imageBitmap
@@ -190,7 +195,7 @@ private fun FrescoImage(
   imageOptions: ImageOptions,
   imageRequest: StableHolder<ImageRequestBuilder>,
   modifier: Modifier = Modifier,
-  content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
+  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
 ) {
   val subscriber = remember(recomposeKey) { FlowBaseBitmapDataSubscriber() }
   val imageOriginRequestListener = ImageOriginRequestListener(
