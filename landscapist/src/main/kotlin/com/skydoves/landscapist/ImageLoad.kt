@@ -18,8 +18,8 @@
 
 package com.skydoves.landscapist
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,7 +49,7 @@ public fun <T : Any> ImageLoad(
   recomposeKey: T?,
   executeImageRequest: suspend () -> Flow<ImageLoadState>,
   modifier: Modifier = Modifier,
-  content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
+  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
 ) {
   var state by remember(recomposeKey) { mutableStateOf<ImageLoadState>(ImageLoadState.None) }
   LaunchedEffect(recomposeKey) {
@@ -59,7 +59,7 @@ public fun <T : Any> ImageLoad(
       state = it
     }
   }
-  Box(modifier) {
+  BoxWithConstraints(modifier) {
     content(state)
   }
 }

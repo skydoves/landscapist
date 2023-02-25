@@ -24,6 +24,9 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -175,7 +178,9 @@ public fun GlideImage(
         } else {
           val data = glideImageState.data ?: return@ImageRequest
           imageOptions.LandscapistImage(
-            modifier = modifier,
+            modifier = Modifier
+              .widthIn(min = minWidth, max = maxWidth)
+              .heightIn(min = minHeight, max = maxHeight),
             painter = if (data is Drawable) {
               rememberDrawablePainter(
                 drawable = data,
@@ -233,7 +238,7 @@ private fun GlideImage(
   glideRequestType: GlideRequestType,
   builder: StableHolder<RequestBuilder<Any>>,
   requestListener: StableHolder<RequestListener<Any>?> = StableHolder(null),
-  content: @Composable BoxScope.(imageState: ImageLoadState) -> Unit
+  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
 ) {
   val requestManager = LocalGlideProvider.getGlideRequestManager()
 
