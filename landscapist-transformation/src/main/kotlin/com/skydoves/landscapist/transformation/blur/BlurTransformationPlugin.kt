@@ -25,7 +25,7 @@ import com.skydoves.landscapist.plugins.ImagePlugin
  * BlurTransformationPlugin adds blur transformation effect while rendering an image.
  * An image plugin that extends [ImagePlugin.PainterPlugin] to be executed while rendering painters.
  *
- * @property radius The radius of the pixels used to blur, a value from 1 to 25. Default is 10.
+ * @property radius The radius of the pixels used to blur, a value from 0 to infinite. Default is 10.
  */
 @Immutable
 public data class BlurTransformationPlugin(
