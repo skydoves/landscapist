@@ -71,7 +71,7 @@ dependencies {
   <h1>Glide</h1>
 </div>
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
 
 Add the codes below to your **root** `build.gradle` file (not your module-level build.gradle file):
 ```gradle
@@ -191,7 +191,7 @@ CompositionLocalProvider(LocalGlideRequestOptions provides requestOptions) {
   <h1>Coil</h1>
 </div>
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
 Add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
@@ -290,7 +290,7 @@ CoilImage(
   <h1>Fresco</h1>
 </div>
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
 
 Add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
@@ -381,7 +381,7 @@ CompositionLocalProvider(LocalFrescoImageRequest provides imageRequestBuilder) {
 <img src="https://user-images.githubusercontent.com/24237865/131246748-b88903a1-43de-4e6c-9069-3e956a0cf8a6.gif" align="right" width="32%"/>
 
 ## Fresco Animated Image Support (GIF, Webp)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
 
 Add the below dependency to your **module**'s `build.gradle` file.
 
@@ -607,7 +607,7 @@ CompositionLocalProvider(LocalImageComponent provides component) {
 
 ## Placeholder
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
 
 The `landscapist-placeholder` package provides useful image plugins, such as loading & failure placeholder supports and shimmering animation.
 To use placeholder supports, add the dependency below:
@@ -660,7 +660,7 @@ GlideImage(
 
 ## Animation
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
 
 The `landscapist-animation` package provides useful image plugins related to animations, such as crossfade and circular reveal animation.
 To use animation supports, add the dependency below:
@@ -713,7 +713,7 @@ GlideImage(
 
  ## Transformation
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
 
 <img src="https://user-images.githubusercontent.com/24237865/196038507-54a3a79c-2e8e-45ec-b5e8-5de65cd50248.png" align="right" width="250"/>
 
@@ -743,7 +743,7 @@ GlideImage( // CoilImage, FrescoImage also can be used.
 
 ## Palette
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
 
 The `landscapist-palette` package provides useful image plugins related to palette, such as extracting primary color sets.
 To use palette supports, add the dependency below:
@@ -810,7 +810,7 @@ GlideImage( // CoilImage, FrescoImage also can be used.
 
  ## BOM
 
- [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://search.maven.org/search?q=landscapist)<br>
+ [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
 
  The landscapist Bill of Materials (BOM) lets you manage all of your landscapist library versions by specifying only the BOM’s version.
 
