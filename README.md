@@ -61,7 +61,7 @@ repositories {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.1.3-SNAPSHOT"
+    implementation "com.github.skydoves:landscapist-glide:2.1.5-SNAPSHOT"
 }
 ```
 </details>
@@ -85,7 +85,7 @@ allprojects {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.1.3"
+    implementation "com.github.skydoves:landscapist-glide:2.1.4"
 }
 ```
 
@@ -195,7 +195,7 @@ CompositionLocalProvider(LocalGlideRequestOptions provides requestOptions) {
 Add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-coil:<version>"
+    implementation "com.github.skydoves:landscapist-coil:$version"
 }
 ```
 
@@ -295,7 +295,7 @@ CoilImage(
 Add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-fresco:<version>"
+    implementation "com.github.skydoves:landscapist-fresco:$version"
 }
 ```
 > **Note**: `Landscapist-Fresco` includes version `2.6.0` of Fresco. So please make sure your project is using the same Fresco version or exclude the Fresco dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
@@ -387,7 +387,7 @@ Add the below dependency to your **module**'s `build.gradle` file.
 
 ```gradle
 dependencies {
-  implementation "com.github.skydoves:landscapist-fresco-websupport:<version>"
+  implementation "com.github.skydoves:landscapist-fresco-websupport:$version"
 }
 ```
 
@@ -734,7 +734,7 @@ You can implement the blur effect with `BlurTransformationPlugin` as the followi
 GlideImage( // CoilImage, FrescoImage also can be used.
   imageModel = { poster.image },
   component = rememberImageComponent {
-      +BlurTransformationPlugin(radius = 10)
+      +BlurTransformationPlugin(radius = 10) // between 0 to Int.MAX_VALUE.
   }
 )
 ```
