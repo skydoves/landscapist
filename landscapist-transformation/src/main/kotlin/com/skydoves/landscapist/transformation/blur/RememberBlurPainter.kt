@@ -47,16 +47,32 @@ internal fun Painter.rememberBlurPainter(
   }
 
   val blurredBitmap = remember(imageBitmap, radius) {
-    RenderScriptToolkit.blur(
-      inputBitmap = androidBitmap,
-      radius = radius
-    )
+    iterativeBlur(androidBitmap, radius)
   }
-
   return remember(this) {
     TransformationPainter(
       imageBitmap = blurredBitmap.asImageBitmap(),
       painter = this
     )
   }
+}
+
+private fun iterativeBlur(
+  androidBitmap: Bitmap,
+  radius: Int
+): Bitmap {
+  val iterate = (radius + 1) / 25
+  var bitmap: Bitmap = RenderScriptToolkit.blur(
+    inputBitmap = androidBitmap,
+    radius = (radius + 1) % 25
+  )
+
+  for (i in 0 until iterate) {
+    bitmap = RenderScriptToolkit.blur(
+      inputBitmap = bitmap,
+      radius = 25
+    )
+  }
+
+  return bitmap
 }
