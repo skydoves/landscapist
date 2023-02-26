@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-🍂 Landscapist is a Jetpack Compose image loading solution that fetches and displays network images with <a href="https://github.com/bumptech/glide" target="_blank"> Glide</a>, <a href="https://github.com/coil-kt/coil" target="_blank"> Coil</a>, and <a href="https://github.com/facebook/fresco" target="_blank"> Fresco.</a> This library supports tracing image loading states, composing custom implementations, and some useful animations, such as crossfades, blur transformation, and circular reveals. Also, with image plugins, you can configure and attach image loading behaviors more easily and fast.
+🌻 Landscapist is a highly optimized, pluggable Jetpack Compose image loading solution that fetches and displays network images with <a href="https://github.com/bumptech/glide" target="_blank"> Glide</a>, <a href="https://github.com/coil-kt/coil" target="_blank"> Coil</a>, and <a href="https://github.com/facebook/fresco" target="_blank"> Fresco.</a> This library supports tracing image loading states, composing custom implementations, and some valuable animations, such as crossfades, blur transformation, and circular reveals. You can also configure and attach image-loading behaviors easily and fast with pluggable image plugins.
 </p>
 
 ## Who's using Landscapist?
