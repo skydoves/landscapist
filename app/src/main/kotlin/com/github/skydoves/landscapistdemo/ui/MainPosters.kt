@@ -55,13 +55,13 @@ import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.palette.rememberPaletteState
-import com.skydoves.landscapist.transformation.blur.BlurTransformationPlugin
 
 @Composable
 fun DisneyPosters(
@@ -132,7 +132,7 @@ private fun SelectedPoster(
     imageModel = { poster.image },
     modifier = Modifier.aspectRatio(0.8f),
     component = rememberImageComponent {
-      +BlurTransformationPlugin(radius = 500)
+      +CircularRevealPlugin()
       +PalettePlugin { palette = it }
     },
     previewPlaceholder = R.drawable.poster

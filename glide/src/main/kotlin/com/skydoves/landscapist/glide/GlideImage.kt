@@ -28,11 +28,16 @@ import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.gif.GifDrawable
@@ -241,33 +246,41 @@ private fun GlideImage(
   content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
 ) {
   val requestManager = LocalGlideProvider.getGlideRequestManager()
+  var target: FlowCustomTarget? by remember(recomposeKey) { mutableStateOf(null) }
 
   ImageLoad(
     recomposeKey = recomposeKey.value,
     executeImageRequest = {
       callbackFlow {
-        val target = FlowCustomTarget(requestSize = imageOptions.requestSize, producerScope = this)
-        val flowRequestListener = FlowRequestListener(this) {
-          target.updateFailException(it)
-        }
+        target =
+          FlowCustomTarget(requestSize = imageOptions.requestSize, producerScope = this).apply {
+            val flowRequestListener = FlowRequestListener(this@callbackFlow) {
+              updateFailException(it)
+            }
 
-        // start the image request into the target.
-        requestManager.buildRequestBuilder(
-          glideRequestType = glideRequestType,
-          recomposeKey = recomposeKey,
-          flowRequestListener = flowRequestListener,
-          requestListener = requestListener,
-          builder = builder
-        ).into(target)
+            // start the image request into the target.
+            requestManager.buildRequestBuilder(
+              glideRequestType = glideRequestType,
+              recomposeKey = recomposeKey,
+              flowRequestListener = flowRequestListener,
+              requestListener = requestListener,
+              builder = builder
+            ).into(this)
 
-        awaitClose {
-          // intentionally do not clear using the Glide.clear for recycling internal bitmaps.
-        }
+            awaitClose {
+              // intentionally do not clear using the Glide.clear for recycling internal bitmaps.
+            }
+          }
       }
     },
     modifier = modifier,
     content = content
   )
+
+  val context = LocalContext.current
+  DisposableEffect(key1 = recomposeKey) {
+    onDispose { target?.let { Glide.with(context).clear(it) } }
+  }
 }
 
 private fun RequestManager.buildRequestBuilder(
