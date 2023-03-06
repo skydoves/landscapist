@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -234,8 +233,4 @@ private fun FrescoImage(
     modifier = modifier,
     content = content
   )
-
-  DisposableEffect(key1 = recomposeKey) {
-    onDispose { subscriber.clearBitmapResource() }
-  }
 }
