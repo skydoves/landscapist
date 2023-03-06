@@ -36,11 +36,7 @@ internal class FlowBaseBitmapDataSubscriber : BaseBitmapReferenceDataSubscriber(
 
   private var imageOrigin: Int = ImageOrigin.UNKNOWN
 
-  private var successBitmapReference: CloseableReference<Bitmap>? = null
-  private var failureBitmapReference: DataSource<CloseableReference<CloseableImage>>? = null
-
   override fun onNewResultImpl(bitmapReference: CloseableReference<Bitmap>?) {
-    this.successBitmapReference = bitmapReference
     this.internalStateFlow.value = ImageLoadState.Success(
       data = bitmapReference?.cloneOrNull(),
       dataSource = imageOrigin.toDataSource()
@@ -48,7 +44,6 @@ internal class FlowBaseBitmapDataSubscriber : BaseBitmapReferenceDataSubscriber(
   }
 
   override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
-    this.failureBitmapReference = dataSource
     this.internalStateFlow.value = ImageLoadState.Failure(
       data = dataSource,
       reason = dataSource.failureCause
@@ -61,11 +56,6 @@ internal class FlowBaseBitmapDataSubscriber : BaseBitmapReferenceDataSubscriber(
     if (internalStateFlow.value == ImageLoadState.None) {
       this.internalStateFlow.value = ImageLoadState.Loading
     }
-  }
-
-  fun clearBitmapResource() {
-    successBitmapReference?.close()
-    failureBitmapReference?.close()
   }
 
   fun updateImageOrigin(imageOrigin: Int) {
