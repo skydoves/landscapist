@@ -301,6 +301,7 @@ private fun CoilImage(
         send(result)
       }
     },
+    imageOptions = imageOptions,
     modifier = modifier,
     content = content
   )

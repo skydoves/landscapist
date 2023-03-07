@@ -265,6 +265,7 @@ private fun GlideImage(
         }
       }
     },
+    imageOptions = imageOptions,
     modifier = modifier,
     content = content
   )

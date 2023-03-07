@@ -49,6 +49,7 @@ public fun <T : Any> ImageLoad(
   recomposeKey: T?,
   executeImageRequest: suspend () -> Flow<ImageLoadState>,
   modifier: Modifier = Modifier,
+  imageOptions: ImageOptions,
   content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
 ) {
   var state by remember(recomposeKey) { mutableStateOf<ImageLoadState>(ImageLoadState.None) }
@@ -59,7 +60,9 @@ public fun <T : Any> ImageLoad(
       state = it
     }
   }
-  BoxWithConstraints(modifier) {
+  BoxWithConstraints(
+    modifier = modifier.imageSemantics(imageOptions)
+  ) {
     content(state)
   }
 }
