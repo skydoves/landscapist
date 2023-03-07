@@ -230,6 +230,7 @@ private fun FrescoImage(
         }
       }
     },
+    imageOptions = imageOptions,
     modifier = modifier,
     content = content
   )
