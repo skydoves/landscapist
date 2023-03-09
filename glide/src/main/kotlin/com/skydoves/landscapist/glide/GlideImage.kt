@@ -261,7 +261,7 @@ private fun GlideImage(
         ).into(target)
 
         awaitClose {
-          requestManager.clear(target)
+          // intentionally do not clear using the Glide.clear for recycling internal bitmaps.
         }
       }
     },
