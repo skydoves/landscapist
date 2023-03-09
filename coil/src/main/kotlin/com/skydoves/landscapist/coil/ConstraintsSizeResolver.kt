@@ -15,7 +15,6 @@
  */
 package com.skydoves.landscapist.coil
 
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Constraints
 import coil.size.Dimension
 import coil.size.SizeResolver
@@ -30,24 +29,17 @@ internal class ConstraintsSizeResolver : Constrainable, SizeResolver {
 
   private val _constraints = MutableStateFlow(ZeroConstraints)
 
-  override suspend fun size() = _constraints.mapNotNull(Constraints::toSizeOrNull).first()
+  override suspend fun size() = _constraints.mapNotNull(Constraints::inferredCoilSize).first()
 
   override fun setConstraints(constraints: Constraints) {
     _constraints.value = constraints
   }
 }
 
-@Stable
-private fun Constraints.toSizeOrNull() = when {
+private fun Constraints.inferredCoilSize(): CoilSize? = when {
   isZero -> null
   else -> CoilSize(
     width = if (hasBoundedWidth) Dimension(maxWidth) else Dimension.Undefined,
     height = if (hasBoundedHeight) Dimension(maxHeight) else Dimension.Undefined
   )
-}
-
-internal fun SizeResolver.setConstraints(constraints: Constraints) {
-  if (this is ConstraintsSizeResolver) {
-    setConstraints(constraints)
-  }
 }

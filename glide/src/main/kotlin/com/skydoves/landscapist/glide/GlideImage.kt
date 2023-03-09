@@ -26,6 +26,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
@@ -236,12 +237,16 @@ private fun GlideImage(
   content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
 ) {
   val requestManager = LocalGlideProvider.getGlideRequestManager()
+  val target =
+    remember(recomposeKey, imageOptions) { FlowCustomTarget(imageOptions = imageOptions) }
 
   ImageLoad(
     recomposeKey = recomposeKey.value,
+    constrainable = target,
     executeImageRequest = {
       callbackFlow {
-        val target = FlowCustomTarget(requestSize = imageOptions.requestSize, producerScope = this)
+        target.setProducerScope(this)
+
         val flowRequestListener = FlowRequestListener(this) {
           target.updateFailException(it)
         }
