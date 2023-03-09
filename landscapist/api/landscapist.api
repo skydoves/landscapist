@@ -144,6 +144,10 @@ public final class com/skydoves/landscapist/components/RememberImageComponentKt 
 	public static final fun rememberImageComponent (Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/components/ImagePluginComponent;
 }
 
+public final class com/skydoves/landscapist/modifiers/ConstraintsKt {
+	public static final fun constraint (Landroidx/compose/ui/Modifier;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;)Landroidx/compose/ui/Modifier;
+}
+
 public abstract interface class com/skydoves/landscapist/plugins/ImagePlugin {
 }
 

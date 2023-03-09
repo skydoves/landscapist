@@ -23,8 +23,6 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -48,6 +46,7 @@ import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
 import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
+import com.skydoves.landscapist.modifiers.constraint
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberBitmapPainter
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -151,9 +150,7 @@ public fun FrescoImage(
         } else {
           val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           imageOptions.LandscapistImage(
-            modifier = Modifier
-              .widthIn(min = minWidth, max = maxWidth)
-              .heightIn(min = minHeight, max = maxHeight),
+            modifier = Modifier.constraint(this),
             painter = rememberBitmapPainter(
               imagePlugins = component.imagePlugins,
               imageBitmap = imageBitmap
