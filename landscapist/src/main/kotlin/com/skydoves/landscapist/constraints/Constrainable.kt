@@ -15,9 +15,15 @@
  */
 package com.skydoves.landscapist.constraints
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Constraints
 import com.skydoves.landscapist.InternalLandscapistApi
 
+/**
+ * Constrainable represents an object can be constrained with the given [Constraints] value
+ * to restrict a composable layout size.
+ */
+@Stable
 @InternalLandscapistApi
 public interface Constrainable {
 
