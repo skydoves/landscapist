@@ -19,20 +19,35 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Constraints
 import coil.size.Dimension
 import coil.size.SizeResolver
+import com.skydoves.landscapist.ZeroConstraints
+import com.skydoves.landscapist.constraints.Constrainable
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import coil.size.Size as CoilSize
 
-internal class ConstraintsSizeResolver constructor(
-  private val constraints: Constraints
-) : SizeResolver {
+internal class ConstraintsSizeResolver : Constrainable, SizeResolver {
 
-  override suspend fun size(): coil.size.Size = constraints.toSizeCoilSize()
+  private val _constraints = MutableStateFlow(ZeroConstraints)
+
+  override suspend fun size() = _constraints.mapNotNull(Constraints::toSizeOrNull).first()
+
+  override fun setConstraints(constraints: Constraints) {
+    _constraints.value = constraints
+  }
 }
 
 @Stable
-private fun Constraints.toSizeCoilSize() = when {
-  isZero -> coil.size.Size.ORIGINAL
+private fun Constraints.toSizeOrNull() = when {
+  isZero -> null
   else -> CoilSize(
     width = if (hasBoundedWidth) Dimension(maxWidth) else Dimension.Undefined,
     height = if (hasBoundedHeight) Dimension(maxHeight) else Dimension.Undefined
   )
+}
+
+internal fun SizeResolver.setConstraints(constraints: Constraints) {
+  if (this is ConstraintsSizeResolver) {
+    setConstraints(constraints)
+  }
 }
