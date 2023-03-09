@@ -13,23 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist.modifiers
+package com.skydoves.landscapist.constraints
 
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Constraints
 import com.skydoves.landscapist.InternalLandscapistApi
 
 @InternalLandscapistApi
-public fun Modifier.constraint(boxConstraints: BoxWithConstraintsScope): Modifier = then(
-  widthIn(
-    min = boxConstraints.minWidth,
-    max = boxConstraints.maxWidth
-  )
-).then(
-  heightIn(
-    min = boxConstraints.minHeight,
-    max = boxConstraints.maxHeight
-  )
-)
+public interface Constrainable {
+
+  public fun setConstraints(constraints: Constraints)
+}

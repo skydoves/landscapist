@@ -27,6 +27,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Constraints
+import com.skydoves.landscapist.constraints.Constrainable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -50,6 +52,7 @@ public fun <T : Any> ImageLoad(
   executeImageRequest: suspend () -> Flow<ImageLoadState>,
   modifier: Modifier = Modifier,
   imageOptions: ImageOptions,
+  constrainable: Constrainable? = null,
   content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
 ) {
   var state by remember(recomposeKey) { mutableStateOf<ImageLoadState>(ImageLoadState.None) }
@@ -63,6 +66,10 @@ public fun <T : Any> ImageLoad(
   BoxWithConstraints(
     modifier = modifier.imageSemantics(imageOptions)
   ) {
+    LaunchedEffect(key1 = recomposeKey, key2 = imageOptions) {
+      constrainable?.setConstraints(constraints)
+    }
+
     content(state)
   }
 }
@@ -76,3 +83,6 @@ private suspend fun executeImageLoading(
   // emit a failure loading state
   emit(ImageLoadState.Failure(null, null))
 }.distinctUntilChanged().flowOn(Dispatchers.IO)
+
+@InternalLandscapistApi
+public val ZeroConstraints: Constraints = Constraints.fixed(0, 0)

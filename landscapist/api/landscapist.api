@@ -12,7 +12,8 @@ public final class com/skydoves/landscapist/DrawablePainterKt {
 }
 
 public final class com/skydoves/landscapist/ImageLoad {
-	public static final fun ImageLoad (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
+	public static final fun ImageLoad (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lcom/skydoves/landscapist/constraints/Constrainable;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
+	public static final fun getZeroConstraints ()J
 }
 
 public abstract class com/skydoves/landscapist/ImageLoadState {
@@ -144,7 +145,11 @@ public final class com/skydoves/landscapist/components/RememberImageComponentKt 
 	public static final fun rememberImageComponent (Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/components/ImagePluginComponent;
 }
 
-public final class com/skydoves/landscapist/modifiers/ConstraintsKt {
+public abstract interface class com/skydoves/landscapist/constraints/Constrainable {
+	public abstract fun setConstraints-BRTryo0 (J)V
+}
+
+public final class com/skydoves/landscapist/constraints/ConstraintsExtensionsKt {
 	public static final fun constraint (Landroidx/compose/ui/Modifier;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;)Landroidx/compose/ui/Modifier;
 }
 

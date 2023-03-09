@@ -26,8 +26,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
@@ -47,7 +45,7 @@ import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
 import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.modifiers.constraint
+import com.skydoves.landscapist.constraints.constraint
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberBitmapPainter
 import com.skydoves.landscapist.rememberDrawablePainter

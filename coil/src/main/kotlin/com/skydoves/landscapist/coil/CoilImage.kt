@@ -27,8 +27,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -37,7 +39,7 @@ import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.ImageResult
-import coil.size.Precision
+import coil.size.SizeResolver
 import com.skydoves.landscapist.DataSource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
@@ -50,7 +52,8 @@ import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
 import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.modifiers.constraint
+import com.skydoves.landscapist.constraints.Constrainable
+import com.skydoves.landscapist.constraints.constraint
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
 import kotlinx.coroutines.channels.trySendBlocking
@@ -280,17 +283,19 @@ private fun CoilImage(
   content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
 ) {
   val context = LocalContext.current
+  val request = rememberRequestWithConstraints(
+    request = recomposeKey.value,
+    imageOptions = imageOptions
+  )
+  val constrainable: Constrainable? =
+    remember(recomposeKey, imageOptions) { (request.sizeResolver) as? Constrainable }
 
   ImageLoad(
     recomposeKey = recomposeKey.value,
+    constrainable = constrainable,
     executeImageRequest = {
       channelFlow {
-        val request = recomposeKey.value.newBuilder(context).apply {
-          if (imageOptions.isValidSize) {
-            size(imageOptions.requestSize.width, imageOptions.requestSize.height)
-            precision(Precision.EXACT)
-          }
-        }.target(
+        request.newBuilder(context).target(
           onStart = { trySendBlocking(ImageLoadState.Loading) }
         ).build()
 
@@ -324,4 +329,30 @@ private fun coil.decode.DataSource.toDataSource(): DataSource = when (this) {
   coil.decode.DataSource.MEMORY -> DataSource.MEMORY
   coil.decode.DataSource.MEMORY_CACHE -> DataSource.MEMORY
   coil.decode.DataSource.DISK -> DataSource.DISK
+}
+
+@Composable
+internal fun rememberRequestWithConstraints(
+  request: ImageRequest,
+  imageOptions: ImageOptions
+): ImageRequest {
+  return remember(request, imageOptions) {
+    if (request.defined.sizeResolver == null) {
+      val sizeResolver = if (imageOptions.isValidSize) {
+        SizeResolver(
+          coil.size.Size(
+            width = imageOptions.requestSize.width,
+            height = imageOptions.requestSize.height
+          )
+        )
+      } else if (imageOptions.contentScale == ContentScale.None) {
+        SizeResolver(coil.size.Size.ORIGINAL)
+      } else {
+        ConstraintsSizeResolver()
+      }
+      request.newBuilder().size(sizeResolver).build()
+    } else {
+      request
+    }
+  }
 }
