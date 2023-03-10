@@ -41,13 +41,15 @@ internal class FlowBaseBitmapDataSubscriber : BaseBitmapReferenceDataSubscriber(
       data = bitmapReference?.cloneOrNull(),
       dataSource = imageOrigin.toDataSource()
     )
+    CloseableReference.closeSafely(bitmapReference)
   }
 
   override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
     this.internalStateFlow.value = ImageLoadState.Failure(
-      data = dataSource,
+      data = dataSource.result?.cloneOrNull(),
       reason = dataSource.failureCause
     )
+    dataSource.close()
   }
 
   override fun onProgressUpdate(dataSource: DataSource<CloseableReference<CloseableImage>>) {

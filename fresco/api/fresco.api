@@ -15,13 +15,13 @@ public abstract class com/skydoves/landscapist/fresco/FrescoImageState : com/sky
 
 public final class com/skydoves/landscapist/fresco/FrescoImageState$Failure : com/skydoves/landscapist/fresco/FrescoImageState {
 	public static final field $stable I
-	public fun <init> (Lcom/facebook/datasource/DataSource;Ljava/lang/Throwable;)V
-	public final fun component1 ()Lcom/facebook/datasource/DataSource;
+	public fun <init> (Lcom/facebook/imagepipeline/image/CloseableImage;Ljava/lang/Throwable;)V
+	public final fun component1 ()Lcom/facebook/imagepipeline/image/CloseableImage;
 	public final fun component2 ()Ljava/lang/Throwable;
-	public final fun copy (Lcom/facebook/datasource/DataSource;Ljava/lang/Throwable;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Failure;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/fresco/FrescoImageState$Failure;Lcom/facebook/datasource/DataSource;Ljava/lang/Throwable;ILjava/lang/Object;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Failure;
+	public final fun copy (Lcom/facebook/imagepipeline/image/CloseableImage;Ljava/lang/Throwable;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Failure;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/fresco/FrescoImageState$Failure;Lcom/facebook/imagepipeline/image/CloseableImage;Ljava/lang/Throwable;ILjava/lang/Object;)Lcom/skydoves/landscapist/fresco/FrescoImageState$Failure;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getDataSource ()Lcom/facebook/datasource/DataSource;
+	public final fun getCloseableImage ()Lcom/facebook/imagepipeline/image/CloseableImage;
 	public final fun getReason ()Ljava/lang/Throwable;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
