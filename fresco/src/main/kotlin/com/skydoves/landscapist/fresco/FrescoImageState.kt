@@ -21,7 +21,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import com.facebook.common.references.CloseableReference
-import com.facebook.datasource.DataSource
 import com.facebook.imagepipeline.image.CloseableImage
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageState
@@ -48,10 +47,9 @@ public sealed class FrescoImageState : ImageState {
   /** Request failed. */
   @Immutable
   public data class Failure(
-    val dataSource: DataSource<CloseableReference<CloseableImage>>?,
+    val closeableImage: CloseableImage?,
     val reason: Throwable?
-  ) :
-    FrescoImageState()
+  ) : FrescoImageState()
 }
 
 /** casts an [ImageLoadState] type to a [FrescoImageState]. */
@@ -73,9 +71,17 @@ public fun ImageLoadState.toFrescoImageState(): FrescoImageState {
         dataSource = dataSource
       )
     }
-    is ImageLoadState.Failure -> FrescoImageState.Failure(
-      dataSource = data as? DataSource<CloseableReference<CloseableImage>>,
-      reason = reason
-    )
+    is ImageLoadState.Failure -> {
+      val bitmapRef = data as? CloseableReference<CloseableImage>
+      val closeableImage = if (bitmapRef != null) {
+        rememberCloseableRef(bitmapRef)
+      } else {
+        null
+      }
+      FrescoImageState.Failure(
+        closeableImage = closeableImage,
+        reason = reason
+      )
+    }
   }
 }
