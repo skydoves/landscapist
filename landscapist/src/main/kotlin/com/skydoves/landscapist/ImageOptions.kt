@@ -42,7 +42,7 @@ public data class ImageOptions(
   public val contentScale: ContentScale = ContentScale.Crop,
   public val colorFilter: ColorFilter? = null,
   public val alpha: Float = DefaultAlpha,
-  public val requestSize: IntSize = IntSize(DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE)
+  public val requestSize: IntSize = IntSize(DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE),
 ) {
   /** Returns true if the [requestSize] is valid. */
   public val isValidSize: Boolean

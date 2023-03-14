@@ -32,7 +32,7 @@ internal class BitmapPalette constructor(
   private var imageModel: Any? = null,
   private val useCache: Boolean = true,
   private val interceptor: PaletteBuilderInterceptor? = null,
-  private val paletteLoadedListener: PaletteLoadedListener? = null
+  private val paletteLoadedListener: PaletteLoadedListener? = null,
 ) {
 
   fun applyImageModel(imageModel: Any?): BitmapPalette = apply {

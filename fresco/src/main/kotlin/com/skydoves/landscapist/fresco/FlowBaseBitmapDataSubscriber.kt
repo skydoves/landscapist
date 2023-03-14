@@ -39,7 +39,7 @@ internal class FlowBaseBitmapDataSubscriber : BaseBitmapReferenceDataSubscriber(
   override fun onNewResultImpl(bitmapReference: CloseableReference<Bitmap>?) {
     this.internalStateFlow.value = ImageLoadState.Success(
       data = bitmapReference?.cloneOrNull(),
-      dataSource = imageOrigin.toDataSource()
+      dataSource = imageOrigin.toDataSource(),
     )
     CloseableReference.closeSafely(bitmapReference)
   }
@@ -47,7 +47,7 @@ internal class FlowBaseBitmapDataSubscriber : BaseBitmapReferenceDataSubscriber(
   override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
     this.internalStateFlow.value = ImageLoadState.Failure(
       data = dataSource.result?.cloneOrNull(),
-      reason = dataSource.failureCause
+      reason = dataSource.failureCause,
     )
     dataSource.close()
   }

@@ -25,6 +25,6 @@ fun Palette?.paletteColorList(): List<Int> {
     this?.mutedSwatch?.rgb,
     this?.darkVibrantSwatch?.rgb,
     this?.darkMutedSwatch?.rgb,
-    this?.dominantSwatch?.rgb
+    this?.dominantSwatch?.rgb,
   ).map { it ?: 0 }
 }

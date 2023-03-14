@@ -92,7 +92,7 @@ public fun FrescoImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: FrescoImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null
+  failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     with(imageOptions) {
@@ -103,7 +103,7 @@ public fun FrescoImage(
         contentScale = contentScale,
         alpha = alpha,
         colorFilter = colorFilter,
-        contentDescription = contentDescription
+        contentDescription = contentDescription,
       )
       return
     }
@@ -113,7 +113,7 @@ public fun FrescoImage(
     recomposeKey = imageUrl,
     imageOptions = imageOptions,
     imageRequest = StableHolder(imageRequest.invoke()),
-    modifier = modifier
+    modifier = modifier,
   ) ImageRequest@{ imageState ->
     when (
       val frescoImageState = imageState.toFrescoImageState().apply {
@@ -124,7 +124,7 @@ public fun FrescoImage(
       is FrescoImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
           modifier = modifier,
-          imageOptions = imageOptions
+          imageOptions = imageOptions,
         )
         loading?.invoke(this, frescoImageState)
       }
@@ -132,7 +132,7 @@ public fun FrescoImage(
         component.ComposeFailureStatePlugins(
           modifier = modifier,
           imageOptions = imageOptions,
-          reason = frescoImageState.reason
+          reason = frescoImageState.reason,
         )
         failure?.invoke(this, frescoImageState)
       }
@@ -141,7 +141,7 @@ public fun FrescoImage(
           modifier = modifier,
           imageModel = imageUrl,
           imageOptions = imageOptions,
-          imageBitmap = frescoImageState.imageBitmap
+          imageBitmap = frescoImageState.imageBitmap,
         )
         if (success != null) {
           success.invoke(this, frescoImageState)
@@ -151,8 +151,8 @@ public fun FrescoImage(
             modifier = Modifier.constraint(this),
             painter = rememberBitmapPainter(
               imagePlugins = component.imagePlugins,
-              imageBitmap = imageBitmap
-            )
+              imageBitmap = imageBitmap,
+            ),
           )
         }
       }
@@ -190,11 +190,11 @@ private fun FrescoImage(
   imageOptions: ImageOptions,
   imageRequest: StableHolder<ImageRequestBuilder>,
   modifier: Modifier = Modifier,
-  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
+  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit,
 ) {
   val subscriber = remember(recomposeKey) { FlowBaseBitmapDataSubscriber() }
   val imageOriginRequestListener = ImageOriginRequestListener(
-    recomposeKey
+    recomposeKey,
   ) { _, imageOrigin, _, _ ->
     subscriber.updateImageOrigin(imageOrigin)
   }
@@ -209,7 +209,7 @@ private fun FrescoImage(
         }
       }.build(),
       context,
-      imageOriginRequestListener
+      imageOriginRequestListener,
     )
   }
 
@@ -227,6 +227,6 @@ private fun FrescoImage(
     },
     imageOptions = imageOptions,
     modifier = modifier,
-    content = content
+    content = content,
   )
 }

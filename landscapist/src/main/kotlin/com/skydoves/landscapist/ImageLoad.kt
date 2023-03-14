@@ -53,18 +53,18 @@ public fun <T : Any> ImageLoad(
   modifier: Modifier = Modifier,
   imageOptions: ImageOptions,
   constrainable: Constrainable? = null,
-  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
+  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit,
 ) {
   var state by remember(recomposeKey) { mutableStateOf<ImageLoadState>(ImageLoadState.None) }
   LaunchedEffect(recomposeKey) {
     executeImageLoading(
-      executeImageRequest
+      executeImageRequest,
     ).collect {
       state = it
     }
   }
   BoxWithConstraints(
-    modifier = modifier.imageSemantics(imageOptions)
+    modifier = modifier.imageSemantics(imageOptions),
   ) {
     LaunchedEffect(key1 = recomposeKey, key2 = imageOptions) {
       constrainable?.setConstraints(constraints)
@@ -75,7 +75,7 @@ public fun <T : Any> ImageLoad(
 }
 
 private suspend fun executeImageLoading(
-  executeImageRequest: suspend () -> Flow<ImageLoadState>
+  executeImageRequest: suspend () -> Flow<ImageLoadState>,
 ) = flow {
   // execute imager loading
   emitAll(executeImageRequest())

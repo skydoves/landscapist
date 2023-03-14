@@ -24,6 +24,6 @@ internal class FrescoTestRunner : AndroidJUnitRunner() {
   override fun newApplication(
     cl: ClassLoader?,
     className: String?,
-    context: Context?
+    context: Context?,
   ): Application = super.newApplication(cl, FrescoTestApplication::class.java.name, context)
 }

@@ -29,14 +29,14 @@ import com.skydoves.landscapist.plugins.ImagePlugin
  */
 @Immutable
 public class CrossfadePlugin(
-  private val duration: Int = 550
+  private val duration: Int = 550,
 ) : ImagePlugin.PainterPlugin {
 
   @Composable
   override fun compose(imageBitmap: ImageBitmap, painter: Painter): Painter {
     return painter.rememberCrossfadePainter(
       imageBitmap = imageBitmap,
-      durationMs = duration
+      durationMs = duration,
     )
   }
 }

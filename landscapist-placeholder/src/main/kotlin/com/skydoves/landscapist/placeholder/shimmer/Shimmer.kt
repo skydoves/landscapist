@@ -68,7 +68,7 @@ public fun Shimmer(
   intensity: Float = DefaultShimmerIntensity,
   dropOff: Float = DefaultShimmerDropOff,
   tilt: Float = DefaultShimmerTilt,
-  durationMillis: Int = DefaultDurationMillis
+  durationMillis: Int = DefaultDurationMillis,
 ) {
   val shimmerWidthPx = with(LocalDensity.current) { shimmerWidth?.toPx() }
   val animatedProgress = remember { Animatable(0f) }
@@ -76,8 +76,8 @@ public fun Shimmer(
     animatedProgress.animateTo(
       targetValue = 1f,
       animationSpec = infiniteRepeatable(
-        animation = tween(durationMillis = durationMillis, easing = LinearEasing)
-      )
+        animation = tween(durationMillis = durationMillis, easing = LinearEasing),
+      ),
     )
   }
 
@@ -97,15 +97,15 @@ public fun Shimmer(
             baseColor,
             highlightColor,
             highlightColor,
-            baseColor
+            baseColor,
           ),
           colorStops = listOf(
             max((1f - intensity - dropOff) / 2f, 0f),
             max((1f - intensity - 0.001f) / 2f, 0f),
             min((1f + intensity + 0.001f) / 2f, 1f),
-            min((1f + intensity + dropOff) / 2f, 1f)
+            min((1f + intensity + dropOff) / 2f, 1f),
           ),
-          tileMode = TileMode.Clamp
+          tileMode = TileMode.Clamp,
         )
         val brush = ShaderBrush(shader)
         paint.asFrameworkPaint().apply {

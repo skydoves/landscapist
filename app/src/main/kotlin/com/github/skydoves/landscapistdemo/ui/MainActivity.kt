@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
       DisneyComposeTheme {
         Scaffold(
           backgroundColor = MaterialTheme.colors.primarySurface,
-          topBar = { PosterAppBar() }
+          topBar = { PosterAppBar() },
         ) {
           val list = MockUtil.getMockPosters().toMutableList()
           list.addAll(MockUtil.getMockPosters())
@@ -69,7 +69,7 @@ private fun PosterAppBar() {
   TopAppBar(
     elevation = 6.dp,
     backgroundColor = purple200,
-    modifier = Modifier.height(58.dp)
+    modifier = Modifier.height(58.dp),
   ) {
     Text(
       modifier = Modifier
@@ -78,7 +78,7 @@ private fun PosterAppBar() {
       text = stringResource(R.string.app_name),
       color = Color.White,
       fontSize = 18.sp,
-      fontWeight = FontWeight.Bold
+      fontWeight = FontWeight.Bold,
     )
   }
 }

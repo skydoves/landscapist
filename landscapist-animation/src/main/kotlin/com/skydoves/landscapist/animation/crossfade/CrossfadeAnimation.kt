@@ -32,7 +32,7 @@ import androidx.compose.ui.graphics.painter.Painter
 @Composable
 internal fun Painter.rememberCrossfadePainter(
   imageBitmap: ImageBitmap,
-  durationMs: Int
+  durationMs: Int,
 ): Painter {
   val size = Size(imageBitmap.width.toFloat(), imageBitmap.height.toFloat())
   val colorMatrix = remember { ColorMatrix() }
@@ -51,11 +51,11 @@ internal fun Painter.rememberCrossfadePainter(
   return remember(
     key1 = fadeInTransition.alpha,
     key2 = fadeInTransition.brightness,
-    key3 = fadeInTransition.saturation
+    key3 = fadeInTransition.saturation,
   ) {
     CrossfadePainter(
       imageBitmap = imageBitmap,
-      painter = this
+      painter = this,
     ).also {
       it.transitionColorFilter = transitionColorFilter
     }

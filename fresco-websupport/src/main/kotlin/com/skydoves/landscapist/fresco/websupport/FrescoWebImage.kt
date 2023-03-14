@@ -85,7 +85,7 @@ public fun FrescoWebImage(
   contentScale: ContentScale = ContentScale.Fit,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  @DrawableRes previewPlaceholder: Int = 0
+  @DrawableRes previewPlaceholder: Int = 0,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     Image(
@@ -95,7 +95,7 @@ public fun FrescoWebImage(
       contentScale = contentScale,
       alpha = alpha,
       colorFilter = colorFilter,
-      contentDescription = contentDescription
+      contentDescription = contentDescription,
     )
     return
   }
@@ -116,7 +116,7 @@ public fun FrescoWebImage(
         alignment = alignment,
         contentScale = contentScale,
         alpha = alpha,
-        colorFilter = colorFilter
+        colorFilter = colorFilter,
       )
     }
   }

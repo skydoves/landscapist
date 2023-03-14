@@ -39,7 +39,7 @@ public sealed class GlideImageState : ImageState {
   public data class Success(
     val data: Any?,
     val dataSource: DataSource,
-    val glideRequestType: GlideRequestType
+    val glideRequestType: GlideRequestType,
   ) : GlideImageState() {
 
     /** Get [ImageBitmap] from the succeed image [data]. */
@@ -61,11 +61,11 @@ public fun ImageLoadState.toGlideImageState(glideRequestType: GlideRequestType):
     is ImageLoadState.Success -> GlideImageState.Success(
       data = data,
       dataSource = dataSource,
-      glideRequestType = glideRequestType
+      glideRequestType = glideRequestType,
     )
     is ImageLoadState.Failure -> GlideImageState.Failure(
       errorDrawable = data as? Drawable,
-      reason = reason
+      reason = reason,
     )
   }
 }

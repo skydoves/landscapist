@@ -33,5 +33,5 @@ import androidx.palette.graphics.Palette
 @Composable
 public fun rememberPaletteState(
   value: Palette?,
-  policy: SnapshotMutationPolicy<Palette?> = structuralEqualityPolicy()
+  policy: SnapshotMutationPolicy<Palette?> = structuralEqualityPolicy(),
 ): MutableState<Palette?> = remember { mutableStateOf(value = value, policy = policy) }

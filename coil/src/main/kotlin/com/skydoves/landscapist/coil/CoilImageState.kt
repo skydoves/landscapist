@@ -58,11 +58,11 @@ public fun ImageLoadState.toCoilImageState(): CoilImageState {
     is ImageLoadState.Loading -> CoilImageState.Loading
     is ImageLoadState.Success -> CoilImageState.Success(
       drawable = data as? Drawable,
-      dataSource = dataSource
+      dataSource = dataSource,
     )
     is ImageLoadState.Failure -> CoilImageState.Failure(
       errorDrawable = data as? Drawable,
-      reason = reason
+      reason = reason,
     )
   }
 }

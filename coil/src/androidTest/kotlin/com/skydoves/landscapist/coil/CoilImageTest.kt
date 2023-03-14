@@ -62,7 +62,7 @@ internal class CoilImageTest {
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_COIL),
-        imageOptions = ImageOptions(contentScale = ContentScale.Crop)
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
       )
     }
 
@@ -81,7 +81,7 @@ internal class CoilImageTest {
           .size(128.dp, 128.dp)
           .testTag(TAG_COIL),
         imageOptions = ImageOptions(contentScale = ContentScale.Crop),
-        loading = { Box(modifier = Modifier) }
+        loading = { Box(modifier = Modifier) },
       )
     }
 
@@ -115,7 +115,7 @@ internal class CoilImageTest {
           imageModel = { IMAGE },
           modifier = Modifier.size(128.dp, 128.dp),
           imageOptions = ImageOptions(contentScale = ContentScale.Crop),
-          loading = { Box(modifier = Modifier) }
+          loading = { Box(modifier = Modifier) },
         )
       }
     }
@@ -143,7 +143,7 @@ internal class CoilImageTest {
         },
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))
-        }
+        },
       )
     }
 
@@ -156,7 +156,7 @@ internal class CoilImageTest {
       assertThat(state.size, `is`(1))
       assertThat(
         state[0],
-        CoreMatchers.instanceOf(CoilImageState.Success::class.java)
+        CoreMatchers.instanceOf(CoilImageState.Success::class.java),
       )
     }
   }
@@ -175,7 +175,7 @@ internal class CoilImageTest {
         failure = {
           Box(modifier = Modifier.testTag(TAG_ERROR))
           state.add(it)
-        }
+        },
       )
     }
 
@@ -188,7 +188,7 @@ internal class CoilImageTest {
       assertThat(state.size, `is`(1))
       assertThat(
         state[0],
-        CoreMatchers.instanceOf(CoilImageState.Failure::class.java)
+        CoreMatchers.instanceOf(CoilImageState.Failure::class.java),
       )
     }
   }

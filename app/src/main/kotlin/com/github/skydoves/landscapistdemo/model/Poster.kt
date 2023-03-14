@@ -26,5 +26,5 @@ data class Poster(
   val description: String,
   val image: String?,
   val gif: String?,
-  val id: String = UUID.randomUUID().toString()
+  val id: String = UUID.randomUUID().toString(),
 )

@@ -30,7 +30,7 @@ import com.skydoves.landscapist.plugins.ImagePlugin
 @Immutable
 public data class CircularRevealPlugin(
   public val duration: Int = DefaultCircularRevealDuration,
-  public val onFinishListener: CircularRevealFinishListener? = null
+  public val onFinishListener: CircularRevealFinishListener? = null,
 ) : ImagePlugin.PainterPlugin {
 
   /**
@@ -44,7 +44,7 @@ public data class CircularRevealPlugin(
     return painter.rememberCircularRevealPainter(
       imageBitmap = imageBitmap,
       durationMs = duration,
-      onFinishListener = onFinishListener
+      onFinishListener = onFinishListener,
     )
   }
 }

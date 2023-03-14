@@ -29,7 +29,7 @@ import com.skydoves.landscapist.plugins.ImagePlugin
  */
 @Immutable
 public data class BlurTransformationPlugin(
-  public val radius: Int = 10
+  public val radius: Int = 10,
 ) : ImagePlugin.PainterPlugin {
 
   /**
@@ -42,7 +42,7 @@ public data class BlurTransformationPlugin(
   override fun compose(imageBitmap: ImageBitmap, painter: Painter): Painter {
     return painter.rememberBlurPainter(
       imageBitmap = imageBitmap,
-      radius = radius
+      radius = radius,
     )
   }
 }

@@ -48,7 +48,7 @@ public sealed interface ImagePlugin {
     @Composable
     public fun compose(
       modifier: Modifier,
-      imageOptions: ImageOptions?
+      imageOptions: ImageOptions?,
     ): ImagePlugin
   }
 
@@ -61,7 +61,7 @@ public sealed interface ImagePlugin {
       modifier: Modifier,
       imageModel: Any?,
       imageOptions: ImageOptions?,
-      imageBitmap: ImageBitmap?
+      imageBitmap: ImageBitmap?,
     ): ImagePlugin
   }
 
@@ -73,7 +73,7 @@ public sealed interface ImagePlugin {
     public fun compose(
       modifier: Modifier,
       imageOptions: ImageOptions?,
-      reason: Throwable?
+      reason: Throwable?,
     ): ImagePlugin
   }
 }
@@ -87,7 +87,7 @@ public sealed interface ImagePlugin {
 @Composable
 internal fun Painter.composePainterPlugins(
   imagePlugins: List<ImagePlugin>,
-  imageBitmap: ImageBitmap
+  imageBitmap: ImageBitmap,
 ): Painter {
   var painter: Painter = this
   imagePlugins

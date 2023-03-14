@@ -22,13 +22,13 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 
 internal class TestRequestListener(
-  private val onComplete: (Any?) -> Unit
+  private val onComplete: (Any?) -> Unit,
 ) : RequestListener<Drawable> {
   override fun onLoadFailed(
     e: GlideException?,
     model: Any?,
     target: Target<Drawable>?,
-    isFirstResource: Boolean
+    isFirstResource: Boolean,
   ): Boolean {
     onComplete(model)
     return false
@@ -39,7 +39,7 @@ internal class TestRequestListener(
     model: Any?,
     target: Target<Drawable>?,
     dataSource: DataSource?,
-    isFirstResource: Boolean
+    isFirstResource: Boolean,
   ): Boolean {
     onComplete(model)
     return false

@@ -86,7 +86,7 @@ internal object RenderScriptToolkit {
     sizeX: Int,
     sizeY: Int,
     radius: Int = 5,
-    restriction: Range2d? = null
+    restriction: Range2d? = null,
   ): ByteArray {
     require(vectorSize == 1 || vectorSize == 4) {
       "$externalName blur. The vectorSize should be 1 or 4. $vectorSize provided."
@@ -109,7 +109,7 @@ internal object RenderScriptToolkit {
       sizeY,
       radius,
       outputArray,
-      restriction
+      restriction,
     )
     return outputArray
   }
@@ -164,7 +164,7 @@ internal object RenderScriptToolkit {
       1f, 0f, 0f, 0f,
       0f, 1f, 0f, 0f,
       0f, 0f, 1f, 0f,
-      0f, 0f, 0f, 1f
+      0f, 0f, 0f, 1f,
     )
 
   /**
@@ -178,7 +178,7 @@ internal object RenderScriptToolkit {
       0.299f, 0.299f, 0.299f, 0f,
       0.587f, 0.587f, 0.587f, 0f,
       0.114f, 0.114f, 0.114f, 0f,
-      0f, 0f, 0f, 1f
+      0f, 0f, 0f, 1f,
     )
 
   /**
@@ -216,7 +216,7 @@ internal object RenderScriptToolkit {
     inputSizeY: Int,
     outputSizeX: Int,
     outputSizeY: Int,
-    restriction: Range2d? = null
+    restriction: Range2d? = null,
   ): ByteArray {
     require(vectorSize in 1..4) {
       "$externalName resize. The vectorSize should be between 1 and 4. $vectorSize provided."
@@ -237,7 +237,7 @@ internal object RenderScriptToolkit {
       outputArray,
       outputSizeX,
       outputSizeY,
-      restriction
+      restriction,
     )
     return outputArray
   }
@@ -267,7 +267,7 @@ internal object RenderScriptToolkit {
     inputBitmap: Bitmap,
     outputSizeX: Int,
     outputSizeY: Int,
-    restriction: Range2d? = null
+    restriction: Range2d? = null,
   ): Bitmap {
     validateBitmap("resize", inputBitmap)
     validateRestriction("resize", outputSizeX, outputSizeY, restriction)
@@ -309,7 +309,7 @@ internal object RenderScriptToolkit {
     sizeY: Int,
     radius: Int,
     outputArray: ByteArray,
-    restriction: Range2d?
+    restriction: Range2d?,
   )
 
   private external fun nativeBlurBitmap(
@@ -317,7 +317,7 @@ internal object RenderScriptToolkit {
     inputBitmap: Bitmap,
     outputBitmap: Bitmap,
     radius: Int,
-    restriction: Range2d?
+    restriction: Range2d?,
   )
 
   private external fun nativeResize(
@@ -329,14 +329,14 @@ internal object RenderScriptToolkit {
     outputArray: ByteArray,
     outputSizeX: Int,
     outputSizeY: Int,
-    restriction: Range2d?
+    restriction: Range2d?,
   )
 
   private external fun nativeResizeBitmap(
     nativeHandle: Long,
     inputBitmap: Bitmap,
     outputBitmap: Bitmap,
-    restriction: Range2d?
+    restriction: Range2d?,
   )
 }
 
@@ -359,7 +359,7 @@ internal class LookupTable {
  */
 internal enum class YuvFormat(val value: Int) {
   NV21(0x11),
-  YV12(0x32315659)
+  YV12(0x32315659),
 }
 
 /**
@@ -377,7 +377,7 @@ internal data class Range2d(
   val startX: Int,
   val endX: Int,
   val startY: Int,
-  val endY: Int
+  val endY: Int,
 ) {
   internal constructor() : this(0, 0, 0, 0)
 }
@@ -411,12 +411,12 @@ internal class Rgba3dArray(val values: ByteArray, val sizeX: Int, val sizeY: Int
 internal fun validateBitmap(
   function: String,
   inputBitmap: Bitmap,
-  alphaAllowed: Boolean = true
+  alphaAllowed: Boolean = true,
 ) {
   if (alphaAllowed) {
     require(
       inputBitmap.config == Bitmap.Config.ARGB_8888 ||
-        inputBitmap.config == Bitmap.Config.ALPHA_8
+        inputBitmap.config == Bitmap.Config.ALPHA_8,
     ) {
       "$externalName. $function supports only ARGB_8888 and ALPHA_8 bitmaps. " +
         "${inputBitmap.config} provided."
@@ -439,7 +439,7 @@ internal fun createCompatibleBitmap(inputBitmap: Bitmap) =
 
 internal fun validateHistogramDotCoefficients(
   coefficients: FloatArray?,
-  vectorSize: Int
+  vectorSize: Int,
 ) {
   require(coefficients == null || coefficients.size == vectorSize) {
     "$externalName histogramDot. The coefficients should be null or have $vectorSize values."
@@ -467,7 +467,7 @@ internal fun validateRestriction(
   tag: String,
   sizeX: Int,
   sizeY: Int,
-  restriction: Range2d? = null
+  restriction: Range2d? = null,
 ) {
   if (restriction == null) return
   require(restriction.startX < sizeX && restriction.endX <= sizeX) {
@@ -495,7 +495,7 @@ internal fun vectorSize(bitmap: Bitmap): Int {
     Bitmap.Config.ARGB_8888 -> 4
     Bitmap.Config.ALPHA_8 -> 1
     else -> throw IllegalArgumentException(
-      "$externalName. Only ARGB_8888 and ALPHA_8 Bitmap are supported."
+      "$externalName. Only ARGB_8888 and ALPHA_8 Bitmap are supported.",
     )
   }
 }

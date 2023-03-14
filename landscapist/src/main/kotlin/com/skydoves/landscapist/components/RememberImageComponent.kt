@@ -27,7 +27,7 @@ import androidx.compose.runtime.remember
 @Composable
 @LandscapistImagePluginComponentDSL
 public fun rememberImageComponent(
-  block: @Composable ImagePluginComponent.() -> Unit
+  block: @Composable ImagePluginComponent.() -> Unit,
 ): ImagePluginComponent {
   val imageComponent = imageComponent(block)
   return remember { imageComponent }

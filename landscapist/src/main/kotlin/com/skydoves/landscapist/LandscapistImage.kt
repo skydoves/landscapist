@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.painter.Painter
 @InternalLandscapistApi
 public fun ImageOptions.LandscapistImage(
   modifier: Modifier,
-  painter: Painter
+  painter: Painter,
 ) {
   Image(
     modifier = modifier,
@@ -34,6 +34,6 @@ public fun ImageOptions.LandscapistImage(
     contentScale = contentScale,
     contentDescription = contentDescription,
     alpha = alpha,
-    colorFilter = colorFilter
+    colorFilter = colorFilter,
   )
 }
