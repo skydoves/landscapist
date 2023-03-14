@@ -2,7 +2,7 @@
 kotlin = "1.8.10"
 dokka = "1.7.20"
 jvmTarget = "1.8"
-nexusPlugin = "1.1.0"
+nexusPlugin = "1.3.0"
 kotlinxCoroutines = "1.6.4"
 kotlinBinaryCompatibility = "0.13.0"
 androidGradlePlugin = "7.3.1"
@@ -21,7 +21,7 @@ glide = "4.14.2"
 fresco = "2.6.0"
 coil = "2.2.1"
 palette = "1.0.0"
-hilt = "2.42"
+hilt = "2.45"
 spotless = "6.12.0"
 
 [libraries]
