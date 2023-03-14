@@ -29,5 +29,5 @@ import androidx.compose.runtime.remember
 @Composable
 public fun rememberFrescoImageState(
   initialState: FrescoImageState = FrescoImageState.None,
-  key: Any? = null
+  key: Any? = null,
 ): MutableState<FrescoImageState> = remember(key1 = key) { mutableStateOf(initialState) }

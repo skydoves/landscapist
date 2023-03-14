@@ -36,7 +36,7 @@ import androidx.compose.ui.graphics.painter.Painter
 internal fun Painter.rememberCircularRevealPainter(
   imageBitmap: ImageBitmap,
   durationMs: Int,
-  onFinishListener: CircularRevealFinishListener? = null
+  onFinishListener: CircularRevealFinishListener? = null,
 ): Painter {
   // Defines a transition of `CircularRevealState`, and updates the transition when the provided state changes.
   val transitionState = remember {
@@ -50,7 +50,7 @@ internal fun Painter.rememberCircularRevealPainter(
 
   val radius: Float by transition.animateFloat(
     transitionSpec = { tween(durationMillis = durationMs) },
-    label = "FloatAnimation"
+    label = "FloatAnimation",
   ) { state ->
     when (state) {
       CircularRevealState.None -> 0f
@@ -64,7 +64,7 @@ internal fun Painter.rememberCircularRevealPainter(
   return remember(this) {
     CircularRevealPainter(
       imageBitmap = imageBitmap,
-      painter = this
+      painter = this,
     )
   }.also {
     it.radius = radius
@@ -80,5 +80,5 @@ internal enum class CircularRevealState {
   None,
 
   /** animation is finished. */
-  Finished
+  Finished,
 }

@@ -56,7 +56,7 @@ import kotlin.math.roundToInt
  * Taken from https://goo.gle/compose-drawable-painter
  */
 internal class DrawablePainter(
-  val drawable: Drawable
+  val drawable: Drawable,
 ) : Painter(), RememberObserver {
   private var drawInvalidateTick by mutableStateOf(0)
   private var drawableIntrinsicSize by mutableStateOf(drawable.intrinsicSize)
@@ -117,7 +117,7 @@ internal class DrawablePainter(
         when (layoutDirection) {
           LayoutDirection.Ltr -> View.LAYOUT_DIRECTION_LTR
           LayoutDirection.Rtl -> View.LAYOUT_DIRECTION_RTL
-        }
+        },
       )
     }
     return false

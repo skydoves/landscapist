@@ -25,11 +25,11 @@ import com.skydoves.landscapist.InternalLandscapistApi
 public fun Modifier.constraint(boxConstraints: BoxWithConstraintsScope): Modifier = then(
   widthIn(
     min = boxConstraints.minWidth,
-    max = boxConstraints.maxWidth
-  )
+    max = boxConstraints.maxWidth,
+  ),
 ).then(
   heightIn(
     min = boxConstraints.minHeight,
-    max = boxConstraints.maxHeight
-  )
+    max = boxConstraints.maxHeight,
+  ),
 )

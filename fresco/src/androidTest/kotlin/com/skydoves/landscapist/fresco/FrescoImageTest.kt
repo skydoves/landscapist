@@ -59,7 +59,7 @@ internal class FrescoImageTest {
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_FRESCO),
-        imageOptions = ImageOptions(contentScale = ContentScale.Crop)
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
       )
     }
 
@@ -87,7 +87,7 @@ internal class FrescoImageTest {
           modifier = Modifier
             .size(128.dp, 128.dp)
             .testTag(TAG_FRESCO),
-          imageOptions = ImageOptions(contentScale = ContentScale.Crop)
+          imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         )
       }
 
@@ -111,7 +111,7 @@ internal class FrescoImageTest {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))
           composeTestRule.onNodeWithTag(TAG_PROGRESS)
             .assertIsDisplayed()
-        }
+        },
       )
     }
 
@@ -141,7 +141,7 @@ internal class FrescoImageTest {
 
           composeTestRule.onNodeWithTag(TAG_PROGRESS)
             .assertIsDisplayed()
-        }
+        },
       )
     }
 
@@ -170,7 +170,7 @@ internal class FrescoImageTest {
         failure = {
           Box(modifier = Modifier.testTag(TAG_ERROR))
           state.add(it)
-        }
+        },
       )
     }
 

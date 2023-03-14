@@ -57,7 +57,7 @@ internal class GlideImageTest {
         modifier = Modifier
           .size(128.dp, 128.dp)
           .testTag(TAG_GLIDE),
-        imageOptions = ImageOptions(contentScale = ContentScale.Crop)
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
       )
     }
 
@@ -76,7 +76,7 @@ internal class GlideImageTest {
         .addListener(
           TestRequestListener {
             latch.countDown()
-          }
+          },
         )
 
       CompositionLocalProvider(LocalGlideRequestBuilder provides glide) {
@@ -85,7 +85,7 @@ internal class GlideImageTest {
           modifier = Modifier
             .size(128.dp, 128.dp)
             .testTag(TAG_GLIDE),
-          imageOptions = ImageOptions(contentScale = ContentScale.Crop)
+          imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         )
       }
 
@@ -114,7 +114,7 @@ internal class GlideImageTest {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))
           composeTestRule.onNodeWithTag(TAG_PROGRESS)
             .assertIsDisplayed()
-        }
+        },
       )
     }
 
@@ -144,7 +144,7 @@ internal class GlideImageTest {
 
           composeTestRule.onNodeWithTag(TAG_PROGRESS)
             .assertIsDisplayed()
-        }
+        },
       )
     }
 
@@ -173,7 +173,7 @@ internal class GlideImageTest {
         failure = {
           Box(modifier = Modifier.testTag(TAG_ERROR))
           state.add(it)
-        }
+        },
       )
     }
 

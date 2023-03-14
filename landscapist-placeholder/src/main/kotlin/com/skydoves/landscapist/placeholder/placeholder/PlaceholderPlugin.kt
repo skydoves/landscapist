@@ -41,7 +41,7 @@ public sealed class PlaceholderPlugin {
     @Composable
     override fun compose(
       modifier: Modifier,
-      imageOptions: ImageOptions?
+      imageOptions: ImageOptions?,
     ): ImagePlugin = apply {
       if (source != null && imageOptions != null) {
         ImageBySource(
@@ -51,7 +51,7 @@ public sealed class PlaceholderPlugin {
           contentDescription = imageOptions.contentDescription,
           contentScale = imageOptions.contentScale,
           colorFilter = imageOptions.colorFilter,
-          alpha = imageOptions.alpha
+          alpha = imageOptions.alpha,
         )
       }
     }
@@ -70,7 +70,7 @@ public sealed class PlaceholderPlugin {
     override fun compose(
       modifier: Modifier,
       imageOptions: ImageOptions?,
-      reason: Throwable?
+      reason: Throwable?,
     ): ImagePlugin = apply {
       if (source != null && imageOptions != null) {
         ImageBySource(
@@ -80,7 +80,7 @@ public sealed class PlaceholderPlugin {
           contentDescription = imageOptions.contentDescription,
           contentScale = imageOptions.contentScale,
           colorFilter = imageOptions.colorFilter,
-          alpha = imageOptions.alpha
+          alpha = imageOptions.alpha,
         )
       }
     }

@@ -40,6 +40,6 @@ private fun Constraints.inferredCoilSize(): CoilSize? = when {
   isZero -> null
   else -> CoilSize(
     width = if (hasBoundedWidth) Dimension(maxWidth) else Dimension.Undefined,
-    height = if (hasBoundedHeight) Dimension(maxHeight) else Dimension.Undefined
+    height = if (hasBoundedHeight) Dimension(maxHeight) else Dimension.Undefined,
   )
 }

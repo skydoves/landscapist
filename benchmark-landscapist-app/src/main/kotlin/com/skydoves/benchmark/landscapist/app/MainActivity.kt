@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         +PlaceholderPlugin.Failure(painterResource(id = R.drawable.poster))
         +ShimmerPlugin(
           baseColor = Color.Transparent,
-          highlightColor = Color.Transparent
+          highlightColor = Color.Transparent,
         )
         +CrossfadePlugin()
         +BlurTransformationPlugin()

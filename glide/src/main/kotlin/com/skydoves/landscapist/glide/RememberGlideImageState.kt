@@ -29,5 +29,5 @@ import androidx.compose.runtime.remember
 @Composable
 public fun rememberGlideImageState(
   initialState: GlideImageState = GlideImageState.None,
-  key: Any? = null
+  key: Any? = null,
 ): MutableState<GlideImageState> = remember(key1 = key) { mutableStateOf(initialState) }

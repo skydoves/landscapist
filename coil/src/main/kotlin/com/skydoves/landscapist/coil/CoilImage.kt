@@ -109,7 +109,7 @@ public fun CoilImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
+  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
   val context = LocalContext.current
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -129,7 +129,7 @@ public fun CoilImage(
     previewPlaceholder = previewPlaceholder,
     loading = loading,
     success = success,
-    failure = failure
+    failure = failure,
   )
 }
 
@@ -179,7 +179,7 @@ public fun CoilImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null
+  failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     with(imageOptions) {
@@ -190,7 +190,7 @@ public fun CoilImage(
         contentScale = contentScale,
         alpha = alpha,
         colorFilter = colorFilter,
-        contentDescription = contentDescription
+        contentDescription = contentDescription,
       )
       return
     }
@@ -200,7 +200,7 @@ public fun CoilImage(
     recomposeKey = StableHolder(imageRequest.invoke()),
     imageLoader = StableHolder(imageLoader.invoke()),
     imageOptions = imageOptions,
-    modifier = modifier
+    modifier = modifier,
   ) ImageRequest@{ imageState ->
     when (
       val coilImageState = imageState.toCoilImageState().apply {
@@ -211,7 +211,7 @@ public fun CoilImage(
       is CoilImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
           modifier = modifier,
-          imageOptions = imageOptions
+          imageOptions = imageOptions,
         )
         loading?.invoke(this, coilImageState)
       }
@@ -219,7 +219,7 @@ public fun CoilImage(
         component.ComposeFailureStatePlugins(
           modifier = modifier,
           imageOptions = imageOptions,
-          reason = coilImageState.reason
+          reason = coilImageState.reason,
         )
         failure?.invoke(this, coilImageState)
       }
@@ -229,7 +229,7 @@ public fun CoilImage(
           imageModel = imageRequest.invoke().data,
           imageOptions = imageOptions,
           imageBitmap = coilImageState.drawable?.toBitmap()
-            ?.copy(Bitmap.Config.ARGB_8888, true)?.asImageBitmap()
+            ?.copy(Bitmap.Config.ARGB_8888, true)?.asImageBitmap(),
         )
         if (success != null) {
           success.invoke(this, coilImageState)
@@ -239,8 +239,8 @@ public fun CoilImage(
             modifier = Modifier.constraint(this),
             painter = rememberDrawablePainter(
               drawable = drawable,
-              imagePlugins = component.imagePlugins
-            )
+              imagePlugins = component.imagePlugins,
+            ),
           )
         }
       }
@@ -280,12 +280,12 @@ private fun CoilImage(
   modifier: Modifier = Modifier,
   imageOptions: ImageOptions,
   imageLoader: StableHolder<ImageLoader> = StableHolder(LocalCoilProvider.getCoilImageLoader()),
-  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
+  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit,
 ) {
   val context = LocalContext.current
   val request = rememberRequestWithConstraints(
     request = recomposeKey.value,
-    imageOptions = imageOptions
+    imageOptions = imageOptions,
   )
   val constrainable: Constrainable? =
     remember(recomposeKey, imageOptions) { (request.sizeResolver) as? Constrainable }
@@ -296,7 +296,7 @@ private fun CoilImage(
     executeImageRequest = {
       channelFlow {
         request.newBuilder(context).target(
-          onStart = { trySendBlocking(ImageLoadState.Loading) }
+          onStart = { trySendBlocking(ImageLoadState.Loading) },
         ).build()
 
         val result = imageLoader.value.execute(request).toResult()
@@ -305,7 +305,7 @@ private fun CoilImage(
     },
     imageOptions = imageOptions,
     modifier = modifier,
-    content = content
+    content = content,
   )
 }
 
@@ -313,13 +313,13 @@ private fun ImageResult.toResult(): ImageLoadState = when (this) {
   is coil.request.SuccessResult -> {
     ImageLoadState.Success(
       data = drawable,
-      dataSource = dataSource.toDataSource()
+      dataSource = dataSource.toDataSource(),
     )
   }
   is coil.request.ErrorResult -> {
     ImageLoadState.Failure(
       data = drawable?.toBitmap()?.asImageBitmap(),
-      reason = throwable
+      reason = throwable,
     )
   }
 }
@@ -334,7 +334,7 @@ private fun coil.decode.DataSource.toDataSource(): DataSource = when (this) {
 @Composable
 internal fun rememberRequestWithConstraints(
   request: ImageRequest,
-  imageOptions: ImageOptions
+  imageOptions: ImageOptions,
 ): ImageRequest {
   return remember(request, imageOptions) {
     if (request.defined.sizeResolver == null) {
@@ -342,8 +342,8 @@ internal fun rememberRequestWithConstraints(
         SizeResolver(
           coil.size.Size(
             width = imageOptions.requestSize.width,
-            height = imageOptions.requestSize.height
-          )
+            height = imageOptions.requestSize.height,
+          ),
         )
       } else if (imageOptions.contentScale == ContentScale.None) {
         SizeResolver(coil.size.Size.ORIGINAL)

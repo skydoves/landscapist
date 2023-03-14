@@ -41,13 +41,13 @@ public data class ShimmerPlugin(
   val intensity: Float = DefaultShimmerIntensity,
   val dropOff: Float = DefaultShimmerDropOff,
   val tilt: Float = DefaultShimmerTilt,
-  val durationMillis: Int = DefaultDurationMillis
+  val durationMillis: Int = DefaultDurationMillis,
 ) : ImagePlugin.LoadingStatePlugin {
 
   @Composable
   override fun compose(
     modifier: Modifier,
-    imageOptions: ImageOptions?
+    imageOptions: ImageOptions?,
   ): ImagePlugin = apply {
     Shimmer(
       modifier = modifier,
@@ -57,7 +57,7 @@ public data class ShimmerPlugin(
       intensity = intensity,
       dropOff = dropOff,
       tilt = tilt,
-      durationMillis = durationMillis
+      durationMillis = durationMillis,
     )
   }
 }

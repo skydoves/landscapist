@@ -33,7 +33,7 @@ import kotlinx.coroutines.channels.trySendBlocking
  * FlowCustomTarget is a [CustomTarget] for receiving Glide image results from network and handle states.
  */
 internal class FlowCustomTarget constructor(
-  private val imageOptions: ImageOptions
+  private val imageOptions: ImageOptions,
 ) : Target<Any>, Constrainable {
 
   private val lock: Any = Any()
@@ -59,8 +59,8 @@ internal class FlowCustomTarget constructor(
     producerScope?.trySendBlocking(
       ImageLoadState.Failure(
         data = errorDrawable,
-        reason = failException
-      )
+        reason = failException,
+      ),
     )
     producerScope?.channel?.close()
   }

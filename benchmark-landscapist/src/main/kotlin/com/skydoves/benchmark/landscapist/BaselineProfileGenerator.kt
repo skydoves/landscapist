@@ -26,7 +26,7 @@ class BaselineProfileGenerator {
   @Test
   fun startup() =
     baselineProfileRule.collectBaselineProfile(
-      packageName = "com.skydoves.benchmark.landscapist.app"
+      packageName = "com.skydoves.benchmark.landscapist.app",
     ) {
       pressHome()
       // This block defines the app's critical user journey. Here we are interested in

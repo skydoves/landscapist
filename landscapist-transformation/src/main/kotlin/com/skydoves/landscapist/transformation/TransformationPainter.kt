@@ -38,7 +38,7 @@ import androidx.core.util.Pools
  */
 internal class TransformationPainter(
   private val imageBitmap: ImageBitmap,
-  private val painter: Painter
+  private val painter: Painter,
 ) : Painter() {
 
   /** return the dimension size of the [painter]'s intrinsic width and height. */
@@ -80,7 +80,7 @@ internal class TransformationPainter(
       // post translate the matrix with the specified translation.
       shaderMatrix.postTranslate(
         (dx + 0.5f) + mDrawableRect.left,
-        (dy + 0.5f) + mDrawableRect.top
+        (dy + 0.5f) + mDrawableRect.top,
       )
       // apply the scaled matrix to the shader.
       shader.setLocalMatrix(shaderMatrix)

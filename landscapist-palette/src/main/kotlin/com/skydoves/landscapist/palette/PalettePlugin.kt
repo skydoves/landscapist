@@ -36,14 +36,14 @@ public data class PalettePlugin(
   private val imageModel: Any? = null,
   private val useCache: Boolean = true,
   private val interceptor: PaletteBuilderInterceptor? = null,
-  private val paletteLoadedListener: PaletteLoadedListener? = null
+  private val paletteLoadedListener: PaletteLoadedListener? = null,
 ) : ImagePlugin.SuccessStatePlugin {
 
   private val bitmapPalette = BitmapPalette(
     imageModel = imageModel,
     useCache = useCache,
     interceptor = interceptor,
-    paletteLoadedListener = paletteLoadedListener
+    paletteLoadedListener = paletteLoadedListener,
   )
 
   @Composable
@@ -51,7 +51,7 @@ public data class PalettePlugin(
     modifier: Modifier,
     imageModel: Any?,
     imageOptions: ImageOptions?,
-    imageBitmap: ImageBitmap?
+    imageBitmap: ImageBitmap?,
   ): ImagePlugin =
     apply {
       imageBitmap?.let {

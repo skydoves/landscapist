@@ -29,7 +29,7 @@ internal annotation class LandscapistImagePluginComponentDSL
 @Composable
 @LandscapistImagePluginComponentDSL
 public inline fun imageComponent(
-  block: @Composable ImagePluginComponent.() -> Unit
+  block: @Composable ImagePluginComponent.() -> Unit,
 ): ImagePluginComponent = ImagePluginComponent(mutableListOf()).compose { block() }
 
 /**
@@ -39,7 +39,7 @@ public inline fun imageComponent(
  */
 @Stable
 public class ImagePluginComponent(
-  @PublishedApi internal val mutablePlugins: MutableList<ImagePlugin> = mutableListOf()
+  @PublishedApi internal val mutablePlugins: MutableList<ImagePlugin> = mutableListOf(),
 ) : ImageComponent {
 
   /** A list of [ImagePlugin] that could be composed to load an image. */

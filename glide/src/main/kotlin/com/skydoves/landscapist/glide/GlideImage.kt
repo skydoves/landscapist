@@ -112,7 +112,7 @@ public fun GlideImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: GlideImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(imageState: GlideImageState.Success) -> Unit)? = null,
-  failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null
+  failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
     with(imageOptions) {
@@ -123,7 +123,7 @@ public fun GlideImage(
         contentScale = contentScale,
         alpha = alpha,
         colorFilter = colorFilter,
-        contentDescription = contentDescription
+        contentDescription = contentDescription,
       )
       return
     }
@@ -135,22 +135,22 @@ public fun GlideImage(
     builder = StableHolder(
       requestBuilder.invoke()
         .apply(requestOptions.invoke())
-        .load(imageModel.invoke()) as RequestBuilder<Any>
+        .load(imageModel.invoke()) as RequestBuilder<Any>,
     ),
     glideRequestType = glideRequestType,
     requestListener = StableHolder(requestListener?.invoke()),
-    modifier = modifier
+    modifier = modifier,
   ) ImageRequest@{ imageState ->
     when (
       val glideImageState = imageState.toGlideImageState(
-        glideRequestType = glideRequestType
+        glideRequestType = glideRequestType,
       ).apply { onImageStateChanged.invoke(this) }
     ) {
       is GlideImageState.None -> Unit
       is GlideImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
           modifier = modifier,
-          imageOptions = imageOptions
+          imageOptions = imageOptions,
         )
         loading?.invoke(this, glideImageState)
       }
@@ -158,7 +158,7 @@ public fun GlideImage(
         component.ComposeFailureStatePlugins(
           modifier = modifier,
           imageOptions = imageOptions,
-          reason = glideImageState.reason
+          reason = glideImageState.reason,
         )
         failure?.invoke(this, glideImageState)
       }
@@ -168,8 +168,8 @@ public fun GlideImage(
           imageModel = imageModel,
           imageOptions = imageOptions,
           imageBitmap = glideImageState.data.toImageBitmap(
-            glideRequestType = glideRequestType
-          )
+            glideRequestType = glideRequestType,
+          ),
         )
         if (success != null) {
           success.invoke(this, glideImageState)
@@ -180,14 +180,14 @@ public fun GlideImage(
             painter = if (data is Drawable) {
               rememberDrawablePainter(
                 drawable = data,
-                imagePlugins = component.imagePlugins
+                imagePlugins = component.imagePlugins,
               )
             } else {
               rememberBitmapPainter(
                 imageBitmap = data.toImageBitmap(glideRequestType = glideRequestType),
-                imagePlugins = component.imagePlugins
+                imagePlugins = component.imagePlugins,
               )
-            }
+            },
           )
         }
       }
@@ -234,7 +234,7 @@ private fun GlideImage(
   glideRequestType: GlideRequestType,
   builder: StableHolder<RequestBuilder<Any>>,
   requestListener: StableHolder<RequestListener<Any>?> = StableHolder(null),
-  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit
+  content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit,
 ) {
   val requestManager = LocalGlideProvider.getGlideRequestManager()
   val target =
@@ -257,7 +257,7 @@ private fun GlideImage(
           recomposeKey = recomposeKey,
           flowRequestListener = flowRequestListener,
           requestListener = requestListener,
-          builder = builder
+          builder = builder,
         ).into(target)
 
         awaitClose {
@@ -267,7 +267,7 @@ private fun GlideImage(
     },
     imageOptions = imageOptions,
     modifier = modifier,
-    content = content
+    content = content,
   )
 }
 
@@ -276,7 +276,7 @@ private fun RequestManager.buildRequestBuilder(
   recomposeKey: StableHolder<Any?>,
   flowRequestListener: FlowRequestListener,
   builder: StableHolder<RequestBuilder<Any>>,
-  requestListener: StableHolder<RequestListener<Any>?> = StableHolder(null)
+  requestListener: StableHolder<RequestListener<Any>?> = StableHolder(null),
 ): RequestBuilder<Any> {
   return when (glideRequestType) {
     GlideRequestType.DRAWABLE -> asDrawable()

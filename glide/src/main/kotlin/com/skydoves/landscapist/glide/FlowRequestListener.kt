@@ -28,14 +28,14 @@ import kotlinx.coroutines.channels.trySendBlocking
  */
 internal class FlowRequestListener constructor(
   private val producerScope: ProducerScope<ImageLoadState>,
-  private val failException: (Throwable?) -> Unit
+  private val failException: (Throwable?) -> Unit,
 ) : RequestListener<Any> {
 
   override fun onLoadFailed(
     e: GlideException?,
     model: Any?,
     target: Target<Any>?,
-    isFirstResource: Boolean
+    isFirstResource: Boolean,
   ): Boolean {
     failException.invoke(e)
     // return false so that the load failed will handle this.
@@ -47,13 +47,13 @@ internal class FlowRequestListener constructor(
     model: Any?,
     target: Target<Any>?,
     dataSource: DataSource,
-    isFirstResource: Boolean
+    isFirstResource: Boolean,
   ): Boolean {
     producerScope.trySendBlocking(
       ImageLoadState.Success(
         data = resource,
-        dataSource = dataSource.toDataSource()
-      )
+        dataSource = dataSource.toDataSource(),
+      ),
     )
     producerScope.channel.close()
     // return true so that the target doesn't receive the drawable.

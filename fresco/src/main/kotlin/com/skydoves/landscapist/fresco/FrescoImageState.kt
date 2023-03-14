@@ -41,14 +41,14 @@ public sealed class FrescoImageState : ImageState {
   @Immutable
   public data class Success(
     val imageBitmap: ImageBitmap?,
-    val dataSource: com.skydoves.landscapist.DataSource
+    val dataSource: com.skydoves.landscapist.DataSource,
   ) : FrescoImageState()
 
   /** Request failed. */
   @Immutable
   public data class Failure(
     val closeableImage: CloseableImage?,
-    val reason: Throwable?
+    val reason: Throwable?,
   ) : FrescoImageState()
 }
 
@@ -68,7 +68,7 @@ public fun ImageLoadState.toFrescoImageState(): FrescoImageState {
       }
       FrescoImageState.Success(
         imageBitmap = imageBitmap,
-        dataSource = dataSource
+        dataSource = dataSource,
       )
     }
     is ImageLoadState.Failure -> {
@@ -80,7 +80,7 @@ public fun ImageLoadState.toFrescoImageState(): FrescoImageState {
       }
       FrescoImageState.Failure(
         closeableImage = closeableImage,
-        reason = reason
+        reason = reason,
       )
     }
   }

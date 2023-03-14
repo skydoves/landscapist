@@ -46,7 +46,7 @@ import com.skydoves.landscapist.plugins.composePainterPlugins
 @InternalLandscapistApi
 public fun rememberDrawablePainter(
   drawable: Drawable,
-  imagePlugins: List<ImagePlugin>
+  imagePlugins: List<ImagePlugin>,
 ): Painter =
   remember(drawable, imagePlugins) {
     when (drawable) {
@@ -58,7 +58,7 @@ public fun rememberDrawablePainter(
     }
   }.composePainterPlugins(
     imagePlugins = imagePlugins,
-    imageBitmap = drawable.toBitmap().asImageBitmap()
+    imageBitmap = drawable.toBitmap().asImageBitmap(),
   )
 
 /**
@@ -71,7 +71,7 @@ public fun rememberDrawablePainter(
 @InternalLandscapistApi
 public fun rememberBitmapPainter(
   imagePlugins: List<ImagePlugin>,
-  imageBitmap: ImageBitmap
+  imageBitmap: ImageBitmap,
 ): Painter = remember(imageBitmap, imagePlugins) {
   BitmapPainter(imageBitmap)
 }.composePainterPlugins(imagePlugins = imagePlugins, imageBitmap = imageBitmap)

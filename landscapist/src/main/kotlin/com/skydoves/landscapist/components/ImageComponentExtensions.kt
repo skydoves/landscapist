@@ -38,7 +38,7 @@ public inline val ImageComponent.imagePlugins: List<ImagePlugin>
 @InternalLandscapistApi
 public fun ImageComponent.ComposeLoadingStatePlugins(
   modifier: Modifier,
-  imageOptions: ImageOptions
+  imageOptions: ImageOptions,
 ) {
   imagePlugins.filterIsInstance<ImagePlugin.LoadingStatePlugin>().forEach { plugin ->
     plugin.compose(modifier = modifier, imageOptions = imageOptions)
@@ -52,14 +52,14 @@ public fun ImageComponent.ComposeSuccessStatePlugins(
   modifier: Modifier,
   imageModel: Any?,
   imageOptions: ImageOptions,
-  imageBitmap: ImageBitmap?
+  imageBitmap: ImageBitmap?,
 ) {
   imagePlugins.filterIsInstance<ImagePlugin.SuccessStatePlugin>().forEach { plugin ->
     plugin.compose(
       modifier = modifier,
       imageModel = imageModel,
       imageOptions = imageOptions,
-      imageBitmap = imageBitmap
+      imageBitmap = imageBitmap,
     )
   }
 }
@@ -70,7 +70,7 @@ public fun ImageComponent.ComposeSuccessStatePlugins(
 public fun ImageComponent.ComposeFailureStatePlugins(
   modifier: Modifier,
   imageOptions: ImageOptions,
-  reason: Throwable?
+  reason: Throwable?,
 ) {
   imagePlugins.filterIsInstance<ImagePlugin.FailureStatePlugin>().forEach { plugin ->
     plugin.compose(modifier = modifier, imageOptions = imageOptions, reason = reason)

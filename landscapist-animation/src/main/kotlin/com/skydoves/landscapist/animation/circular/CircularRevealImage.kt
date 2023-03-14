@@ -54,14 +54,14 @@ public fun CircularRevealImage(
   contentDescription: String?,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  circularReveal: CircularRevealPlugin? = null
+  circularReveal: CircularRevealPlugin? = null,
 ) {
   Image(
     painter = if (circularReveal != null) {
       bitmapPainter.rememberCircularRevealPainter(
         bitmap,
         circularReveal.duration,
-        circularReveal.onFinishListener
+        circularReveal.onFinishListener,
       )
     } else {
       bitmapPainter
@@ -71,7 +71,7 @@ public fun CircularRevealImage(
     contentDescription = contentDescription,
     contentScale = contentScale,
     colorFilter = colorFilter,
-    alpha = alpha
+    alpha = alpha,
   )
 }
 

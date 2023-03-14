@@ -67,14 +67,14 @@ import com.skydoves.landscapist.palette.rememberPaletteState
 fun DisneyPosters(
   posters: List<Poster>,
   paddingValues: PaddingValues,
-  vm: MainViewModel
+  vm: MainViewModel,
 ) {
   val poster: Poster by vm.poster
 
   Column(
     Modifier
       .verticalScroll(rememberScrollState())
-      .padding(paddingValues)
+      .padding(paddingValues),
   ) {
     LazyRow {
       item {
@@ -83,14 +83,14 @@ fun DisneyPosters(
             start = 16.dp,
             bottom = 16.dp,
             top = 16.dp,
-            end = 8.dp
-          )
+            end = 8.dp,
+          ),
         ) {
           Icon(
             imageVector = Icons.Filled.Favorite,
             contentDescription = "Favorite",
             modifier = Modifier.size(50.dp),
-            tint = Color.Red
+            tint = Color.Red,
           )
         }
       }
@@ -105,7 +105,7 @@ fun DisneyPosters(
 @Composable
 private fun PosterItem(
   poster: Poster,
-  vm: MainViewModel
+  vm: MainViewModel,
 ) {
   Card(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
     FrescoImage(
@@ -117,14 +117,14 @@ private fun PosterItem(
       component = rememberImageComponent {
         +CrossfadePlugin()
       },
-      previewPlaceholder = R.drawable.poster
+      previewPlaceholder = R.drawable.poster,
     )
   }
 }
 
 @Composable
 private fun SelectedPoster(
-  poster: Poster
+  poster: Poster,
 ) {
   var palette by rememberPaletteState(null)
 
@@ -135,7 +135,7 @@ private fun SelectedPoster(
       +CircularRevealPlugin()
       +PalettePlugin { palette = it }
     },
-    previewPlaceholder = R.drawable.poster
+    previewPlaceholder = R.drawable.poster,
   )
 
   ColorPalettes(palette)
@@ -144,21 +144,21 @@ private fun SelectedPoster(
     text = poster.name,
     style = MaterialTheme.typography.h2,
     textAlign = TextAlign.Center,
-    modifier = Modifier.padding(8.dp)
+    modifier = Modifier.padding(8.dp),
   )
 
   Text(
     text = poster.description,
     style = MaterialTheme.typography.body1,
     textAlign = TextAlign.Start,
-    modifier = Modifier.padding(8.dp)
+    modifier = Modifier.padding(8.dp),
   )
 
   Text(
     text = "Gif",
     style = MaterialTheme.typography.h2,
     textAlign = TextAlign.Center,
-    modifier = Modifier.padding(8.dp)
+    modifier = Modifier.padding(8.dp),
   )
 
   GlideImage(
@@ -167,7 +167,7 @@ private fun SelectedPoster(
       .fillMaxWidth()
       .padding(8.dp)
       .clip(RoundedCornerShape(8.dp)),
-    previewPlaceholder = R.drawable.poster
+    previewPlaceholder = R.drawable.poster,
   )
 
   Spacer(modifier = Modifier.height(12.dp))
@@ -179,19 +179,19 @@ private fun ColorPalettes(palette: Palette?) {
 
   LazyRow(
     modifier = Modifier
-      .padding(horizontal = 8.dp, vertical = 16.dp)
+      .padding(horizontal = 8.dp, vertical = 16.dp),
   ) {
     items(colorList) { color ->
       Crossfade(
         targetState = color,
         modifier = Modifier
           .padding(horizontal = 8.dp)
-          .size(45.dp)
+          .size(45.dp),
       ) {
         Box(
           modifier = Modifier
             .background(color = Color(it))
-            .fillMaxSize()
+            .fillMaxSize(),
         )
       }
     }

@@ -28,6 +28,6 @@ fun FrescoImageProfiles() {
     modifier = Modifier.size(120.dp),
     imageUrl = "https://user-images.githubusercontent.com/" +
       "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
-    component = LocalImageComponent.current
+    component = LocalImageComponent.current,
   )
 }
