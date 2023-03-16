@@ -295,11 +295,11 @@ private fun CoilImage(
     constrainable = constrainable,
     executeImageRequest = {
       channelFlow {
-        request.newBuilder(context).target(
+        val newBuilder = request.newBuilder(context).target(
           onStart = { trySendBlocking(ImageLoadState.Loading) },
         ).build()
 
-        val result = imageLoader.value.execute(request).toResult()
+        val result = imageLoader.value.execute(newBuilder).toResult()
         send(result)
       }
     },
