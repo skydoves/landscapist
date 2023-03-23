@@ -44,7 +44,7 @@ Lcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;
 HSPLcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;-><init>()V
 HSPLcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;->getImageLoadStateFlow()Lkotlinx/coroutines/flow/StateFlow;
 PLcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;->onNewResultImpl(Lcom/facebook/common/references/CloseableReference;)V
-HSPLcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;->onProgressUpdate(Lcom/facebook/datasource/DataSource;)V
+PLcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;->onProgressUpdate(Lcom/facebook/datasource/DataSource;)V
 PLcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;->updateImageOrigin(I)V
 PLcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriberKt;->access$toDataSource(I)Lcom/skydoves/landscapist/DataSource;
 PLcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriberKt;->toDataSource(I)Lcom/skydoves/landscapist/DataSource;
@@ -105,4 +105,4 @@ HSPLcom/skydoves/landscapist/fresco/LocalFrescoProviderKt$LocalFrescoImageReques
 HSPLcom/skydoves/landscapist/fresco/LocalFrescoProviderKt$LocalFrescoImageRequest$1;-><init>()V
 HSPLcom/skydoves/landscapist/fresco/LocalFrescoProviderKt$LocalFrescoImageRequest$1;->invoke()Lcom/facebook/imagepipeline/request/ImageRequestBuilder;
 HSPLcom/skydoves/landscapist/fresco/LocalFrescoProviderKt$LocalFrescoImageRequest$1;->invoke()Ljava/lang/Object;
-HPLcom/skydoves/landscapist/fresco/RememberCloseableRefKt;->rememberCloseableRef(Lcom/facebook/common/references/CloseableReference;Landroidx/compose/runtime/Composer;I)Ljava/lang/Object;
+PLcom/skydoves/landscapist/fresco/RememberCloseableRefKt;->rememberCloseableRef(Lcom/facebook/common/references/CloseableReference;Landroidx/compose/runtime/Composer;I)Ljava/lang/Object;

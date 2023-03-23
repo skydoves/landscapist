@@ -1,7 +1,7 @@
 PLcom/skydoves/landscapist/transformation/RenderScriptToolkit;-><clinit>()V
 PLcom/skydoves/landscapist/transformation/RenderScriptToolkit;-><init>()V
 PLcom/skydoves/landscapist/transformation/RenderScriptToolkit;->blur$landscapist_transformation_release$default(Lcom/skydoves/landscapist/transformation/RenderScriptToolkit;Landroid/graphics/Bitmap;ILcom/skydoves/landscapist/transformation/Range2d;ILjava/lang/Object;)Landroid/graphics/Bitmap;
-HPLcom/skydoves/landscapist/transformation/RenderScriptToolkit;->blur$landscapist_transformation_release(Landroid/graphics/Bitmap;ILcom/skydoves/landscapist/transformation/Range2d;)Landroid/graphics/Bitmap;
+PLcom/skydoves/landscapist/transformation/RenderScriptToolkit;->blur$landscapist_transformation_release(Landroid/graphics/Bitmap;ILcom/skydoves/landscapist/transformation/Range2d;)Landroid/graphics/Bitmap;
 PLcom/skydoves/landscapist/transformation/RenderScriptToolkitKt;->createCompatibleBitmap(Landroid/graphics/Bitmap;)Landroid/graphics/Bitmap;
 PLcom/skydoves/landscapist/transformation/RenderScriptToolkitKt;->validateBitmap$default(Ljava/lang/String;Landroid/graphics/Bitmap;ZILjava/lang/Object;)V
 PLcom/skydoves/landscapist/transformation/RenderScriptToolkitKt;->validateBitmap(Ljava/lang/String;Landroid/graphics/Bitmap;Z)V
@@ -10,7 +10,7 @@ PLcom/skydoves/landscapist/transformation/RenderScriptToolkitKt;->vectorSize(Lan
 PLcom/skydoves/landscapist/transformation/RenderScriptToolkitKt$WhenMappings;-><clinit>()V
 PLcom/skydoves/landscapist/transformation/TransformationPainter;-><init>(Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/ui/graphics/painter/Painter;)V
 PLcom/skydoves/landscapist/transformation/TransformationPainter;->getIntrinsicSize-NH-jbRc()J
-HPLcom/skydoves/landscapist/transformation/TransformationPainter;->onDraw(Landroidx/compose/ui/graphics/drawscope/DrawScope;)V
+PLcom/skydoves/landscapist/transformation/TransformationPainter;->onDraw(Landroidx/compose/ui/graphics/drawscope/DrawScope;)V
 PLcom/skydoves/landscapist/transformation/TransformationPainterKt;-><clinit>()V
 PLcom/skydoves/landscapist/transformation/TransformationPainterKt;->access$getPaintPool$p()Landroidx/core/util/Pools$SimplePool;
 Lcom/skydoves/landscapist/transformation/blur/BlurTransformationPlugin;
