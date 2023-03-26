@@ -76,6 +76,7 @@ HSPLcom/skydoves/landscapist/ImageWithSource;->ImageBySource(Ljava/lang/Object;L
 Lcom/skydoves/landscapist/ImageWithSource__ImageBySourceKt;
 HSPLcom/skydoves/landscapist/ImageWithSource__ImageBySourceKt;->ImageBySource(Ljava/lang/Object;Landroidx/compose/ui/Modifier;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;Landroidx/compose/ui/graphics/ColorFilter;FLandroidx/compose/runtime/Composer;II)V
 PLcom/skydoves/landscapist/RememberPainterPluginsKt;->rememberBitmapPainter(Ljava/util/List;Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
+HPLcom/skydoves/landscapist/RememberPainterPluginsKt;->rememberDrawablePainter(Landroid/graphics/drawable/Drawable;Ljava/util/List;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
 Lcom/skydoves/landscapist/StableHolder;
 HSPLcom/skydoves/landscapist/StableHolder;-><clinit>()V
 HSPLcom/skydoves/landscapist/StableHolder;-><init>(Ljava/lang/Object;)V
