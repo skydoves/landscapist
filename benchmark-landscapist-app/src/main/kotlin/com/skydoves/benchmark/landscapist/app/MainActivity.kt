@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.components.LocalImageComponent
 import com.skydoves.landscapist.components.imageComponent
@@ -43,6 +44,7 @@ class MainActivity : ComponentActivity() {
           highlightColor = Color.Transparent,
         )
         +CrossfadePlugin()
+        +CircularRevealPlugin()
         +BlurTransformationPlugin()
         +PalettePlugin()
       }
