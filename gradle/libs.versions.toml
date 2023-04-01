@@ -77,3 +77,4 @@ nexus-plugin = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "ne
 kotlin-binary-compatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibility" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+baseline-profile = { id = "androidx.baselineprofile", version.ref = "androidxMacroBenchmark" }

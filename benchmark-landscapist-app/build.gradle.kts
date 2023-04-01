@@ -17,6 +17,7 @@
 import com.github.skydoves.landscapist.Configuration
 
 plugins {
+  id(libs.plugins.baseline.profile.get().pluginId)
   id("landscapist.application.compose")
   id("landscapist.spotless")
 }
@@ -58,4 +59,6 @@ dependencies {
   implementation(libs.androidx.compose.ui.tooling)
   implementation(libs.androidx.compose.runtime)
   implementation(libs.androidx.compose.material)
+
+  baselineProfile(project(":benchmark-landscapist"))
 }

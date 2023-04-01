@@ -8,6 +8,7 @@ plugins {
   alias(libs.plugins.spotless)
   alias(libs.plugins.nexus.plugin)
   alias(libs.plugins.dokka)
+  alias(libs.plugins.baseline.profile)
 }
 
 apply(from = "${rootDir}/scripts/publish-root.gradle")
