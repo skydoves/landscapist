@@ -1567,13 +1567,12 @@ HSPLcom/skydoves/landscapist/glide/GlideRequestType;->$values()[Lcom/skydoves/la
 HSPLcom/skydoves/landscapist/glide/GlideRequestType;-><clinit>()V
 HSPLcom/skydoves/landscapist/glide/GlideRequestType;-><init>(Ljava/lang/String;I)V
 HSPLcom/skydoves/landscapist/glide/GlideRequestType;->values()[Lcom/skydoves/landscapist/glide/GlideRequestType;
-PLcom/skydoves/landscapist/glide/GlideRequestTypeKt;->toImageBitmap(Ljava/lang/Object;Lcom/skydoves/landscapist/glide/GlideRequestType;)Landroidx/compose/ui/graphics/ImageBitmap;
+HPLcom/skydoves/landscapist/glide/GlideRequestTypeKt;->toImageBitmap(Ljava/lang/Object;Lcom/skydoves/landscapist/glide/GlideRequestType;)Landroidx/compose/ui/graphics/ImageBitmap;
 PLcom/skydoves/landscapist/glide/GlideRequestTypeKt$WhenMappings;-><clinit>()V
 Lcom/skydoves/landscapist/glide/LocalGlideProvider;
 HSPLcom/skydoves/landscapist/glide/LocalGlideProvider;-><clinit>()V
 HSPLcom/skydoves/landscapist/glide/LocalGlideProvider;-><init>()V
 HSPLcom/skydoves/landscapist/glide/LocalGlideProvider;->getGlideRequestBuilder(Landroidx/compose/runtime/Composer;I)Lcom/bumptech/glide/RequestBuilder;
-HSPLcom/skydoves/landscapist/glide/LocalGlideProvider;->getGlideRequestManager(Landroidx/compose/runtime/Composer;I)Lcom/bumptech/glide/RequestManager;
 HSPLcom/skydoves/landscapist/glide/LocalGlideProvider;->getGlideRequestOptions(Landroidx/compose/runtime/Composer;I)Lcom/bumptech/glide/request/RequestOptions;
 Lcom/skydoves/landscapist/glide/LocalGlideProviderKt;
 HSPLcom/skydoves/landscapist/glide/LocalGlideProviderKt;-><clinit>()V
