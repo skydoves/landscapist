@@ -30,6 +30,7 @@ rootProject.extra.apply {
 apply(from = "${rootDir}/scripts/publish-module.gradle")
 
 android {
+  namespace = "com.skydoves.landscapist.fresco.websupport"
   compileSdk = Configuration.compileSdk
   defaultConfig {
     minSdk = Configuration.minSdk
