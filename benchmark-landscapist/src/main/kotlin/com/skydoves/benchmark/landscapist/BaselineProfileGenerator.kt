@@ -15,7 +15,13 @@
  */
 package com.skydoves.benchmark.landscapist
 
+import androidx.benchmark.macro.ExperimentalStableBaselineProfilesApi
 import androidx.benchmark.macro.junit4.BaselineProfileRule
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.BySelector
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiObject2
+import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
 
@@ -24,9 +30,12 @@ class BaselineProfileGenerator {
   val baselineProfileRule = BaselineProfileRule()
 
   @Test
+  @OptIn(ExperimentalStableBaselineProfilesApi::class)
   fun startup() =
-    baselineProfileRule.collectBaselineProfile(
-      packageName = "com.skydoves.benchmark.landscapist.app",
+    baselineProfileRule.collectStableBaselineProfile(
+      packageName = packageName,
+      stableIterations = 2,
+      maxIterations = 8,
     ) {
       pressHome()
       // This block defines the app's critical user journey. Here we are interested in
@@ -34,5 +43,21 @@ class BaselineProfileGenerator {
       // through your most important UI.
       startActivityAndWait()
       device.waitForIdle()
+
+      device.testDiscover() || return@collectStableBaselineProfile
     }
 }
+
+private fun UiDevice.testDiscover(): Boolean {
+  return wait(Until.hasObject(By.res(packageName, "GlideImage")), 1_000)
+}
+
+private fun UiDevice.waitForObject(selector: BySelector, timeout: Long = 5_000): UiObject2 {
+  if (wait(Until.hasObject(selector), timeout)) {
+    return findObject(selector)
+  }
+
+  error("Object with selector [$selector] not found")
+}
+
+private const val packageName = "com.skydoves.benchmark.landscapist.app"
