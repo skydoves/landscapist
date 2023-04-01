@@ -22,6 +22,7 @@ plugins {
 }
 
 android {
+  namespace = "com.skydoves.benchmark.landscapist.app"
   compileSdk = Configuration.compileSdk
   defaultConfig {
     applicationId = "com.skydoves.benchmark.landscapist.app"

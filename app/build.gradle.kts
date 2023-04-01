@@ -25,6 +25,7 @@ plugins {
 }
 
 android {
+  namespace = "com.github.skydoves.landscapistdemo"
   compileSdk = Configuration.compileSdk
   defaultConfig {
     applicationId = "com.github.skydoves.landscapistdemo"
@@ -33,6 +34,11 @@ android {
     versionCode = Configuration.versionCode
     versionName = Configuration.versionName
     multiDexEnabled = true
+  }
+
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
   }
 }
 

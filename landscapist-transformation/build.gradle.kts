@@ -29,6 +29,7 @@ rootProject.extra.apply {
 apply(from = "${rootDir}/scripts/publish-module.gradle")
 
 android {
+  namespace = "com.skydoves.landscapist.transformation"
   compileSdk = Configuration.compileSdk
 
   defaultConfig {
