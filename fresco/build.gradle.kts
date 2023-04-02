@@ -34,8 +34,14 @@ android {
   compileSdk = Configuration.compileSdk
   defaultConfig {
     minSdk = Configuration.minSdk
-    targetSdk = Configuration.targetSdk
     testInstrumentationRunner = "com.skydoves.landscapist.fresco.FrescoTestRunner"
+  }
+}
+
+baselineProfile {
+  filter {
+    include("fresco")
+    include("Fresco")
   }
 }
 

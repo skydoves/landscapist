@@ -34,9 +34,24 @@ android {
   compileSdk = Configuration.compileSdk
   defaultConfig {
     minSdk = Configuration.minSdk
-    targetSdk = Configuration.targetSdk
   }
 }
+
+baselineProfile {
+  filter {
+    include("landscapist")
+    exclude("glide")
+    exclude("fresco")
+    exclude("Fresco")
+    exclude("coil")
+    exclude("animation")
+    exclude("palette")
+    exclude("placeholder")
+    exclude("transformation")
+    exclude("benchmark")
+  }
+}
+
 
 dependencies {
   implementation(libs.androidx.core.ktx)

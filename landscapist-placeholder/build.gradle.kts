@@ -34,8 +34,13 @@ android {
 
   defaultConfig {
     minSdk = Configuration.minSdk
-    targetSdk = Configuration.targetSdk
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  }
+}
+
+baselineProfile {
+  filter {
+    include("landscapist.placeholder.**")
   }
 }
 

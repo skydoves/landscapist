@@ -34,8 +34,13 @@ android {
   compileSdk = Configuration.compileSdk
   defaultConfig {
     minSdk = Configuration.minSdk
-    targetSdk = Configuration.targetSdk
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  }
+}
+
+baselineProfile {
+  filter {
+    include("coil")
   }
 }
 
