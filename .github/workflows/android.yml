@@ -36,7 +36,8 @@ jobs:
         run: ./gradlew apiCheck
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v3.1.0
 
