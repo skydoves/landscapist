@@ -42,25 +42,12 @@ android {
   targetProjectPath = ":benchmark-landscapist-app"
 
   testOptions.managedDevices.devices {
-    maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel6Api31").apply {
+    maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel6api31").apply {
       device = "Pixel 6"
       apiLevel = 31
       systemImageSource = "aosp"
     }
   }
-
-  buildTypes {
-    // This benchmark buildType is used for benchmarking, and should function like your
-    // release build (for example, with minification on). It"s signed with a debug key
-    // for easy local/CI testing.
-    create("benchmark") {
-      isDebuggable = true
-      signingConfig = getByName("debug").signingConfig
-      matchingFallbacks += listOf("release")
-    }
-  }
-
-  experimentalProperties["android.experimental.self-instrumenting"] = true
 }
 
 // This is the plugin configuration. Everything is optional. Defaults are in the
@@ -69,7 +56,7 @@ baselineProfile {
 
   // This specifies the managed devices to use that you run the tests on. The default
   // is none.
-  managedDevices += "pixel6Api31"
+  managedDevices += "pixel6api31"
 
   // This enables using connected devices to generate profiles. The default is true.
   // When using connected devices, they must be rooted or API 33 and higher.

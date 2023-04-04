@@ -7,7 +7,7 @@ pluginManagement {
     google()
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
-    maven(url = "https://androidx.dev/snapshots/builds/9866954/artifacts/repository")
+    maven(url = "https://androidx.dev/snapshots/builds/9879305/artifacts/repository")
   }
 }
 dependencyResolutionManagement {
@@ -16,7 +16,7 @@ dependencyResolutionManagement {
     google()
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
-    maven(url = "https://androidx.dev/snapshots/builds/9866954/artifacts/repository")
+    maven(url = "https://androidx.dev/snapshots/builds/9879305/artifacts/repository")
   }
 }
 
