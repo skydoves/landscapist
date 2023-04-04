@@ -39,16 +39,15 @@ android {
 
 baselineProfile {
   filter {
-    include("landscapist")
-    exclude("glide")
-    exclude("fresco")
-    exclude("Fresco")
-    exclude("coil")
-    exclude("animation")
-    exclude("palette")
-    exclude("placeholder")
-    exclude("transformation")
-    exclude("benchmark")
+    include("com.skydoves.landscapist.**")
+    exclude("com.skydoves.landscapist.glide.**")
+    exclude("com.skydoves.landscapist.fresco.**")
+    exclude("com.skydoves.landscapist.coil.**")
+    exclude("com.skydoves.landscapist.animation.**")
+    exclude("com.skydoves.landscapist.palette.**")
+    exclude("com.skydoves.landscapist.placeholder.**")
+    exclude("com.skydoves.landscapist.transformation.**")
+    exclude("com.skydoves.benchmark.**")
   }
 }
 

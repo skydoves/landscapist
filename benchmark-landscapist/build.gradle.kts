@@ -42,7 +42,7 @@ android {
   targetProjectPath = ":benchmark-landscapist-app"
 
   testOptions.managedDevices.devices {
-    maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel6api31").apply {
+    maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel6Api31").apply {
       device = "Pixel 6"
       apiLevel = 31
       systemImageSource = "aosp"
@@ -81,10 +81,4 @@ dependencies {
   implementation(libs.androidx.test.uiautomator)
   implementation(libs.androidx.benchmark.macro)
   implementation(libs.androidx.profileinstaller)
-}
-
-androidComponents {
-  beforeVariants(selector().all()) {
-    it.enable = it.buildType == "benchmark"
-  }
 }

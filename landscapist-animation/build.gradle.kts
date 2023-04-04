@@ -40,7 +40,7 @@ android {
 
 baselineProfile {
   filter {
-    include("landscapist.animation.**")
+    include("com.skydoves.landscapist.animation.**")
   }
 }
 

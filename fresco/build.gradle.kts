@@ -40,8 +40,8 @@ android {
 
 baselineProfile {
   filter {
-    include("fresco")
-    include("Fresco")
+    include("com.skydoves.landscapist.fresco.**")
+    include("com.facebook.**")
   }
 }
 

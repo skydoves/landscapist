@@ -29,5 +29,5 @@ HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$1;->
 HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$1;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$2$1;
 HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$2$1;-><init>(FLjava/lang/Float;Landroidx/compose/animation/core/Animatable;JJFF)V
-HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$2$1;->invoke(Landroidx/compose/ui/graphics/drawscope/DrawScope;)V
+HPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$2$1;->invoke(Landroidx/compose/ui/graphics/drawscope/DrawScope;)V
 HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$2$1;->invoke(Ljava/lang/Object;)Ljava/lang/Object;

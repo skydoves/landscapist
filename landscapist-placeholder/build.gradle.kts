@@ -40,7 +40,7 @@ android {
 
 baselineProfile {
   filter {
-    include("landscapist.placeholder.**")
+    include("com.skydoves.landscapist.placeholder.**")
   }
 }
 

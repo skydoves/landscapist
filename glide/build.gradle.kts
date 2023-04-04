@@ -40,7 +40,8 @@ android {
 
 baselineProfile {
   filter {
-    include("glide")
+    include("com.skydoves.landscapist.glide.**")
+    include("com.bumptech.glide.**")
   }
 }
 

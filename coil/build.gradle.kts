@@ -40,7 +40,8 @@ android {
 
 baselineProfile {
   filter {
-    include("coil")
+    include("com.skydoves.landscapist.coil.**")
+    include("coil.**")
   }
 }
 

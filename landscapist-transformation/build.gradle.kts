@@ -51,7 +51,7 @@ android {
 
 baselineProfile {
   filter {
-    include("landscapist.transformation.**")
+    include("com.skydoves.landscapist.transformation.**")
   }
 }
 
