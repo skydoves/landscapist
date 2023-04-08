@@ -9,7 +9,8 @@ on:
 jobs:
   publish:
     name: Snapshot build and publish
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
+    timeout-minutes: 55
     steps:
       - name: Check out code
         uses: actions/checkout@v3.1.0
