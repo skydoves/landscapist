@@ -62,17 +62,7 @@ jobs:
 
       # Generates Baseline Profile
       - name: Generate Baseline Profile
-        run: ./gradlew :benchmark-landscapist:pixel2Api31BenchmarkAndroidTest -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules=BaselineProfile -Dorg.gradle.workers.max=4
-
-      # Sets the Baseline Profile on its proper place so it gets correctly bundled into Play Store
-      - name: Move & Rename Baseline Profiles
-        run: |
-          mv -f benchmark-landscapist/build/outputs/managed_device_android_test_additional_output/pixel2Api31/BaselineProfileGenerator_startup-baseline-prof.txt app/src/main/baseline-prof.txt
-
-      # Run bash for baseline profile
-      - name: Run Bash for Baseline Profile Amender
-        run: |
-          ./bash/baseline-profile-amender.sh
+        run: ./gradlew generateBaselineProfile -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules=BaselineProfile -Pandroid.experimental.testOptions.managedDevices.setupTimeoutMinutes=20 -Dorg.gradle.workers.max=4
 
       # Create Pull Request
       - name: Create Pull Request

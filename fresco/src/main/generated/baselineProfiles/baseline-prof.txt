@@ -1162,6 +1162,7 @@ HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->getInstance()Lcom/f
 HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->onAlloc(I)V
 HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->onSoftCapReached()V
 HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->onValueRelease(I)V
+HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->onValueReuse(I)V
 HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->setBasePool(Lcom/facebook/imagepipeline/memory/BasePool;)V
 Lcom/facebook/imagepipeline/memory/PoolConfig;
 HSPLcom/facebook/imagepipeline/memory/PoolConfig;-><init>(Lcom/facebook/imagepipeline/memory/PoolConfig$Builder;)V
