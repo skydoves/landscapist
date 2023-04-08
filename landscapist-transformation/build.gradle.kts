@@ -28,13 +28,13 @@ rootProject.extra.apply {
 
 apply(from = "${rootDir}/scripts/publish-module.gradle")
 
+
 android {
   namespace = "com.skydoves.landscapist.transformation"
   compileSdk = Configuration.compileSdk
 
   defaultConfig {
     minSdk = Configuration.minSdk
-    targetSdk = Configuration.targetSdk
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     externalNativeBuild {
       cmake {
@@ -46,6 +46,12 @@ android {
     cmake {
       path = file("src/main/cpp/CMakeLists.txt")
     }
+  }
+}
+
+baselineProfile {
+  filter {
+    include("com.skydoves.landscapist.transformation.**")
   }
 }
 

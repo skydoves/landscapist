@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity() {
           CoilImageProfiles()
           GlideImageProfiles()
           FrescoImageProfiles()
+          FrescoWebSupportProfiles()
         }
       }
     }

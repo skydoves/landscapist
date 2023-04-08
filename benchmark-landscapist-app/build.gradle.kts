@@ -17,6 +17,7 @@
 import com.github.skydoves.landscapist.Configuration
 
 plugins {
+  id(libs.plugins.baseline.profile.get().pluginId)
   id("landscapist.application.compose")
   id("landscapist.spotless")
 }
@@ -51,6 +52,7 @@ dependencies {
   implementation(project(":glide"))
   implementation(project(":coil"))
   implementation(project(":fresco"))
+  implementation(project(":fresco-websupport"))
 
   implementation(libs.androidx.material)
   implementation(libs.androidx.activity.compose)
@@ -58,4 +60,6 @@ dependencies {
   implementation(libs.androidx.compose.ui.tooling)
   implementation(libs.androidx.compose.runtime)
   implementation(libs.androidx.compose.material)
+
+  baselineProfile(project(":benchmark-landscapist"))
 }

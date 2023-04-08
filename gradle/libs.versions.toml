@@ -14,7 +14,7 @@ androidxComposeConstraintLayout = "1.0.0"
 androidxCore = "1.8.0"
 androidxTest = "1.4.0"
 androidxJunit = "1.1.3"
-androidxMacroBenchmark = "1.2.0-alpha12"
+androidxMacroBenchmark = "1.2.0-SNAPSHOT"
 androidxProfileinstaller = "1.3.0"
 androidxUiAutomator = "2.3.0-alpha02"
 glide = "4.15.1"
@@ -77,3 +77,4 @@ nexus-plugin = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "ne
 kotlin-binary-compatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibility" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+baseline-profile = { id = "androidx.baselineprofile", version.ref = "androidxMacroBenchmark" }

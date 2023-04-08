@@ -1,10 +1,10 @@
 name: Android CI
 
 on:
- push:
-  branches: [ main ]
- pull_request:
-  branches: [ '*' ]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ '*' ]
 
 jobs:
   lint:
@@ -36,7 +36,8 @@ jobs:
         run: ./gradlew apiCheck
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v3.1.0
 
@@ -59,5 +60,10 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x ./gradlew
 
+      # Cleans managed device if previously settle and space currently is not available
+      - name: Clean Managed Devices
+        run: ./gradlew cleanManagedDevices --unused-only
+
+      # Build Android modules with managed devices options
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" -Pandroid.experimental.testOptions.managedDevices.setupTimeoutMinutes=20 -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules=BaselineProfile

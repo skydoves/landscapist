@@ -58,8 +58,13 @@ import com.skydoves.landscapist.rememberDrawablePainter
  *
  * ```
  * FrescoWebImage(
- *  controllerBuilder = Fresco.newDraweeControllerBuilder()
- *   .setUri("https://user-images.githubusercontent.com/24237865/75088201-0ba84100-5542-11ea-8587-0c2823b05351.jpg"),
+ *  controllerBuilder = {
+ *    Fresco.newDraweeControllerBuilder()
+ *      .setUri(
+ *        "https://user-images.githubusercontent.com/" +
+ *          "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg"
+ *      )
+ *  },
  *  modifier = Modifier
  *    .width(300.dp)
  *     .height(300.dp)

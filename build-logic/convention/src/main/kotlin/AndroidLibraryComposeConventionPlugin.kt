@@ -21,6 +21,7 @@ import com.skydoves.landscapist.kotlinOptions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
 
 class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
@@ -29,6 +30,7 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
       pluginManager.apply("org.jetbrains.kotlin.android")
       pluginManager.apply("binary-compatibility-validator")
       pluginManager.apply("org.jetbrains.dokka")
+      pluginManager.apply("androidx.baselineprofile")
 
       extensions.configure<LibraryExtension> {
         configureKotlinAndroid(this)
@@ -37,6 +39,10 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
         kotlinOptions {
           freeCompilerArgs = freeCompilerArgs + listOf("-Xexplicit-api=strict")
         }
+      }
+
+      dependencies {
+        add("baselineProfile", project(":benchmark-landscapist"))
       }
     }
   }

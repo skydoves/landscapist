@@ -34,9 +34,23 @@ android {
   compileSdk = Configuration.compileSdk
   defaultConfig {
     minSdk = Configuration.minSdk
-    targetSdk = Configuration.targetSdk
   }
 }
+
+baselineProfile {
+  filter {
+    include("com.skydoves.landscapist.**")
+    exclude("com.skydoves.landscapist.glide.**")
+    exclude("com.skydoves.landscapist.fresco.**")
+    exclude("com.skydoves.landscapist.coil.**")
+    exclude("com.skydoves.landscapist.animation.**")
+    exclude("com.skydoves.landscapist.palette.**")
+    exclude("com.skydoves.landscapist.placeholder.**")
+    exclude("com.skydoves.landscapist.transformation.**")
+    exclude("com.skydoves.benchmark.**")
+  }
+}
+
 
 dependencies {
   implementation(libs.androidx.core.ktx)
