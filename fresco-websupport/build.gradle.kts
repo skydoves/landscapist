@@ -37,6 +37,12 @@ android {
   }
 }
 
+baselineProfile {
+  filter {
+    include("com.skydoves.landscapist.fresco.websupport.**")
+  }
+}
+
 dependencies {
   api(project(":fresco"))
   api(libs.fresco.webp)

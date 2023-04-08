@@ -52,6 +52,7 @@ dependencies {
   implementation(project(":glide"))
   implementation(project(":coil"))
   implementation(project(":fresco"))
+  implementation(project(":fresco-websupport"))
 
   implementation(libs.androidx.material)
   implementation(libs.androidx.activity.compose)
