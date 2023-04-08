@@ -19,10 +19,17 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
+
+      # Cleans managed device if previously settle and space currently is not available
+      - name: Clean Managed Devices
+        run: ./gradlew cleanManagedDevices --unused-only
+
       - name: Release build
-        run: ./gradlew assemble --scan
+        run: ./gradlew assemble --scan -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules=BaselineProfile -Pandroid.experimental.testOptions.managedDevices.setupTimeoutMinutes=20 -Dorg.gradle.workers.max=4
+
       - name: Source jar and dokka
         run: ./gradlew androidSourcesJar javadocJar --scan
+
       - name: Publish to MavenCentral
         run: ./gradlew publishReleasePublicationToSonatypeRepository --scan
         env:

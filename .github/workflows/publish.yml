@@ -11,17 +11,26 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 55
     steps:
+      -
       - name: Check out code
         uses: actions/checkout@v3.1.0
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3.5.1
         with:
           distribution: 'zulu'
           java-version: 17
+
+      # Cleans managed device if previously settle and space currently is not available
+      - name: Clean Managed Devices
+        run: ./gradlew cleanManagedDevices --unused-only
+
       - name: Release build
-        run: ./gradlew assemble --scan
+        run: ./gradlew assemble --scan -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules=BaselineProfile -Pandroid.experimental.testOptions.managedDevices.setupTimeoutMinutes=20 -Dorg.gradle.workers.max=4
+
       - name: Source jar and dokka
         run: ./gradlew androidSourcesJar javadocJar --scan
+
       - name: Publish to MavenCentral
         run: ./gradlew publishReleasePublicationToSonatypeRepository --max-workers 1 closeAndReleaseSonatypeStagingRepository --scan
         env:
