@@ -54,7 +54,7 @@ jobs:
       # This allows us to build most of what we need without the emulator running
       # and using resources
       - name: Build app and benchmark
-        run: ./gradlew :benchmark-landscapist:assembleBenchmark :benchmark-landscapist-app:assembleBenchmark
+        run: ./gradlew :benchmark-landscapist-app:assembleBenchmark
 
       # Cleans managed device if previously settle and space currently is not available
       - name: Clean Managed Devices
