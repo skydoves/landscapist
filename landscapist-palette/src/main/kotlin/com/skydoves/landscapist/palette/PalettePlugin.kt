@@ -50,7 +50,7 @@ public data class PalettePlugin(
   override fun compose(
     modifier: Modifier,
     imageModel: Any?,
-    imageOptions: ImageOptions?,
+    imageOptions: ImageOptions,
     imageBitmap: ImageBitmap?,
   ): ImagePlugin =
     apply {

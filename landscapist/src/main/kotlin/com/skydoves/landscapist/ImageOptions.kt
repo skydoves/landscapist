@@ -43,10 +43,15 @@ public data class ImageOptions(
   public val colorFilter: ColorFilter? = null,
   public val alpha: Float = DefaultAlpha,
   public val requestSize: IntSize = IntSize(DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE),
+  public val thumbnailSize: IntSize = IntSize(DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE),
 ) {
   /** Returns true if the [requestSize] is valid. */
   public val isValidSize: Boolean
     inline get() = requestSize.width > 0 && requestSize.height > 0
+
+  /** Returns true if the [thumbnailSize] is valid. */
+  public val isValidThumbnailSize: Boolean
+    inline get() = thumbnailSize.width > 0 && thumbnailSize.height > 0
 
   private companion object {
     const val DEFAULT_IMAGE_SIZE: Int = -1

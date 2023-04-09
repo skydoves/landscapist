@@ -47,7 +47,7 @@ public data class ShimmerPlugin(
   @Composable
   override fun compose(
     modifier: Modifier,
-    imageOptions: ImageOptions?,
+    imageOptions: ImageOptions,
   ): ImagePlugin = apply {
     Shimmer(
       modifier = modifier,
