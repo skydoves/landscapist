@@ -48,7 +48,7 @@ public sealed interface ImagePlugin {
     @Composable
     public fun compose(
       modifier: Modifier,
-      imageOptions: ImageOptions?,
+      imageOptions: ImageOptions,
     ): ImagePlugin
   }
 
@@ -60,7 +60,7 @@ public sealed interface ImagePlugin {
     public fun compose(
       modifier: Modifier,
       imageModel: Any?,
-      imageOptions: ImageOptions?,
+      imageOptions: ImageOptions,
       imageBitmap: ImageBitmap?,
     ): ImagePlugin
   }
@@ -72,7 +72,7 @@ public sealed interface ImagePlugin {
     @Composable
     public fun compose(
       modifier: Modifier,
-      imageOptions: ImageOptions?,
+      imageOptions: ImageOptions,
       reason: Throwable?,
     ): ImagePlugin
   }

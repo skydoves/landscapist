@@ -41,9 +41,9 @@ public sealed class PlaceholderPlugin {
     @Composable
     override fun compose(
       modifier: Modifier,
-      imageOptions: ImageOptions?,
+      imageOptions: ImageOptions,
     ): ImagePlugin = apply {
-      if (source != null && imageOptions != null) {
+      if (source != null) {
         ImageBySource(
           source = source,
           modifier = modifier,
@@ -69,10 +69,10 @@ public sealed class PlaceholderPlugin {
     @Composable
     override fun compose(
       modifier: Modifier,
-      imageOptions: ImageOptions?,
+      imageOptions: ImageOptions,
       reason: Throwable?,
     ): ImagePlugin = apply {
-      if (source != null && imageOptions != null) {
+      if (source != null) {
         ImageBySource(
           source = source,
           modifier = modifier,
