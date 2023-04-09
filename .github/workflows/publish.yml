@@ -2,7 +2,7 @@ name: Publish
 
 on:
   release:
-    types: [released]
+    types: [ released ]
   workflow_dispatch:
 
 jobs:
@@ -11,7 +11,6 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 55
     steps:
-      -
       - name: Check out code
         uses: actions/checkout@v3.1.0
 
