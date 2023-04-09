@@ -61,17 +61,16 @@ public final class com/skydoves/landscapist/ImageLoadState$Success : com/skydove
 public final class com/skydoves/landscapist/ImageOptions {
 	public static final field $stable I
 	public static final field DEFAULT_IMAGE_SIZE I
-	public synthetic fun <init> (Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJJILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Landroidx/compose/ui/Alignment;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Landroidx/compose/ui/layout/ContentScale;
 	public final fun component4 ()Landroidx/compose/ui/graphics/ColorFilter;
 	public final fun component5 ()F
 	public final fun component6-YbymL2g ()J
-	public final fun component7-YbymL2g ()J
-	public final fun copy-MQ5xg-Y (Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJJ)Lcom/skydoves/landscapist/ImageOptions;
-	public static synthetic fun copy-MQ5xg-Y$default (Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJJILjava/lang/Object;)Lcom/skydoves/landscapist/ImageOptions;
+	public final fun copy-kX5Mx0E (Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJ)Lcom/skydoves/landscapist/ImageOptions;
+	public static synthetic fun copy-kX5Mx0E$default (Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJILjava/lang/Object;)Lcom/skydoves/landscapist/ImageOptions;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAlignment ()Landroidx/compose/ui/Alignment;
 	public final fun getAlpha ()F
@@ -79,10 +78,8 @@ public final class com/skydoves/landscapist/ImageOptions {
 	public final fun getContentDescription ()Ljava/lang/String;
 	public final fun getContentScale ()Landroidx/compose/ui/layout/ContentScale;
 	public final fun getRequestSize-YbymL2g ()J
-	public final fun getThumbnailSize-YbymL2g ()J
 	public fun hashCode ()I
 	public final fun isValidSize ()Z
-	public final fun isValidThumbnailSize ()Z
 	public fun toString ()Ljava/lang/String;
 }
 
