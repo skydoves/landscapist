@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
@@ -91,7 +92,12 @@ public fun FrescoImage(
   onImageStateChanged: (FrescoImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: FrescoImageState.Loading) -> Unit)? = null,
-  success: @Composable (BoxScope.(imageState: FrescoImageState.Success) -> Unit)? = null,
+  success: @Composable (
+    BoxScope.(
+      imageState: FrescoImageState.Success,
+      painter: Painter,
+    ) -> Unit
+  )? = null,
   failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
@@ -121,6 +127,7 @@ public fun FrescoImage(
       }
     ) {
       is FrescoImageState.None -> Unit
+
       is FrescoImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
           modifier = modifier,
@@ -128,6 +135,7 @@ public fun FrescoImage(
         )
         loading?.invoke(this, frescoImageState)
       }
+
       is FrescoImageState.Failure -> {
         component.ComposeFailureStatePlugins(
           modifier = modifier,
@@ -136,6 +144,7 @@ public fun FrescoImage(
         )
         failure?.invoke(this, frescoImageState)
       }
+
       is FrescoImageState.Success -> {
         component.ComposeSuccessStatePlugins(
           modifier = modifier,
@@ -143,16 +152,19 @@ public fun FrescoImage(
           imageOptions = imageOptions,
           imageBitmap = frescoImageState.imageBitmap,
         )
+
+        val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
+        val painter = rememberBitmapPainter(
+          imagePlugins = component.imagePlugins,
+          imageBitmap = imageBitmap,
+        )
+
         if (success != null) {
-          success.invoke(this, frescoImageState)
+          success.invoke(this, frescoImageState, painter)
         } else {
-          val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
           imageOptions.LandscapistImage(
             modifier = Modifier.constraint(this),
-            painter = rememberBitmapPainter(
-              imagePlugins = component.imagePlugins,
-              imageBitmap = imageBitmap,
-            ),
+            painter = painter,
           )
         }
       }
