@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import com.bumptech.glide.RequestBuilder
@@ -111,7 +112,12 @@ public fun GlideImage(
   onImageStateChanged: (GlideImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: GlideImageState.Loading) -> Unit)? = null,
-  success: @Composable (BoxScope.(imageState: GlideImageState.Success) -> Unit)? = null,
+  success: @Composable (
+    BoxScope.(
+      imageState: GlideImageState.Success,
+      painter: Painter,
+    ) -> Unit
+  )? = null,
   failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
@@ -147,6 +153,7 @@ public fun GlideImage(
       ).apply { onImageStateChanged.invoke(this) }
     ) {
       is GlideImageState.None -> Unit
+
       is GlideImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
           modifier = modifier,
@@ -154,6 +161,7 @@ public fun GlideImage(
         )
         loading?.invoke(this, glideImageState)
       }
+
       is GlideImageState.Failure -> {
         component.ComposeFailureStatePlugins(
           modifier = modifier,
@@ -162,6 +170,7 @@ public fun GlideImage(
         )
         failure?.invoke(this, glideImageState)
       }
+
       is GlideImageState.Success -> {
         component.ComposeSuccessStatePlugins(
           modifier = modifier,
@@ -171,23 +180,26 @@ public fun GlideImage(
             glideRequestType = glideRequestType,
           ),
         )
-        if (success != null) {
-          success.invoke(this, glideImageState)
+
+        val data = glideImageState.data ?: return@ImageRequest
+        val painter = if (data is Drawable) {
+          rememberDrawablePainter(
+            drawable = data,
+            imagePlugins = component.imagePlugins,
+          )
         } else {
-          val data = glideImageState.data ?: return@ImageRequest
+          rememberBitmapPainter(
+            imageBitmap = data.toImageBitmap(glideRequestType = glideRequestType),
+            imagePlugins = component.imagePlugins,
+          )
+        }
+
+        if (success != null) {
+          success.invoke(this, glideImageState, painter)
+        } else {
           imageOptions.LandscapistImage(
             modifier = Modifier.constraint(this),
-            painter = if (data is Drawable) {
-              rememberDrawablePainter(
-                drawable = data,
-                imagePlugins = component.imagePlugins,
-              )
-            } else {
-              rememberBitmapPainter(
-                imageBitmap = data.toImageBitmap(glideRequestType = glideRequestType),
-                imagePlugins = component.imagePlugins,
-              )
-            },
+            painter = painter,
           )
         }
       }
@@ -284,11 +296,13 @@ private fun RequestManager.buildRequestBuilder(
       .apply(builder.value)
       .addListener(flowRequestListener as RequestListener<Drawable>)
       .addListener(requestListener.value as RequestListener<Drawable>?)
+
     GlideRequestType.GIF -> asGif()
       .load(recomposeKey.value)
       .apply(builder.value)
       .addListener(flowRequestListener as RequestListener<GifDrawable>)
       .addListener(requestListener.value as RequestListener<GifDrawable>?)
+
     GlideRequestType.BITMAP -> asBitmap()
       .load(recomposeKey.value)
       .apply(builder.value)

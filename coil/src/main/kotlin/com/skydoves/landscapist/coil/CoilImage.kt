@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -108,7 +109,12 @@ public fun CoilImage(
   onImageStateChanged: (CoilImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
-  success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
+  success: @Composable (
+    BoxScope.(
+      imageState: CoilImageState.Success,
+      painter: Painter,
+    ) -> Unit
+  )? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
   val context = LocalContext.current
@@ -178,7 +184,12 @@ public fun CoilImage(
   onImageStateChanged: (CoilImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
-  success: @Composable (BoxScope.(imageState: CoilImageState.Success) -> Unit)? = null,
+  success: @Composable (
+    BoxScope.(
+      imageState: CoilImageState.Success,
+      painter: Painter,
+    ) -> Unit
+  )? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
   if (LocalInspectionMode.current && previewPlaceholder != 0) {
@@ -208,6 +219,7 @@ public fun CoilImage(
       }
     ) {
       is CoilImageState.None -> Unit
+
       is CoilImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
           modifier = modifier,
@@ -215,6 +227,7 @@ public fun CoilImage(
         )
         loading?.invoke(this, coilImageState)
       }
+
       is CoilImageState.Failure -> {
         component.ComposeFailureStatePlugins(
           modifier = modifier,
@@ -223,6 +236,7 @@ public fun CoilImage(
         )
         failure?.invoke(this, coilImageState)
       }
+
       is CoilImageState.Success -> {
         component.ComposeSuccessStatePlugins(
           modifier = modifier,
@@ -231,16 +245,19 @@ public fun CoilImage(
           imageBitmap = coilImageState.drawable?.toBitmap()
             ?.copy(Bitmap.Config.ARGB_8888, true)?.asImageBitmap(),
         )
+
+        val drawable = coilImageState.drawable ?: return@ImageRequest
+        val painter = rememberDrawablePainter(
+          drawable = drawable,
+          imagePlugins = component.imagePlugins,
+        )
+
         if (success != null) {
-          success.invoke(this, coilImageState)
+          success.invoke(this, coilImageState, painter)
         } else {
-          val drawable = coilImageState.drawable ?: return@ImageRequest
           imageOptions.LandscapistImage(
             modifier = Modifier.constraint(this),
-            painter = rememberDrawablePainter(
-              drawable = drawable,
-              imagePlugins = component.imagePlugins,
-            ),
+            painter = painter,
           )
         }
       }
@@ -316,6 +333,7 @@ private fun ImageResult.toResult(): ImageLoadState = when (this) {
       dataSource = dataSource.toDataSource(),
     )
   }
+
   is coil.request.ErrorResult -> {
     ImageLoadState.Failure(
       data = drawable?.toBitmap()?.asImageBitmap(),
