@@ -3,11 +3,10 @@
 pluginManagement {
   includeBuild("build-logic")
   repositories {
-    gradlePluginPortal()
     google()
+    gradlePluginPortal()
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
-    maven(url = "https://androidx.dev/snapshots/builds/9879305/artifacts/repository")
   }
 }
 dependencyResolutionManagement {
@@ -16,7 +15,6 @@ dependencyResolutionManagement {
     google()
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
-    maven(url = "https://androidx.dev/snapshots/builds/9879305/artifacts/repository")
   }
 }
 
