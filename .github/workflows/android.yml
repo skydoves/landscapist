@@ -7,14 +7,6 @@ on:
     branches: [ '*' ]
 
 jobs:
-
-  prerequisites:
-    name: Setup prerequisites
-    runs-on: ubuntu-latest
-    steps:
-      - name: Make Gradle executable
-        run: chmod +x ./gradlew
-
   lint:
     name: Spotless check
     runs-on: ubuntu-latest
@@ -64,6 +56,9 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
 
       - name: Build with Gradle
         run: |
