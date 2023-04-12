@@ -20,7 +20,7 @@ jobs:
           java-version: 17
 
       - name: Release build
-        run: ./gradlew assemble --scan  -x :benchmark-landscapist:pixel6api31Setup -x :benchmark-landscapist:pixel6api31NonMinifiedReleaseAndroidTest
+        run: ./gradlew assemble --scan  -x :benchmark-landscapist:pixel6api31Setup -x :benchmark-landscapist:pixel6api31NonMinifiedReleaseAndroidTest -x :benchmark-landscapist:collectNonMinifiedReleaseBaselineProfile
 
       - name: Source jar and dokka
         run: ./gradlew androidSourcesJar javadocJar --scan
