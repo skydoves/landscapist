@@ -9,8 +9,7 @@ on:
 jobs:
   publish:
     name: Snapshot build and publish
-    runs-on: macos-latest
-    timeout-minutes: 55
+    runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v3.1.0
@@ -20,12 +19,8 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
-      # Cleans managed device if previously settle and space currently is not available
-      - name: Clean Managed Devices
-        run: ./gradlew cleanManagedDevices --unused-only
-
       - name: Release build
-        run: ./gradlew assemble --scan -Pandroid.testoptions.manageddevices.emulator.gpu="swiftshader_indirect" -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules=BaselineProfile -Pandroid.experimental.testOptions.managedDevices.setupTimeoutMinutes=20 -Dorg.gradle.workers.max=4
+        run: ./gradlew assemble --scan -x :benchmark-landscapist:pixel6api31Setup
 
       - name: Source jar and dokka
         run: ./gradlew androidSourcesJar javadocJar --scan
