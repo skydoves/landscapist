@@ -827,6 +827,22 @@ dependencies {
 }
  ```
 
+ ## Taking Snapshot Images With Paparazzi
+
+[Paparazzi](https://github.com/cashapp/paparazzi) allows you to take snapshot images of your Composable functions without running them on physical devices. You can take proper snapshots images about your images with Paparazzi like the below:
+
+```kotlin
+paparazzi.snapshot {
+  CompositionLocalProvider(LocalInspectionMode provides true) {
+    GlideImage(
+      modifier = Modifier.fillMaxSize(),
+      imageModel = { ".." },
+      previewPlaceholder = R.drawable.placeholder
+  )
+ }
+}
+```
+
 ## Who's using Landscapist?
 If your project uses Landscapist, please let me know by creating a new issue! 🤗
 
