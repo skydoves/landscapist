@@ -19,6 +19,4 @@ import androidx.compose.runtime.Stable
 
 @Stable
 @InternalLandscapistApi
-public class StableHolder<T>(public val value: T) {
-  public operator fun component1(): T = value
-}
+public data class StableHolder<T>(public val value: T)
