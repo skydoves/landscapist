@@ -55,8 +55,10 @@ public fun <T : Any> ImageLoad(
   constrainable: Constrainable? = null,
   content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit,
 ) {
-  var state by remember(recomposeKey) { mutableStateOf<ImageLoadState>(ImageLoadState.None) }
-  LaunchedEffect(recomposeKey) {
+  var state by remember(recomposeKey, imageOptions) {
+    mutableStateOf<ImageLoadState>(ImageLoadState.None)
+  }
+  LaunchedEffect(recomposeKey, imageOptions) {
     executeImageLoading(
       executeImageRequest,
     ).collect {
