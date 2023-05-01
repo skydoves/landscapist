@@ -21,10 +21,12 @@ package com.skydoves.landscapist
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
@@ -36,6 +38,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 
 /**
  * A common image loading model for fetching an image asynchronously and
@@ -53,6 +56,7 @@ public fun <T : Any> ImageLoad(
   modifier: Modifier = Modifier,
   imageOptions: ImageOptions,
   constrainable: Constrainable? = null,
+  disposable: (() -> Unit)? = null,
   content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit,
 ) {
   var state by remember(recomposeKey, imageOptions) {
@@ -68,8 +72,14 @@ public fun <T : Any> ImageLoad(
   BoxWithConstraints(
     modifier = modifier.imageSemantics(imageOptions),
   ) {
-    LaunchedEffect(key1 = recomposeKey, key2 = imageOptions) {
-      constrainable?.setConstraints(constraints)
+    val coroutineScope = rememberCoroutineScope()
+    DisposableEffect(key1 = recomposeKey, key2 = imageOptions) {
+      coroutineScope.launch {
+        constrainable?.setConstraints(constraints)
+      }
+      onDispose {
+        disposable?.invoke()
+      }
     }
 
     content(state)
