@@ -115,10 +115,10 @@ public fun GlideImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: GlideImageState.Loading) -> Unit)? = null,
   success: @Composable (
-  BoxScope.(
-    imageState: GlideImageState.Success,
-    painter: Painter,
-  ) -> Unit
+    BoxScope.(
+      imageState: GlideImageState.Success,
+      painter: Painter,
+    ) -> Unit
   )? = null,
   failure: @Composable (BoxScope.(imageState: GlideImageState.Failure) -> Unit)? = null,
 ) {
