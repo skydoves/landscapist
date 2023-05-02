@@ -71,6 +71,7 @@ public fun <T : Any> ImageLoad(
   }
   BoxWithConstraints(
     modifier = modifier.imageSemantics(imageOptions),
+    propagateMinConstraints = true,
   ) {
     val coroutineScope = rememberCoroutineScope()
     DisposableEffect(key1 = recomposeKey, key2 = imageOptions) {
