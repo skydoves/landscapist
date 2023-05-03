@@ -26,13 +26,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
-import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.gif.GifDrawable
@@ -251,9 +248,10 @@ private fun GlideImage(
   content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit,
 ) {
   val requestManager = LocalGlideProvider.getGlideRequestManager()
-  val target =
-    remember(recomposeKey, imageOptions) { FlowCustomTarget(imageOptions = imageOptions) }
-  val context = LocalContext.current
+  val target = rememberTarget(
+    target = FlowCustomTarget(imageOptions = imageOptions),
+    imageOptions = imageOptions,
+  )
 
   ImageLoad(
     recomposeKey = recomposeKey.value,
@@ -281,9 +279,6 @@ private fun GlideImage(
       }
     },
     imageOptions = imageOptions,
-    disposable = {
-      Glide.with(context).clear(target)
-    },
     modifier = modifier,
     content = content,
   )
