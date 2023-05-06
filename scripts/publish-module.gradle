@@ -3,9 +3,7 @@ apply plugin: 'signing'
 apply plugin: 'org.jetbrains.dokka'
 
 task androidSourcesJar(type: Jar) {
-  if (!project.name.contains('bom')) {
-    dependsOn(':bundleReleaseAar')
-  }
+  dependsOn(':generateMetadataFileForReleasePublication')
   archiveClassifier.set('sources')
   if (project.plugins.findPlugin("com.android.library")) {
     from android.sourceSets.main.java.srcDirs
