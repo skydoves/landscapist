@@ -9,7 +9,7 @@ PLcom/skydoves/landscapist/transformation/RenderScriptToolkitKt;->validateRestri
 HPLcom/skydoves/landscapist/transformation/RenderScriptToolkitKt;->vectorSize(Landroid/graphics/Bitmap;)I
 PLcom/skydoves/landscapist/transformation/RenderScriptToolkitKt$WhenMappings;-><clinit>()V
 HPLcom/skydoves/landscapist/transformation/TransformationPainter;-><init>(Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/ui/graphics/painter/Painter;)V
-HPLcom/skydoves/landscapist/transformation/TransformationPainter;->getIntrinsicSize-NH-jbRc()J
+PLcom/skydoves/landscapist/transformation/TransformationPainter;->getIntrinsicSize-NH-jbRc()J
 HPLcom/skydoves/landscapist/transformation/TransformationPainter;->onDraw(Landroidx/compose/ui/graphics/drawscope/DrawScope;)V
 PLcom/skydoves/landscapist/transformation/TransformationPainterKt;-><clinit>()V
 PLcom/skydoves/landscapist/transformation/TransformationPainterKt;->access$getPaintPool$p()Landroidx/core/util/Pools$SimplePool;
