@@ -41,6 +41,7 @@ android {
         cppFlags += "-std=c++17"
       }
     }
+    consumerProguardFiles("consumer-rules.pro")
   }
   externalNativeBuild {
     cmake {
