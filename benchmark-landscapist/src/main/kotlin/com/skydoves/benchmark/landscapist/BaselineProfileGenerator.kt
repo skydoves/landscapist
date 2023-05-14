@@ -49,7 +49,9 @@ class BaselineProfileGenerator {
 }
 
 private fun UiDevice.testDiscover(): Boolean {
-  return wait(Until.hasObject(By.res(packageName, "GlideImage")), 1_000)
+  return wait(Until.hasObject(By.res(packageName, "GlideImage")), 1_000) &&
+    wait(Until.hasObject(By.res(packageName, "CoilImage")), 1_000) &&
+    wait(Until.hasObject(By.res(packageName, "FrescoImage")), 1_000)
 }
 
 private fun UiDevice.waitForObject(selector: BySelector, timeout: Long = 5_000): UiObject2 {

@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
@@ -197,7 +198,9 @@ public fun GlideImage(
           success.invoke(this, glideImageState, painter)
         } else {
           imageOptions.LandscapistImage(
-            modifier = Modifier.constraint(this),
+            modifier = Modifier
+              .constraint(this)
+              .testTag(imageOptions.testTag),
             painter = painter,
           )
         }

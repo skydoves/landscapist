@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package com.skydoves.benchmark.landscapist.app
 
 import android.os.Bundle
@@ -20,8 +22,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.components.LocalImageComponent
@@ -50,7 +56,11 @@ class MainActivity : ComponentActivity() {
       }
 
       CompositionLocalProvider(LocalImageComponent provides imageComponent) {
-        Column {
+        Column(
+          modifier = Modifier.semantics {
+            testTagsAsResourceId = true
+          },
+        ) {
           CoilImageProfiles()
           GlideImageProfiles()
           FrescoImageProfiles()

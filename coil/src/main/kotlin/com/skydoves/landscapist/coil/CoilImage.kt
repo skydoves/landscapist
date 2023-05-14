@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
@@ -256,7 +257,9 @@ public fun CoilImage(
           success.invoke(this, coilImageState, painter)
         } else {
           imageOptions.LandscapistImage(
-            modifier = Modifier.constraint(this),
+            modifier = Modifier
+              .constraint(this)
+              .testTag(imageOptions.testTag),
             painter = painter,
           )
         }
