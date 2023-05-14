@@ -94,10 +94,10 @@ public fun FrescoImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable (
-  BoxScope.(
-    imageState: FrescoImageState.Success,
-    painter: Painter,
-  ) -> Unit
+    BoxScope.(
+      imageState: FrescoImageState.Success,
+      painter: Painter,
+    ) -> Unit
   )? = null,
   failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {

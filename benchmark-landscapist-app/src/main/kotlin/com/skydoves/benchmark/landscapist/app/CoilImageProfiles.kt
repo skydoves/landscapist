@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.components.LocalImageComponent
 
@@ -32,5 +33,6 @@ fun CoilImageProfiles() {
     },
     previewPlaceholder = R.drawable.poster,
     component = LocalImageComponent.current,
+    imageOptions = ImageOptions(testTag = "CoilImage"),
   )
 }
