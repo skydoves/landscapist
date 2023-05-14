@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.drawee.backends.pipeline.info.ImageOriginRequestListener
@@ -93,10 +94,10 @@ public fun FrescoImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable (
-    BoxScope.(
-      imageState: FrescoImageState.Success,
-      painter: Painter,
-    ) -> Unit
+  BoxScope.(
+    imageState: FrescoImageState.Success,
+    painter: Painter,
+  ) -> Unit
   )? = null,
   failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
@@ -163,7 +164,9 @@ public fun FrescoImage(
           success.invoke(this, frescoImageState, painter)
         } else {
           imageOptions.LandscapistImage(
-            modifier = Modifier.constraint(this),
+            modifier = Modifier
+              .constraint(this)
+              .testTag(imageOptions.testTag),
             painter = painter,
           )
         }

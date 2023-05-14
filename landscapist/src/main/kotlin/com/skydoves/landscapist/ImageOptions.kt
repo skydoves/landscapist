@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.IntSize
  * @property colorFilter The colorFilter parameter used to apply for the image when it is rendered onscreen.
  * @property alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @property requestSize The [IntSize] that will be used to request remote images.
+ * @property testTag A test tag option that will be applied to a success image's modifier.
  */
 @Immutable
 public data class ImageOptions(
@@ -43,6 +44,7 @@ public data class ImageOptions(
   public val colorFilter: ColorFilter? = null,
   public val alpha: Float = DefaultAlpha,
   public val requestSize: IntSize = IntSize(DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE),
+  public val testTag: String = "",
 ) {
   /** Returns true if the [requestSize] is valid. */
   public val isValidSize: Boolean

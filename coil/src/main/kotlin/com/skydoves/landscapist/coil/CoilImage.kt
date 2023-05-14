@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
@@ -57,11 +58,11 @@ import com.skydoves.landscapist.constraints.Constrainable
 import com.skydoves.landscapist.constraints.constraint
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
+import java.io.File
+import java.nio.ByteBuffer
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.channelFlow
 import okhttp3.HttpUrl
-import java.io.File
-import java.nio.ByteBuffer
 
 /**
  * Load and render an image with the given [imageModel] from the network or local storage.
@@ -110,10 +111,10 @@ public fun CoilImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (
-    BoxScope.(
-      imageState: CoilImageState.Success,
-      painter: Painter,
-    ) -> Unit
+  BoxScope.(
+    imageState: CoilImageState.Success,
+    painter: Painter,
+  ) -> Unit
   )? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
@@ -185,10 +186,10 @@ public fun CoilImage(
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (
-    BoxScope.(
-      imageState: CoilImageState.Success,
-      painter: Painter,
-    ) -> Unit
+  BoxScope.(
+    imageState: CoilImageState.Success,
+    painter: Painter,
+  ) -> Unit
   )? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
@@ -256,7 +257,9 @@ public fun CoilImage(
           success.invoke(this, coilImageState, painter)
         } else {
           imageOptions.LandscapistImage(
-            modifier = Modifier.constraint(this),
+            modifier = Modifier
+              .constraint(this)
+              .testTag(imageOptions.testTag),
             painter = painter,
           )
         }
