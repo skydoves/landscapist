@@ -13,10 +13,9 @@ HPLcom/skydoves/landscapist/transformation/TransformationPainter;->getIntrinsicS
 HPLcom/skydoves/landscapist/transformation/TransformationPainter;->onDraw(Landroidx/compose/ui/graphics/drawscope/DrawScope;)V
 PLcom/skydoves/landscapist/transformation/TransformationPainterKt;-><clinit>()V
 PLcom/skydoves/landscapist/transformation/TransformationPainterKt;->access$getPaintPool$p()Landroidx/core/util/Pools$SimplePool;
-Lcom/skydoves/landscapist/transformation/blur/BlurTransformationPlugin;
-HSPLcom/skydoves/landscapist/transformation/blur/BlurTransformationPlugin;-><clinit>()V
-HSPLcom/skydoves/landscapist/transformation/blur/BlurTransformationPlugin;-><init>(I)V
-HSPLcom/skydoves/landscapist/transformation/blur/BlurTransformationPlugin;-><init>(IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+PLcom/skydoves/landscapist/transformation/blur/BlurTransformationPlugin;-><clinit>()V
+PLcom/skydoves/landscapist/transformation/blur/BlurTransformationPlugin;-><init>(I)V
+PLcom/skydoves/landscapist/transformation/blur/BlurTransformationPlugin;-><init>(IILkotlin/jvm/internal/DefaultConstructorMarker;)V
 HPLcom/skydoves/landscapist/transformation/blur/BlurTransformationPlugin;->compose(Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/ui/graphics/painter/Painter;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
 PLcom/skydoves/landscapist/transformation/blur/RememberBlurPainterKt;->access$iterativeBlur(Landroid/graphics/Bitmap;I)Landroid/graphics/Bitmap;
 PLcom/skydoves/landscapist/transformation/blur/RememberBlurPainterKt;->iterativeBlur(Landroid/graphics/Bitmap;I)Landroid/graphics/Bitmap;
