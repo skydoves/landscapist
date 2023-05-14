@@ -37,7 +37,12 @@ internal fun rememberTarget(
   imageOptions: ImageOptions,
 ): FlowCustomTarget {
   val context = LocalContext.current
-  return remember(target, imageOptions) { RememberableTarget(context, target) }.value
+  return remember(target, imageOptions) {
+    RememberableTarget(
+      context.applicationContext,
+      target,
+    )
+  }.value
 }
 
 internal class RememberableTarget(
