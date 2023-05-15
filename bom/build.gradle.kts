@@ -17,22 +17,13 @@
 import com.github.skydoves.landscapist.Configuration
 
 plugins {
-  id("landscapist.library.compose")
-  id("landscapist.spotless")
+  `java-platform`
 }
 
 rootProject.extra.apply {
   set("PUBLISH_GROUP_ID", Configuration.artifactGroup)
   set("PUBLISH_ARTIFACT_ID", "landscapist-bom")
   set("PUBLISH_VERSION", rootProject.extra.get("rootVersionName"))
-}
-
-android {
-  namespace = "com.skydoves.landscapist.bom"
-  compileSdk = Configuration.compileSdk
-  defaultConfig {
-    minSdk = Configuration.minSdk
-  }
 }
 
 dependencies {

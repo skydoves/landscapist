@@ -8,7 +8,7 @@ task androidSourcesJar(type: Jar) {
   if (project.plugins.findPlugin("com.android.library")) {
     from android.sourceSets.main.java.srcDirs
     from android.sourceSets.main.kotlin.srcDirs
-  } else {
+  } else if (!project.name.contains("bom")) {
     from sourceSets.main.java.srcDirs
     from sourceSets.main.kotlin.srcDirs
   }
@@ -44,7 +44,7 @@ afterEvaluate {
         version PUBLISH_VERSION
         if (project.plugins.findPlugin("com.android.library")) {
           from components.release
-        } else {
+        } else if (!project.name.contains("bom")) {
           from components.java
         }
 
