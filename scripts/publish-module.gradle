@@ -36,8 +36,10 @@ afterEvaluate {
   publishing {
     publications {
       release(MavenPublication) {
-        tasks.named("generateMetadataFileForReleasePublication").configure { dependsOn("androidSourcesJar") }
-        tasks.named("generateMetadataFileForReleasePublication").configure { dependsOn("javadocJar") }
+        if (!project.name.contains("bom")) {
+          tasks.named("generateMetadataFileForReleasePublication").configure { dependsOn("androidSourcesJar") }
+          tasks.named("generateMetadataFileForReleasePublication").configure { dependsOn("javadocJar") }
+        }
         groupId PUBLISH_GROUP_ID
         artifactId PUBLISH_ARTIFACT_ID
         version PUBLISH_VERSION
