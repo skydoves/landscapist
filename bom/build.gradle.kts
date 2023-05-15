@@ -17,7 +17,7 @@
 import com.github.skydoves.landscapist.Configuration
 
 plugins {
-  `java-platform`
+  kotlin("jvm")
 }
 
 rootProject.extra.apply {
