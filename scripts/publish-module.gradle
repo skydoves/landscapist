@@ -46,7 +46,6 @@ afterEvaluate {
           artifact("$buildDir/libs/${project.getName()}-${version}.jar")
         }
 
-        artifact androidSourcesJar
         artifact javadocJar
 
         pom {
