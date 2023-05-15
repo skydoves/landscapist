@@ -46,6 +46,8 @@ afterEvaluate {
           artifact("$buildDir/libs/${project.getName()}-${version}.jar")
         }
 
+        artifact javadocJar
+
         pom {
           name = PUBLISH_ARTIFACT_ID
           description = 'Jetpack Compose image loading library that fetches and displays network images with Glide, Coil, and Fresco.'
