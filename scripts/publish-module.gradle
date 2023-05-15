@@ -43,12 +43,11 @@ afterEvaluate {
         version PUBLISH_VERSION
         if (project.plugins.findPlugin("com.android.library")) {
           from components.release
+          artifact androidSourcesJar
         } else {
           from components.java
+          artifact javadocJar
         }
-
-        artifact androidSourcesJar
-        artifact javadocJar
 
         pom {
           name = PUBLISH_ARTIFACT_ID
