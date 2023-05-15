@@ -5,7 +5,6 @@ apply plugin: 'org.jetbrains.dokka'
 task androidSourcesJar(type: Jar) {
   archiveClassifier.set('sources')
   if (project.plugins.findPlugin("com.android.library")) {
-    dependsOn(':bundleReleaseAar')
     from android.sourceSets.main.java.srcDirs
     from android.sourceSets.main.kotlin.srcDirs
   } else {
