@@ -14,17 +14,26 @@
  * limitations under the License.
  */
 
-//import com.github.skydoves.landscapist.Configuration
+import com.github.skydoves.landscapist.Configuration
 
 plugins {
-  `java-platform`
+  id("landscapist.library.compose")
+  id("landscapist.spotless")
 }
 
-//rootProject.extra.apply {
-//  set("PUBLISH_GROUP_ID", Configuration.artifactGroup)
-//  set("PUBLISH_ARTIFACT_ID", "landscapist-bom")
-//  set("PUBLISH_VERSION", rootProject.extra.get("rootVersionName"))
-//}
+rootProject.extra.apply {
+  set("PUBLISH_GROUP_ID", Configuration.artifactGroup)
+  set("PUBLISH_ARTIFACT_ID", "landscapist-bom")
+  set("PUBLISH_VERSION", rootProject.extra.get("rootVersionName"))
+}
+
+android {
+  namespace = "com.skydoves.landscapist.bom"
+  compileSdk = Configuration.compileSdk
+  defaultConfig {
+    minSdk = Configuration.minSdk
+  }
+}
 
 dependencies {
   constraints {
@@ -40,5 +49,5 @@ dependencies {
   }
 }
 
-//apply(from ="${rootDir}/scripts/publish-module.gradle")
+apply(from ="${rootDir}/scripts/publish-module.gradle")
 
