@@ -49,8 +49,10 @@ afterEvaluate {
           from components.java
         }
 
-        artifact androidSourcesJar
-        artifact javadocJar
+        if (!project.name.contains("bom")) {
+          artifact androidSourcesJar
+          artifact javadocJar
+        }
 
         pom {
           name = PUBLISH_ARTIFACT_ID
