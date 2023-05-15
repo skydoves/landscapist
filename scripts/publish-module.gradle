@@ -7,7 +7,7 @@ task androidSourcesJar(type: Jar) {
   if (project.plugins.findPlugin("com.android.library")) {
     from android.sourceSets.main.java.srcDirs
     from android.sourceSets.main.kotlin.srcDirs
-  } else if (!project.name.contains("bom")) {
+  } else {
     from sourceSets.main.java.srcDirs
     from sourceSets.main.kotlin.srcDirs
   }
@@ -36,23 +36,19 @@ afterEvaluate {
   publishing {
     publications {
       release(MavenPublication) {
-        if (!project.name.contains("bom")) {
-          tasks.named("generateMetadataFileForReleasePublication").configure { dependsOn("androidSourcesJar") }
-          tasks.named("generateMetadataFileForReleasePublication").configure { dependsOn("javadocJar") }
-        }
+        tasks.named("generateMetadataFileForReleasePublication").configure { dependsOn("androidSourcesJar") }
+        tasks.named("generateMetadataFileForReleasePublication").configure { dependsOn("javadocJar") }
         groupId PUBLISH_GROUP_ID
         artifactId PUBLISH_ARTIFACT_ID
         version PUBLISH_VERSION
         if (project.plugins.findPlugin("com.android.library")) {
           from components.release
-        } else if (!project.name.contains("bom")) {
+        } else {
           from components.java
         }
 
-        if (!project.name.contains("bom")) {
-          artifact androidSourcesJar
-          artifact javadocJar
-        }
+        artifact androidSourcesJar
+        artifact javadocJar
 
         pom {
           name = PUBLISH_ARTIFACT_ID
