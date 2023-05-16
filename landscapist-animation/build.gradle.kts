@@ -38,7 +38,9 @@ android {
   }
 
   publishing {
-    singleVariant("release")
+    singleVariant("release") {
+      withSourcesJar()
+    }
   }
 }
 

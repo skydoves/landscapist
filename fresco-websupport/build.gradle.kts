@@ -36,7 +36,9 @@ android {
     minSdk = Configuration.minSdk
   }
   publishing {
-    singleVariant("release")
+    singleVariant("release") {
+      withSourcesJar()
+    }
   }
 }
 
