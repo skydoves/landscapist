@@ -35,6 +35,9 @@ android {
   defaultConfig {
     minSdk = Configuration.minSdk
   }
+  publishing {
+    singleVariant("release")
+  }
 }
 
 baselineProfile {

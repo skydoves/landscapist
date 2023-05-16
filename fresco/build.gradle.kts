@@ -36,6 +36,9 @@ android {
     minSdk = Configuration.minSdk
     testInstrumentationRunner = "com.skydoves.landscapist.fresco.FrescoTestRunner"
   }
+  publishing {
+    singleVariant("release")
+  }
 }
 
 baselineProfile {
