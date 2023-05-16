@@ -11,16 +11,4 @@ plugins {
   alias(libs.plugins.dokka)
 }
 
-apply(from = "${rootDir}/scripts/publish-root.gradle.kts")
-
-// Set up Sonatype repository
-nexusPublishing {
-  this.repositories {
-    sonatype {
-      stagingProfileId.set(rootProject.extra.get("sonatypeStagingProfileId") as? String)
-      username.set(rootProject.extra.get("ossrhUsername") as? String)
-      password.set(rootProject.extra.get("ossrhPassword") as? String)
-      version = rootProject.extra.get("rootVersionName")
-    }
-  }
-}
+apply(from = "${rootDir}/scripts/publish-root.gradle")
