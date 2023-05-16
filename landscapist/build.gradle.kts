@@ -36,7 +36,7 @@ android {
     minSdk = Configuration.minSdk
   }
   publishing {
-    singleVariant("fullRelease")
+    singleVariant("release")
   }
 }
 

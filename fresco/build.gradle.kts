@@ -37,7 +37,7 @@ android {
     testInstrumentationRunner = "com.skydoves.landscapist.fresco.FrescoTestRunner"
   }
   publishing {
-    singleVariant("fullRelease")
+    singleVariant("release")
   }
 }
 

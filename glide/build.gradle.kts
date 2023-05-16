@@ -37,7 +37,7 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   publishing {
-    singleVariant("fullRelease")
+    singleVariant("release")
   }
 }
 

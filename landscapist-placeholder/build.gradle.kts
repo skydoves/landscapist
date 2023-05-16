@@ -38,7 +38,7 @@ android {
   }
 
   publishing {
-    singleVariant("fullRelease")
+    singleVariant("release")
   }
 }
 
