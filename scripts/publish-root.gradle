@@ -34,7 +34,7 @@ if (snapshot) {
 
 // Set up Sonatype repository
 nexusPublishing {
-  repositories {
+  this.repositories {
     sonatype {
       stagingProfileId = sonatypeStagingProfileId
       username = ossrhUsername

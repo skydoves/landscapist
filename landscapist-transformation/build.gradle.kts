@@ -48,8 +48,8 @@ android {
     }
   }
   publishing {
-    multipleVariants {
-      allVariants()
+    singleVariant("release") {
+      withSourcesJar()
     }
   }
 }

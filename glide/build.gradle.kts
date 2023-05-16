@@ -37,8 +37,8 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   publishing {
-    multipleVariants {
-      allVariants()
+    singleVariant("release") {
+      withSourcesJar()
     }
   }
 }
