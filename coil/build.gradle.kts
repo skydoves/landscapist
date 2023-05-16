@@ -36,6 +36,9 @@ android {
     minSdk = Configuration.minSdk
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
+  publishing {
+    singleVariant("fullRelease")
+  }
 }
 
 baselineProfile {
