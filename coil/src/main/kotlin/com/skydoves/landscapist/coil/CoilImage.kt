@@ -225,6 +225,7 @@ public fun CoilImage(
         component.ComposeLoadingStatePlugins(
           modifier = modifier,
           imageOptions = imageOptions,
+          executor = {},
         )
         loading?.invoke(this, coilImageState)
       }

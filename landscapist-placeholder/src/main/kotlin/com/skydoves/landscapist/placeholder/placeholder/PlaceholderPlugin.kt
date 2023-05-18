@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.IntSize
 import com.skydoves.landscapist.ImageBySource
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
@@ -42,6 +43,7 @@ public sealed class PlaceholderPlugin {
     override fun compose(
       modifier: Modifier,
       imageOptions: ImageOptions,
+      executor: @Composable (IntSize) -> Unit,
     ): ImagePlugin = apply {
       if (source != null) {
         ImageBySource(

@@ -70,7 +70,18 @@ public fun <T : Any> ImageLoad(
     propagateMinConstraints = true,
   ) {
     LaunchedEffect(key1 = recomposeKey, key2 = imageOptions) {
-      constrainable?.setConstraints(constraints)
+      val updatedConstraints = if (imageOptions.isValidSize) {
+        val size = imageOptions.requestSize
+        constraints.copy(
+          minWidth = size.width,
+          maxWidth = size.width,
+          minHeight = size.height,
+          maxHeight = size.height,
+        )
+      } else {
+        constraints
+      }
+      constrainable?.setConstraints(updatedConstraints)
     }
 
     content(state)

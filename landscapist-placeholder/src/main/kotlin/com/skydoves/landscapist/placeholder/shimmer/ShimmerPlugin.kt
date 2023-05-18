@@ -20,6 +20,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.plugins.ImagePlugin
 
@@ -48,6 +49,7 @@ public data class ShimmerPlugin(
   override fun compose(
     modifier: Modifier,
     imageOptions: ImageOptions,
+    executor: @Composable (IntSize) -> Unit,
   ): ImagePlugin = apply {
     Shimmer(
       modifier = modifier,

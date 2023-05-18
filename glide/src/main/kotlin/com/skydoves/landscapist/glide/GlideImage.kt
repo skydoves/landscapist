@@ -158,6 +158,19 @@ public fun GlideImage(
         component.ComposeLoadingStatePlugins(
           modifier = modifier,
           imageOptions = imageOptions,
+          executor = { size ->
+            GlideThumbnail(
+              recomposeKey = StableHolder(imageModel.invoke()),
+              imageOptions = imageOptions.copy(requestSize = size),
+              builder = StableHolder(
+                requestBuilder.invoke()
+                  .apply(requestOptions.invoke())
+                  .load(imageModel.invoke()) as RequestBuilder<Any>,
+              ),
+              glideRequestType = glideRequestType,
+              requestListener = StableHolder(requestListener?.invoke()),
+            )
+          },
         )
         loading?.invoke(this, glideImageState)
       }
@@ -219,7 +232,6 @@ public fun GlideImage(
  *   .asBitmap()
  *   .load(poster.poster)
  *   .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
- *   .thumbnail(0.6f)
  *   .transition(withCrossFade()),
  * modifier = modifier,
  * ) { imageState ->
@@ -285,6 +297,46 @@ private fun GlideImage(
     modifier = modifier,
     content = content,
   )
+}
+
+@Composable
+private fun GlideThumbnail(
+  recomposeKey: StableHolder<Any?>,
+  imageOptions: ImageOptions,
+  glideRequestType: GlideRequestType,
+  builder: StableHolder<RequestBuilder<Any>>,
+  requestListener: StableHolder<RequestListener<Any>?> = StableHolder(null),
+) {
+  GlideImage(
+    recomposeKey = recomposeKey,
+    imageOptions = imageOptions,
+    builder = builder,
+    glideRequestType = glideRequestType,
+    requestListener = requestListener,
+  ) ImageRequest@{ imageState ->
+    val glideImageState = imageState.toGlideImageState(
+      glideRequestType = glideRequestType,
+    )
+    if (glideImageState is GlideImageState.Success) {
+      val data = glideImageState.data ?: return@ImageRequest
+      val painter = if (data is Drawable) {
+        rememberDrawablePainter(
+          drawable = data,
+          imagePlugins = emptyList(),
+        )
+      } else {
+        rememberBitmapPainter(
+          imageBitmap = data.toImageBitmap(glideRequestType = glideRequestType),
+          imagePlugins = emptyList(),
+        )
+      }
+
+      imageOptions.LandscapistImage(
+        modifier = Modifier,
+        painter = painter,
+      )
+    }
+  }
 }
 
 private fun RequestManager.buildRequestBuilder(

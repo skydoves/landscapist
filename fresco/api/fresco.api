@@ -1,8 +1,10 @@
 public final class com/skydoves/landscapist/fresco/ComposableSingletons$FrescoImageKt {
 	public static final field INSTANCE Lcom/skydoves/landscapist/fresco/ComposableSingletons$FrescoImageKt;
 	public static field lambda-1 Lkotlin/jvm/functions/Function3;
+	public static field lambda-2 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
 	public final fun getLambda-1$fresco_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda-2$fresco_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/skydoves/landscapist/fresco/FrescoImage {
