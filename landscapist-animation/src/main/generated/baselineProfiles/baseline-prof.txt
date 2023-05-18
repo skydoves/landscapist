@@ -7,9 +7,10 @@ HPLcom/skydoves/landscapist/animation/circular/CircularRevealAnimationKt$remembe
 HPLcom/skydoves/landscapist/animation/circular/CircularRevealPainter;-><init>(Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/ui/graphics/painter/Painter;)V
 HPLcom/skydoves/landscapist/animation/circular/CircularRevealPainter;->getIntrinsicSize-NH-jbRc()J
 HPLcom/skydoves/landscapist/animation/circular/CircularRevealPainter;->setRadius(F)V
-PLcom/skydoves/landscapist/animation/circular/CircularRevealPlugin;-><clinit>()V
-PLcom/skydoves/landscapist/animation/circular/CircularRevealPlugin;-><init>(ILcom/skydoves/landscapist/animation/circular/CircularRevealFinishListener;)V
-PLcom/skydoves/landscapist/animation/circular/CircularRevealPlugin;-><init>(ILcom/skydoves/landscapist/animation/circular/CircularRevealFinishListener;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+Lcom/skydoves/landscapist/animation/circular/CircularRevealPlugin;
+HSPLcom/skydoves/landscapist/animation/circular/CircularRevealPlugin;-><clinit>()V
+HSPLcom/skydoves/landscapist/animation/circular/CircularRevealPlugin;-><init>(ILcom/skydoves/landscapist/animation/circular/CircularRevealFinishListener;)V
+HSPLcom/skydoves/landscapist/animation/circular/CircularRevealPlugin;-><init>(ILcom/skydoves/landscapist/animation/circular/CircularRevealFinishListener;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 HPLcom/skydoves/landscapist/animation/circular/CircularRevealPlugin;->compose(Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/ui/graphics/painter/Painter;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
 PLcom/skydoves/landscapist/animation/circular/CircularRevealState;->$values()[Lcom/skydoves/landscapist/animation/circular/CircularRevealState;
 PLcom/skydoves/landscapist/animation/circular/CircularRevealState;-><clinit>()V
@@ -19,9 +20,10 @@ HPLcom/skydoves/landscapist/animation/crossfade/CrossfadeAnimationKt;->rememberC
 HPLcom/skydoves/landscapist/animation/crossfade/CrossfadePainter;-><init>(Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/ui/graphics/painter/Painter;)V
 HPLcom/skydoves/landscapist/animation/crossfade/CrossfadePainter;->getIntrinsicSize-NH-jbRc()J
 PLcom/skydoves/landscapist/animation/crossfade/CrossfadePainter;->setTransitionColorFilter(Landroidx/compose/ui/graphics/ColorFilter;)V
-PLcom/skydoves/landscapist/animation/crossfade/CrossfadePlugin;-><clinit>()V
-PLcom/skydoves/landscapist/animation/crossfade/CrossfadePlugin;-><init>(I)V
-PLcom/skydoves/landscapist/animation/crossfade/CrossfadePlugin;-><init>(IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+Lcom/skydoves/landscapist/animation/crossfade/CrossfadePlugin;
+HSPLcom/skydoves/landscapist/animation/crossfade/CrossfadePlugin;-><clinit>()V
+HSPLcom/skydoves/landscapist/animation/crossfade/CrossfadePlugin;-><init>(I)V
+HSPLcom/skydoves/landscapist/animation/crossfade/CrossfadePlugin;-><init>(IILkotlin/jvm/internal/DefaultConstructorMarker;)V
 HPLcom/skydoves/landscapist/animation/crossfade/CrossfadePlugin;->compose(Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/ui/graphics/painter/Painter;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
 PLcom/skydoves/landscapist/animation/crossfade/CrossfadeTransitionKt;->updateAlpha-RaGpIIw([FF)V
 PLcom/skydoves/landscapist/animation/crossfade/CrossfadeTransitionKt;->updateBrightness-RaGpIIw([FF)V
