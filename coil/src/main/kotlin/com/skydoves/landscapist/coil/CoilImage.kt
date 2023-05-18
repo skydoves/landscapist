@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
 import coil.request.ImageRequest
@@ -225,6 +226,14 @@ public fun CoilImage(
         component.ComposeLoadingStatePlugins(
           modifier = modifier,
           imageOptions = imageOptions,
+          executor = { size ->
+            CoilThumbnail(
+              requestSize = size,
+              recomposeKey = StableHolder(imageRequest.invoke()),
+              imageLoader = StableHolder(imageLoader.invoke()),
+              imageOptions = imageOptions,
+            )
+          },
         )
         loading?.invoke(this, coilImageState)
       }
@@ -327,6 +336,32 @@ private fun CoilImage(
     modifier = modifier,
     content = content,
   )
+}
+
+@Composable
+private fun CoilThumbnail(
+  requestSize: IntSize,
+  recomposeKey: StableHolder<ImageRequest>,
+  imageOptions: ImageOptions,
+  imageLoader: StableHolder<ImageLoader> = StableHolder(LocalCoilProvider.getCoilImageLoader()),
+) {
+  CoilImage(
+    recomposeKey = recomposeKey,
+    imageLoader = imageLoader,
+    imageOptions = imageOptions.copy(requestSize = requestSize),
+  ) ImageRequest@{ imageState ->
+    val coilImageState = imageState.toCoilImageState()
+    if (coilImageState is CoilImageState.Success) {
+      val drawable = coilImageState.drawable ?: return@ImageRequest
+      imageOptions.LandscapistImage(
+        modifier = Modifier,
+        painter = rememberDrawablePainter(
+          drawable = drawable,
+          imagePlugins = emptyList(),
+        ),
+      )
+    }
+  }
 }
 
 private fun ImageResult.toResult(): ImageLoadState = when (this) {

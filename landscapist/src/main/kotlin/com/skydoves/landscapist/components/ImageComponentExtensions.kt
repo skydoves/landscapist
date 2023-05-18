@@ -18,6 +18,7 @@ package com.skydoves.landscapist.components
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.unit.IntSize
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.InternalLandscapistApi
 import com.skydoves.landscapist.plugins.ImagePlugin
@@ -39,9 +40,10 @@ public inline val ImageComponent.imagePlugins: List<ImagePlugin>
 public fun ImageComponent.ComposeLoadingStatePlugins(
   modifier: Modifier,
   imageOptions: ImageOptions,
+  executor: @Composable (IntSize) -> Unit,
 ) {
   imagePlugins.filterIsInstance<ImagePlugin.LoadingStatePlugin>().forEach { plugin ->
-    plugin.compose(modifier = modifier, imageOptions = imageOptions)
+    plugin.compose(modifier = modifier, imageOptions = imageOptions, executor = executor)
   }
 }
 

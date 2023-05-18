@@ -20,6 +20,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.IntSize
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
 
@@ -49,6 +50,7 @@ public sealed interface ImagePlugin {
     public fun compose(
       modifier: Modifier,
       imageOptions: ImageOptions,
+      executor: @Composable (IntSize) -> Unit,
     ): ImagePlugin
   }
 

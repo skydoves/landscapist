@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntSize
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.gif.GifDrawable
@@ -158,6 +159,16 @@ public fun GlideImage(
         component.ComposeLoadingStatePlugins(
           modifier = modifier,
           imageOptions = imageOptions,
+          executor = { size ->
+            GlideThumbnail(
+              requestSize = size,
+              recomposeKey = StableHolder(imageModel.invoke()),
+              imageOptions = imageOptions,
+              builder = StableHolder(
+                requestBuilder.invoke().load(imageModel.invoke()) as RequestBuilder<Any>,
+              ),
+            )
+          },
         )
         loading?.invoke(this, glideImageState)
       }
@@ -219,7 +230,6 @@ public fun GlideImage(
  *   .asBitmap()
  *   .load(poster.poster)
  *   .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
- *   .thumbnail(0.6f)
  *   .transition(withCrossFade()),
  * modifier = modifier,
  * ) { imageState ->
@@ -268,13 +278,22 @@ private fun GlideImage(
         }
 
         // start the image request into the target.
-        requestManager.buildRequestBuilder(
+        val typedBuilder = requestManager.buildRequestBuilder(
           glideRequestType = glideRequestType,
           recomposeKey = recomposeKey,
           flowRequestListener = flowRequestListener,
           requestListener = requestListener,
           builder = builder,
-        ).into(target)
+        )
+
+        // override this size.
+        val sizedBuilder = if (imageOptions.isValidSize) {
+          typedBuilder.override(imageOptions.requestSize.width, imageOptions.requestSize.height)
+        } else {
+          typedBuilder
+        }
+
+        sizedBuilder.into(target)
 
         awaitClose {
           // intentionally do not clear using the Glide.clear for recycling internal bitmaps.
@@ -285,6 +304,37 @@ private fun GlideImage(
     modifier = modifier,
     content = content,
   )
+}
+
+@Composable
+private fun GlideThumbnail(
+  requestSize: IntSize,
+  recomposeKey: StableHolder<Any?>,
+  imageOptions: ImageOptions,
+  builder: StableHolder<RequestBuilder<Any>>,
+) {
+  val glideRequestType = GlideRequestType.DRAWABLE
+  GlideImage(
+    recomposeKey = recomposeKey,
+    imageOptions = imageOptions.copy(requestSize = requestSize),
+    builder = builder,
+    glideRequestType = glideRequestType,
+    requestListener = StableHolder(null),
+  ) ImageRequest@{ imageState ->
+    val glideImageState = imageState.toGlideImageState(
+      glideRequestType = glideRequestType,
+    )
+    if (glideImageState is GlideImageState.Success) {
+      val data = glideImageState.data ?: return@ImageRequest
+      imageOptions.LandscapistImage(
+        modifier = Modifier,
+        painter = rememberDrawablePainter(
+          drawable = data as Drawable,
+          imagePlugins = emptyList(),
+        ),
+      )
+    }
+  }
 }
 
 private fun RequestManager.buildRequestBuilder(

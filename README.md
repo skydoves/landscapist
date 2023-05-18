@@ -544,7 +544,7 @@ You can compose supported image plugins by Landscapist or you can create your ow
 For example, you can implement your own `LoadingStatePlugin` that will be composed while loading an image like the below:
 
 ```kotlin
-public data class LoadingPlugin(val source: Any?) : ImagePlugin.LoadingStatePlugin {
+data class LoadingPlugin(val source: Any?) : ImagePlugin.LoadingStatePlugin {
 
   @Composable
   override fun compose(
@@ -649,7 +649,7 @@ You can show your own placeholder while loading an image or when fails to load a
 ```kotlin
 GlideImage(
   ..
-  component = imageComponent {
+  component = rememberImageComponent {
       +PlaceholderPlugin.Loading(painterResource(id = R.drawable.placeholder_loading))
       +PlaceholderPlugin.Failure(painterResource(id = R.drawable.placeholder_failure))
     },
@@ -657,6 +657,33 @@ GlideImage(
 ```
 
 > **Note**: The source should be one of `ImageBitmap`, `ImageVector`, or `Painter`.
+
+### ThumbnailPlugin
+
+<img src="https://github.com/skydoves/landscapist/assets/24237865/dad9db76-31c5-453a-98a8-f3dfd3103993" align="right" width="250px" />
+
+Landscapist supports the thumbnail feature, which pre-loads and displays small sizes of images while loading the original image. So you can make users feel images loading faster and give images a nature loading effect while displaying an original image.
+To show thumbnail, add the image plugin into your image component like the example below:
+
+```kotlin
+GlideImage(
+  ..,
+  component = rememberImageComponent {
+      +ThumbnailPlugin() 
+  },
+)
+```
+
+You can also adjust the request sizes by giving the `requestSize` parameter:
+
+```kotlin
+component = rememberImageComponent {
+    +ThumbnailPlugin(IntSize(30 ,30)) 
+},
+```
+
+> **Note**: It's highly recommended to use a small size of the request size on the thumbnail plugin to load the pre-load images process faster.
+
 
 ## Animation
 
@@ -673,8 +700,8 @@ dependencies {
 
 ### Preview
 
-| Circular Reveal | Crossfade |
-| :---------------: | :---------------: |
+|                                                                Circular Reveal                                                                 |                                                                   Crossfade                                                                    |
+|:----------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------:|
 | <img src="https://user-images.githubusercontent.com/24237865/189552544-5f8e1209-4930-45e6-a050-3a0cda088e9f.gif" align="center" width="100%"/> | <img src="https://user-images.githubusercontent.com/24237865/189552547-d933cee7-e811-4170-a806-1ac165e8f055.gif" align="center" width="100%"/> | 
 
 

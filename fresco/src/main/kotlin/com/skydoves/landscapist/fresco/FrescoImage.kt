@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntSize
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.drawee.backends.pipeline.info.ImageOriginRequestListener
 import com.facebook.imagepipeline.common.ResizeOptions
@@ -133,6 +134,14 @@ public fun FrescoImage(
         component.ComposeLoadingStatePlugins(
           modifier = modifier,
           imageOptions = imageOptions,
+          executor = { size ->
+            FrescoImageThumbnail(
+              requestSize = size,
+              recomposeKey = imageUrl,
+              imageOptions = imageOptions,
+              imageRequest = StableHolder(imageRequest.invoke()),
+            )
+          },
         )
         loading?.invoke(this, frescoImageState)
       }
@@ -244,4 +253,30 @@ private fun FrescoImage(
     modifier = modifier,
     content = content,
   )
+}
+
+@Composable
+private fun FrescoImageThumbnail(
+  requestSize: IntSize,
+  recomposeKey: String?,
+  imageOptions: ImageOptions,
+  imageRequest: StableHolder<ImageRequestBuilder>,
+) {
+  FrescoImage(
+    recomposeKey = recomposeKey,
+    imageOptions = imageOptions.copy(requestSize = requestSize),
+    imageRequest = imageRequest,
+  ) ImageRequest@{ imageState ->
+    val frescoImageState = imageState.toFrescoImageState()
+    if (frescoImageState is FrescoImageState.Success) {
+      val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
+      imageOptions.LandscapistImage(
+        modifier = Modifier,
+        painter = rememberBitmapPainter(
+          imageBitmap = imageBitmap,
+          imagePlugins = emptyList(),
+        ),
+      )
+    }
+  }
 }
