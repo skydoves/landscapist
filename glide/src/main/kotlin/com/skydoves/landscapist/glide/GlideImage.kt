@@ -136,17 +136,14 @@ public fun GlideImage(
     }
   }
 
-  val recomposeKey = StableHolder(imageModel.invoke())
-  val builder = StableHolder(
-    requestBuilder.invoke()
-      .apply(requestOptions.invoke())
-      .load(imageModel.invoke()) as RequestBuilder<Any>,
-  )
-
   GlideImage(
-    recomposeKey = recomposeKey,
+    recomposeKey = StableHolder(imageModel.invoke()),
     imageOptions = imageOptions,
-    builder = builder,
+    builder = StableHolder(
+      requestBuilder.invoke()
+        .apply(requestOptions.invoke())
+        .load(imageModel.invoke()) as RequestBuilder<Any>,
+    ),
     glideRequestType = glideRequestType,
     requestListener = StableHolder(requestListener?.invoke()),
     modifier = modifier,
