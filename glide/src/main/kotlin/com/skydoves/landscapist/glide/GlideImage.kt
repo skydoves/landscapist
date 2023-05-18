@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntSize
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.gif.GifDrawable
@@ -135,14 +136,17 @@ public fun GlideImage(
     }
   }
 
+  val recomposeKey = StableHolder(imageModel.invoke())
+  val builder = StableHolder(
+    requestBuilder.invoke()
+      .apply(requestOptions.invoke())
+      .load(imageModel.invoke()) as RequestBuilder<Any>,
+  )
+
   GlideImage(
-    recomposeKey = StableHolder(imageModel.invoke()),
+    recomposeKey = recomposeKey,
     imageOptions = imageOptions,
-    builder = StableHolder(
-      requestBuilder.invoke()
-        .apply(requestOptions.invoke())
-        .load(imageModel.invoke()) as RequestBuilder<Any>,
-    ),
+    builder = builder,
     glideRequestType = glideRequestType,
     requestListener = StableHolder(requestListener?.invoke()),
     modifier = modifier,
@@ -160,15 +164,12 @@ public fun GlideImage(
           imageOptions = imageOptions,
           executor = { size ->
             GlideThumbnail(
+              requestSize = size,
               recomposeKey = StableHolder(imageModel.invoke()),
-              imageOptions = imageOptions.copy(requestSize = size),
+              imageOptions = imageOptions,
               builder = StableHolder(
-                requestBuilder.invoke()
-                  .apply(requestOptions.invoke())
-                  .load(imageModel.invoke()) as RequestBuilder<Any>,
+                requestBuilder.invoke().load(imageModel.invoke()) as RequestBuilder<Any>,
               ),
-              glideRequestType = glideRequestType,
-              requestListener = StableHolder(requestListener?.invoke()),
             )
           },
         )
@@ -280,13 +281,22 @@ private fun GlideImage(
         }
 
         // start the image request into the target.
-        requestManager.buildRequestBuilder(
+        val typedBuilder = requestManager.buildRequestBuilder(
           glideRequestType = glideRequestType,
           recomposeKey = recomposeKey,
           flowRequestListener = flowRequestListener,
           requestListener = requestListener,
           builder = builder,
-        ).into(target)
+        )
+
+        // override this size.
+        val sizedBuilder = if (imageOptions.isValidSize) {
+          typedBuilder.override(imageOptions.requestSize.width, imageOptions.requestSize.height)
+        } else {
+          typedBuilder
+        }
+
+        sizedBuilder.into(target)
 
         awaitClose {
           // intentionally do not clear using the Glide.clear for recycling internal bitmaps.
@@ -301,39 +311,30 @@ private fun GlideImage(
 
 @Composable
 private fun GlideThumbnail(
+  requestSize: IntSize,
   recomposeKey: StableHolder<Any?>,
   imageOptions: ImageOptions,
-  glideRequestType: GlideRequestType,
   builder: StableHolder<RequestBuilder<Any>>,
-  requestListener: StableHolder<RequestListener<Any>?> = StableHolder(null),
 ) {
+  val glideRequestType = GlideRequestType.DRAWABLE
   GlideImage(
     recomposeKey = recomposeKey,
-    imageOptions = imageOptions,
+    imageOptions = imageOptions.copy(requestSize = requestSize),
     builder = builder,
     glideRequestType = glideRequestType,
-    requestListener = requestListener,
+    requestListener = StableHolder(null),
   ) ImageRequest@{ imageState ->
     val glideImageState = imageState.toGlideImageState(
       glideRequestType = glideRequestType,
     )
     if (glideImageState is GlideImageState.Success) {
       val data = glideImageState.data ?: return@ImageRequest
-      val painter = if (data is Drawable) {
-        rememberDrawablePainter(
-          drawable = data,
-          imagePlugins = emptyList(),
-        )
-      } else {
-        rememberBitmapPainter(
-          imageBitmap = data.toImageBitmap(glideRequestType = glideRequestType),
-          imagePlugins = emptyList(),
-        )
-      }
-
       imageOptions.LandscapistImage(
         modifier = Modifier,
-        painter = painter,
+        painter = rememberDrawablePainter(
+          drawable = data as Drawable,
+          imagePlugins = emptyList(),
+        ),
       )
     }
   }
