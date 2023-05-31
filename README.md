@@ -61,7 +61,7 @@ repositories {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.2.1-SNAPSHOT"
+    implementation "com.github.skydoves:landscapist-glide:2.2.2-SNAPSHOT"
 }
 ```
 </details>
@@ -85,11 +85,11 @@ allprojects {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.2.0"
+    implementation "com.github.skydoves:landscapist-glide:2.2.1"
 }
 ```
 
-> **Note**: `Landscapist-Glide` includes version `4.14.2` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
+> **Note**: `Landscapist-Glide` includes version `4.15.1` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### GlideImage
 You can load images simply by using `GlideImage` composable function as the following example below:
