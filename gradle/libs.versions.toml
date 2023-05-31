@@ -5,15 +5,16 @@ jvmTarget = "17"
 nexusPlugin = "1.3.0"
 kotlinxCoroutines = "1.7.1"
 kotlinBinaryCompatibility = "0.13.1"
-androidGradlePlugin = "8.0.0"
-androidxActivity = "1.4.0"
-androidxMaterial = "1.6.0"
+androidGradlePlugin = "8.0.2"
+androidxActivity = "1.7.2"
+androidxMaterial = "1.9.0"
 androidxComposeBom = "2023.05.01"
 androidxComposeCompiler = "1.4.7"
-androidxComposeConstraintLayout = "1.0.0"
-androidxCore = "1.8.0"
-androidxTest = "1.4.0"
-androidxJunit = "1.1.3"
+androidxComposeConstraintLayout = "1.0.1"
+androidxCore = "1.10.1"
+androidxTestRunner = "1.5.2"
+androidxTestRules = "1.5.0"
+androidxJunit = "1.1.5"
 androidxMacroBenchmark = "1.2.0-alpha13"
 androidxProfileinstaller = "1.3.1"
 androidxUiAutomator = "2.3.0-alpha02"
@@ -21,8 +22,9 @@ glide = "4.15.1"
 fresco = "2.6.0"
 coil = "2.2.2"
 palette = "1.0.0"
-hilt = "2.45"
-spotless = "6.17.0"
+hilt = "2.46.1"
+spotless = "6.19.0"
+desugar="2.0.3"
 
 [libraries]
 androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidxMaterial" }
@@ -42,8 +44,8 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "androidxProfileinstaller" }
-androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTest" }
-androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidxTest" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTestRunner" }
+androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidxTestRules" }
 androidx-test-junit = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "androidxJunit" }
 androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "androidxUiAutomator" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
@@ -60,6 +62,7 @@ fresco-drawable = { group = "com.facebook.fresco", name = "animated-drawable", v
 fresco-websupport = { group = "com.facebook.fresco", name = "webpsupport", version.ref = "fresco" }
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coil" }
+desugar = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
