@@ -90,6 +90,7 @@ import kotlinx.coroutines.flow.callbackFlow
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
+ * @param clearTarget Whether clear the target or not.
  * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
  * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
  * @param loading Content to be displayed when the request is in progress.
@@ -110,6 +111,7 @@ public fun GlideImage(
   requestListener: (() -> RequestListener<Any>)? = null,
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
+  clearTarget: Boolean = false,
   onImageStateChanged: (GlideImageState) -> Unit = {},
   @DrawableRes previewPlaceholder: Int = 0,
   loading: @Composable (BoxScope.(imageState: GlideImageState.Loading) -> Unit)? = null,
@@ -146,6 +148,7 @@ public fun GlideImage(
     ),
     glideRequestType = glideRequestType,
     requestListener = StableHolder(requestListener?.invoke()),
+    clearTarget = clearTarget,
     modifier = modifier,
   ) ImageRequest@{ imageState ->
     when (
@@ -246,6 +249,7 @@ public fun GlideImage(
  * @param modifier [Modifier] used to adjust the layout or drawing content.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param glideRequestType Glide image request type, which decides the result of image data.
+ * @param clearTarget Whether clear the target or not.
  * @param builder The request to execute.
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param content Content to be displayed for the given state.
@@ -256,6 +260,7 @@ private fun GlideImage(
   modifier: Modifier = Modifier,
   imageOptions: ImageOptions,
   glideRequestType: GlideRequestType,
+  clearTarget: Boolean = false,
   builder: StableHolder<RequestBuilder<Any>>,
   requestListener: StableHolder<RequestListener<Any>?> = StableHolder(null),
   content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit,
@@ -264,6 +269,7 @@ private fun GlideImage(
   val target = rememberTarget(
     target = FlowCustomTarget(imageOptions = imageOptions),
     imageOptions = imageOptions,
+    clearTarget = clearTarget,
   )
 
   ImageLoad(
