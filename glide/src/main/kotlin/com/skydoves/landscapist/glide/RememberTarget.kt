@@ -30,17 +30,20 @@ import com.skydoves.landscapist.ImageOptions
  *
  * @param target the [FlowCustomTarget] to be remembered
  * @param imageOptions the [ImageOptions] to be used a key.
+ * @param clearTarget Whether clear the target or not.
  */
 @Composable
 internal fun rememberTarget(
   target: FlowCustomTarget,
   imageOptions: ImageOptions,
+  clearTarget: Boolean,
 ): FlowCustomTarget {
   val context = LocalContext.current
   return remember(target, imageOptions) {
     RememberableTarget(
-      context.applicationContext,
-      target,
+      context = context.applicationContext,
+      target = target,
+      clearTarget = clearTarget,
     )
   }.value
 }
@@ -48,6 +51,7 @@ internal fun rememberTarget(
 internal class RememberableTarget(
   private val context: Context,
   private val target: FlowCustomTarget,
+  private val clearTarget: Boolean,
 ) : RememberObserver {
 
   internal val value: FlowCustomTarget
@@ -58,10 +62,14 @@ internal class RememberableTarget(
   }
 
   override fun onAbandoned() {
-    Glide.with(context).clear(target)
+    if (clearTarget) {
+      Glide.with(context).clear(target)
+    }
   }
 
   override fun onForgotten() {
-    Glide.with(context).clear(target)
+    if (clearTarget) {
+      Glide.with(context).clear(target)
+    }
   }
 }
