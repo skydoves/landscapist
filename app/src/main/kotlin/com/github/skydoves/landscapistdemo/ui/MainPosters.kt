@@ -15,6 +15,8 @@
  */
 package com.github.skydoves.landscapistdemo.ui
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,6 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -62,6 +66,7 @@ import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.palette.rememberPaletteState
+import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
 
 @Composable
 fun DisneyPosters(
@@ -98,7 +103,10 @@ fun DisneyPosters(
         PosterItem(poster, vm)
       }
     }
-    SelectedPoster(poster)
+    val context = LocalContext.current
+    SelectedPoster(poster) {
+      Toast.makeText(context, poster.name, Toast.LENGTH_SHORT).show()
+    }
   }
 }
 
@@ -125,15 +133,28 @@ private fun PosterItem(
 @Composable
 private fun SelectedPoster(
   poster: Poster,
+  onClick: (() -> Unit)? = null,
 ) {
   var palette by rememberPaletteState(null)
 
+  var modifier: Modifier = Modifier
+  if (onClick != null) {
+    modifier = modifier.clickable { onClick() }
+  }
+
   GlideImage(
     imageModel = { poster.image },
-    modifier = Modifier.aspectRatio(0.8f),
+    modifier = modifier
+      .aspectRatio(0.8f)
+      .clickable { onClick?.invoke() },
     component = rememberImageComponent {
+      +PlaceholderPlugin.Loading(painterResource(id = R.drawable.ic_android))
+      +PlaceholderPlugin.Failure(painterResource(id = R.drawable.ic_android))
       +CircularRevealPlugin()
       +PalettePlugin { palette = it }
+    },
+    onImageStateChanged = {
+      Log.e("Test", "state: $it")
     },
     previewPlaceholder = R.drawable.poster,
   )
