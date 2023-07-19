@@ -62,6 +62,7 @@ public final class com/skydoves/landscapist/glide/GlideRequestType : java/lang/E
 	public static final field BITMAP Lcom/skydoves/landscapist/glide/GlideRequestType;
 	public static final field DRAWABLE Lcom/skydoves/landscapist/glide/GlideRequestType;
 	public static final field GIF Lcom/skydoves/landscapist/glide/GlideRequestType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcom/skydoves/landscapist/glide/GlideRequestType;
 	public static fun values ()[Lcom/skydoves/landscapist/glide/GlideRequestType;
 }
