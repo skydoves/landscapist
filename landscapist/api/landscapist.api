@@ -3,6 +3,7 @@ public final class com/skydoves/landscapist/DataSource : java/lang/Enum {
 	public static final field MEMORY Lcom/skydoves/landscapist/DataSource;
 	public static final field NETWORK Lcom/skydoves/landscapist/DataSource;
 	public static final field UNKNOWN Lcom/skydoves/landscapist/DataSource;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcom/skydoves/landscapist/DataSource;
 	public static fun values ()[Lcom/skydoves/landscapist/DataSource;
 }
