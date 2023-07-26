@@ -1,0 +1,63 @@
+site_name: Landscapist
+site_description: 'A pluggable, highly optimized Jetpack Compose image loading library that fetches and displays network images with Glide, Coil, and Fresco.'
+site_author: 'Jaewoong (skydoves)'
+site_url: 'https://github.com/skydoves/landscapist'
+edit_uri: 'tree/main/docs/'
+remote_branch: gh-pages
+
+docs_dir: docs
+
+# Navigation
+nav:
+  - 'Overview': index.md
+  - 'Snapshot': snapshot.md
+  - 'Glide':
+    - 'Overview': glide/overview.md
+    - 'Custom Options': glide/options.md
+  - 'Coil':
+    - 'Overview': coil/overview.md
+    - 'Custom ImageLoader': coil/imageloader.md
+  - 'Fresco':
+    - 'Overview': fresco/overview.md
+    - 'Custom ImageRequest': fresco/request.md
+    - 'Animated Image Support (GIF, Webp)': 'fresco/animated-image.md' 
+  - 'ImageOptions': image-options.md  
+    
+# Repository
+repo_name: 'Landscapist'
+repo_url: 'https://github.com/skydoves/landscapist'
+
+# Configuration
+theme:
+  name: 'material'
+  language: 'en'
+  icon:
+    logo: material/leaf-maple
+
+  palette:
+    primary: 'red'
+    accent: 'red'
+    scheme: slate
+
+  font:
+    text: 'Roboto'
+    code: 'JetBrains Mono'
+
+  features:
+    - content.tabs.link  
+    - content.code.copy
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - attr_list
+  - codehilite:
+      guess_lang: false
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.betterem
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
