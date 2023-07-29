@@ -1,4 +1,4 @@
-# Sponsor
+# Sponsor 🩷
 
 Landscapist has been skillfully crafted and maintained by [skydoves (Jaewoong Eum)](https://github.com/skydoves) since the early days of Compose when it was in its alpha version. As an early adopter of Compose, skydoves recognized the potential of this modern toolkit and set out to develop Landscapist, ensuring seamless and efficient image loading capabilities within Compose-based projects.
 
