@@ -28,9 +28,7 @@ class SpotlessConventionPlugin : Plugin<Project> {
         kotlin {
           target("**/*.kt")
           targetExclude("**/build/**/*.kt")
-          ktlint()
-            .setUseExperimental(true)
-            .editorConfigOverride(mapOf("indent_size" to 2, "continuation_indent_size" to 2))
+          ktlint().editorConfigOverride(mapOf("indent_size" to 2, "continuation_indent_size" to 2))
           licenseHeaderFile(rootProject.file("$rootDir/spotless/copyright.kt"))
         }
         format("kts") {
