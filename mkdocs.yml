@@ -59,6 +59,11 @@ theme:
     - content.code.copy
     - content.code.annotate
 
+extra:
+  analytics:
+    provider: google
+    property: G-1SBY14Q79E    
+
 # Extensions
 markdown_extensions:
   - admonition
