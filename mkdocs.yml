@@ -20,8 +20,19 @@ nav:
   - 'Fresco':
     - 'Overview': fresco/overview.md
     - 'Custom ImageRequest': fresco/request.md
-    - 'Animated Image Support (GIF, Webp)': 'fresco/animated-image.md' 
-  - 'ImageOptions': image-options.md  
+    - 'Animated Image Support': 'fresco/animated-image.md' 
+  - 'Image Options': image-options.md
+  - 'Image States': image-state.md
+  - 'Custom Composable': custom-composable.md
+  - 'Preview on Android Studio': preview.md
+  - 'Placeholder': placeholder.md
+  - 'Animation': animation.md
+  - 'Transformation': transformation.md
+  - 'Palette': palette.md
+  - 'Image Component and Plugin': image-component-and-plugin.md
+  - 'BOM': bom.md
+  - 'Snapshots With Paparazzi': snapshots-with-paparazzi.md
+  - 'Sponsor 🩷': sponsor.md
     
 # Repository
 repo_name: 'Landscapist'
@@ -46,6 +57,7 @@ theme:
   features:
     - content.tabs.link  
     - content.code.copy
+    - content.code.annotate
 
 # Extensions
 markdown_extensions:
