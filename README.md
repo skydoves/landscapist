@@ -34,6 +34,10 @@ Landscapist is built with a lot of consideration to improve the performance of i
 
 </details>
 
+## Documentation
+
+If you want to learn everything about Landscapist, you can [check out the docs for Landscapist](https://skydoves.github.io/landscapist/).
+
 ## Demo projects
 You can see the use cases of this library in the repositories below:
 - [google/modernstorage](https://github.com/google/modernstorage/tree/e62cda539ca75884dd49df3bcf8629751f0a91e6/sample): ModernStorage is a group of libraries that provide an abstraction layer over storage on Android to simplify its interactions.
