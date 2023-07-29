@@ -15,7 +15,8 @@
  */
 package com.skydoves.benchmark.landscapist
 
-import androidx.benchmark.macro.ExperimentalStableBaselineProfilesApi
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.BySelector
@@ -25,14 +26,14 @@ import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
 
+@RequiresApi(Build.VERSION_CODES.P)
 class BaselineProfileGenerator {
   @get:Rule
   val baselineProfileRule = BaselineProfileRule()
 
   @Test
-  @OptIn(ExperimentalStableBaselineProfilesApi::class)
   fun startup() =
-    baselineProfileRule.collectStableBaselineProfile(
+    baselineProfileRule.collect(
       packageName = packageName,
       stableIterations = 2,
       maxIterations = 8,
@@ -44,7 +45,7 @@ class BaselineProfileGenerator {
       startActivityAndWait()
       device.waitForIdle()
 
-      device.testDiscover() || return@collectStableBaselineProfile
+      device.testDiscover() || return@collect
     }
 }
 
