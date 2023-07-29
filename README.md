@@ -500,18 +500,14 @@ Also, you can customize the image content with our own composable function like 
 ```kotlin
 GlideImage( // CoilImage, FrescoImage
   imageModel = { imageUrl },
-  // draw a resized image.
-  success = { imageState ->
-    imageState.imageBitmap?.let {
-      Image(
-        bitmap = it,
-        modifier = Modifier.size(128.dp)
-      )
-    }
+  success = { state, painter ->
+    Image(
+      painter = painter,
+      modifier = Modifier.size(128.dp), // draw a resized image.
+      contentDescription = "Image"
+    )
   },
-  loading = { 
-    // do something 
-  }
+  ..  
 )
 ```
 > **Note**: You can also use the custom Composables for **`CoilImage`** and **`FrescoImage`**.
@@ -786,7 +782,7 @@ You can extract primary (theme) color profiles with `PalettePlugin`. You can che
 <img src="https://user-images.githubusercontent.com/24237865/129226361-877689b8-a1ec-4f59-b8a6-e2efe33a8de7.gif" align="right" width="250"/>
 
 ```kotlin
-var palette by remember { mutableStateOf<Palette?>(null) }
+var palette by rememberPaletteState(null)
 
 GlideImage( // CoilImage, FrescoImage also can be used.
   imageModel = { poster.image },
