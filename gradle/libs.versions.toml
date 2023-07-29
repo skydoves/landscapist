@@ -24,7 +24,6 @@ coil = "2.3.0"
 palette = "1.0.0"
 hilt = "2.47"
 spotless = "6.20.0"
-desugar="2.0.3"
 
 [libraries]
 androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidxMaterial" }
@@ -62,7 +61,6 @@ fresco-drawable = { group = "com.facebook.fresco", name = "animated-drawable", v
 fresco-websupport = { group = "com.facebook.fresco", name = "webpsupport", version.ref = "fresco" }
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coil" }
-desugar = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
