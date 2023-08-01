@@ -187,6 +187,7 @@ private fun ColorPalettes(palette: Palette?) {
         modifier = Modifier
           .padding(horizontal = 8.dp)
           .size(45.dp),
+        label = "ColorPalettes",
       ) {
         Box(
           modifier = Modifier
