@@ -132,7 +132,7 @@ public fun FrescoImage(
 
       is FrescoImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
-          modifier = modifier,
+          modifier = Modifier.constraint(this),
           imageOptions = imageOptions,
           executor = { size ->
             FrescoImageThumbnail(
@@ -148,7 +148,7 @@ public fun FrescoImage(
 
       is FrescoImageState.Failure -> {
         component.ComposeFailureStatePlugins(
-          modifier = modifier,
+          modifier = Modifier.constraint(this),
           imageOptions = imageOptions,
           reason = frescoImageState.reason,
         )
@@ -157,7 +157,7 @@ public fun FrescoImage(
 
       is FrescoImageState.Success -> {
         component.ComposeSuccessStatePlugins(
-          modifier = modifier,
+          modifier = Modifier.constraint(this),
           imageModel = imageUrl,
           imageOptions = imageOptions,
           imageBitmap = frescoImageState.imageBitmap,

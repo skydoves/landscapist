@@ -224,7 +224,7 @@ public fun CoilImage(
 
       is CoilImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
-          modifier = modifier,
+          modifier = Modifier.constraint(this),
           imageOptions = imageOptions,
           executor = { size ->
             CoilThumbnail(
@@ -240,7 +240,7 @@ public fun CoilImage(
 
       is CoilImageState.Failure -> {
         component.ComposeFailureStatePlugins(
-          modifier = modifier,
+          modifier = Modifier.constraint(this),
           imageOptions = imageOptions,
           reason = coilImageState.reason,
         )
@@ -249,7 +249,7 @@ public fun CoilImage(
 
       is CoilImageState.Success -> {
         component.ComposeSuccessStatePlugins(
-          modifier = modifier,
+          modifier = Modifier.constraint(this),
           imageModel = imageRequest.invoke().data,
           imageOptions = imageOptions,
           imageBitmap = coilImageState.drawable?.toBitmap()

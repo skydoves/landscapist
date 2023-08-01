@@ -160,7 +160,7 @@ public fun GlideImage(
 
       is GlideImageState.Loading -> {
         component.ComposeLoadingStatePlugins(
-          modifier = modifier,
+          modifier = Modifier.constraint(this),
           imageOptions = imageOptions,
           executor = { size ->
             GlideThumbnail(
@@ -178,7 +178,7 @@ public fun GlideImage(
 
       is GlideImageState.Failure -> {
         component.ComposeFailureStatePlugins(
-          modifier = modifier,
+          modifier = Modifier.constraint(this),
           imageOptions = imageOptions,
           reason = glideImageState.reason,
         )
@@ -187,7 +187,7 @@ public fun GlideImage(
 
       is GlideImageState.Success -> {
         component.ComposeSuccessStatePlugins(
-          modifier = modifier,
+          modifier = Modifier.constraint(this),
           imageModel = imageModel,
           imageOptions = imageOptions,
           imageBitmap = glideImageState.data.toImageBitmap(
