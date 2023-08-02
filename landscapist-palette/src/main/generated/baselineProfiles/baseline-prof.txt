@@ -1,13 +1,11 @@
 Lcom/skydoves/landscapist/palette/BitmapPalette;
-PLcom/skydoves/landscapist/palette/BitmapPalette;->$r8$lambda$yRmSrUfqPKXPlnH_KJwHgujBAhc(Lcom/skydoves/landscapist/palette/BitmapPalette;Ljava/lang/Object;Landroidx/palette/graphics/Palette;)V
 HSPLcom/skydoves/landscapist/palette/BitmapPalette;-><clinit>()V
 HSPLcom/skydoves/landscapist/palette/BitmapPalette;-><init>(Ljava/lang/Object;ZLcom/skydoves/landscapist/palette/PaletteBuilderInterceptor;Lcom/skydoves/landscapist/palette/PaletteLoadedListener;)V
 PLcom/skydoves/landscapist/palette/BitmapPalette;->access$getCache$delegate$cp()Lkotlin/Lazy;
+PLcom/skydoves/landscapist/palette/BitmapPalette;->access$getPaletteLoadedListener$p(Lcom/skydoves/landscapist/palette/BitmapPalette;)Lcom/skydoves/landscapist/palette/PaletteLoadedListener;
+PLcom/skydoves/landscapist/palette/BitmapPalette;->access$getUseCache$p(Lcom/skydoves/landscapist/palette/BitmapPalette;)Z
 PLcom/skydoves/landscapist/palette/BitmapPalette;->applyImageModel(Ljava/lang/Object;)Lcom/skydoves/landscapist/palette/BitmapPalette;
-PLcom/skydoves/landscapist/palette/BitmapPalette;->generate$lambda$1(Lcom/skydoves/landscapist/palette/BitmapPalette;Ljava/lang/Object;Landroidx/palette/graphics/Palette;)V
 HPLcom/skydoves/landscapist/palette/BitmapPalette;->generate(Landroid/graphics/Bitmap;)V
-PLcom/skydoves/landscapist/palette/BitmapPalette$$ExternalSyntheticLambda0;-><init>(Lcom/skydoves/landscapist/palette/BitmapPalette;Ljava/lang/Object;)V
-PLcom/skydoves/landscapist/palette/BitmapPalette$$ExternalSyntheticLambda0;->onGenerated(Landroidx/palette/graphics/Palette;)V
 Lcom/skydoves/landscapist/palette/BitmapPalette$Companion;
 HSPLcom/skydoves/landscapist/palette/BitmapPalette$Companion;-><init>()V
 HSPLcom/skydoves/landscapist/palette/BitmapPalette$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -17,6 +15,8 @@ HSPLcom/skydoves/landscapist/palette/BitmapPalette$Companion$cache$2;-><clinit>(
 HSPLcom/skydoves/landscapist/palette/BitmapPalette$Companion$cache$2;-><init>()V
 PLcom/skydoves/landscapist/palette/BitmapPalette$Companion$cache$2;->invoke()Landroid/util/LruCache;
 PLcom/skydoves/landscapist/palette/BitmapPalette$Companion$cache$2;->invoke()Ljava/lang/Object;
+PLcom/skydoves/landscapist/palette/BitmapPalette$generate$1;-><init>(Lcom/skydoves/landscapist/palette/BitmapPalette;Ljava/lang/Object;)V
+PLcom/skydoves/landscapist/palette/BitmapPalette$generate$1;->onGenerated(Landroidx/palette/graphics/Palette;)V
 Lcom/skydoves/landscapist/palette/PalettePlugin;
 HSPLcom/skydoves/landscapist/palette/PalettePlugin;-><clinit>()V
 HSPLcom/skydoves/landscapist/palette/PalettePlugin;-><init>(Ljava/lang/Object;ZLcom/skydoves/landscapist/palette/PaletteBuilderInterceptor;Lcom/skydoves/landscapist/palette/PaletteLoadedListener;)V
