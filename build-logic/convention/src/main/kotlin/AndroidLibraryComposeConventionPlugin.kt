@@ -20,8 +20,11 @@ import com.skydoves.landscapist.configureKotlinAndroid
 import com.skydoves.landscapist.kotlinOptions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.getByType
 
 class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
@@ -39,6 +42,12 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
         kotlinOptions {
           freeCompilerArgs = freeCompilerArgs + listOf("-Xexplicit-api=strict")
         }
+      }
+
+      val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+      tasks.withType(JavaCompile::class.java).configureEach {
+        this.targetCompatibility = libs.findVersion("jvmTarget").get().toString()
+        this.sourceCompatibility = libs.findVersion("jvmTarget").get().toString()
       }
 
       dependencies {
