@@ -2082,7 +2082,7 @@ HSPLcom/facebook/soloader/SoLoader;->makeNonZipPath(Ljava/lang/String;)Ljava/lan
 HSPLcom/facebook/soloader/SoLoader;->makePrepareFlags()I
 Lcom/facebook/soloader/SoLoader$1;
 HSPLcom/facebook/soloader/SoLoader$1;-><init>(ZLjava/lang/String;Ljava/lang/String;Ljava/lang/Runtime;Ljava/lang/reflect/Method;)V
-PLcom/facebook/soloader/SoLoader$1;->load(Ljava/lang/String;I)V
+HSPLcom/facebook/soloader/SoLoader$1;->load(Ljava/lang/String;I)V
 Lcom/facebook/soloader/SoSource;
 HSPLcom/facebook/soloader/SoSource;-><init>()V
 HSPLcom/facebook/soloader/SoSource;->prepare(I)V
@@ -2166,8 +2166,13 @@ PLcom/skydoves/landscapist/fresco/FrescoImageState$Success;->getImageBitmap()Lan
 Lcom/skydoves/landscapist/fresco/FrescoImageStateKt;
 HPLcom/skydoves/landscapist/fresco/FrescoImageStateKt;->toFrescoImageState(Lcom/skydoves/landscapist/ImageLoadState;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/fresco/FrescoImageState;
 Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;
+PLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->$r8$lambda$wUrv6CMjt9NWbLOkKyP2ntkCB2A(Lcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;Ljava/lang/String;IZLjava/lang/String;)V
 HPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->FrescoImage$FrescoImage__FrescoImageKt(Ljava/lang/String;Lcom/skydoves/landscapist/ImageOptions;Lcom/skydoves/landscapist/StableHolder;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
-HPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->FrescoImage(Ljava/lang/String;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
+PLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->FrescoImage$lambda$2$FrescoImage__FrescoImageKt(Lcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;Ljava/lang/String;IZLjava/lang/String;)V
+HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->FrescoImage(Ljava/lang/String;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
+Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda0;
+HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda0;-><init>(Lcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;)V
+PLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda0;->onImageLoaded(Ljava/lang/String;IZLjava/lang/String;)V
 Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$1;
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$1;-><init>(Ljava/lang/String;I)V
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$1;->invoke(Landroidx/compose/runtime/Composer;I)Lcom/facebook/imagepipeline/request/ImageRequestBuilder;
@@ -2190,9 +2195,6 @@ HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$6;->i
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$6;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$6$1$1;
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$6$1$1;-><init>(Lcom/facebook/datasource/DataSource;)V
-Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$imageOriginRequestListener$1;
-HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$imageOriginRequestListener$1;-><init>(Lcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;)V
-PLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$imageOriginRequestListener$1;->onImageLoaded(Ljava/lang/String;IZLjava/lang/String;)V
 Lcom/skydoves/landscapist/fresco/LocalFrescoProvider;
 HSPLcom/skydoves/landscapist/fresco/LocalFrescoProvider;-><clinit>()V
 HSPLcom/skydoves/landscapist/fresco/LocalFrescoProvider;-><init>()V
