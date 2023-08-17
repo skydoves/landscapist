@@ -22,7 +22,7 @@ HSPLcom/skydoves/landscapist/DrawablePainter$callback$2;->invoke()Lcom/skydoves/
 HSPLcom/skydoves/landscapist/DrawablePainter$callback$2;->invoke()Ljava/lang/Object;
 Lcom/skydoves/landscapist/DrawablePainter$callback$2$1;
 HSPLcom/skydoves/landscapist/DrawablePainter$callback$2$1;-><init>(Lcom/skydoves/landscapist/DrawablePainter;)V
-HPLcom/skydoves/landscapist/DrawablePainter$callback$2$1;->invalidateDrawable(Landroid/graphics/drawable/Drawable;)V
+PLcom/skydoves/landscapist/DrawablePainter$callback$2$1;->invalidateDrawable(Landroid/graphics/drawable/Drawable;)V
 Lcom/skydoves/landscapist/DrawablePainterKt;
 HSPLcom/skydoves/landscapist/DrawablePainterKt;-><clinit>()V
 HSPLcom/skydoves/landscapist/DrawablePainterKt;->access$getIntrinsicSize(Landroid/graphics/drawable/Drawable;)J
@@ -85,10 +85,10 @@ Lcom/skydoves/landscapist/ImageLoad__ImageLoadKt$executeImageLoading$3;
 HSPLcom/skydoves/landscapist/ImageLoad__ImageLoadKt$executeImageLoading$3;-><init>(Lkotlin/coroutines/Continuation;)V
 Lcom/skydoves/landscapist/ImageOptions;
 HSPLcom/skydoves/landscapist/ImageOptions;-><clinit>()V
-HPLcom/skydoves/landscapist/ImageOptions;-><init>(Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJLjava/lang/String;)V
+HSPLcom/skydoves/landscapist/ImageOptions;-><init>(Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJLjava/lang/String;)V
 HSPLcom/skydoves/landscapist/ImageOptions;-><init>(Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 HSPLcom/skydoves/landscapist/ImageOptions;-><init>(Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJLjava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-HPLcom/skydoves/landscapist/ImageOptions;->equals(Ljava/lang/Object;)Z
+HSPLcom/skydoves/landscapist/ImageOptions;->equals(Ljava/lang/Object;)Z
 HSPLcom/skydoves/landscapist/ImageOptions;->getAlignment()Landroidx/compose/ui/Alignment;
 HSPLcom/skydoves/landscapist/ImageOptions;->getAlpha()F
 HSPLcom/skydoves/landscapist/ImageOptions;->getColorFilter()Landroidx/compose/ui/graphics/ColorFilter;
@@ -112,7 +112,6 @@ HPLcom/skydoves/landscapist/RememberPainterPluginsKt;->rememberDrawablePainter(L
 Lcom/skydoves/landscapist/StableHolder;
 HSPLcom/skydoves/landscapist/StableHolder;-><clinit>()V
 HSPLcom/skydoves/landscapist/StableHolder;-><init>(Ljava/lang/Object;)V
-HSPLcom/skydoves/landscapist/StableHolder;->equals(Ljava/lang/Object;)Z
 HSPLcom/skydoves/landscapist/StableHolder;->getValue()Ljava/lang/Object;
 Lcom/skydoves/landscapist/components/ImageComponent;
 Lcom/skydoves/landscapist/components/ImageComponentExtensionsKt;
