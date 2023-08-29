@@ -26,7 +26,7 @@ import kotlinx.coroutines.channels.trySendBlocking
 /**
  * FlowRequestListener is a [RequestListener] for receiving Glide image results from network and handle states.
  */
-internal class FlowRequestListener constructor(
+internal class FlowRequestListener(
   private val producerScope: ProducerScope<ImageLoadState>,
   private val failException: (Throwable?) -> Unit,
 ) : RequestListener<Any> {
@@ -34,7 +34,7 @@ internal class FlowRequestListener constructor(
   override fun onLoadFailed(
     e: GlideException?,
     model: Any?,
-    target: Target<Any>?,
+    target: Target<Any>,
     isFirstResource: Boolean,
   ): Boolean {
     failException.invoke(e)
@@ -43,8 +43,8 @@ internal class FlowRequestListener constructor(
   }
 
   override fun onResourceReady(
-    resource: Any?,
-    model: Any?,
+    resource: Any,
+    model: Any,
     target: Target<Any>?,
     dataSource: DataSource,
     isFirstResource: Boolean,
