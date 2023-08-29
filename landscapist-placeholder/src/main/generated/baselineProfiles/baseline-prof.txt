@@ -19,14 +19,14 @@ HSPLcom/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin;-><init>(JJLandro
 HSPLcom/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin;->compose(Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
 Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt;
 HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt;-><clinit>()V
-HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt;->Shimmer-0Cdfkco(Landroidx/compose/ui/Modifier;JJLandroidx/compose/ui/unit/Dp;FFFILandroidx/compose/runtime/Composer;II)V
+HPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt;->Shimmer-0Cdfkco(Landroidx/compose/ui/Modifier;JJLandroidx/compose/ui/unit/Dp;FFFILandroidx/compose/runtime/Composer;II)V
 HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt;->access$getPaintPool$p()Landroidx/core/util/Pools$SimplePool;
 HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt;->access$offset(FFF)F
 HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt;->offset$Shimmer__ShimmerKt(FFF)F
 Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$1;
 HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$1;-><init>(Landroidx/compose/animation/core/Animatable;ILkotlin/coroutines/Continuation;)V
 HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$1;->create(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
-HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$1;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
+PLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$1;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$2$1;
 HSPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$2$1;-><init>(FLjava/lang/Float;Landroidx/compose/animation/core/Animatable;JJFF)V
 HPLcom/skydoves/landscapist/placeholder/shimmer/Shimmer__ShimmerKt$Shimmer$2$1;->invoke(Landroidx/compose/ui/graphics/drawscope/DrawScope;)V
