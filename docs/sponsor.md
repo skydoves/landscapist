@@ -18,6 +18,20 @@ If you want to suggest a feature request or sponsorship collaboration, you can r
 
 ## Sponsors
 
-Be the first sponsor for this library!
+These are the sponsors who have supported Landscapist.
+
+### 🚀 Rocket Sponsor
+
+### ✈️ Airplane Spnsor
+
+<a href="https://www.hemisphere.com/">
+    <img src="https://www.hemisphere.com/images/logo.png">
+</a>
+
+### 🚢 Cruise Sponsor
+
+### 🚂 Train Sponsor
+
+I truly appreciate all of our sponsors, no matter their tier, company, or any other factor!
 
 ![WorldWide](https://user-images.githubusercontent.com/24237865/181870785-fe31da7e-f362-46a7-be6c-e1609bab7a49.png)
