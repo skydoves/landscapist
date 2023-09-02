@@ -22,11 +22,12 @@ These are the sponsors who have supported Landscapist.
 
 ### 🚀 Rocket Sponsor
 
-### ✈️ Airplane Sponsor
-
 <a href="https://www.hemisphere.com/">
     <img src="https://www.hemisphere.com/images/logo.png">
 </a>
+
+
+### ✈️ Airplane Sponsor
 
 ### 🚢 Cruise Sponsor
 
