@@ -44,9 +44,9 @@ val context = LocalContext.current
 val imageLoader = ImageLoader.Builder(context)
   .componentRegistry {
     if (SDK_INT >= 28) {
-      add(ImageDecoderDecoder(context))
+      add(ImageDecoderDecoder.Factory())
     } else {
-      add(GifDecoder())
+      add(GifDecoder.Factory())
     }
   }
   .build()
