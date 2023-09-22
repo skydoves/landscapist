@@ -582,7 +582,7 @@ HSPLcoil/request/ImageRequest$Builder;->listener(Lcoil/request/ImageRequest$List
 HSPLcoil/request/ImageRequest$Builder;->resetResolvedScale()V
 HSPLcoil/request/ImageRequest$Builder;->resetResolvedValues()V
 HPLcoil/request/ImageRequest$Builder;->resolveScale()Lcoil/size/Scale;
-HSPLcoil/request/ImageRequest$Builder;->resolveSizeResolver()Lcoil/size/SizeResolver;
+HPLcoil/request/ImageRequest$Builder;->resolveSizeResolver()Lcoil/size/SizeResolver;
 HSPLcoil/request/ImageRequest$Builder;->size(Lcoil/size/SizeResolver;)Lcoil/request/ImageRequest$Builder;
 HSPLcoil/request/ImageRequest$Builder;->target(Lcoil/target/Target;)Lcoil/request/ImageRequest$Builder;
 Lcoil/request/ImageRequest$Listener;
