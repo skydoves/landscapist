@@ -17,7 +17,7 @@
 </p>
 
 ## Who's using Landscapist?
-👉 [Check out who's using Landscapist](/usecases.md).
+👉 [Check out who's using Landscapist](https://skydoves.github.io/landscapist/#whos-using-landscapist).
 
 Landscapist hits **+300,000 downloads every month** around the globe! 🚀
 
