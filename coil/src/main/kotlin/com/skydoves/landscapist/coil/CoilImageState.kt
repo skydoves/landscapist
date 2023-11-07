@@ -30,11 +30,11 @@ public sealed class CoilImageState : ImageState {
 
   /** Request not started. */
   @Immutable
-  public object None : CoilImageState()
+  public data object None : CoilImageState()
 
   /** Request is currently in progress. */
   @Immutable
-  public object Loading : CoilImageState()
+  public data object Loading : CoilImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
   @Immutable

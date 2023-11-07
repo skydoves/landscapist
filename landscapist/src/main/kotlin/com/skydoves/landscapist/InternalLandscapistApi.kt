@@ -22,6 +22,7 @@ package com.skydoves.landscapist
   AnnotationTarget.FUNCTION,
   AnnotationTarget.TYPEALIAS,
 )
+@Retention(AnnotationRetention.BINARY)
 @RequiresOptIn(
   message = "This is internal API for the landscapist libraries. Do not depend on " +
     "this API in your own client code.",

@@ -15,5 +15,8 @@
  */
 package com.skydoves.landscapist
 
+import androidx.compose.runtime.Stable
+
 /** The highest level interface of the image loading states. */
+@Stable
 public interface ImageState

@@ -28,11 +28,11 @@ public sealed class GlideImageState : ImageState {
 
   /** Request not started. */
   @Immutable
-  public object None : GlideImageState()
+  public data object None : GlideImageState()
 
   /** Request is currently in progress. */
   @Immutable
-  public object Loading : GlideImageState()
+  public data object Loading : GlideImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
   @Immutable
@@ -63,6 +63,7 @@ public fun ImageLoadState.toGlideImageState(glideRequestType: GlideRequestType):
       dataSource = dataSource,
       glideRequestType = glideRequestType,
     )
+
     is ImageLoadState.Failure -> GlideImageState.Failure(
       errorDrawable = data as? Drawable,
       reason = reason,

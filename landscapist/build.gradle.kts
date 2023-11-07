@@ -54,11 +54,10 @@ baselineProfile {
   }
 }
 
-
 dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.compose.ui)
   implementation(libs.androidx.compose.runtime)
   implementation(libs.androidx.compose.foundation)
-  implementation(libs.kotlinx.coroutines.android)
+  implementation(libs.kotlinx.coroutines.core)
 }

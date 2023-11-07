@@ -38,11 +38,17 @@ public final class com/skydoves/landscapist/ImageLoadState$Failure : com/skydove
 public final class com/skydoves/landscapist/ImageLoadState$Loading : com/skydoves/landscapist/ImageLoadState {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/ImageLoadState$Loading;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/skydoves/landscapist/ImageLoadState$None : com/skydoves/landscapist/ImageLoadState {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/ImageLoadState$None;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/skydoves/landscapist/ImageLoadState$Success : com/skydoves/landscapist/ImageLoadState {
