@@ -24,11 +24,11 @@ public sealed class ImageLoadState {
 
   /** Request not started. */
   @Immutable
-  public object None : ImageLoadState()
+  public data object None : ImageLoadState()
 
   /** Request is currently in progress. */
   @Immutable
-  public object Loading : ImageLoadState()
+  public data object Loading : ImageLoadState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
   @Immutable

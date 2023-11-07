@@ -26,6 +26,7 @@ import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,7 +59,7 @@ import kotlin.math.roundToInt
 internal class DrawablePainter(
   val drawable: Drawable,
 ) : Painter(), RememberObserver {
-  private var drawInvalidateTick by mutableStateOf(0)
+  private var drawInvalidateTick by mutableIntStateOf(0)
   private var drawableIntrinsicSize by mutableStateOf(drawable.intrinsicSize)
 
   private val callback: Drawable.Callback by lazy {

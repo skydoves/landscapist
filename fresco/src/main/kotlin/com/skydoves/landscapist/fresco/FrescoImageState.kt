@@ -31,11 +31,11 @@ public sealed class FrescoImageState : ImageState {
 
   /** Request not started. */
   @Immutable
-  public object None : FrescoImageState()
+  public data object None : FrescoImageState()
 
   /** Request is currently in progress. */
   @Immutable
-  public object Loading : FrescoImageState()
+  public data object Loading : FrescoImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
   @Immutable

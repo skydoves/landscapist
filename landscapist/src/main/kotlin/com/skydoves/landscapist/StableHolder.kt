@@ -15,8 +15,8 @@
  */
 package com.skydoves.landscapist
 
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 
-@Stable
+@Immutable
 @InternalLandscapistApi
 public data class StableHolder<T>(public val value: T)

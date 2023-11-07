@@ -30,11 +30,17 @@ public final class com/skydoves/landscapist/fresco/FrescoImageState$Failure : co
 public final class com/skydoves/landscapist/fresco/FrescoImageState$Loading : com/skydoves/landscapist/fresco/FrescoImageState {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/fresco/FrescoImageState$Loading;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/skydoves/landscapist/fresco/FrescoImageState$None : com/skydoves/landscapist/fresco/FrescoImageState {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/fresco/FrescoImageState$None;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/skydoves/landscapist/fresco/FrescoImageState$Success : com/skydoves/landscapist/fresco/FrescoImageState {

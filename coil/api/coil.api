@@ -24,11 +24,17 @@ public final class com/skydoves/landscapist/coil/CoilImageState$Failure : com/sk
 public final class com/skydoves/landscapist/coil/CoilImageState$Loading : com/skydoves/landscapist/coil/CoilImageState {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/coil/CoilImageState$Loading;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/skydoves/landscapist/coil/CoilImageState$None : com/skydoves/landscapist/coil/CoilImageState {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/skydoves/landscapist/coil/CoilImageState$None;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/skydoves/landscapist/coil/CoilImageState$Success : com/skydoves/landscapist/coil/CoilImageState {
