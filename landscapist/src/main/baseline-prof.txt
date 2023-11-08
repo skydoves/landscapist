@@ -42,9 +42,11 @@ HSPLcom/skydoves/landscapist/ImageLoadState;-><init>(Lkotlin/jvm/internal/Defaul
 Lcom/skydoves/landscapist/ImageLoadState$Loading;
 HSPLcom/skydoves/landscapist/ImageLoadState$Loading;-><clinit>()V
 HSPLcom/skydoves/landscapist/ImageLoadState$Loading;-><init>()V
+HSPLcom/skydoves/landscapist/ImageLoadState$Loading;->equals(Ljava/lang/Object;)Z
 Lcom/skydoves/landscapist/ImageLoadState$None;
 HSPLcom/skydoves/landscapist/ImageLoadState$None;-><clinit>()V
 HSPLcom/skydoves/landscapist/ImageLoadState$None;-><init>()V
+HSPLcom/skydoves/landscapist/ImageLoadState$None;->equals(Ljava/lang/Object;)Z
 Lcom/skydoves/landscapist/ImageLoadState$Success;
 HSPLcom/skydoves/landscapist/ImageLoadState$Success;-><clinit>()V
 HSPLcom/skydoves/landscapist/ImageLoadState$Success;-><init>(Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;)V

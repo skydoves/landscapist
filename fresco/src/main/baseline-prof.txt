@@ -296,7 +296,7 @@ HSPLcom/facebook/common/memory/PooledByteBufferInputStream;->available()I
 HSPLcom/facebook/common/memory/PooledByteBufferInputStream;->mark(I)V
 HSPLcom/facebook/common/memory/PooledByteBufferInputStream;->markSupported()Z
 HSPLcom/facebook/common/memory/PooledByteBufferInputStream;->read()I
-HSPLcom/facebook/common/memory/PooledByteBufferInputStream;->read([BII)I
+HPLcom/facebook/common/memory/PooledByteBufferInputStream;->read([BII)I
 HSPLcom/facebook/common/memory/PooledByteBufferInputStream;->reset()V
 HSPLcom/facebook/common/memory/PooledByteBufferInputStream;->skip(J)J
 Lcom/facebook/common/memory/PooledByteBufferOutputStream;
@@ -332,7 +332,7 @@ Lcom/facebook/common/references/DefaultCloseableReference;
 HSPLcom/facebook/common/references/DefaultCloseableReference;-><init>(Lcom/facebook/common/references/SharedReference;Lcom/facebook/common/references/CloseableReference$LeakHandler;Ljava/lang/Throwable;)V
 HSPLcom/facebook/common/references/DefaultCloseableReference;-><init>(Ljava/lang/Object;Lcom/facebook/common/references/ResourceReleaser;Lcom/facebook/common/references/CloseableReference$LeakHandler;Ljava/lang/Throwable;)V
 HSPLcom/facebook/common/references/DefaultCloseableReference;->clone()Lcom/facebook/common/references/CloseableReference;
-PLcom/facebook/common/references/DefaultCloseableReference;->finalize()V
+HSPLcom/facebook/common/references/DefaultCloseableReference;->finalize()V
 Lcom/facebook/common/references/HasBitmap;
 Lcom/facebook/common/references/ResourceReleaser;
 Lcom/facebook/common/references/SharedReference;
@@ -359,7 +359,6 @@ HSPLcom/facebook/common/statfs/StatFsHelper;->testLowDiskSpace(Lcom/facebook/com
 HSPLcom/facebook/common/statfs/StatFsHelper;->updateStats()V
 HSPLcom/facebook/common/statfs/StatFsHelper;->updateStatsHelper(Landroid/os/StatFs;Ljava/io/File;)Landroid/os/StatFs;
 Lcom/facebook/common/statfs/StatFsHelper$StorageType;
-HSPLcom/facebook/common/statfs/StatFsHelper$StorageType;->$values()[Lcom/facebook/common/statfs/StatFsHelper$StorageType;
 HSPLcom/facebook/common/statfs/StatFsHelper$StorageType;-><clinit>()V
 HSPLcom/facebook/common/statfs/StatFsHelper$StorageType;-><init>(Ljava/lang/String;I)V
 Lcom/facebook/common/time/Clock;
@@ -381,7 +380,6 @@ Lcom/facebook/common/util/SecureHashUtil;
 HSPLcom/facebook/common/util/SecureHashUtil;-><clinit>()V
 HSPLcom/facebook/common/util/SecureHashUtil;->makeSHA1HashBase64([B)Ljava/lang/String;
 Lcom/facebook/common/util/TriState;
-HSPLcom/facebook/common/util/TriState;->$values()[Lcom/facebook/common/util/TriState;
 HSPLcom/facebook/common/util/TriState;-><clinit>()V
 HSPLcom/facebook/common/util/TriState;-><init>(Ljava/lang/String;I)V
 HSPLcom/facebook/common/util/TriState;->asBoolean()Z
@@ -416,7 +414,7 @@ HSPLcom/facebook/datasource/AbstractDataSource;->isClosed()Z
 HSPLcom/facebook/datasource/AbstractDataSource;->isFinished()Z
 HSPLcom/facebook/datasource/AbstractDataSource;->notifyDataSubscriber(Lcom/facebook/datasource/DataSubscriber;Ljava/util/concurrent/Executor;ZZ)V
 HSPLcom/facebook/datasource/AbstractDataSource;->notifyDataSubscribers()V
-HPLcom/facebook/datasource/AbstractDataSource;->notifyProgressUpdate()V
+HSPLcom/facebook/datasource/AbstractDataSource;->notifyProgressUpdate()V
 HSPLcom/facebook/datasource/AbstractDataSource;->setExtras(Ljava/util/Map;)V
 HSPLcom/facebook/datasource/AbstractDataSource;->setProgress(F)Z
 HSPLcom/facebook/datasource/AbstractDataSource;->setProgressInternal(F)Z
@@ -431,7 +429,6 @@ Lcom/facebook/datasource/AbstractDataSource$2;
 HSPLcom/facebook/datasource/AbstractDataSource$2;-><init>(Lcom/facebook/datasource/AbstractDataSource;Lcom/facebook/datasource/DataSubscriber;)V
 HSPLcom/facebook/datasource/AbstractDataSource$2;->run()V
 Lcom/facebook/datasource/AbstractDataSource$DataSourceStatus;
-HSPLcom/facebook/datasource/AbstractDataSource$DataSourceStatus;->$values()[Lcom/facebook/datasource/AbstractDataSource$DataSourceStatus;
 HSPLcom/facebook/datasource/AbstractDataSource$DataSourceStatus;-><clinit>()V
 HSPLcom/facebook/datasource/AbstractDataSource$DataSourceStatus;-><init>(Ljava/lang/String;I)V
 Lcom/facebook/datasource/BaseDataSubscriber;
@@ -536,7 +533,6 @@ HSPLcom/facebook/drawee/components/DraweeEventTracker;->newInstance()Lcom/facebo
 HSPLcom/facebook/drawee/components/DraweeEventTracker;->recordEvent(Lcom/facebook/drawee/components/DraweeEventTracker$Event;)V
 HSPLcom/facebook/drawee/components/DraweeEventTracker;->toString()Ljava/lang/String;
 Lcom/facebook/drawee/components/DraweeEventTracker$Event;
-HSPLcom/facebook/drawee/components/DraweeEventTracker$Event;->$values()[Lcom/facebook/drawee/components/DraweeEventTracker$Event;
 HSPLcom/facebook/drawee/components/DraweeEventTracker$Event;-><clinit>()V
 HSPLcom/facebook/drawee/components/DraweeEventTracker$Event;-><init>(Ljava/lang/String;I)V
 Lcom/facebook/drawee/controller/AbstractDraweeController;
@@ -550,6 +546,7 @@ HSPLcom/facebook/drawee/controller/AbstractDraweeController;->getControllerListe
 HSPLcom/facebook/drawee/controller/AbstractDraweeController;->getControllerListener2()Lcom/facebook/fresco/ui/common/ControllerListener2;
 HSPLcom/facebook/drawee/controller/AbstractDraweeController;->getDimensions()Landroid/graphics/Rect;
 HSPLcom/facebook/drawee/controller/AbstractDraweeController;->getHierarchy()Lcom/facebook/drawee/interfaces/DraweeHierarchy;
+HSPLcom/facebook/drawee/controller/AbstractDraweeController;->getSettableDraweeHierarchy()Lcom/facebook/drawee/interfaces/SettableDraweeHierarchy;
 HSPLcom/facebook/drawee/controller/AbstractDraweeController;->init(Ljava/lang/String;Ljava/lang/Object;)V
 HSPLcom/facebook/drawee/controller/AbstractDraweeController;->initialize(Ljava/lang/String;Ljava/lang/Object;)V
 HSPLcom/facebook/drawee/controller/AbstractDraweeController;->isExpectedDataSource(Ljava/lang/String;Lcom/facebook/datasource/DataSource;)Z
@@ -610,7 +607,6 @@ HSPLcom/facebook/drawee/controller/AbstractDraweeControllerBuilder$2;-><init>(Lc
 HSPLcom/facebook/drawee/controller/AbstractDraweeControllerBuilder$2;->get()Lcom/facebook/datasource/DataSource;
 HSPLcom/facebook/drawee/controller/AbstractDraweeControllerBuilder$2;->get()Ljava/lang/Object;
 Lcom/facebook/drawee/controller/AbstractDraweeControllerBuilder$CacheLevel;
-HSPLcom/facebook/drawee/controller/AbstractDraweeControllerBuilder$CacheLevel;->$values()[Lcom/facebook/drawee/controller/AbstractDraweeControllerBuilder$CacheLevel;
 HSPLcom/facebook/drawee/controller/AbstractDraweeControllerBuilder$CacheLevel;-><clinit>()V
 HSPLcom/facebook/drawee/controller/AbstractDraweeControllerBuilder$CacheLevel;-><init>(Ljava/lang/String;I)V
 HSPLcom/facebook/drawee/controller/AbstractDraweeControllerBuilder$CacheLevel;->values()[Lcom/facebook/drawee/controller/AbstractDraweeControllerBuilder$CacheLevel;
@@ -649,7 +645,7 @@ HSPLcom/facebook/drawee/drawable/DrawableUtils;->setDrawableProperties(Landroid/
 Lcom/facebook/drawee/drawable/FadeDrawable;
 HSPLcom/facebook/drawee/drawable/FadeDrawable;-><init>([Landroid/graphics/drawable/Drawable;ZI)V
 HSPLcom/facebook/drawee/drawable/FadeDrawable;->beginBatchMode()V
-HSPLcom/facebook/drawee/drawable/FadeDrawable;->draw(Landroid/graphics/Canvas;)V
+HPLcom/facebook/drawee/drawable/FadeDrawable;->draw(Landroid/graphics/Canvas;)V
 HSPLcom/facebook/drawee/drawable/FadeDrawable;->drawDrawableWithAlpha(Landroid/graphics/Canvas;Landroid/graphics/drawable/Drawable;I)V
 HSPLcom/facebook/drawee/drawable/FadeDrawable;->endBatchMode()V
 HSPLcom/facebook/drawee/drawable/FadeDrawable;->fadeInAllLayers()V
@@ -1712,13 +1708,13 @@ Lcom/facebook/imagepipeline/memory/MemoryChunkUtil;
 HSPLcom/facebook/imagepipeline/memory/MemoryChunkUtil;-><clinit>()V
 HSPLcom/facebook/imagepipeline/memory/MemoryChunkUtil;-><init>()V
 HSPLcom/facebook/imagepipeline/memory/MemoryChunkUtil;->adjustByteCount(III)I
-HPLcom/facebook/imagepipeline/memory/MemoryChunkUtil;->checkBounds(IIIII)V
+HSPLcom/facebook/imagepipeline/memory/MemoryChunkUtil;->checkBounds(IIIII)V
 Lcom/facebook/imagepipeline/memory/MemoryPooledByteBuffer;
 HSPLcom/facebook/imagepipeline/memory/MemoryPooledByteBuffer;-><init>(Lcom/facebook/common/references/CloseableReference;I)V
 HSPLcom/facebook/imagepipeline/memory/MemoryPooledByteBuffer;->ensureValid()V
 HSPLcom/facebook/imagepipeline/memory/MemoryPooledByteBuffer;->isClosed()Z
 HSPLcom/facebook/imagepipeline/memory/MemoryPooledByteBuffer;->read(I)B
-HPLcom/facebook/imagepipeline/memory/MemoryPooledByteBuffer;->read(I[BII)I
+HSPLcom/facebook/imagepipeline/memory/MemoryPooledByteBuffer;->read(I[BII)I
 HSPLcom/facebook/imagepipeline/memory/MemoryPooledByteBuffer;->size()I
 Lcom/facebook/imagepipeline/memory/MemoryPooledByteBufferFactory;
 HSPLcom/facebook/imagepipeline/memory/MemoryPooledByteBufferFactory;-><init>(Lcom/facebook/imagepipeline/memory/MemoryChunkPool;Lcom/facebook/common/memory/PooledByteStreams;)V
@@ -1739,7 +1735,7 @@ HSPLcom/facebook/imagepipeline/memory/NativeMemoryChunk;-><init>(I)V
 HSPLcom/facebook/imagepipeline/memory/NativeMemoryChunk;->getSize()I
 HSPLcom/facebook/imagepipeline/memory/NativeMemoryChunk;->isClosed()Z
 HSPLcom/facebook/imagepipeline/memory/NativeMemoryChunk;->read(I)B
-HSPLcom/facebook/imagepipeline/memory/NativeMemoryChunk;->read(I[BII)I
+HPLcom/facebook/imagepipeline/memory/NativeMemoryChunk;->read(I[BII)I
 HSPLcom/facebook/imagepipeline/memory/NativeMemoryChunk;->write(I[BII)I
 Lcom/facebook/imagepipeline/memory/NativeMemoryChunkPool;
 HSPLcom/facebook/imagepipeline/memory/NativeMemoryChunkPool;-><init>(Lcom/facebook/common/memory/MemoryTrimmableRegistry;Lcom/facebook/imagepipeline/memory/PoolParams;Lcom/facebook/imagepipeline/memory/PoolStatsTracker;)V
@@ -1752,6 +1748,7 @@ HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->getInstance()Lcom/f
 HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->onAlloc(I)V
 HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->onSoftCapReached()V
 HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->onValueRelease(I)V
+HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->onValueReuse(I)V
 HSPLcom/facebook/imagepipeline/memory/NoOpPoolStatsTracker;->setBasePool(Lcom/facebook/imagepipeline/memory/BasePool;)V
 Lcom/facebook/imagepipeline/memory/PoolConfig;
 HSPLcom/facebook/imagepipeline/memory/PoolConfig;-><init>(Lcom/facebook/imagepipeline/memory/PoolConfig$Builder;)V
@@ -1818,16 +1815,10 @@ HSPLcom/facebook/imagepipeline/platform/DefaultDecoder;-><clinit>()V
 HSPLcom/facebook/imagepipeline/platform/DefaultDecoder;-><init>(Lcom/facebook/imagepipeline/memory/BitmapPool;Landroidx/core/util/Pools$Pool;Lcom/facebook/imagepipeline/platform/PlatformDecoderOptions;)V
 HSPLcom/facebook/imagepipeline/platform/DefaultDecoder;->decodeFromStream(Ljava/io/InputStream;Landroid/graphics/BitmapFactory$Options;Landroid/graphics/Rect;Landroid/graphics/ColorSpace;)Lcom/facebook/common/references/CloseableReference;
 HSPLcom/facebook/imagepipeline/platform/DefaultDecoder;->decodeJPEGFromEncodedImageWithColorSpace(Lcom/facebook/imagepipeline/image/EncodedImage;Landroid/graphics/Bitmap$Config;Landroid/graphics/Rect;ILandroid/graphics/ColorSpace;)Lcom/facebook/common/references/CloseableReference;
-HSPLcom/facebook/imagepipeline/platform/DefaultDecoder;->getDecodeOptionsForStream(Lcom/facebook/imagepipeline/image/EncodedImage;Landroid/graphics/Bitmap$Config;ZZ)Landroid/graphics/BitmapFactory$Options;
+HSPLcom/facebook/imagepipeline/platform/DefaultDecoder;->getDecodeOptionsForStream(Lcom/facebook/imagepipeline/image/EncodedImage;Landroid/graphics/Bitmap$Config;Z)Landroid/graphics/BitmapFactory$Options;
 Lcom/facebook/imagepipeline/platform/OreoDecoder;
-HSPLcom/facebook/imagepipeline/platform/OreoDecoder;-><clinit>()V
 HSPLcom/facebook/imagepipeline/platform/OreoDecoder;-><init>(Lcom/facebook/imagepipeline/memory/BitmapPool;Landroidx/core/util/Pools$Pool;Lcom/facebook/imagepipeline/platform/PlatformDecoderOptions;)V
 HSPLcom/facebook/imagepipeline/platform/OreoDecoder;->getBitmapSize(IILandroid/graphics/BitmapFactory$Options;)I
-Lcom/facebook/imagepipeline/platform/OreoDecoder$Companion;
-HSPLcom/facebook/imagepipeline/platform/OreoDecoder$Companion;-><init>()V
-HSPLcom/facebook/imagepipeline/platform/OreoDecoder$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-HSPLcom/facebook/imagepipeline/platform/OreoDecoder$Companion;->access$hasColorGamutMismatch(Lcom/facebook/imagepipeline/platform/OreoDecoder$Companion;Landroid/graphics/BitmapFactory$Options;)Z
-HSPLcom/facebook/imagepipeline/platform/OreoDecoder$Companion;->hasColorGamutMismatch(Landroid/graphics/BitmapFactory$Options;)Z
 Lcom/facebook/imagepipeline/platform/PlatformDecoder;
 Lcom/facebook/imagepipeline/platform/PlatformDecoderFactory;
 HSPLcom/facebook/imagepipeline/platform/PlatformDecoderFactory;-><clinit>()V
@@ -1835,10 +1826,8 @@ HSPLcom/facebook/imagepipeline/platform/PlatformDecoderFactory;-><init>()V
 HSPLcom/facebook/imagepipeline/platform/PlatformDecoderFactory;->buildPlatformDecoder(Lcom/facebook/imagepipeline/memory/PoolFactory;ZZLcom/facebook/imagepipeline/platform/PlatformDecoderOptions;)Lcom/facebook/imagepipeline/platform/PlatformDecoder;
 HSPLcom/facebook/imagepipeline/platform/PlatformDecoderFactory;->createPool(Lcom/facebook/imagepipeline/memory/PoolFactory;Z)Landroidx/core/util/Pools$Pool;
 Lcom/facebook/imagepipeline/platform/PlatformDecoderOptions;
-HSPLcom/facebook/imagepipeline/platform/PlatformDecoderOptions;-><init>(ZZZZ)V
-HSPLcom/facebook/imagepipeline/platform/PlatformDecoderOptions;-><init>(ZZZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
-HSPLcom/facebook/imagepipeline/platform/PlatformDecoderOptions;->getFixReadingOptions()Z
-HSPLcom/facebook/imagepipeline/platform/PlatformDecoderOptions;->getUseOutConfig()Z
+HSPLcom/facebook/imagepipeline/platform/PlatformDecoderOptions;-><init>(ZZ)V
+HSPLcom/facebook/imagepipeline/platform/PlatformDecoderOptions;-><init>(ZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 Lcom/facebook/imagepipeline/platform/PreverificationHelper;
 HSPLcom/facebook/imagepipeline/platform/PreverificationHelper;-><init>()V
 HSPLcom/facebook/imagepipeline/platform/PreverificationHelper;->shouldUseHardwareBitmapConfig(Landroid/graphics/Bitmap$Config;)Z
@@ -2029,7 +2018,6 @@ Lcom/facebook/imagepipeline/producers/JobScheduler$3;
 HSPLcom/facebook/imagepipeline/producers/JobScheduler$3;-><clinit>()V
 Lcom/facebook/imagepipeline/producers/JobScheduler$JobRunnable;
 Lcom/facebook/imagepipeline/producers/JobScheduler$JobState;
-HSPLcom/facebook/imagepipeline/producers/JobScheduler$JobState;->$values()[Lcom/facebook/imagepipeline/producers/JobScheduler$JobState;
 HSPLcom/facebook/imagepipeline/producers/JobScheduler$JobState;-><clinit>()V
 HSPLcom/facebook/imagepipeline/producers/JobScheduler$JobState;-><init>(Ljava/lang/String;I)V
 HSPLcom/facebook/imagepipeline/producers/JobScheduler$JobState;->values()[Lcom/facebook/imagepipeline/producers/JobScheduler$JobState;
@@ -2156,11 +2144,9 @@ HSPLcom/facebook/imagepipeline/request/ImageRequest$1;-><init>()V
 HSPLcom/facebook/imagepipeline/request/ImageRequest$1;->apply(Lcom/facebook/imagepipeline/request/ImageRequest;)Landroid/net/Uri;
 HSPLcom/facebook/imagepipeline/request/ImageRequest$1;->apply(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/facebook/imagepipeline/request/ImageRequest$CacheChoice;
-HSPLcom/facebook/imagepipeline/request/ImageRequest$CacheChoice;->$values()[Lcom/facebook/imagepipeline/request/ImageRequest$CacheChoice;
 HSPLcom/facebook/imagepipeline/request/ImageRequest$CacheChoice;-><clinit>()V
 HSPLcom/facebook/imagepipeline/request/ImageRequest$CacheChoice;-><init>(Ljava/lang/String;I)V
 Lcom/facebook/imagepipeline/request/ImageRequest$RequestLevel;
-HSPLcom/facebook/imagepipeline/request/ImageRequest$RequestLevel;->$values()[Lcom/facebook/imagepipeline/request/ImageRequest$RequestLevel;
 HSPLcom/facebook/imagepipeline/request/ImageRequest$RequestLevel;-><clinit>()V
 HSPLcom/facebook/imagepipeline/request/ImageRequest$RequestLevel;-><init>(Ljava/lang/String;II)V
 HSPLcom/facebook/imagepipeline/request/ImageRequest$RequestLevel;->getMax(Lcom/facebook/imagepipeline/request/ImageRequest$RequestLevel;Lcom/facebook/imagepipeline/request/ImageRequest$RequestLevel;)Lcom/facebook/imagepipeline/request/ImageRequest$RequestLevel;
@@ -2287,7 +2273,7 @@ HSPLcom/facebook/soloader/nativeloader/SystemDelegate;-><init>()V
 HSPLcom/facebook/soloader/nativeloader/SystemDelegate;->loadLibrary(Ljava/lang/String;I)Z
 Lcom/skydoves/landscapist/fresco/CloseableRefObserver;
 HSPLcom/skydoves/landscapist/fresco/CloseableRefObserver;-><init>(Lcom/facebook/common/references/CloseableReference;)V
-HSPLcom/skydoves/landscapist/fresco/CloseableRefObserver;->getValue()Ljava/lang/Object;
+HPLcom/skydoves/landscapist/fresco/CloseableRefObserver;->getValue()Ljava/lang/Object;
 PLcom/skydoves/landscapist/fresco/CloseableRefObserver;->onForgotten()V
 HSPLcom/skydoves/landscapist/fresco/CloseableRefObserver;->onRemembered()V
 Lcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;
@@ -2333,7 +2319,7 @@ HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$1;->i
 Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$2;
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$2;-><clinit>()V
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$2;-><init>()V
-HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$2;->invoke(Lcom/skydoves/landscapist/fresco/FrescoImageState;)V
+HPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$2;->invoke(Lcom/skydoves/landscapist/fresco/FrescoImageState;)V
 HPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$2;->invoke(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$4;
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$FrescoImage$4;-><init>(Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;ILkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Ljava/lang/String;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V

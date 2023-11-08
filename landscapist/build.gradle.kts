@@ -41,6 +41,7 @@ android {
 }
 
 baselineProfile {
+  baselineProfileOutputDir = "."
   filter {
     include("com.skydoves.landscapist.**")
     exclude("com.skydoves.landscapist.glide.**")
