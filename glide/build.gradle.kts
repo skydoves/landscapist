@@ -42,6 +42,7 @@ android {
 }
 
 baselineProfile {
+  baselineProfileOutputDir = "."
   filter {
     include("com.skydoves.landscapist.glide.**")
     include("com.bumptech.glide.**")

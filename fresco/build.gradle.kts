@@ -42,6 +42,7 @@ android {
 }
 
 baselineProfile {
+  baselineProfileOutputDir = "."
   filter {
     include("com.skydoves.landscapist.fresco.**")
     include("com.facebook.**")
