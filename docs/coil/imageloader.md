@@ -42,7 +42,7 @@ You can load animated GIFs and WebP Images with your `ImageLoader`.
 ```kotlin
 val context = LocalContext.current
 val imageLoader = ImageLoader.Builder(context)
-  .componentRegistry {
+  .components {
     if (SDK_INT >= 28) {
       add(ImageDecoderDecoder.Factory())
     } else {
