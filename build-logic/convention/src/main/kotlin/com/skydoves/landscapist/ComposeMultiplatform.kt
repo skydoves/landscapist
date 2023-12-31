@@ -45,7 +45,6 @@ internal fun Project.configureComposeMultiplatform(
     macosArm64()
     js(IR) {
       browser()
-      nodejs()
     }
     @Suppress("OPT_IN_USAGE")
     applyHierarchyTemplate {
