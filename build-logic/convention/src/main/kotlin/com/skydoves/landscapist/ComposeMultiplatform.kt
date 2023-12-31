@@ -43,9 +43,7 @@ internal fun Project.configureComposeMultiplatform(
     iosSimulatorArm64()
     macosX64()
     macosArm64()
-    js(IR) {
-      browser()
-    }
+
     @Suppress("OPT_IN_USAGE")
     applyHierarchyTemplate {
       common {
