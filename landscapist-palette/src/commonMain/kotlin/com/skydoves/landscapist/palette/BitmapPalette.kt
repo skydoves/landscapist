@@ -15,9 +15,11 @@
  */
 package com.skydoves.landscapist.palette
 
-import android.graphics.Bitmap
-import android.util.LruCache
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.palette.graphics.Palette
+import com.kmpalette.rememberPaletteState
 
 /**
  * BitmapPalette is a [Palette] generator for extracting major (theme) colors
@@ -28,7 +30,7 @@ import androidx.palette.graphics.Palette
  * @param interceptor A custom interceptor before generating colors.
  * @param paletteLoadedListener A listener for listening to the loaded palette.
  */
-internal class BitmapPalette constructor(
+internal class BitmapPalette(
   private var imageModel: Any? = null,
   private val useCache: Boolean = true,
   private val interceptor: PaletteBuilderInterceptor? = null,
@@ -39,29 +41,17 @@ internal class BitmapPalette constructor(
     this.imageModel = imageModel
   }
 
-  fun generate(bitmap: Bitmap?) {
-    val target = bitmap ?: return
-    val model = imageModel ?: return
-    if (useCache) {
-      val palette = cache.get(model)
+  @Composable
+  fun generate(bitmap: ImageBitmap) {
+    val cacheSize = if (useCache) 5 else 0
+    val paletteState = rememberPaletteState(cacheSize = cacheSize)
+    LaunchedEffect(bitmap) {
+      paletteState.generate(bitmap)
+      val palette = paletteState.palette
+
       if (palette != null) {
         paletteLoadedListener?.onPaletteLoaded(palette)
-        return
       }
     }
-    val builder = interceptor?.intercept(Palette.Builder(target))
-      ?: Palette.Builder(target)
-    builder.generate async@{
-      val palette: Palette = it ?: return@async
-      if (useCache) {
-        cache.put(model, palette)
-      }
-      paletteLoadedListener?.onPaletteLoaded(palette)
-    }
-  }
-
-  internal companion object {
-    internal val cache: LruCache<Any, Palette?>
-      by lazy(LazyThreadSafetyMode.NONE) { LruCache(20) }
   }
 }

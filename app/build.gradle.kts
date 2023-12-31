@@ -29,7 +29,7 @@ android {
   compileSdk = Configuration.compileSdk
   defaultConfig {
     applicationId = "com.github.skydoves.landscapistdemo"
-    minSdk = Configuration.minSdk
+    minSdk = Configuration.minSdk24
     targetSdk = Configuration.targetSdk
     versionCode = Configuration.versionCode
     versionName = Configuration.versionName

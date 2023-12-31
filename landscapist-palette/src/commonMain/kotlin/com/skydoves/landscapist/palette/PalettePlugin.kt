@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.plugins.ImagePlugin
 
@@ -56,7 +55,7 @@ public data class PalettePlugin(
     apply {
       imageBitmap?.let {
         bitmapPalette.applyImageModel(this.imageModel ?: imageModel)
-        bitmapPalette.generate(it.asAndroidBitmap())
+        bitmapPalette.generate(it)
       }
     }
 }
