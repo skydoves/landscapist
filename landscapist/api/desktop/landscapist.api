@@ -8,7 +8,11 @@ public final class com/skydoves/landscapist/DataSource : java/lang/Enum {
 	public static fun values ()[Lcom/skydoves/landscapist/DataSource;
 }
 
-public final class com/skydoves/landscapist/ImageLoad {
+public final class com/skydoves/landscapist/ImageBySourceKt {
+	public static final fun ImageBySource (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;Landroidx/compose/ui/graphics/ColorFilter;FLandroidx/compose/runtime/Composer;II)V
+}
+
+public final class com/skydoves/landscapist/ImageLoadKt {
 	public static final fun ImageLoad (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lcom/skydoves/landscapist/constraints/Constrainable;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
 	public static final fun getZeroConstraints ()J
 }
@@ -89,10 +93,6 @@ public final class com/skydoves/landscapist/ImageOptions {
 }
 
 public abstract interface class com/skydoves/landscapist/ImageState {
-}
-
-public final class com/skydoves/landscapist/ImageWithSource {
-	public static final fun ImageBySource (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;Ljava/lang/String;Landroidx/compose/ui/graphics/ColorFilter;FLandroidx/compose/runtime/Composer;II)V
 }
 
 public abstract interface annotation class com/skydoves/landscapist/InternalLandscapistApi : java/lang/annotation/Annotation {
