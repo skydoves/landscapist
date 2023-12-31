@@ -2,7 +2,7 @@
 kotlin = "1.9.21"
 dokka = "1.9.10"
 jvmTarget = "11"
-nexusPlugin = "1.3.0"
+nexusPlugin = "0.26.0"
 kotlinxCoroutines = "1.7.3"
 kotlinBinaryCompatibility = "0.13.2"
 androidGradlePlugin = "8.2.0"
@@ -75,7 +75,7 @@ android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-nexus-plugin = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPlugin" }
+nexus-plugin = { id = "com.vanniktech.maven.publish", version.ref = "nexusPlugin" }
 kotlin-binary-compatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibility" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

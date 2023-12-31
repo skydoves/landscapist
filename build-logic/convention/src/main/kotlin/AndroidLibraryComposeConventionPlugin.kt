@@ -31,6 +31,7 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
     with(target) {
       pluginManager.apply("com.android.library")
       pluginManager.apply("org.jetbrains.kotlin.android")
+      pluginManager.apply("com.vanniktech.maven.publish")
       pluginManager.apply("binary-compatibility-validator")
       pluginManager.apply("org.jetbrains.dokka")
       pluginManager.apply("androidx.baselineprofile")

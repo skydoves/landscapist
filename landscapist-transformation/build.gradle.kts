@@ -20,13 +20,20 @@ plugins {
   id("landscapist.spotless")
 }
 
-rootProject.extra.apply {
-  set("PUBLISH_GROUP_ID", Configuration.artifactGroup)
-  set("PUBLISH_ARTIFACT_ID", "landscapist-transformation")
-  set("PUBLISH_VERSION", rootProject.extra.get("rootVersionName"))
-}
+apply(from = "${rootDir}/scripts/publish-module.gradle.kts")
 
-apply(from = "${rootDir}/scripts/publish-module.gradle")
+mavenPublishing {
+  val artifactId = "landscapist-transformation"
+  coordinates(
+    Configuration.artifactGroup,
+    artifactId,
+    rootProject.extra.get("libVersion").toString()
+  )
+
+  pom {
+    name.set(artifactId)
+  }
+}
 
 android {
   namespace = "com.skydoves.landscapist.transformation"
@@ -46,9 +53,6 @@ android {
     cmake {
       path = file("src/main/cpp/CMakeLists.txt")
     }
-  }
-  publishing {
-    singleVariant("release")
   }
 }
 

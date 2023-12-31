@@ -18,12 +18,22 @@ import com.github.skydoves.landscapist.Configuration
 
 plugins {
   kotlin("jvm")
+  id(libs.plugins.nexus.plugin.get().pluginId)
 }
 
-rootProject.extra.apply {
-  set("PUBLISH_GROUP_ID", Configuration.artifactGroup)
-  set("PUBLISH_ARTIFACT_ID", "landscapist-bom")
-  set("PUBLISH_VERSION", rootProject.extra.get("rootVersionName"))
+apply(from = "${rootDir}/scripts/publish-module.gradle.kts")
+
+mavenPublishing {
+  val artifactId = "landscapist-bom"
+  coordinates(
+    Configuration.artifactGroup,
+    artifactId,
+    rootProject.extra.get("libVersion").toString()
+  )
+
+  pom {
+    name.set(artifactId)
+  }
 }
 
 dependencies {
@@ -39,6 +49,4 @@ dependencies {
     api(project(":fresco-websupport"))
   }
 }
-
-apply(from ="${rootDir}/scripts/publish-module.gradle")
 

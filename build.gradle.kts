@@ -10,5 +10,3 @@ plugins {
   alias(libs.plugins.nexus.plugin)
   alias(libs.plugins.dokka)
 }
-
-apply(from = "${rootDir}/scripts/publish-root.gradle")
