@@ -27,7 +27,7 @@ android {
   compileSdk = Configuration.compileSdk
   defaultConfig {
     applicationId = "com.skydoves.benchmark.landscapist.app"
-    minSdk = 24
+    minSdk = Configuration.minSdk24
     targetSdk = Configuration.targetSdk
     versionCode = Configuration.versionCode
     versionName = Configuration.versionName
