@@ -17,7 +17,7 @@
 import com.github.skydoves.landscapist.Configuration
 
 plugins {
-  id("landscapist.library.compose")
+  id("landscapist.library.compose.multiplatform")
   id("landscapist.spotless")
 }
 
@@ -33,6 +33,30 @@ mavenPublishing {
 
   pom {
     name.set(artifactId)
+  }
+}
+
+kotlin {
+  sourceSets {
+    all {
+      languageSettings.optIn("kotlin.RequiresOptIn")
+      languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+      languageSettings.optIn("com.skydoves.landscapist.InternalLandscapistApi")
+    }
+    val commonMain by getting {
+      dependencies {
+        implementation(compose.ui)
+        implementation(compose.runtime)
+        implementation(compose.foundation)
+        implementation(libs.kotlinx.coroutines.core)
+      }
+    }
+
+    val androidMain by getting {
+      dependencies {
+        implementation(libs.androidx.core.ktx)
+      }
+    }
   }
 }
 
@@ -59,10 +83,14 @@ baselineProfile {
   }
 }
 
-dependencies {
-  implementation(libs.androidx.core.ktx)
-  implementation(libs.androidx.compose.ui)
-  implementation(libs.androidx.compose.runtime)
-  implementation(libs.androidx.compose.foundation)
-  implementation(libs.kotlinx.coroutines.core)
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+  kotlinOptions {
+    jvmTarget = "1.8"
+    freeCompilerArgs += listOf(
+      "-Xexplicit-api=strict",
+      "-opt-in=kotlin.RequiresOptIn",
+      "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+      "-opt-in=com.skydoves.landscapist.InternalLandscapistApi",
+    )
+  }
 }

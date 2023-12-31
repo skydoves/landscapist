@@ -73,6 +73,8 @@ internal fun Project.configureComposeMultiplatform(
         }
       }
     }
+
+    explicitApi()
   }
 
   commonExtension.apply {
@@ -83,10 +85,6 @@ internal fun Project.configureComposeMultiplatform(
     composeOptions {
       kotlinCompilerExtensionVersion =
         libs.findVersion("androidxComposeCompiler").get().toString()
-    }
-
-    kotlinOptions {
-      freeCompilerArgs = freeCompilerArgs + buildComposeMetricsParameters()
     }
 
     packaging {

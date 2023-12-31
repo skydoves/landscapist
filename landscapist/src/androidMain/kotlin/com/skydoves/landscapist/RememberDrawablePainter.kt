@@ -21,7 +21,6 @@ import android.graphics.drawable.Drawable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -60,18 +59,3 @@ public fun rememberDrawablePainter(
     imagePlugins = imagePlugins,
     imageBitmap = drawable.toBitmap().asImageBitmap(),
   )
-
-/**
- * Remembers [ImageBitmap] wrapped up as a [Painter] with a given the list of [ImagePlugin].
- *
- * @param imageBitmap An [ImageBitmap] to be drawn.
- * @param imagePlugins A list of [ImagePlugin] that will be applied to the drawable painter.
- */
-@Composable
-@InternalLandscapistApi
-public fun rememberBitmapPainter(
-  imagePlugins: List<ImagePlugin>,
-  imageBitmap: ImageBitmap,
-): Painter = remember(imageBitmap, imagePlugins) {
-  BitmapPainter(imageBitmap)
-}.composePainterPlugins(imagePlugins = imagePlugins, imageBitmap = imageBitmap)

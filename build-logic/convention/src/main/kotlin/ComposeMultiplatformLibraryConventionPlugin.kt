@@ -39,13 +39,8 @@ class ComposeMultiplatformLibraryConventionPlugin : Plugin<Project> {
       pluginManager.apply("androidx.baselineprofile")
 
       extensions.configure<LibraryExtension> libraryExtension@{
-        configureKotlinAndroid(this)
         extensions.configure<KotlinMultiplatformExtension> kmpExtension@{
           configureComposeMultiplatform(this@libraryExtension, this@kmpExtension)
-        }
-
-        kotlinOptions {
-          freeCompilerArgs = freeCompilerArgs + listOf("-Xexplicit-api=strict")
         }
       }
 
