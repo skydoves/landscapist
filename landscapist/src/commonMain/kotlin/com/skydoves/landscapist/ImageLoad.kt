@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:JvmName("ImageLoad")
-@file:JvmMultifileClass
-
 package com.skydoves.landscapist
 
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -30,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
 import com.skydoves.landscapist.constraints.Constrainable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged

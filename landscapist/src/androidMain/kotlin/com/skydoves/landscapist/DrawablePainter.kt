@@ -151,6 +151,7 @@ private val Drawable.intrinsicSize: Size
     intrinsicWidth >= 0 && intrinsicHeight >= 0 -> {
       Size(width = intrinsicWidth.toFloat(), height = intrinsicHeight.toFloat())
     }
+
     else -> Size.Unspecified
   }
 

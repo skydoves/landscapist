@@ -9,7 +9,7 @@ on:
 jobs:
   lint:
     name: Spotless check
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v4.1.1
@@ -23,7 +23,7 @@ jobs:
 
   api_check:
     name: API check
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v4.1.1
@@ -37,7 +37,7 @@ jobs:
 
   build:
     name: Build and Tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4.1.1
 

@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:JvmName("ImageWithSource")
-@file:JvmMultifileClass
-
 package com.skydoves.landscapist
 
 import androidx.compose.foundation.Image
@@ -62,6 +59,7 @@ public fun ImageBySource(
         alpha = alpha,
       )
     }
+
     is ImageVector -> {
       Image(
         imageVector = source,
@@ -73,6 +71,7 @@ public fun ImageBySource(
         alpha = alpha,
       )
     }
+
     is Painter -> {
       Image(
         painter = source,
@@ -84,6 +83,7 @@ public fun ImageBySource(
         alpha = alpha,
       )
     }
+
     else -> {
       throw IllegalArgumentException(
         "Wrong source was used: $source, " +
