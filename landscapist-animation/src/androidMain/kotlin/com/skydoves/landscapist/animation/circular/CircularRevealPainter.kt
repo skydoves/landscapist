@@ -13,65 +13,62 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist.animation.crossfade
+package com.skydoves.landscapist.animation.circular
 
 import android.graphics.Matrix
 import android.graphics.RectF
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.core.util.Pools
 
 /**
- * CrossfadePainter is a [Painter] that applies crossfade filter effect on the given [imageBitmap].
+ * CircularRevealPainter is a [Painter] which animates a clipping circle to reveal an image.
+ * Reveal animations provide users visual continuity when we show an image.
  *
  * @param imageBitmap an image bitmap for loading for the content.
  * @param painter an image painter to draw an [ImageBitmap] into the provided canvas.
  */
-internal class CrossfadePainter(
-  private val imageBitmap: ImageBitmap,
-  private val painter: Painter,
+internal actual class CircularRevealPainter actual constructor(
+  actual val imageBitmap: ImageBitmap,
+  actual val painter: Painter,
 ) : Painter() {
 
-  /** return the dimension size of the [painter]'s intrinsic width and height. */
-  override val intrinsicSize: Size get() = painter.intrinsicSize
-
-  /** color filter that will be applied to draw the [imageBitmap]. */
-  var transitionColorFilter by mutableStateOf<ColorFilter?>(null)
+  actual var radius by mutableStateOf(0f, policy = neverEqualPolicy())
 
   override fun DrawScope.onDraw() {
-    drawIntoCanvas { canvas ->
-      var dx = 0f
-      var dy = 0f
-      val scale: Float
-      val shaderMatrix = Matrix()
-      val shader = ImageShader(imageBitmap, TileMode.Clamp)
-      val brush = ShaderBrush(shader)
-      val paint = paintPool.acquire() ?: Paint()
-      paint.asFrameworkPaint().apply {
-        isAntiAlias = true
-        isDither = true
-        isFilterBitmap = true
-      }
+    var dx = 0f
+    var dy = 0f
+    var scale: Float
+    val shaderMatrix = Matrix()
+    val shader = ImageShader(imageBitmap, TileMode.Clamp)
+    val brush = ShaderBrush(shader)
+    val paint = paintPool.acquire() ?: Paint()
+    paint.asFrameworkPaint().apply {
+      isAntiAlias = true
+      isDither = true
+      isFilterBitmap = true
+    }
 
+    drawIntoCanvas { canvas ->
       // cache the paint in the internal stack.
       canvas.saveLayer(size.toRect(), paint)
 
       val mDrawableRect = RectF(0f, 0f, size.width, size.height)
-      val bitmapWidth: Int = imageBitmap.asAndroidBitmap().width
-      val bitmapHeight: Int = imageBitmap.asAndroidBitmap().height
+      val bitmapWidth: Int = imageBitmap.width
+      val bitmapHeight: Int = imageBitmap.height
 
       if (bitmapWidth * mDrawableRect.height() > mDrawableRect.width() * bitmapHeight) {
         scale = mDrawableRect.height() / bitmapHeight.toFloat()
@@ -91,8 +88,9 @@ internal class CrossfadePainter(
       )
       // apply the scaled matrix to the shader.
       shader.setLocalMatrix(shaderMatrix)
-      // draw an image bitmap as a rect.
-      drawRect(brush = brush, colorFilter = transitionColorFilter)
+      // calculate radius and draw an image bitmap as a circle.
+      val calculatedRadius = size.width.coerceAtLeast(size.height) * radius
+      drawCircle(brush, calculatedRadius, Offset(size.width / 2, size.height / 2))
       // restore canvas.
       canvas.restore()
       // resets the paint and release to the pool.
@@ -100,6 +98,9 @@ internal class CrossfadePainter(
       paintPool.release(paint)
     }
   }
+
+  /** return the dimension size of the [painter]'s intrinsic width and height. */
+  override val intrinsicSize: Size get() = painter.intrinsicSize
 }
 
 /** paint pool which caching and reusing [Paint] instances. */
