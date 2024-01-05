@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.plugins.ImagePlugin
@@ -29,20 +28,12 @@ import com.skydoves.landscapist.plugins.ImagePlugin
  *
  * @param baseColor the base color of the content.
  * @param highlightColor the shimmer's highlight color.
- * @param intensity adjust the density of the highlight at the center.
- * @param dropOff adjust the size of the fading edge of the highlight.
- * @param tilt adjust an angle at which the highlight is tilted and measured in degrees.
- * @param durationMillis a milli-second time to move the simmering effect from start to finish animation.
  */
 @Immutable
 public data class ShimmerPlugin(
   val baseColor: Color,
   val highlightColor: Color,
-  val width: Dp? = null,
-  val intensity: Float = DefaultShimmerIntensity,
-  val dropOff: Float = DefaultShimmerDropOff,
-  val tilt: Float = DefaultShimmerTilt,
-  val durationMillis: Int = DefaultDurationMillis,
+  val shimmerType: ShimmerType = ShimmerType.RESONATE,
 ) : ImagePlugin.LoadingStatePlugin {
 
   @Composable
@@ -55,11 +46,7 @@ public data class ShimmerPlugin(
       modifier = modifier,
       baseColor = baseColor,
       highlightColor = highlightColor,
-      shimmerWidth = width,
-      intensity = intensity,
-      dropOff = dropOff,
-      tilt = tilt,
-      durationMillis = durationMillis,
+      shimmerType = shimmerType,
     )
   }
 }
