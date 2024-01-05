@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:JvmName("LocalShimmerParams")
-@file:JvmMultifileClass
 @file:Suppress("unused")
 
 package com.skydoves.landscapist.placeholder.shimmer
