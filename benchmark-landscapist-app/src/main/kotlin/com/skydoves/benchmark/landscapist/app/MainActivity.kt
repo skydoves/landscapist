@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -45,10 +44,7 @@ class MainActivity : ComponentActivity() {
       val imageComponent = imageComponent {
         +PlaceholderPlugin.Loading(painterResource(id = R.drawable.poster))
         +PlaceholderPlugin.Failure(painterResource(id = R.drawable.poster))
-        +ShimmerPlugin(
-          baseColor = Color.Transparent,
-          highlightColor = Color.Transparent,
-        )
+        +ShimmerPlugin()
         +CrossfadePlugin()
         +CircularRevealPlugin()
         +BlurTransformationPlugin()
