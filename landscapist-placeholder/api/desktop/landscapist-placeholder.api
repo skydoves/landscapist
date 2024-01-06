@@ -28,38 +28,100 @@ public final class com/skydoves/landscapist/placeholder/placeholder/PlaceholderP
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class com/skydoves/landscapist/placeholder/shimmer/FlashShimmerKt {
+	public static final fun Shimmer-0Cdfkco (Landroidx/compose/ui/Modifier;JJLandroidx/compose/ui/unit/Dp;FFFILandroidx/compose/runtime/Composer;II)V
+}
+
 public final class com/skydoves/landscapist/placeholder/shimmer/LocalShimmerKt {
 	public static final fun getLocalShimmerPlugin ()Landroidx/compose/runtime/ProvidableCompositionLocal;
 }
 
-public final class com/skydoves/landscapist/placeholder/shimmer/ShimmerKt {
-	public static final fun Shimmer-eopBjH0 (Landroidx/compose/ui/Modifier;JJLcom/skydoves/landscapist/placeholder/shimmer/ShimmerType;Landroidx/compose/runtime/Composer;II)V
+public abstract class com/skydoves/landscapist/placeholder/shimmer/Shimmer {
+	public static final field $stable I
+	public synthetic fun <init> (JJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getShimmerBaseColor-0d7_KjU ()J
+	public final fun getShimmerDuration ()I
+	public final fun getShimmerHighlightColor-0d7_KjU ()J
 }
 
-public final class com/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin : com/skydoves/landscapist/plugins/ImagePlugin$LoadingStatePlugin {
+public final class com/skydoves/landscapist/placeholder/shimmer/Shimmer$Fade : com/skydoves/landscapist/placeholder/shimmer/Shimmer {
 	public static final field $stable I
-	public synthetic fun <init> (JJLcom/skydoves/landscapist/placeholder/shimmer/ShimmerType;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (JJLcom/skydoves/landscapist/placeholder/shimmer/ShimmerType;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-0d7_KjU ()J
 	public final fun component2-0d7_KjU ()J
-	public final fun component3 ()Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerType;
-	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
-	public final fun copy-jxsXWHM (JJLcom/skydoves/landscapist/placeholder/shimmer/ShimmerType;)Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin;
-	public static synthetic fun copy-jxsXWHM$default (Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin;JJLcom/skydoves/landscapist/placeholder/shimmer/ShimmerType;ILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin;
+	public final fun component3 ()I
+	public final fun copy-jxsXWHM (JJI)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Fade;
+	public static synthetic fun copy-jxsXWHM$default (Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Fade;JJIILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Fade;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBaseColor-0d7_KjU ()J
+	public final fun getDuration ()I
 	public final fun getHighlightColor-0d7_KjU ()J
-	public final fun getShimmerType ()Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerType;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/skydoves/landscapist/placeholder/shimmer/ShimmerType : java/lang/Enum {
-	public static final field FADE Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerType;
-	public static final field RESONATE Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerType;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerType;
-	public static fun values ()[Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerType;
+public final class com/skydoves/landscapist/placeholder/shimmer/Shimmer$Flash : com/skydoves/landscapist/placeholder/shimmer/Shimmer {
+	public static final field $stable I
+	public synthetic fun <init> (JJLandroidx/compose/ui/unit/Dp;FFFIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJLandroidx/compose/ui/unit/Dp;FFFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-0d7_KjU ()J
+	public final fun component2-0d7_KjU ()J
+	public final fun component3-lTKBWiU ()Landroidx/compose/ui/unit/Dp;
+	public final fun component4 ()F
+	public final fun component5 ()F
+	public final fun component6 ()F
+	public final fun component7 ()I
+	public final fun copy-EsoZhhI (JJLandroidx/compose/ui/unit/Dp;FFFI)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Flash;
+	public static synthetic fun copy-EsoZhhI$default (Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Flash;JJLandroidx/compose/ui/unit/Dp;FFFIILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Flash;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBaseColor-0d7_KjU ()J
+	public final fun getDropOff ()F
+	public final fun getDuration ()I
+	public final fun getHighlightColor-0d7_KjU ()J
+	public final fun getIntensity ()F
+	public final fun getTilt ()F
+	public final fun getWidth-lTKBWiU ()Landroidx/compose/ui/unit/Dp;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/placeholder/shimmer/Shimmer$Resonate : com/skydoves/landscapist/placeholder/shimmer/Shimmer {
+	public static final field $stable I
+	public synthetic fun <init> (JJIFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJIFLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-0d7_KjU ()J
+	public final fun component2-0d7_KjU ()J
+	public final fun component3 ()I
+	public final fun component4 ()F
+	public final fun copy-RFnl5yQ (JJIF)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Resonate;
+	public static synthetic fun copy-RFnl5yQ$default (Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Resonate;JJIFILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Resonate;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBaseColor-0d7_KjU ()J
+	public final fun getDuration ()I
+	public final fun getHighlightColor-0d7_KjU ()J
+	public final fun getProgressForMaxAlpha ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/placeholder/shimmer/ShimmerContainerKt {
+	public static final fun ShimmerContainer (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer;Landroidx/compose/runtime/Composer;I)V
+}
+
+public final class com/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin : com/skydoves/landscapist/plugins/ImagePlugin$LoadingStatePlugin {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer;)V
+	public synthetic fun <init> (Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer;
+	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+	public final fun copy (Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer;)Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin;Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer;ILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getShimmer ()Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/skydoves/landscapist/placeholder/thumbnail/ThumbnailPlugin : com/skydoves/landscapist/plugins/ImagePlugin$LoadingStatePlugin {

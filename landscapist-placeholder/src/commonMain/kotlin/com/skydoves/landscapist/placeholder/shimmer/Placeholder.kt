@@ -16,15 +16,11 @@
 package com.skydoves.landscapist.placeholder.shimmer
 
 import androidx.compose.animation.core.FiniteAnimationSpec
-import androidx.compose.animation.core.InfiniteRepeatableSpec
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,31 +49,6 @@ import androidx.compose.ui.unit.LayoutDirection
  *
  * All rights reserved to Google LLC.
  *
- * Contains default values used by [Modifier.placeholder] and [PlaceholderHighlight].
- */
-internal object PlaceholderDefaults {
-  /**
-   * The default [InfiniteRepeatableSpec] to use for [fade].
-   */
-  val fadeAnimationSpec: InfiniteRepeatableSpec<Float> by lazy {
-    infiniteRepeatable(
-      animation = tween(delayMillis = 0, durationMillis = 600),
-      repeatMode = RepeatMode.Reverse,
-    )
-  }
-
-  /**
-   * The default [InfiniteRepeatableSpec] to use for [shimmer].
-   */
-  val shimmerAnimationSpec: InfiniteRepeatableSpec<Float> by lazy {
-    infiniteRepeatable(
-      animation = tween(delayMillis = 0, durationMillis = 1700),
-      repeatMode = RepeatMode.Restart,
-    )
-  }
-}
-
-/**
  * Draws some skeleton UI which is typically used whilst content is 'loading'.
  *
  * A version of this modifier which uses appropriate values for Material themed apps is available

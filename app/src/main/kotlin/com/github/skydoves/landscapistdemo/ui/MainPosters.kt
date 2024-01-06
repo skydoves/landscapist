@@ -18,6 +18,7 @@ package com.github.skydoves.landscapistdemo.ui
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -54,6 +55,7 @@ import com.github.skydoves.landscapistdemo.R
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
+import com.github.skydoves.landscapistdemo.theme.background
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
@@ -62,6 +64,8 @@ import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.palette.rememberPaletteState
+import com.skydoves.landscapist.placeholder.shimmer.Shimmer
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @Composable
 fun DisneyPosters(
@@ -132,6 +136,16 @@ private fun SelectedPoster(
     imageModel = { poster.image },
     modifier = Modifier.aspectRatio(0.8f),
     component = rememberImageComponent {
+      +ShimmerPlugin(
+        Shimmer.Resonate(
+          baseColor = if (isSystemInDarkTheme()) {
+            background
+          } else {
+            Color.White
+          },
+          highlightColor = Color.LightGray,
+        ),
+      )
       +CircularRevealPlugin()
       +PalettePlugin { palette = it }
     },
