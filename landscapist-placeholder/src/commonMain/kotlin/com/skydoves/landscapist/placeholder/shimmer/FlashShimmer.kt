@@ -102,7 +102,7 @@ public fun Shimmer(
       val width = shimmerWidthPx ?: (size.width + tiltTan * size.height).toFloat()
 
       try {
-        val dx = offset(-width, width, animatedProgress.value)
+        val dx = offset(-width, width * 1.5f, animatedProgress.value)
         val shaderMatrix = Matrix().apply {
           reset()
           rotateX(size.width / 2f)

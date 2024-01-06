@@ -35,6 +35,7 @@ import com.skydoves.landscapist.placeholder.shimmer.Shimmer.Resonate
 public sealed class Shimmer(
   public val shimmerBaseColor: Color,
   public val shimmerHighlightColor: Color,
+  public val shimmerDuration: Int,
 ) {
 
   /**
@@ -47,7 +48,7 @@ public sealed class Shimmer(
    * @property intensity controls the brightness of the highlight at the center.
    * @property dropOff controls the size of the fading edge of the highlight.
    * @property tilt angle at which the highlight is tilted, measured in degrees.
-   * @property durationMillis animation duration of the shimmering start to end.
+   * @property duration animation duration of the shimmering start to end.
    */
   @Immutable
   public data class Flash(
@@ -57,8 +58,12 @@ public sealed class Shimmer(
     val intensity: Float = DefaultShimmerIntensity,
     val dropOff: Float = DefaultShimmerDropOff,
     val tilt: Float = DefaultShimmerTilt,
-    val durationMillis: Int = DefaultDurationMillis,
-  ) : Shimmer(shimmerBaseColor = baseColor, shimmerHighlightColor = highlightColor)
+    val duration: Int = DefaultDurationMillis,
+  ) : Shimmer(
+    shimmerBaseColor = baseColor,
+    shimmerHighlightColor = highlightColor,
+    shimmerDuration = duration,
+  )
 
   /**
    * Characterized by its smooth and glowing appearance, this effect creates a more subtle and elegant visual.
@@ -69,24 +74,36 @@ public sealed class Shimmer(
    *
    * @property baseColor base background color of this composable.
    * @property highlightColor highlight shimmering effect color of this composable.
+   * @property duration duration of the animation.
    * @property progressForMaxAlpha The progress where the shimmer should be at it's peak opacity.
    */
   @Immutable
   public data class Resonate(
     val baseColor: Color,
     val highlightColor: Color,
-    val progressForMaxAlpha: Float = 0.6f,
-  ) : Shimmer(shimmerBaseColor = baseColor, shimmerHighlightColor = highlightColor)
+    val duration: Int = DefaultResonateDuration,
+    val progressForMaxAlpha: Float = DefaultProgressForMaxAlpha,
+  ) : Shimmer(
+    shimmerBaseColor = baseColor,
+    shimmerHighlightColor = highlightColor,
+    shimmerDuration = duration,
+  )
 
   /**
    * This effect offers a fading transition between the [baseColor] and [highlightColor].
    *
    * @property baseColor base background color of this composable.
    * @property highlightColor highlight shimmering effect color of this composable.
+   * @property duration duration of the animation.
    */
   @Immutable
   public data class Fade(
     val baseColor: Color,
     val highlightColor: Color,
-  ) : Shimmer(shimmerBaseColor = baseColor, shimmerHighlightColor = highlightColor)
+    val duration: Int = DefaultFadeDuration,
+  ) : Shimmer(
+    shimmerBaseColor = baseColor,
+    shimmerHighlightColor = highlightColor,
+    shimmerDuration = duration,
+  )
 }

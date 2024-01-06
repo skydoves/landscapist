@@ -19,13 +19,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.github.skydoves.landscapistdemo.R
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
+import com.github.skydoves.landscapistdemo.theme.background
 import com.github.skydoves.landscapistdemo.theme.purple200
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -51,7 +51,11 @@ class MainActivity : ComponentActivity() {
     setContent {
       DisneyComposeTheme {
         Scaffold(
-          backgroundColor = MaterialTheme.colors.primarySurface,
+          backgroundColor = if (isSystemInDarkTheme()) {
+            background
+          } else {
+            Color.White
+          },
           topBar = { PosterAppBar() },
         ) {
           val list = MockUtil.getMockPosters().toMutableList()

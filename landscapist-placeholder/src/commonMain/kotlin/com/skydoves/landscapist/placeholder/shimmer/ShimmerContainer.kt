@@ -30,11 +30,11 @@ public fun ShimmerContainer(
         modifier = Modifier.matchParentSize(),
         baseColor = shimmer.shimmerBaseColor,
         highlightColor = shimmer.shimmerHighlightColor,
+        durationMillis = shimmer.shimmerDuration,
         shimmerWidth = shimmer.width,
         intensity = shimmer.intensity,
         dropOff = shimmer.dropOff,
         tilt = shimmer.tilt,
-        durationMillis = shimmer.durationMillis,
       )
     } else {
       Box(
@@ -45,11 +45,13 @@ public fun ShimmerContainer(
             highlight = if (shimmer is Shimmer.Resonate) {
               PlaceholderHighlight.shimmer(
                 highlightColor = shimmer.shimmerHighlightColor,
+                duration = shimmer.shimmerDuration,
                 progressForMaxAlpha = shimmer.progressForMaxAlpha,
               )
             } else {
               PlaceholderHighlight.fade(
                 highlightColor = shimmer.shimmerHighlightColor,
+                duration = shimmer.shimmerDuration,
               )
             },
           ),

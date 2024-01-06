@@ -38,20 +38,24 @@ public final class com/skydoves/landscapist/placeholder/shimmer/LocalShimmerKt {
 
 public abstract class com/skydoves/landscapist/placeholder/shimmer/Shimmer {
 	public static final field $stable I
-	public synthetic fun <init> (JJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun getShimmerBaseColor-0d7_KjU ()J
+	public final fun getShimmerDuration ()I
 	public final fun getShimmerHighlightColor-0d7_KjU ()J
 }
 
 public final class com/skydoves/landscapist/placeholder/shimmer/Shimmer$Fade : com/skydoves/landscapist/placeholder/shimmer/Shimmer {
 	public static final field $stable I
-	public synthetic fun <init> (JJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-0d7_KjU ()J
 	public final fun component2-0d7_KjU ()J
-	public final fun copy--OWjLjI (JJ)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Fade;
-	public static synthetic fun copy--OWjLjI$default (Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Fade;JJILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Fade;
+	public final fun component3 ()I
+	public final fun copy-jxsXWHM (JJI)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Fade;
+	public static synthetic fun copy-jxsXWHM$default (Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Fade;JJIILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Fade;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBaseColor-0d7_KjU ()J
+	public final fun getDuration ()I
 	public final fun getHighlightColor-0d7_KjU ()J
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -73,7 +77,7 @@ public final class com/skydoves/landscapist/placeholder/shimmer/Shimmer$Flash : 
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBaseColor-0d7_KjU ()J
 	public final fun getDropOff ()F
-	public final fun getDurationMillis ()I
+	public final fun getDuration ()I
 	public final fun getHighlightColor-0d7_KjU ()J
 	public final fun getIntensity ()F
 	public final fun getTilt ()F
@@ -84,15 +88,17 @@ public final class com/skydoves/landscapist/placeholder/shimmer/Shimmer$Flash : 
 
 public final class com/skydoves/landscapist/placeholder/shimmer/Shimmer$Resonate : com/skydoves/landscapist/placeholder/shimmer/Shimmer {
 	public static final field $stable I
-	public synthetic fun <init> (JJFILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (JJFLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJIFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJIFLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-0d7_KjU ()J
 	public final fun component2-0d7_KjU ()J
-	public final fun component3 ()F
-	public final fun copy-jxsXWHM (JJF)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Resonate;
-	public static synthetic fun copy-jxsXWHM$default (Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Resonate;JJFILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Resonate;
+	public final fun component3 ()I
+	public final fun component4 ()F
+	public final fun copy-RFnl5yQ (JJIF)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Resonate;
+	public static synthetic fun copy-RFnl5yQ$default (Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Resonate;JJIFILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer$Resonate;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBaseColor-0d7_KjU ()J
+	public final fun getDuration ()I
 	public final fun getHighlightColor-0d7_KjU ()J
 	public final fun getProgressForMaxAlpha ()F
 	public fun hashCode ()I

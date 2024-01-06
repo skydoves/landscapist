@@ -17,6 +17,9 @@ package com.skydoves.landscapist.placeholder.shimmer
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -70,10 +73,13 @@ internal interface PlaceholderHighlight {
  */
 internal fun PlaceholderHighlight.Companion.fade(
   highlightColor: Color,
-  animationSpec: InfiniteRepeatableSpec<Float> = PlaceholderDefaults.fadeAnimationSpec,
+  duration: Int,
 ): PlaceholderHighlight = Fade(
   highlightColor = highlightColor,
-  animationSpec = animationSpec,
+  animationSpec = infiniteRepeatable(
+    animation = tween(delayMillis = 0, durationMillis = duration),
+    repeatMode = RepeatMode.Reverse,
+  ),
 )
 
 /**
@@ -92,11 +98,14 @@ internal fun PlaceholderHighlight.Companion.fade(
  */
 internal fun PlaceholderHighlight.Companion.shimmer(
   highlightColor: Color,
-  animationSpec: InfiniteRepeatableSpec<Float> = PlaceholderDefaults.shimmerAnimationSpec,
+  duration: Int,
   progressForMaxAlpha: Float = 0.6f,
 ): PlaceholderHighlight = Placeholder(
   highlightColor = highlightColor,
-  animationSpec = animationSpec,
+  animationSpec = infiniteRepeatable(
+    animation = tween(delayMillis = 0, durationMillis = duration),
+    repeatMode = RepeatMode.Restart,
+  ),
   progressForMaxAlpha = progressForMaxAlpha,
 )
 
@@ -151,3 +160,9 @@ private data class Placeholder(
 private fun lerp(start: Float, stop: Float, fraction: Float): Float {
   return (1 - fraction) * start + fraction * stop
 }
+
+internal const val DefaultProgressForMaxAlpha = 0.6f
+
+internal const val DefaultResonateDuration = 1000
+
+internal const val DefaultFadeDuration = 600
