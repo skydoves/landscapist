@@ -15,34 +15,78 @@
  */
 package com.skydoves.landscapist.placeholder.shimmer
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import com.skydoves.landscapist.placeholder.shimmer.Shimmer.Fade
+import com.skydoves.landscapist.placeholder.shimmer.Shimmer.Flash
+import com.skydoves.landscapist.placeholder.shimmer.Shimmer.Resonate
 
-@Composable
-public fun Shimmer(
-  modifier: Modifier,
-  baseColor: Color,
-  highlightColor: Color,
-  shimmerType: ShimmerType = ShimmerType.RESONATE,
+/**
+ * This is a representation of Shimmer to be used with [ShimmerPlugin].
+ *
+ * There are three different type of shimmering effect, [Flash], [Resonate], and [Fade].
+ *
+ * @property shimmerBaseColor base background color of this composable.
+ * @property shimmerHighlightColor highlight shimmering effect color of this composable.
+ */
+@Stable
+public sealed class Shimmer(
+  public val shimmerBaseColor: Color,
+  public val shimmerHighlightColor: Color,
 ) {
-  Box(modifier = modifier) {
-    Box(
-      modifier = Modifier.matchParentSize()
-        .placeholder(
-          visible = true,
-          color = baseColor,
-          highlight = if (shimmerType == ShimmerType.RESONATE) {
-            PlaceholderHighlight.shimmer(
-              highlightColor = highlightColor,
-            )
-          } else {
-            PlaceholderHighlight.fade(
-              highlightColor = highlightColor,
-            )
-          },
-        ),
-    )
-  }
+
+  /**
+   * This is the most commonly used effect, popularized by platforms like Facebook and Twitter.
+   * It features a quick, bright flash that moves across the content, giving the impression of dynamic loading.
+   *
+   * @property baseColor base background color of this composable.
+   * @property highlightColor highlight shimmering effect color of this composable.
+   * @property width the width size of the shimmer.
+   * @property intensity controls the brightness of the highlight at the center.
+   * @property dropOff controls the size of the fading edge of the highlight.
+   * @property tilt angle at which the highlight is tilted, measured in degrees.
+   * @property durationMillis animation duration of the shimmering start to end.
+   */
+  @Immutable
+  public data class Flash(
+    val baseColor: Color,
+    val highlightColor: Color,
+    val width: Dp? = null,
+    val intensity: Float = DefaultShimmerIntensity,
+    val dropOff: Float = DefaultShimmerDropOff,
+    val tilt: Float = DefaultShimmerTilt,
+    val durationMillis: Int = DefaultDurationMillis,
+  ) : Shimmer(shimmerBaseColor = baseColor, shimmerHighlightColor = highlightColor)
+
+  /**
+   * Characterized by its smooth and glowing appearance, this effect creates a more subtle and elegant visual.
+   *
+   * The highlight starts at the top-start, and then grows to the bottom-end during the animation.
+   * During that time it is also faded in, from 0f..progressForMaxAlpha, and then faded out from
+   * progressForMaxAlpha..1f.
+   *
+   * @property baseColor base background color of this composable.
+   * @property highlightColor highlight shimmering effect color of this composable.
+   * @property progressForMaxAlpha The progress where the shimmer should be at it's peak opacity.
+   */
+  @Immutable
+  public data class Resonate(
+    val baseColor: Color,
+    val highlightColor: Color,
+    val progressForMaxAlpha: Float = 0.6f,
+  ) : Shimmer(shimmerBaseColor = baseColor, shimmerHighlightColor = highlightColor)
+
+  /**
+   * This effect offers a fading transition between the [baseColor] and [highlightColor].
+   *
+   * @property baseColor base background color of this composable.
+   * @property highlightColor highlight shimmering effect color of this composable.
+   */
+  @Immutable
+  public data class Fade(
+    val baseColor: Color,
+    val highlightColor: Color,
+  ) : Shimmer(shimmerBaseColor = baseColor, shimmerHighlightColor = highlightColor)
 }

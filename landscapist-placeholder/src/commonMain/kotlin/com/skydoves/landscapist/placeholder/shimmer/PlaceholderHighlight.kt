@@ -94,7 +94,7 @@ internal fun PlaceholderHighlight.Companion.shimmer(
   highlightColor: Color,
   animationSpec: InfiniteRepeatableSpec<Float> = PlaceholderDefaults.shimmerAnimationSpec,
   progressForMaxAlpha: Float = 0.6f,
-): PlaceholderHighlight = Shimmer(
+): PlaceholderHighlight = Placeholder(
   highlightColor = highlightColor,
   animationSpec = animationSpec,
   progressForMaxAlpha = progressForMaxAlpha,
@@ -110,7 +110,7 @@ private data class Fade(
   override fun alpha(progress: Float): Float = progress
 }
 
-private data class Shimmer(
+private data class Placeholder(
   private val highlightColor: Color,
   override val animationSpec: InfiniteRepeatableSpec<Float>,
   private val progressForMaxAlpha: Float = 0.6f,

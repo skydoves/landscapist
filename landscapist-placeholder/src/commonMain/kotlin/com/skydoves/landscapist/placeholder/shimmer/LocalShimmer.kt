@@ -29,11 +29,16 @@ import com.skydoves.landscapist.placeholder.shimmer.LocalShimmerProvider.default
 public val LocalShimmerPlugin: ProvidableCompositionLocal<ShimmerPlugin> =
   compositionLocalOf { defaultShimmerPlugin() }
 
-/** A provider for taking the local instances related to the [Shimmer]. */
+/** A provider for taking the local instances related to the [ShimmerContainer]. */
 internal object LocalShimmerProvider {
 
   /** Returns the current or default [ShimmerPlugin] for the `shimmerParams` parameter. */
   fun defaultShimmerPlugin(): ShimmerPlugin {
-    return ShimmerPlugin(baseColor = Color.DarkGray, highlightColor = Color.LightGray)
+    return ShimmerPlugin(
+      shimmer = Shimmer.Flash(
+        baseColor = Color.DarkGray,
+        highlightColor = Color.LightGray,
+      ),
+    )
   }
 }

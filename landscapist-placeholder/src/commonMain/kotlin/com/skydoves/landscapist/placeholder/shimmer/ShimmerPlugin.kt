@@ -24,16 +24,16 @@ import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.plugins.ImagePlugin
 
 /**
- * Shimmer params holds attributes of the [Shimmer] composable.
+ * Shimmer params holds attributes of the [ShimmerContainer] composable.
  *
- * @param baseColor the base color of the content.
- * @param highlightColor the shimmer's highlight color.
+ * @property A representation of Shimmer to be used with [ShimmerPlugin].
  */
 @Immutable
 public data class ShimmerPlugin(
-  val baseColor: Color,
-  val highlightColor: Color,
-  val shimmerType: ShimmerType = ShimmerType.RESONATE,
+  val shimmer: Shimmer = Shimmer.Flash(
+    baseColor = Color.DarkGray,
+    highlightColor = Color.LightGray,
+  ),
 ) : ImagePlugin.LoadingStatePlugin {
 
   @Composable
@@ -42,11 +42,9 @@ public data class ShimmerPlugin(
     imageOptions: ImageOptions,
     executor: @Composable (IntSize) -> Unit,
   ): ImagePlugin = apply {
-    Shimmer(
+    ShimmerContainer(
       modifier = modifier,
-      baseColor = baseColor,
-      highlightColor = highlightColor,
-      shimmerType = shimmerType,
+      shimmer = shimmer,
     )
   }
 }
