@@ -68,6 +68,9 @@ coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coil" }
 coil3 = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil3" }
 coil3-network = { group = "io.coil-kt.coil3", name = "coil-network", version.ref = "coil3" }
 ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+ktor-engine-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-engine-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

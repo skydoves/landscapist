@@ -48,6 +48,7 @@ kotlin {
         api(project(":landscapist"))
         api(libs.coil3)
         api(libs.coil3.network)
+
         implementation(libs.ktor.core)
 
         implementation(compose.ui)
@@ -61,6 +62,18 @@ kotlin {
     val androidMain by getting {
       dependencies {
         implementation(libs.androidx.core.ktx)
+      }
+    }
+
+    val jvmMain by getting {
+      dependencies {
+        api(libs.ktor.okhttp)
+      }
+    }
+
+    val iosMain by getting {
+      dependencies {
+        api(libs.ktor.engine.darwin)
       }
     }
   }
