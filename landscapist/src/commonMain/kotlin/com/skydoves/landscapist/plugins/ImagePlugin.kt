@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.IntSize
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.InternalLandscapistApi
 
 /**
  * A pluggable compose interface that will be executed for loading images.
@@ -87,7 +88,8 @@ public sealed interface ImagePlugin {
  * @param imageBitmap A target [imageBitmap] to be composed of the given [Painter]
  */
 @Composable
-internal fun Painter.composePainterPlugins(
+@InternalLandscapistApi
+public fun Painter.composePainterPlugins(
   imagePlugins: List<ImagePlugin>,
   imageBitmap: ImageBitmap,
 ): Painter {

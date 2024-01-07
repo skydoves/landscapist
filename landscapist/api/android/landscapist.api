@@ -189,3 +189,7 @@ public abstract interface class com/skydoves/landscapist/plugins/ImagePlugin$Suc
 	public abstract fun compose (Landroidx/compose/ui/Modifier;Ljava/lang/Object;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
 }
 
+public final class com/skydoves/landscapist/plugins/ImagePluginKt {
+	public static final fun composePainterPlugins (Landroidx/compose/ui/graphics/painter/Painter;Ljava/util/List;Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
+}
+
