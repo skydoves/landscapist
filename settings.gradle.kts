@@ -7,7 +7,6 @@ pluginManagement {
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
     maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
     maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
   }
 }
@@ -18,7 +17,6 @@ dependencyResolutionManagement {
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
     maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
     maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
   }
 }

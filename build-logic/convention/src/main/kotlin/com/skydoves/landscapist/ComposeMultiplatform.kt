@@ -37,7 +37,7 @@ internal fun Project.configureComposeMultiplatform(
 
   kotlinMultiplatformExtension.apply {
     androidTarget { publishLibraryVariants("release") }
-
+    jvm("desktop")
     iosX64()
     iosArm64()
     iosSimulatorArm64()
