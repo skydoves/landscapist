@@ -19,7 +19,6 @@
 
 package com.skydoves.landscapist.fresco
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
@@ -30,7 +29,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.drawee.backends.pipeline.info.ImageOriginRequestListener
@@ -80,7 +78,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
  * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.ø
- * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
+ * @param previewPlaceholder A painter that is specifically rendered when this function operates in preview mode.
  */
 @Composable
 public fun FrescoImage(
@@ -92,7 +90,7 @@ public fun FrescoImage(
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
   onImageStateChanged: (FrescoImageState) -> Unit = {},
-  @DrawableRes previewPlaceholder: Int = 0,
+  previewPlaceholder: Painter? = null,
   loading: @Composable (BoxScope.(imageState: FrescoImageState.Loading) -> Unit)? = null,
   success: @Composable (
     BoxScope.(
@@ -102,11 +100,11 @@ public fun FrescoImage(
   )? = null,
   failure: @Composable (BoxScope.(imageState: FrescoImageState.Failure) -> Unit)? = null,
 ) {
-  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+  if (LocalInspectionMode.current && previewPlaceholder != null) {
     with(imageOptions) {
       Image(
         modifier = modifier,
-        painter = painterResource(id = previewPlaceholder),
+        painter = previewPlaceholder,
         alignment = alignment,
         contentScale = contentScale,
         alpha = alpha,
