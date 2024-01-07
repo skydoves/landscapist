@@ -14,35 +14,24 @@
  * limitations under the License.
  */
 @file:Suppress("unused")
-@file:JvmName("CoilImage")
-@file:JvmMultifileClass
 
-package com.skydoves.landscapist.coil
+package com.skydoves.landscapist.coil3
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.net.Uri
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
-import androidx.core.graphics.drawable.toBitmap
-import coil.ImageLoader
-import coil.request.ImageRequest
-import coil.request.ImageResult
-import coil.size.SizeResolver
+import coil3.ImageLoader
+import coil3.request.ImageRequest
+import coil3.request.ImageResult
+import coil3.size.SizeResolver
 import com.skydoves.landscapist.DataSource
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
@@ -58,18 +47,13 @@ import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.constraints.Constrainable
 import com.skydoves.landscapist.constraints.constraint
 import com.skydoves.landscapist.plugins.ImagePlugin
-import com.skydoves.landscapist.rememberDrawablePainter
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.channelFlow
-import okhttp3.HttpUrl
-import java.io.File
-import java.nio.ByteBuffer
 
 /**
  * Load and render an image with the given [imageModel] from the network or local storage.
  *
  * Supported types for the [imageModel] are the below:
- * [String], [Uri], [HttpUrl], [File], [DrawableRes], [Drawable], [Bitmap], [ByteArray], [ByteBuffer]
  *
  * ```
  * CoilImage(
@@ -109,7 +93,7 @@ public fun CoilImage(
   requestListener: (() -> ImageRequest.Listener)? = null,
   imageOptions: ImageOptions = ImageOptions(),
   onImageStateChanged: (CoilImageState) -> Unit = {},
-  @DrawableRes previewPlaceholder: Int = 0,
+  previewPlaceholder: Painter? = null,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (
     BoxScope.(
@@ -119,16 +103,10 @@ public fun CoilImage(
   )? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
-  val context = LocalContext.current
-  val lifecycleOwner = LocalLifecycleOwner.current
+  val imageRequest =
+    buildImageRequest(data = imageModel.invoke(), requestListener = requestListener?.invoke())
   CoilImage(
-    imageRequest = {
-      ImageRequest.Builder(context)
-        .data(imageModel.invoke())
-        .listener(requestListener?.invoke())
-        .lifecycle(lifecycleOwner)
-        .build()
-    },
+    imageRequest = { imageRequest },
     imageLoader = imageLoader,
     component = component,
     modifier = modifier,
@@ -184,7 +162,7 @@ public fun CoilImage(
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
   onImageStateChanged: (CoilImageState) -> Unit = {},
-  @DrawableRes previewPlaceholder: Int = 0,
+  previewPlaceholder: Painter? = null,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (
     BoxScope.(
@@ -194,11 +172,11 @@ public fun CoilImage(
   )? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
-  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+  if (LocalInspectionMode.current && previewPlaceholder != null) {
     with(imageOptions) {
       Image(
         modifier = modifier,
-        painter = painterResource(id = previewPlaceholder),
+        painter = previewPlaceholder,
         alignment = alignment,
         contentScale = contentScale,
         alpha = alpha,
@@ -252,15 +230,11 @@ public fun CoilImage(
           modifier = Modifier.constraint(this),
           imageModel = imageRequest.invoke().data,
           imageOptions = imageOptions,
-          imageBitmap = coilImageState.drawable?.toBitmap()
-            ?.copy(Bitmap.Config.ARGB_8888, true)?.asImageBitmap(),
+          imageBitmap = coilImageState.imageBitmap,
         )
 
-        val drawable = coilImageState.drawable ?: return@ImageRequest
-        val painter = rememberDrawablePainter(
-          drawable = drawable,
-          imagePlugins = component.imagePlugins,
-        )
+        val image = coilImageState.image ?: return@ImageRequest
+        val painter = rememberImagePainter(image = image, imagePlugins = component.imagePlugins)
 
         if (success != null) {
           success.invoke(this, coilImageState, painter)
@@ -311,7 +285,7 @@ private fun CoilImage(
   imageLoader: StableHolder<ImageLoader> = StableHolder(LocalCoilProvider.getCoilImageLoader()),
   content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit,
 ) {
-  val context = LocalContext.current
+  val context = platformContext
   val request = rememberRequestWithConstraints(
     request = recomposeKey.value,
     imageOptions = imageOptions,
@@ -352,39 +326,37 @@ private fun CoilThumbnail(
   ) ImageRequest@{ imageState ->
     val coilImageState = imageState.toCoilImageState()
     if (coilImageState is CoilImageState.Success) {
-      val drawable = coilImageState.drawable ?: return@ImageRequest
+      val image = coilImageState.image ?: return@ImageRequest
+      val painter = rememberImagePainter(image = image, imagePlugins = emptyList())
       imageOptions.LandscapistImage(
         modifier = Modifier,
-        painter = rememberDrawablePainter(
-          drawable = drawable,
-          imagePlugins = emptyList(),
-        ),
+        painter = painter,
       )
     }
   }
 }
 
 private fun ImageResult.toResult(): ImageLoadState = when (this) {
-  is coil.request.SuccessResult -> {
+  is coil3.request.SuccessResult -> {
     ImageLoadState.Success(
-      data = drawable,
+      data = image,
       dataSource = dataSource.toDataSource(),
     )
   }
 
-  is coil.request.ErrorResult -> {
+  is coil3.request.ErrorResult -> {
     ImageLoadState.Failure(
-      data = drawable?.toBitmap()?.asImageBitmap(),
+      data = image,
       reason = throwable,
     )
   }
 }
 
-private fun coil.decode.DataSource.toDataSource(): DataSource = when (this) {
-  coil.decode.DataSource.NETWORK -> DataSource.NETWORK
-  coil.decode.DataSource.MEMORY -> DataSource.MEMORY
-  coil.decode.DataSource.MEMORY_CACHE -> DataSource.MEMORY
-  coil.decode.DataSource.DISK -> DataSource.DISK
+private fun coil3.decode.DataSource.toDataSource(): DataSource = when (this) {
+  coil3.decode.DataSource.NETWORK -> DataSource.NETWORK
+  coil3.decode.DataSource.MEMORY -> DataSource.MEMORY
+  coil3.decode.DataSource.MEMORY_CACHE -> DataSource.MEMORY
+  coil3.decode.DataSource.DISK -> DataSource.DISK
 }
 
 @Composable
@@ -396,13 +368,13 @@ internal fun rememberRequestWithConstraints(
     if (request.defined.sizeResolver == null) {
       val sizeResolver = if (imageOptions.isValidSize) {
         SizeResolver(
-          coil.size.Size(
+          coil3.size.Size(
             width = imageOptions.requestSize.width,
             height = imageOptions.requestSize.height,
           ),
         )
       } else if (imageOptions.contentScale == ContentScale.None) {
-        SizeResolver(coil.size.Size.ORIGINAL)
+        SizeResolver(coil3.size.Size.ORIGINAL)
       } else {
         ConstraintsSizeResolver()
       }

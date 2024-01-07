@@ -1,0 +1,75 @@
+public final class com/skydoves/landscapist/coil3/CoilImageKt {
+	public static final fun CoilImage (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/graphics/painter/Painter;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
+	public static final fun CoilImage (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/graphics/painter/Painter;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
+}
+
+public abstract class com/skydoves/landscapist/coil3/CoilImageState : com/skydoves/landscapist/ImageState {
+	public static final field $stable I
+}
+
+public final class com/skydoves/landscapist/coil3/CoilImageState$Failure : com/skydoves/landscapist/coil3/CoilImageState {
+	public static final field $stable I
+	public fun <init> (Lcoil3/Image;Ljava/lang/Throwable;)V
+	public final fun component1 ()Lcoil3/Image;
+	public final fun component2 ()Ljava/lang/Throwable;
+	public final fun copy (Lcoil3/Image;Ljava/lang/Throwable;)Lcom/skydoves/landscapist/coil3/CoilImageState$Failure;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/coil3/CoilImageState$Failure;Lcoil3/Image;Ljava/lang/Throwable;ILjava/lang/Object;)Lcom/skydoves/landscapist/coil3/CoilImageState$Failure;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getErrorImage ()Lcoil3/Image;
+	public final fun getReason ()Ljava/lang/Throwable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/coil3/CoilImageState$Loading : com/skydoves/landscapist/coil3/CoilImageState {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/skydoves/landscapist/coil3/CoilImageState$Loading;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/coil3/CoilImageState$None : com/skydoves/landscapist/coil3/CoilImageState {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/skydoves/landscapist/coil3/CoilImageState$None;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/coil3/CoilImageState$Success : com/skydoves/landscapist/coil3/CoilImageState {
+	public static final field $stable I
+	public fun <init> (Lcoil3/Image;Lcom/skydoves/landscapist/DataSource;)V
+	public final fun component1 ()Lcoil3/Image;
+	public final fun component2 ()Lcom/skydoves/landscapist/DataSource;
+	public final fun copy (Lcoil3/Image;Lcom/skydoves/landscapist/DataSource;)Lcom/skydoves/landscapist/coil3/CoilImageState$Success;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/coil3/CoilImageState$Success;Lcoil3/Image;Lcom/skydoves/landscapist/DataSource;ILjava/lang/Object;)Lcom/skydoves/landscapist/coil3/CoilImageState$Success;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDataSource ()Lcom/skydoves/landscapist/DataSource;
+	public final fun getImage ()Lcoil3/Image;
+	public final fun getImageBitmap (Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/ImageBitmap;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/coil3/CoilImageStateKt {
+	public static final fun toCoilImageState (Lcom/skydoves/landscapist/ImageLoadState;)Lcom/skydoves/landscapist/coil3/CoilImageState;
+}
+
+public final class com/skydoves/landscapist/coil3/ComposableSingletons$CoilImageKt {
+	public static final field INSTANCE Lcom/skydoves/landscapist/coil3/ComposableSingletons$CoilImageKt;
+	public static field lambda-1 Lkotlin/jvm/functions/Function3;
+	public static field lambda-2 Lkotlin/jvm/functions/Function3;
+	public fun <init> ()V
+	public final fun getLambda-1$coil3 ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda-2$coil3 ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class com/skydoves/landscapist/coil3/LocalCoilProviderKt {
+	public static final fun getLocalCoilImageLoader ()Landroidx/compose/runtime/ProvidableCompositionLocal;
+}
+
+public final class com/skydoves/landscapist/coil3/RememberCoilImageStateKt {
+	public static final fun rememberCoilImageState (Lcom/skydoves/landscapist/coil3/CoilImageState;Ljava/lang/Object;Landroidx/compose/runtime/Composer;II)Landroidx/compose/runtime/MutableState;
+}
+

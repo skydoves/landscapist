@@ -17,14 +17,18 @@
 
 package com.github.skydoves.landscapistdemo
 
+import android.content.Context
 import androidx.multidex.MultiDexApplication
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.fetch.NetworkFetcher
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 
 @HiltAndroidApp
-class App : MultiDexApplication() {
+class App : MultiDexApplication(), SingletonImageLoader.Factory {
 
   override fun onCreate() {
     super.onCreate()
@@ -39,5 +43,13 @@ class App : MultiDexApplication() {
         .build()
 
     Fresco.initialize(this, pipelineConfig)
+  }
+
+  override fun newImageLoader(context: Context): ImageLoader {
+    return ImageLoader.Builder(context)
+      .components {
+        add(NetworkFetcher.Factory())
+      }
+      .build()
   }
 }

@@ -175,7 +175,7 @@ public fun FrescoImage(
           imageOptions.LandscapistImage(
             modifier = Modifier
               .constraint(this)
-              .testTag(imageOptions.testTag),
+              .testTag(imageOptions.tag),
             painter = painter,
           )
         }

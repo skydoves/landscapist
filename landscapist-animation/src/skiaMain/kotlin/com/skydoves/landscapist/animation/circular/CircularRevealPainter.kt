@@ -73,7 +73,6 @@ internal actual class CircularRevealPainter actual constructor(
         scale = mDrawableRect.size.width / bitmapWidth.toFloat()
         dy = (mDrawableRect.size.height - bitmapHeight * scale) * 0.5f
       }
-
       // resize the matrix to scale by sx and sy.
       val m1 = Matrix33.makeScale(scale, scale)
       val m2 = Matrix33.makeTranslate(

@@ -23,7 +23,7 @@ plugins {
 apply(from = "${rootDir}/scripts/publish-module.gradle.kts")
 
 mavenPublishing {
-  val artifactId = "landscapist-animation"
+  val artifactId = "landscapist-coil3"
   coordinates(
     Configuration.artifactGroup,
     artifactId,
@@ -41,20 +41,38 @@ kotlin {
       languageSettings.optIn("kotlin.RequiresOptIn")
       languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
       languageSettings.optIn("com.skydoves.landscapist.InternalLandscapistApi")
+      languageSettings.optIn("coil3.annotation.ExperimentalCoilApi")
     }
     val commonMain by getting {
       dependencies {
         api(project(":landscapist"))
+        api(libs.coil3)
+        api(libs.coil3.network)
+        api(libs.ktor.core)
 
         implementation(compose.ui)
         implementation(compose.runtime)
         implementation(compose.foundation)
+        @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+        implementation(compose.components.resources)
       }
     }
 
     val androidMain by getting {
       dependencies {
         implementation(libs.androidx.core.ktx)
+      }
+    }
+
+    val jvmMain by getting {
+      dependencies {
+        api(libs.ktor.okhttp)
+      }
+    }
+
+    val iosMain by getting {
+      dependencies {
+        api(libs.ktor.engine.darwin)
       }
     }
   }
@@ -70,11 +88,12 @@ kotlin {
 }
 
 android {
-  namespace = "com.skydoves.landscapist.animation"
+  namespace = "com.skydoves.landscapist.coil3"
   compileSdk = Configuration.compileSdk
 
   defaultConfig {
     minSdk = Configuration.minSdk
+    consumerProguardFiles("consumer-rules.pro")
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 }
@@ -82,7 +101,7 @@ android {
 baselineProfile {
   baselineProfileOutputDir = "."
   filter {
-    include("com.skydoves.landscapist.animation.**")
+    include("com.skydoves.landscapist.coil3.**")
   }
 }
 
@@ -94,6 +113,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
       "-opt-in=kotlin.RequiresOptIn",
       "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
       "-opt-in=com.skydoves.landscapist.InternalLandscapistApi",
+      "-opt-in=coil3.annotation.ExperimentalCoilApi",
     )
   }
 }

@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -59,6 +60,7 @@ import com.github.skydoves.landscapistdemo.theme.background
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
+import com.skydoves.landscapist.coil3.CoilImage
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
@@ -132,7 +134,7 @@ private fun SelectedPoster(
 ) {
   var palette by rememberPaletteState(null)
 
-  GlideImage(
+  CoilImage(
     imageModel = { poster.image },
     modifier = Modifier.aspectRatio(0.8f),
     component = rememberImageComponent {
@@ -149,7 +151,7 @@ private fun SelectedPoster(
       +CircularRevealPlugin()
       +PalettePlugin { palette = it }
     },
-    previewPlaceholder = R.drawable.poster,
+    previewPlaceholder = painterResource(id = R.drawable.poster),
   )
 
   ColorPalettes(palette)

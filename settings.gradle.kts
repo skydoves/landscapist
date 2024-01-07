@@ -1,5 +1,4 @@
 @file:Suppress("UnstableApiUsage")
-
 pluginManagement {
   includeBuild("build-logic")
   repositories {
@@ -8,6 +7,7 @@ pluginManagement {
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
     maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
   }
 }
 dependencyResolutionManagement {
@@ -17,6 +17,7 @@ dependencyResolutionManagement {
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
     maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
   }
 }
 
@@ -29,6 +30,7 @@ include(":landscapist-palette")
 include(":landscapist-placeholder")
 include(":landscapist-transformation")
 include(":coil")
+include(":coil3")
 include(":glide")
 include(":fresco")
 include(":fresco-websupport")
