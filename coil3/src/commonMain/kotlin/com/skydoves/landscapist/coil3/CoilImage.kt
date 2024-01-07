@@ -104,8 +104,10 @@ public fun CoilImage(
   )? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
-  val singleImageLoader = imageLoader.invoke()
-  SingletonImageLoader.setSafe { singleImageLoader }
+  if (getPlatform() == Platform.NonAndroid) {
+    val singleImageLoader = imageLoader.invoke()
+    SingletonImageLoader.setSafe { singleImageLoader }
+  }
 
   val imageRequest =
     buildImageRequest(data = imageModel.invoke(), requestListener = requestListener?.invoke())

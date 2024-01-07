@@ -32,6 +32,8 @@ import coil3.request.ImageRequest
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.plugins.composePainterPlugins
 
+internal actual fun getPlatform(): Platform = Platform.NonAndroid
+
 @Composable
 internal actual fun Image.toImageBitmap(): ImageBitmap {
   return asBitmap().asComposeImageBitmap()
@@ -40,7 +42,7 @@ internal actual fun Image.toImageBitmap(): ImageBitmap {
 internal actual val platformContext: PlatformContext
   @Composable get() = PlatformContext.INSTANCE
 
-internal actual val contextImageLoader: ImageLoader
+internal actual val platformImageLoader: ImageLoader
   @Composable get() = SingletonImageLoader.get(platformContext)
 
 @Composable

@@ -34,6 +34,8 @@ import coil3.request.lifecycle
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
 
+internal actual fun getPlatform(): Platform = Platform.Android
+
 @Composable
 internal actual fun Image.toImageBitmap(): ImageBitmap {
   val context = LocalContext.current
@@ -43,7 +45,7 @@ internal actual fun Image.toImageBitmap(): ImageBitmap {
 internal actual val platformContext: PlatformContext
   @Composable get() = LocalContext.current
 
-internal actual val contextImageLoader: ImageLoader
+internal actual val platformImageLoader: ImageLoader
   @Composable get() = platformContext.imageLoader
 
 @Composable

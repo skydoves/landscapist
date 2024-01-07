@@ -24,6 +24,12 @@ import coil3.PlatformContext
 import coil3.request.ImageRequest
 import com.skydoves.landscapist.plugins.ImagePlugin
 
+internal enum class Platform {
+  Android, NonAndroid
+}
+
+internal expect fun getPlatform(): Platform
+
 /** Transforms coil's [Image] to Compose [ImageBitmap]. */
 @Composable
 internal expect fun Image.toImageBitmap(): ImageBitmap
@@ -32,7 +38,7 @@ internal expect fun Image.toImageBitmap(): ImageBitmap
 internal expect val platformContext: PlatformContext
 
 /** Returns [ImageLoader] from the platform context. */
-internal expect val contextImageLoader: ImageLoader
+internal expect val platformImageLoader: ImageLoader
 
 /** Builds an [ImageRequest] depending on its target platform. */
 @Composable

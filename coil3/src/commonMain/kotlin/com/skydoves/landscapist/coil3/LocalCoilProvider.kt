@@ -33,6 +33,6 @@ internal object LocalCoilProvider {
   /** Returns the current or default [ImageLoader] for the `ColiImage` parameter. */
   @Composable
   fun getCoilImageLoader(): ImageLoader {
-    return LocalCoilImageLoader.current ?: contextImageLoader
+    return LocalCoilImageLoader.current ?: platformImageLoader
   }
 }
