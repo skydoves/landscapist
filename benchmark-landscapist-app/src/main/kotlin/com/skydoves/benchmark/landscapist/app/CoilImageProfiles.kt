@@ -33,6 +33,6 @@ fun CoilImageProfiles() {
     },
     previewPlaceholder = R.drawable.poster,
     component = LocalImageComponent.current,
-    imageOptions = ImageOptions(testTag = "CoilImage"),
+    imageOptions = ImageOptions(tag = "CoilImage"),
   )
 }

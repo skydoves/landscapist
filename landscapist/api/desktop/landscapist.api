@@ -86,7 +86,7 @@ public final class com/skydoves/landscapist/ImageOptions {
 	public final fun getContentDescription ()Ljava/lang/String;
 	public final fun getContentScale ()Landroidx/compose/ui/layout/ContentScale;
 	public final fun getRequestSize-YbymL2g ()J
-	public final fun getTestTag ()Ljava/lang/String;
+	public final fun getTag ()Ljava/lang/String;
 	public fun hashCode ()I
 	public final fun isValidSize ()Z
 	public fun toString ()Ljava/lang/String;

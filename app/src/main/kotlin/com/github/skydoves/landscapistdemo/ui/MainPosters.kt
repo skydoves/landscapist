@@ -59,6 +59,8 @@ import com.github.skydoves.landscapistdemo.theme.background
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
+import com.skydoves.landscapist.coil3.CoilImage
+import com.skydoves.landscapist.coil3.Placeholder
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
@@ -132,7 +134,7 @@ private fun SelectedPoster(
 ) {
   var palette by rememberPaletteState(null)
 
-  GlideImage(
+  CoilImage(
     imageModel = { poster.image },
     modifier = Modifier.aspectRatio(0.8f),
     component = rememberImageComponent {
@@ -149,7 +151,7 @@ private fun SelectedPoster(
       +CircularRevealPlugin()
       +PalettePlugin { palette = it }
     },
-    previewPlaceholder = R.drawable.poster,
+    previewPlaceholder = Placeholder(R.drawable.poster),
   )
 
   ColorPalettes(palette)

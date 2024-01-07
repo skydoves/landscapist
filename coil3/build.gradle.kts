@@ -59,6 +59,7 @@ kotlin {
 
     val androidMain by getting {
       dependencies {
+        api(libs.ktor.okhttp)
         implementation(libs.androidx.core.ktx)
       }
     }

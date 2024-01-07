@@ -54,7 +54,6 @@ import kotlinx.coroutines.flow.channelFlow
  * Load and render an image with the given [imageModel] from the network or local storage.
  *
  * Supported types for the [imageModel] are the below:
- * [String], [Uri], [HttpUrl], [File], [DrawableRes], [Drawable], [Bitmap], [ByteArray], [ByteBuffer]
  *
  * ```
  * CoilImage(
@@ -243,7 +242,7 @@ public fun CoilImage(
           imageOptions.LandscapistImage(
             modifier = Modifier
               .constraint(this)
-              .testTag(imageOptions.testTag),
+              .testTag(imageOptions.tag),
             painter = painter,
           )
         }

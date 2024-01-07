@@ -33,6 +33,6 @@ fun GlideImageProfiles() {
     },
     previewPlaceholder = R.drawable.poster,
     component = LocalImageComponent.current,
-    imageOptions = ImageOptions(testTag = "GlideImage"),
+    imageOptions = ImageOptions(tag = "GlideImage"),
   )
 }
