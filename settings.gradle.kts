@@ -7,7 +7,6 @@ pluginManagement {
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
     maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
   }
 }
 dependencyResolutionManagement {
@@ -17,7 +16,6 @@ dependencyResolutionManagement {
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
     maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
   }
 }
 
