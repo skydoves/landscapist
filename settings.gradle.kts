@@ -1,5 +1,4 @@
 @file:Suppress("UnstableApiUsage")
-
 pluginManagement {
   includeBuild("build-logic")
   repositories {
@@ -29,6 +28,7 @@ include(":landscapist-palette")
 include(":landscapist-placeholder")
 include(":landscapist-transformation")
 include(":coil")
+include(":coil3")
 include(":glide")
 include(":fresco")
 include(":fresco-websupport")
