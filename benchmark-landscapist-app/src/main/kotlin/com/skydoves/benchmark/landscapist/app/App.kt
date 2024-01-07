@@ -18,11 +18,15 @@
 package com.skydoves.benchmark.landscapist.app
 
 import android.app.Application
+import android.content.Context
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.fetch.NetworkFetcher
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import okhttp3.OkHttpClient
 
-class App : Application() {
+class App : Application(), SingletonImageLoader.Factory {
 
   override fun onCreate() {
     super.onCreate()
@@ -37,5 +41,13 @@ class App : Application() {
         .build()
 
     Fresco.initialize(this, pipelineConfig)
+  }
+
+  override fun newImageLoader(context: Context): ImageLoader {
+    return ImageLoader.Builder(context)
+      .components {
+        add(NetworkFetcher.Factory())
+      }
+      .build()
   }
 }

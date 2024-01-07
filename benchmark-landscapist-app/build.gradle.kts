@@ -51,6 +51,7 @@ dependencies {
 
   implementation(project(":glide"))
   implementation(project(":coil"))
+  implementation(project(":coil3"))
   implementation(project(":fresco"))
   implementation(project(":fresco-websupport"))
 
