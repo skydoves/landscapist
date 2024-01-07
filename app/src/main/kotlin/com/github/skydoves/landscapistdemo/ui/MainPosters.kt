@@ -123,7 +123,7 @@ private fun PosterItem(
       component = rememberImageComponent {
         +CrossfadePlugin()
       },
-      previewPlaceholder = R.drawable.poster,
+      previewPlaceholder = painterResource(id = R.drawable.poster),
     )
   }
 }
@@ -183,7 +183,7 @@ private fun SelectedPoster(
       .fillMaxWidth()
       .padding(8.dp)
       .clip(RoundedCornerShape(8.dp)),
-    previewPlaceholder = R.drawable.poster,
+    previewPlaceholder = painterResource(id = R.drawable.poster),
   )
 
   Spacer(modifier = Modifier.height(12.dp))
@@ -219,6 +219,12 @@ private fun ColorPalettes(palette: Palette?) {
 @Composable
 private fun SelectedPosterPreview() {
   DisneyComposeTheme(darkTheme = false) {
-    SelectedPoster(poster = MockUtil.getMockPoster())
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState()),
+    ) {
+      SelectedPoster(poster = MockUtil.getMockPoster())
+    }
   }
 }

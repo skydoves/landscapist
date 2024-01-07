@@ -79,7 +79,7 @@ import kotlinx.coroutines.flow.channelFlow
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
- * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
+ * @param previewPlaceholder A painter that is specifically rendered when this function operates in preview mode.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
@@ -149,7 +149,7 @@ public fun CoilImage(
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
- * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
+ * @param previewPlaceholder A painter that is specifically rendered when this function operates in preview mode.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.

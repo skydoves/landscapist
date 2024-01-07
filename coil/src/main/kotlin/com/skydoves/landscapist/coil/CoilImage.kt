@@ -36,7 +36,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
@@ -95,7 +94,7 @@ import java.nio.ByteBuffer
  * @param requestListener A class for monitoring the status of a request while images load.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
- * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
+ * @param previewPlaceholder A painter that is specifically rendered when this function operates in preview mode.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
@@ -109,7 +108,7 @@ public fun CoilImage(
   requestListener: (() -> ImageRequest.Listener)? = null,
   imageOptions: ImageOptions = ImageOptions(),
   onImageStateChanged: (CoilImageState) -> Unit = {},
-  @DrawableRes previewPlaceholder: Int = 0,
+  previewPlaceholder: Painter? = null,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (
     BoxScope.(
@@ -171,7 +170,7 @@ public fun CoilImage(
  * @param component An image component that conjuncts pluggable [ImagePlugin]s.
  * @param imageOptions Represents parameters to load generic [Image] Composable.
  * @param onImageStateChanged An image state change listener will be triggered whenever the image state is changed.
- * @param previewPlaceholder Drawable resource ID which will be displayed when this function is ran in preview mode.
+ * @param previewPlaceholder A painter that is specifically rendered when this function operates in preview mode.
  * @param loading Content to be displayed when the request is in progress.
  * @param success Content to be displayed when the request is succeeded.
  * @param failure Content to be displayed when the request is failed.
@@ -184,7 +183,7 @@ public fun CoilImage(
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
   onImageStateChanged: (CoilImageState) -> Unit = {},
-  @DrawableRes previewPlaceholder: Int = 0,
+  previewPlaceholder: Painter? = null,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (
     BoxScope.(
@@ -194,11 +193,11 @@ public fun CoilImage(
   )? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
-  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+  if (LocalInspectionMode.current && previewPlaceholder != null) {
     with(imageOptions) {
       Image(
         modifier = modifier,
-        painter = painterResource(id = previewPlaceholder),
+        painter = previewPlaceholder,
         alignment = alignment,
         contentScale = contentScale,
         alpha = alpha,
