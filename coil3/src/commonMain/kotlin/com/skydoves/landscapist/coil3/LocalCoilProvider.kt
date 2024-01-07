@@ -19,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.fetch.NetworkFetcher
 
 /**
  * Local containing the preferred [ImageLoader] for providing the same instance
@@ -33,6 +35,17 @@ internal object LocalCoilProvider {
   /** Returns the current or default [ImageLoader] for the `ColiImage` parameter. */
   @Composable
   fun getCoilImageLoader(): ImageLoader {
-    return LocalCoilImageLoader.current ?: platformImageLoader
+    return LocalCoilImageLoader.current ?: let {
+      if (getPlatform() == Platform.NonAndroid) {
+        val defaultImageLoader = ImageLoader.Builder(platformContext)
+          .components {
+            add(NetworkFetcher.Factory())
+          }
+          .build()
+        SingletonImageLoader.setSafe { defaultImageLoader }
+      }
+
+      platformImageLoader
+    }
   }
 }

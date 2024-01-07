@@ -29,7 +29,6 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.IntSize
 import coil3.ImageLoader
-import coil3.SingletonImageLoader
 import coil3.request.ImageRequest
 import coil3.request.ImageResult
 import coil3.size.SizeResolver
@@ -104,11 +103,6 @@ public fun CoilImage(
   )? = null,
   failure: @Composable (BoxScope.(imageState: CoilImageState.Failure) -> Unit)? = null,
 ) {
-  if (getPlatform() == Platform.NonAndroid) {
-    val singleImageLoader = imageLoader.invoke()
-    SingletonImageLoader.setSafe { singleImageLoader }
-  }
-
   val imageRequest =
     buildImageRequest(data = imageModel.invoke(), requestListener = requestListener?.invoke())
   CoilImage(
