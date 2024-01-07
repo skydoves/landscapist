@@ -93,7 +93,7 @@ public fun CoilImage(
   requestListener: (() -> ImageRequest.Listener)? = null,
   imageOptions: ImageOptions = ImageOptions(),
   onImageStateChanged: (CoilImageState) -> Unit = {},
-  previewPlaceholder: Placeholder? = null,
+  previewPlaceholder: Painter? = null,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (
     BoxScope.(
@@ -162,7 +162,7 @@ public fun CoilImage(
   component: ImageComponent = rememberImageComponent {},
   imageOptions: ImageOptions = ImageOptions(),
   onImageStateChanged: (CoilImageState) -> Unit = {},
-  previewPlaceholder: Placeholder? = null,
+  previewPlaceholder: Painter? = null,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
   success: @Composable (
     BoxScope.(
@@ -176,7 +176,7 @@ public fun CoilImage(
     with(imageOptions) {
       Image(
         modifier = modifier,
-        painter = rememberPlaceholderPainter(previewPlaceholder),
+        painter = previewPlaceholder,
         alignment = alignment,
         contentScale = contentScale,
         alpha = alpha,

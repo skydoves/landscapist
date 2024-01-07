@@ -1,6 +1,6 @@
 public final class com/skydoves/landscapist/coil3/CoilImageKt {
-	public static final fun CoilImage (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;Lcom/skydoves/landscapist/coil3/Placeholder;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
-	public static final fun CoilImage (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;Lcom/skydoves/landscapist/coil3/Placeholder;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
+	public static final fun CoilImage (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/graphics/painter/Painter;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
+	public static final fun CoilImage (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/graphics/painter/Painter;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
 }
 
 public abstract class com/skydoves/landscapist/coil3/CoilImageState : com/skydoves/landscapist/ImageState {
@@ -67,12 +67,6 @@ public final class com/skydoves/landscapist/coil3/ComposableSingletons$CoilImage
 
 public final class com/skydoves/landscapist/coil3/LocalCoilProviderKt {
 	public static final fun getLocalCoilImageLoader ()Landroidx/compose/runtime/ProvidableCompositionLocal;
-}
-
-public final class com/skydoves/landscapist/coil3/Placeholder {
-	public static final field $stable I
-	public fun <init> (Ljava/lang/String;)V
-	public final fun getResource ()Ljava/lang/String;
 }
 
 public final class com/skydoves/landscapist/coil3/RememberCoilImageStateKt {
