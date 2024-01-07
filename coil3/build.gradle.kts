@@ -48,6 +48,7 @@ kotlin {
         api(project(":landscapist"))
         api(libs.coil3)
         api(libs.coil3.network)
+        implementation(libs.ktor.core)
 
         implementation(compose.ui)
         implementation(compose.runtime)

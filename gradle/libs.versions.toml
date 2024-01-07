@@ -23,7 +23,7 @@ glide = "4.16.0"
 fresco = "3.1.3"
 coil = "2.5.0"
 coil3 = "3.0.0-SNAPSHOT"
-ktor = "2.3.7"
+ktor = "3.0.0-wasm2"
 palette = "2.2.0"
 hilt = "2.50"
 spotless = "6.21.0"
@@ -67,6 +67,7 @@ coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coil" }
 coil3 = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil3" }
 coil3-network = { group = "io.coil-kt.coil3", name = "coil-network", version.ref = "coil3" }
+ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
