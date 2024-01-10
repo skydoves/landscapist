@@ -21,7 +21,7 @@ import android.content.Context
 import androidx.multidex.MultiDexApplication
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
-import coil3.fetch.NetworkFetcher
+import coil3.network.NetworkFetcher
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import dagger.hilt.android.HiltAndroidApp
