@@ -20,7 +20,7 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
-import coil3.fetch.NetworkFetcher
+import coil3.network.NetworkFetcher
 
 /**
  * Local containing the preferred [ImageLoader] for providing the same instance
