@@ -20,7 +20,6 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
-import coil3.network.NetworkFetcher
 import coil3.network.ktor.KtorNetworkFetcherFactory
 
 /**

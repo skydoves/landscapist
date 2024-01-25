@@ -21,7 +21,6 @@ import android.app.Application
 import android.content.Context
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
-import coil3.network.NetworkFetcher
 import coil3.network.ktor.KtorNetworkFetcherFactory
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
