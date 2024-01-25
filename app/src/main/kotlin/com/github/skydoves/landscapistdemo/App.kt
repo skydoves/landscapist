@@ -22,6 +22,7 @@ import androidx.multidex.MultiDexApplication
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import coil3.network.NetworkFetcher
+import coil3.network.ktor.KtorNetworkFetcherFactory
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import dagger.hilt.android.HiltAndroidApp
@@ -48,7 +49,7 @@ class App : MultiDexApplication(), SingletonImageLoader.Factory {
   override fun newImageLoader(context: Context): ImageLoader {
     return ImageLoader.Builder(context)
       .components {
-        add(NetworkFetcher.Factory())
+        add(KtorNetworkFetcherFactory())
       }
       .build()
   }
