@@ -196,12 +196,28 @@ CompositionLocalProvider(LocalGlideRequestOptions provides requestOptions) {
 </div>
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
+
 Add the dependency below to your **module**'s `build.gradle` file:
+
 ```gradle
 dependencies {
     implementation "com.github.skydoves:landscapist-coil:$version"
 }
 ```
+
+If you're targeting on Kotlin Multiplatform, add the dependency below to your module's `build.gradle.kts` file:
+
+```kotlin
+sourceSets {
+    val commonMain by getting {
+        dependencies {
+            implementation("com.github.skydoves:landscapist-coil3:2.3.0”)
+        }
+    }
+}
+```
+
+The `coil3-landscapist` package functions identically to the `coil-landscapist` package, with the key distinction being its focus on Kotlin Multiplatform. This enables the use of Coil3 across various platforms, including Android, iOS, and Desktop (JVM), facilitating a unified image loading experience across different environments.
 
 > **Note**: Please make sure your project uses the same Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
@@ -219,6 +235,7 @@ CoilImage(
 ```
 
 ### More Details for CoilImage
+
 <details>
  <summary>👉 Read further for more details</summary>
 
