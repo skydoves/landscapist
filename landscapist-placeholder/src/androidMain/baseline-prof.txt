@@ -16,7 +16,7 @@ HSPLcom/skydoves/landscapist/placeholder/shimmer/FlashShimmerKt;->offset(FFF)F
 Lcom/skydoves/landscapist/placeholder/shimmer/FlashShimmerKt$Shimmer$1;
 HSPLcom/skydoves/landscapist/placeholder/shimmer/FlashShimmerKt$Shimmer$1;-><init>(Landroidx/compose/animation/core/Animatable;ILkotlin/coroutines/Continuation;)V
 HSPLcom/skydoves/landscapist/placeholder/shimmer/FlashShimmerKt$Shimmer$1;->create(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
-PLcom/skydoves/landscapist/placeholder/shimmer/FlashShimmerKt$Shimmer$1;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
+HSPLcom/skydoves/landscapist/placeholder/shimmer/FlashShimmerKt$Shimmer$1;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/placeholder/shimmer/FlashShimmerKt$Shimmer$2$1;
 HSPLcom/skydoves/landscapist/placeholder/shimmer/FlashShimmerKt$Shimmer$2$1;-><init>(FLjava/lang/Float;Landroidx/compose/animation/core/Animatable;Landroidx/compose/ui/graphics/Paint;Ljava/util/List;Ljava/util/List;Landroidx/compose/ui/graphics/Paint;)V
 HPLcom/skydoves/landscapist/placeholder/shimmer/FlashShimmerKt$Shimmer$2$1;->invoke(Landroidx/compose/ui/graphics/drawscope/DrawScope;)V
