@@ -29,7 +29,7 @@ If you're targeting on Kotlin Multiplatform, add the dependency below to your mo
 sourceSets {
     val commonMain by getting {
         dependencies {
-            implementation("com.github.skydoves:landscapist-coil3:2.3.0”)
+            implementation("com.github.skydoves:landscapist-coil3:$version")
         }
     }
 }
