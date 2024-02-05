@@ -65,7 +65,7 @@ repositories {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.2.14-SNAPSHOT"
+    implementation "com.github.skydoves:landscapist-glide:2.3.1-SNAPSHOT"
 }
 ```
 </details>
@@ -89,7 +89,7 @@ allprojects {
 Next, add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.2.13"
+    implementation "com.github.skydoves:landscapist-glide:2.3.0"
 }
 ```
 
@@ -630,8 +630,10 @@ GlideImage( // CoilImage, FrescoImage
   component = rememberImageComponent {
     // shows a shimmering effect when loading an image.
     +ShimmerPlugin(
-      baseColor = background800,
-      highlightColor = shimmerHighLight
+      Shimmer.Resonate(
+        baseColor = Color.White,
+        highlightColor = Color.LightGray,
+      ),
     )
   },
   // shows an error text message when request failed.

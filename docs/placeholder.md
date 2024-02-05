@@ -78,8 +78,10 @@ You can implement a shimmering effect while loading an image by using the `Shimm
         component = rememberImageComponent {
           // displays a shimmering effect when loading an image.
           +ShimmerPlugin(
-            baseColor = background800,
-            highlightColor = shimmerHighLight
+            Shimmer.Resonate(
+              baseColor = Color.White,
+              highlightColor = Color.LightGray,
+            )
           )
         },
         ..
@@ -93,8 +95,10 @@ You can implement a shimmering effect while loading an image by using the `Shimm
         component = rememberImageComponent {
           // displays a shimmering effect when loading an image.
           +ShimmerPlugin(
-            baseColor = background800,
-            highlightColor = shimmerHighLight
+            Shimmer.Resonate(
+              baseColor = Color.White,
+              highlightColor = Color.LightGray,
+            )
           )
         },
         ..
@@ -108,8 +112,10 @@ You can implement a shimmering effect while loading an image by using the `Shimm
         component = rememberImageComponent {
           // displays a shimmering effect when loading an image.
           +ShimmerPlugin(
-            baseColor = background800,
-            highlightColor = shimmerHighLight
+            Shimmer.Resonate(
+              baseColor = Color.White,
+              highlightColor = Color.LightGray,
+            )
           )
         },
         ..
