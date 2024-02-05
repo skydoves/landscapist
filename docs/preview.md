@@ -8,7 +8,7 @@ The versatility of Landscapist extends to supporting preview mode for each image
 
     ```kotlin
     GlideImage(
-      previewPlaceholder = R.drawable.poster,
+      previewPlaceholder = painterResource(id = R.drawable.poster),
       ..
     )
     ```
@@ -17,7 +17,7 @@ The versatility of Landscapist extends to supporting preview mode for each image
 
     ```kotlin
     CoilImage(
-      previewPlaceholder = R.drawable.poster,
+      previewPlaceholder = painterResource(id = R.drawable.poster),
       ..
     )
     ```
@@ -26,7 +26,7 @@ The versatility of Landscapist extends to supporting preview mode for each image
 
     ```kotlin
     FrescoImage(
-      previewPlaceholder = R.drawable.poster,
+      previewPlaceholder = painterResource(id = R.drawable.poster),
       ..
     )
     ```
@@ -39,7 +39,7 @@ Now, you can build your preview composable like so:
 @Composable
 private fun GlideImagePreview() {
     GlideImage(
-      previewPlaceholder = R.drawable.poster,
+      previewPlaceholder = painterResource(id = R.drawable.poster),
       ..
     )
 }
