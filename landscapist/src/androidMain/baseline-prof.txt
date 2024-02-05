@@ -12,7 +12,7 @@ HSPLcom/skydoves/landscapist/DrawablePainter;->getDrawInvalidateTick()I
 PLcom/skydoves/landscapist/DrawablePainter;->getDrawable()Landroid/graphics/drawable/Drawable;
 HSPLcom/skydoves/landscapist/DrawablePainter;->getDrawableIntrinsicSize-NH-jbRc()J
 HSPLcom/skydoves/landscapist/DrawablePainter;->getIntrinsicSize-NH-jbRc()J
-HSPLcom/skydoves/landscapist/DrawablePainter;->onDraw(Landroidx/compose/ui/graphics/drawscope/DrawScope;)V
+HPLcom/skydoves/landscapist/DrawablePainter;->onDraw(Landroidx/compose/ui/graphics/drawscope/DrawScope;)V
 PLcom/skydoves/landscapist/DrawablePainter;->onForgotten()V
 HSPLcom/skydoves/landscapist/DrawablePainter;->onRemembered()V
 PLcom/skydoves/landscapist/DrawablePainter;->setDrawInvalidateTick(I)V
@@ -23,7 +23,7 @@ HSPLcom/skydoves/landscapist/DrawablePainter$callback$2;->invoke()Lcom/skydoves/
 HSPLcom/skydoves/landscapist/DrawablePainter$callback$2;->invoke()Ljava/lang/Object;
 Lcom/skydoves/landscapist/DrawablePainter$callback$2$1;
 HSPLcom/skydoves/landscapist/DrawablePainter$callback$2$1;-><init>(Lcom/skydoves/landscapist/DrawablePainter;)V
-HPLcom/skydoves/landscapist/DrawablePainter$callback$2$1;->invalidateDrawable(Landroid/graphics/drawable/Drawable;)V
+PLcom/skydoves/landscapist/DrawablePainter$callback$2$1;->invalidateDrawable(Landroid/graphics/drawable/Drawable;)V
 Lcom/skydoves/landscapist/DrawablePainterKt;
 HSPLcom/skydoves/landscapist/DrawablePainterKt;-><clinit>()V
 HSPLcom/skydoves/landscapist/DrawablePainterKt;->access$getIntrinsicSize(Landroid/graphics/drawable/Drawable;)J
@@ -75,7 +75,7 @@ HSPLcom/skydoves/landscapist/ImageLoadState;-><init>(Lkotlin/jvm/internal/Defaul
 Lcom/skydoves/landscapist/ImageLoadState$Loading;
 HSPLcom/skydoves/landscapist/ImageLoadState$Loading;-><clinit>()V
 HSPLcom/skydoves/landscapist/ImageLoadState$Loading;-><init>()V
-PLcom/skydoves/landscapist/ImageLoadState$Loading;->equals(Ljava/lang/Object;)Z
+HSPLcom/skydoves/landscapist/ImageLoadState$Loading;->equals(Ljava/lang/Object;)Z
 Lcom/skydoves/landscapist/ImageLoadState$None;
 HSPLcom/skydoves/landscapist/ImageLoadState$None;-><clinit>()V
 HSPLcom/skydoves/landscapist/ImageLoadState$None;-><init>()V
