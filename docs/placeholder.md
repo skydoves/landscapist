@@ -78,7 +78,7 @@ You can implement a shimmering effect while loading an image by using the `Shimm
         component = rememberImageComponent {
           // displays a shimmering effect when loading an image.
           +ShimmerPlugin(
-            Shimmer.Resonate(
+            Shimmer.Flash(
               baseColor = Color.White,
               highlightColor = Color.LightGray,
             )
@@ -95,7 +95,7 @@ You can implement a shimmering effect while loading an image by using the `Shimm
         component = rememberImageComponent {
           // displays a shimmering effect when loading an image.
           +ShimmerPlugin(
-            Shimmer.Resonate(
+            Shimmer.Flash(
               baseColor = Color.White,
               highlightColor = Color.LightGray,
             )
@@ -112,7 +112,7 @@ You can implement a shimmering effect while loading an image by using the `Shimm
         component = rememberImageComponent {
           // displays a shimmering effect when loading an image.
           +ShimmerPlugin(
-            Shimmer.Resonate(
+            Shimmer.Flash(
               baseColor = Color.White,
               highlightColor = Color.LightGray,
             )
@@ -125,6 +125,13 @@ You can implement a shimmering effect while loading an image by using the `Shimm
 After building the above sample, you'll see the shimmering effect in the result below:
 
 ![Shimmer](https://user-images.githubusercontent.com/24237865/95812167-be3a4780-0d4f-11eb-9360-2a4a66a3fb46.gif)
+
+`Shimmer` sealed class provides following the three different types: `Resonate`, `Fade`, and `Flash`.
+
+|                                                               Resonate                                                                |                                                                 Fade                                                                  |                                                                 Flash                                                                 |
+|:-------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------:|
+| <img src="https://github.com/skydoves/landscapist/assets/24237865/bf8f6d04-2e30-44a5-ba9d-9e706af15a09" align="center" width="100%"/> | <img src="https://github.com/skydoves/landscapist/assets/24237865/add42855-9e71-4222-b41e-aa9cfa7f0ce3" align="center" width="100%"/> | <img src="https://github.com/skydoves/landscapist/assets/24237865/c79bcad3-bd30-4b63-b3f8-5b3bdd7c561a" align="center" width="100%"/> | 
+
 
 ### ThumbnailPlugin
 

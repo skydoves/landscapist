@@ -647,7 +647,7 @@ GlideImage( // CoilImage, FrescoImage
   component = rememberImageComponent {
     // shows a shimmering effect when loading an image.
     +ShimmerPlugin(
-      Shimmer.Resonate(
+      Shimmer.Flash(
         baseColor = Color.White,
         highlightColor = Color.LightGray,
       ),
@@ -660,6 +660,12 @@ GlideImage( // CoilImage, FrescoImage
 )
  ```
  > **Note**: You can also use the Shimmer effect for **`CoilImage`** and **`FrescoImage`**.
+
+`Shimmer` sealed class provides following the three different types: `Resonate`, `Fade`, and `Flash`.
+
+|                                                               Resonate                                                                |                                                                 Fade                                                                  |                                                                 Flash                                                                 |
+|:-------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------:|
+| <img src="https://github.com/skydoves/landscapist/assets/24237865/bf8f6d04-2e30-44a5-ba9d-9e706af15a09" align="center" width="100%"/> | <img src="https://github.com/skydoves/landscapist/assets/24237865/add42855-9e71-4222-b41e-aa9cfa7f0ce3" align="center" width="100%"/> | <img src="https://github.com/skydoves/landscapist/assets/24237865/c79bcad3-bd30-4b63-b3f8-5b3bdd7c561a" align="center" width="100%"/> |
 
 ### PlaceholderPlugin
 
