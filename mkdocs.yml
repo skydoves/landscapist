@@ -17,6 +17,7 @@ nav:
   - 'Coil':
     - 'Overview': coil/overview.md
     - 'Custom ImageLoader': coil/imageloader.md
+  - 'Coil3 (KMP)': coil3.md
   - 'Fresco':
     - 'Overview': fresco/overview.md
     - 'Custom ImageRequest': fresco/request.md
