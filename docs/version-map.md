@@ -1,10 +1,11 @@
 # Version Map
-\
+
 The Landscapist utilizes varying Compose versions and JVM targets for each release. This map will assist you in ensuring compatibility and smooth integration with your project.
 
 
 | Landscapist | Compose UI             | Jvm Target | Glide  | Coil  | Fresco |
 |-------------|------------------------|------------|--------|-------|--------|
+| 2.3.1       | 1.6.1 (BOM 2024.02.00) | 11         | 4.16.0 | 2.5.0 | 3.1.3  |
 | 2.3.0       | 1.6.0 (BOM 2024.01.00) | 11         | 4.16.0 | 2.5.0 | 3.1.3  |
 | 2.2.13      | 1.5.4 (BOM 2023.10.01) | 11         | 4.16.0 | 2.5.0 | 3.1.3  |
 | 2.2.12      | 1.5.4 (BOM 2023.10.01) | 11         | 4.16.0 | 2.5.0 | 3.1.3  |
