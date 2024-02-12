@@ -15,7 +15,7 @@
  */
 package com.skydoves.landscapist.palette
 
-import androidx.palette.graphics.Palette
+import com.kmpalette.palette.graphics.Palette
 
 /** A definition for listening to the palette loaded. */
 public fun interface PaletteLoadedListener {

@@ -18,7 +18,6 @@ package com.skydoves.landscapist.palette
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.palette.graphics.Palette
 import com.kmpalette.rememberPaletteState
 
 /**
