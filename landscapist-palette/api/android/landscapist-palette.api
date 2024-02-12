@@ -1,9 +1,9 @@
 public abstract interface class com/skydoves/landscapist/palette/PaletteBuilderInterceptor {
-	public abstract fun intercept (Landroidx/palette/graphics/Palette$Builder;)Landroidx/palette/graphics/Palette$Builder;
+	public abstract fun intercept (Lcom/kmpalette/palette/graphics/Palette$Builder;)Lcom/kmpalette/palette/graphics/Palette$Builder;
 }
 
 public abstract interface class com/skydoves/landscapist/palette/PaletteLoadedListener {
-	public abstract fun onPaletteLoaded (Landroidx/palette/graphics/Palette;)V
+	public abstract fun onPaletteLoaded (Lcom/kmpalette/palette/graphics/Palette;)V
 }
 
 public final class com/skydoves/landscapist/palette/PalettePlugin : com/skydoves/landscapist/plugins/ImagePlugin$SuccessStatePlugin {
@@ -20,6 +20,6 @@ public final class com/skydoves/landscapist/palette/PalettePlugin : com/skydoves
 }
 
 public final class com/skydoves/landscapist/palette/RememberPaletteStateKt {
-	public static final fun rememberPaletteState (Landroidx/palette/graphics/Palette;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Landroidx/compose/runtime/MutableState;
+	public static final fun rememberPaletteState (Lcom/kmpalette/palette/graphics/Palette;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Landroidx/compose/runtime/MutableState;
 }
 

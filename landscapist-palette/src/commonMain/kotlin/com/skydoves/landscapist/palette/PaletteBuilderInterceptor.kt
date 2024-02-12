@@ -15,7 +15,7 @@
  */
 package com.skydoves.landscapist.palette
 
-import androidx.palette.graphics.Palette
+import com.kmpalette.palette.graphics.Palette
 
 /** A definition for intercepting [Palette.Builder] before loading. */
 public fun interface PaletteBuilderInterceptor {

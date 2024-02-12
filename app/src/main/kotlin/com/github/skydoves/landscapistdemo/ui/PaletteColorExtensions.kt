@@ -15,7 +15,7 @@
  */
 package com.github.skydoves.landscapistdemo.ui
 
-import androidx.palette.graphics.Palette
+import com.kmpalette.palette.graphics.Palette
 
 fun Palette?.paletteColorList(): List<Int> {
   return listOf(

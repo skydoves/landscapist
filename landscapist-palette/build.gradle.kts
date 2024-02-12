@@ -69,7 +69,7 @@ android {
   compileSdk = Configuration.compileSdk
 
   defaultConfig {
-    minSdk = Configuration.minSdk24
+    minSdk = Configuration.minSdk
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 }

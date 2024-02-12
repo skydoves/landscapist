@@ -21,7 +21,7 @@ import androidx.compose.runtime.SnapshotMutationPolicy
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.palette.graphics.Palette
+import com.kmpalette.palette.graphics.Palette
 
 /**
  * Create a mutable state and remember the new instance of [Palette] that is wrapped by [MutableState]
