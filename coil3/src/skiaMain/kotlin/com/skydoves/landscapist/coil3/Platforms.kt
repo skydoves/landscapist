@@ -36,7 +36,7 @@ internal actual fun getPlatform(): Platform = Platform.NonAndroid
 
 @Composable
 internal actual fun Image.toImageBitmap(): ImageBitmap {
-  return asBitmap().asComposeImageBitmap()
+  return toBitmap().asComposeImageBitmap()
 }
 
 internal actual val platformContext: PlatformContext
@@ -69,5 +69,5 @@ internal actual fun rememberImagePainter(image: Image, imagePlugins: List<ImageP
 
 @Composable
 internal fun bitmapPainter(image: Image): Painter {
-  return BitmapPainter(image = image.asBitmap().asComposeImageBitmap())
+  return BitmapPainter(image = image.toImageBitmap())
 }
