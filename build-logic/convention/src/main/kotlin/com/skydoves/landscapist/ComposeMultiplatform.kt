@@ -25,6 +25,7 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 /**
  * Configure Compose-Multiplatform-specific options
@@ -38,9 +39,40 @@ internal fun Project.configureComposeMultiplatform(
   kotlinMultiplatformExtension.apply {
     androidTarget { publishLibraryVariants("release") }
     jvm("desktop")
+
+    js {
+      browser()
+      nodejs {
+        testTask {
+          useMocha {
+            timeout = "60s"
+          }
+        }
+      }
+      binaries.executable()
+      binaries.library()
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+      browser {
+        testTask {
+          enabled = false
+        }
+      }
+      nodejs {
+        testTask {
+          enabled = false
+        }
+      }
+      binaries.executable()
+      binaries.library()
+    }
+
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+
     macosX64()
     macosArm64()
 
