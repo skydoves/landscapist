@@ -28,6 +28,11 @@
       "description": "Exclude Spotless updates",
       "matchPackagePrefixes": ["com.diffplug.spotless"],
       "enabled": false
+    },
+    {
+      "description": "Exclude Maven Plugin",
+      "matchPackagePrefixes": ["com.vanniktech.maven.publish"],
+      "enabled": false
     }
   ]
 }
