@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist.coroutines
+package com.skydoves.landscapist.platforms
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-internal actual val coroutineDispatcher: CoroutineDispatcher
-  get() = Dispatchers.Default
+internal actual val platformCoroutineDispatcher: CoroutineDispatcher = Dispatchers.Default

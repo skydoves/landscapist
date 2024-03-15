@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist.coroutines
+package com.skydoves.landscapist.platforms
 
 import kotlinx.coroutines.CoroutineDispatcher
 
-internal expect val coroutineDispatcher: CoroutineDispatcher
+internal expect val platformCoroutineDispatcher: CoroutineDispatcher
