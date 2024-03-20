@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * Configure Compose-Multiplatform-specific options
  */
 internal fun Project.configureComposeMultiplatform(
-  commonExtension: CommonExtension<*, *, *, *, *>,
+  commonExtension: CommonExtension<*, *, *, *, *, *>,
   kotlinMultiplatformExtension: KotlinMultiplatformExtension,
 ) {
   val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
