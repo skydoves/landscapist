@@ -543,7 +543,7 @@ Landscapist supports preview mode for each image library; **Glide**, **Coil**, a
 GlideImage(
   imageModel = { imageUrl },
   modifier = Modifier.aspectRatio(0.8f),
-  previewPlaceholder = R.drawable.poster
+  previewPlaceholder = painterResource(id = R.drawable.poster)
 )
 ```
 > **Note**: You can also use the the `previewPlaceholder` parameter for **`CoilImage`** and **`FrescoImage`**.
