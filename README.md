@@ -889,7 +889,7 @@ paparazzi.snapshot {
     GlideImage(
       modifier = Modifier.fillMaxSize(),
       imageModel = { ".." },
-      previewPlaceholder = R.drawable.placeholder
+      previewPlaceholder = painterResource(R.drawable.placeholder)
   )
  }
 }
