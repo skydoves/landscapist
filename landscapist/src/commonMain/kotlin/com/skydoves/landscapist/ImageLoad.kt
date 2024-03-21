@@ -26,8 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
 import com.skydoves.landscapist.constraints.Constrainable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import com.skydoves.landscapist.platforms.platformCoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -94,7 +93,7 @@ private suspend fun executeImageLoading(
 }.catch {
   // emit a failure loading state
   emit(ImageLoadState.Failure(null, null))
-}.distinctUntilChanged().flowOn(Dispatchers.IO)
+}.distinctUntilChanged().flowOn(platformCoroutineDispatcher)
 
 @InternalLandscapistApi
 public val ZeroConstraints: Constraints = Constraints.fixed(0, 0)

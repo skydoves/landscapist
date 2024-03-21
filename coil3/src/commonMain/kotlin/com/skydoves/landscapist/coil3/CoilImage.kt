@@ -47,7 +47,6 @@ import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.constraints.Constrainable
 import com.skydoves.landscapist.constraints.constraint
 import com.skydoves.landscapist.plugins.ImagePlugin
-import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.channelFlow
 
 /**
@@ -299,7 +298,7 @@ private fun CoilImage(
     executeImageRequest = {
       channelFlow {
         val newBuilder = request.newBuilder(context).target(
-          onStart = { trySendBlocking(ImageLoadState.Loading) },
+          onStart = { trySend(ImageLoadState.Loading) },
         ).build()
 
         val result = imageLoader.value.execute(newBuilder).toResult()
