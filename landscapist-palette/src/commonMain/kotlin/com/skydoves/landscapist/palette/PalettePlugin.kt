@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.LocalInspectionMode
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.plugins.ImagePlugin
 
@@ -53,6 +54,8 @@ public data class PalettePlugin(
     imageBitmap: ImageBitmap?,
   ): ImagePlugin =
     apply {
+      if (LocalInspectionMode.current) return@apply
+
       imageBitmap?.let {
         bitmapPalette.applyImageModel(this.imageModel ?: imageModel)
         bitmapPalette.generate(it)
