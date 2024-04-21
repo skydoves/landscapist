@@ -11,7 +11,7 @@ If your team or personal projects have benefited from reduced development costs 
 
 Sponsoring helps sustain the continuous development and improvement of the library, ensuring that it remains a valuable resource for the community. Your contribution not only shows gratitude but also contributes to the growth and success of open-source projects like this one. Feel free to lend your support and make a positive impact on the developer's efforts.
 
-If you want to suggest a feature request or sponsorship collaboration, you can reach out to the auther with the contacts below:
+If you want to suggest a feature request or sponsorship collaboration, you can reach out to the author with the contacts below:
 
 - skydoves2@gmail.com
 - [Twitter](https://twitter.com/github_skydoves)
