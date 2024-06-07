@@ -137,9 +137,9 @@ internal class CoilImageTest {
           .size(128.dp, 128.dp)
           .testTag(TAG_COIL),
         imageOptions = ImageOptions(contentScale = ContentScale.Crop),
-        success = {
-          state.add(it)
-          assertThat(it.drawable, `is`(CoreMatchers.notNullValue()))
+        success = { imageState, _ ->
+          state.add(imageState)
+          assertThat(imageState.drawable, `is`(CoreMatchers.notNullValue()))
         },
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))

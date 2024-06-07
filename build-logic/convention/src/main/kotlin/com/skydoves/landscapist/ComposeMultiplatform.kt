@@ -72,6 +72,7 @@ internal fun Project.configureComposeMultiplatform(
     }
 
     explicitApi()
+    task("testClasses")
   }
 
   commonExtension.apply {

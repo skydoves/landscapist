@@ -24,6 +24,7 @@ import coil3.SingletonImageLoader
 import coil3.network.ktor.KtorNetworkFetcherFactory
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
+import com.facebook.imagepipeline.core.DownsampleMode
 import okhttp3.OkHttpClient
 
 class App : Application(), SingletonImageLoader.Factory {
@@ -36,7 +37,7 @@ class App : Application(), SingletonImageLoader.Factory {
       OkHttpImagePipelineConfigFactory
         .newBuilder(this, OkHttpClient.Builder().build())
         .setDiskCacheEnabled(true)
-        .setDownsampleEnabled(true)
+        .setDownsampleMode(DownsampleMode.AUTO)
         .setResizeAndRotateEnabledForNetwork(true)
         .build()
 
