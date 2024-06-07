@@ -48,7 +48,7 @@ internal actual class CircularRevealPainter actual constructor(
 
   actual var radius by mutableStateOf(0f, policy = neverEqualPolicy())
 
-  override fun DrawScope.onDraw() {
+  actual override fun DrawScope.onDraw() {
     var dx = 0f
     var dy = 0f
     var scale: Float
@@ -100,7 +100,7 @@ internal actual class CircularRevealPainter actual constructor(
   }
 
   /** return the dimension size of the [painter]'s intrinsic width and height. */
-  override val intrinsicSize: Size get() = painter.intrinsicSize
+  actual override val intrinsicSize: Size get() = painter.intrinsicSize
 }
 
 /** paint pool which caching and reusing [Paint] instances. */
