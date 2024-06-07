@@ -57,6 +57,7 @@ dependencies {
   api(project(":landscapist"))
   api(libs.fresco)
   api(libs.fresco.okhttp3)
+  api(libs.fresco.middleware)
 
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.compose.ui)

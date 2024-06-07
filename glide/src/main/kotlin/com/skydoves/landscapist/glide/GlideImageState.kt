@@ -17,21 +17,22 @@ package com.skydoves.landscapist.glide
 
 import android.graphics.drawable.Drawable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.ImageBitmap
 import com.skydoves.landscapist.DataSource
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageState
 
 /** GlideImageState represents the image loading states for Glide. */
-@Immutable
+@Stable
 public sealed class GlideImageState : ImageState {
 
   /** Request not started. */
-  @Immutable
+  @Stable
   public data object None : GlideImageState()
 
   /** Request is currently in progress. */
-  @Immutable
+  @Stable
   public data object Loading : GlideImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */

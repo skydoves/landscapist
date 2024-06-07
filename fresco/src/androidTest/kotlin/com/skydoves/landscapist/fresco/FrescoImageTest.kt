@@ -79,7 +79,6 @@ internal class FrescoImageTest {
         .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
         .setProgressiveRenderingEnabled(false)
         .setResizeOptions(ResizeOptions(350, 350))
-        .build()
 
       CompositionLocalProvider(LocalFrescoImageRequest provides imageRequest) {
         FrescoImage(
@@ -132,9 +131,9 @@ internal class FrescoImageTest {
           .size(128.dp, 128.dp)
           .testTag(TAG_FRESCO),
         imageOptions = ImageOptions(contentScale = ContentScale.Crop),
-        success = {
-          state.add(it)
-          assertThat(it.imageBitmap, `is`(notNullValue()))
+        success = { imageState, _ ->
+          state.add(imageState)
+          assertThat(imageState.imageBitmap, `is`(notNullValue()))
         },
         loading = {
           Box(modifier = Modifier.testTag(TAG_PROGRESS))

@@ -19,11 +19,13 @@
 package com.skydoves.landscapist
 
 import com.android.build.api.dsl.CommonExtension
-import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.assign
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 
 /**
  * Configure Compose-specific options
@@ -31,7 +33,7 @@ import org.gradle.kotlin.dsl.getByType
 internal fun Project.configureAndroidCompose(
   commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
-  val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+  pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
   commonExtension.apply {
     buildFeatures {
@@ -39,11 +41,7 @@ internal fun Project.configureAndroidCompose(
     }
 
     composeOptions {
-      kotlinCompilerExtensionVersion = libs.findVersion("androidxComposeCompiler").get().toString()
-    }
-
-    kotlinOptions {
-      freeCompilerArgs += buildComposeMetricsParameters() + configureComposeStabilityPath()
+      kotlinCompilerExtensionVersion = "1.5.14"
     }
 
     packaging {
@@ -51,47 +49,18 @@ internal fun Project.configureAndroidCompose(
         excludes.add("/META-INF/{AL2.0,LGPL2.1}")
       }
     }
-
-    dependencies {
-      val bom = libs.findLibrary("androidx-compose-bom").get()
-      add("implementation", platform(bom))
-      add("androidTestImplementation", platform(bom))
-    }
-  }
-}
-
-private fun Project.buildComposeMetricsParameters(): List<String> {
-  val metricParameters = mutableListOf<String>()
-  val enableMetricsProvider = project.providers.gradleProperty("enableComposeCompilerMetrics")
-  val relativePath = projectDir.relativeTo(rootDir)
-  val buildDir = layout.buildDirectory.get().asFile
-  val enableMetrics = (enableMetricsProvider.orNull == "true")
-  if (enableMetrics) {
-    val metricsFolder = buildDir.resolve("compose-metrics").resolve(relativePath)
-    metricParameters.add("-P")
-    metricParameters.add(
-      "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + metricsFolder.absolutePath
-    )
   }
 
-  val enableReportsProvider = project.providers.gradleProperty("enableComposeCompilerReports")
-  val enableReports = (enableReportsProvider.orNull == "true")
-  if (enableReports) {
-    val reportsFolder = buildDir.resolve("compose-reports").resolve(relativePath)
-    metricParameters.add("-P")
-    metricParameters.add(
-      "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + reportsFolder.absolutePath
-    )
+  extensions.configure<ComposeCompilerGradlePluginExtension> {
+    enableStrongSkippingMode = true
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
   }
-  return metricParameters.toList()
-}
 
-private fun Project.configureComposeStabilityPath(): List<String> {
-  val metricParameters = mutableListOf<String>()
-  val stabilityConfigurationFile = rootDir.resolve("compose_compiler_config.conf")
-  metricParameters.add("-P")
-  metricParameters.add(
-    "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" + stabilityConfigurationFile.absolutePath
-  )
-  return metricParameters.toList()
+  val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+
+  dependencies {
+    val bom = libs.findLibrary("androidx-compose-bom").get()
+    add("implementation", platform(bom))
+    add("androidTestImplementation", platform(bom))
+  }
 }

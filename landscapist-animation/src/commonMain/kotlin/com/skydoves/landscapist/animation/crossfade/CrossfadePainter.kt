@@ -15,9 +15,12 @@
  */
 package com.skydoves.landscapist.animation.crossfade
 
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * CrossfadePainter is a [Painter] that applies crossfade filter effect on the given [imageBitmap].
@@ -32,4 +35,10 @@ internal expect class CrossfadePainter(
   internal val imageBitmap: ImageBitmap
   internal val painter: Painter
   internal var transitionColorFilter: ColorFilter?
+  override fun DrawScope.onDraw()
+
+  override val intrinsicSize: Size
+  override fun applyAlpha(alpha: Float): Boolean
+  override fun applyColorFilter(colorFilter: ColorFilter?): Boolean
+  override fun applyLayoutDirection(layoutDirection: LayoutDirection): Boolean
 }
