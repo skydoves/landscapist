@@ -17,6 +17,7 @@ package com.skydoves.landscapist.fresco
 
 import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -38,14 +39,14 @@ public sealed class FrescoImageState : ImageState {
   public data object Loading : FrescoImageState()
 
   /** Request is completed successfully and ready to use an [ImageBitmap]. */
-  @Stable
+  @Immutable
   public data class Success(
     val imageBitmap: ImageBitmap?,
     val dataSource: com.skydoves.landscapist.DataSource,
   ) : FrescoImageState()
 
   /** Request failed. */
-  @Stable
+  @Immutable
   public data class Failure(
     val closeableImage: CloseableImage?,
     val reason: Throwable?,
@@ -71,6 +72,7 @@ public fun ImageLoadState.toFrescoImageState(): FrescoImageState {
         dataSource = dataSource,
       )
     }
+
     is ImageLoadState.Failure -> {
       val bitmapRef = data as? CloseableReference<CloseableImage>
       val closeableImage = if (bitmapRef != null) {
