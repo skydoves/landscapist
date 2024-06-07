@@ -33,7 +33,7 @@ internal fun Project.configureComposeMultiplatform(
   commonExtension: CommonExtension<*, *, *, *, *, *>,
   kotlinMultiplatformExtension: KotlinMultiplatformExtension,
 ) {
-  val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+  pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
   kotlinMultiplatformExtension.apply {
     androidTarget { publishLibraryVariants("release") }
@@ -79,39 +79,10 @@ internal fun Project.configureComposeMultiplatform(
       compose = true
     }
 
-    composeOptions {
-      kotlinCompilerExtensionVersion =
-        libs.findVersion("androidxComposeCompiler").get().toString()
-    }
-
     packaging {
       resources {
         excludes.add("/META-INF/{AL2.0,LGPL2.1}")
       }
     }
   }
-}
-
-private fun Project.buildComposeMetricsParameters(): List<String> {
-  val metricParameters = mutableListOf<String>()
-  val enableMetricsProvider = project.providers.gradleProperty("enableComposeCompilerMetrics")
-  val enableMetrics = (enableMetricsProvider.orNull == "true")
-  if (enableMetrics) {
-    val metricsFolder = File(project.buildDir, "compose-metrics")
-    metricParameters.add("-P")
-    metricParameters.add(
-      "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${metricsFolder.absolutePath}/compose_metrics"
-    )
-  }
-
-  val enableReportsProvider = project.providers.gradleProperty("enableComposeCompilerReports")
-  val enableReports = (enableReportsProvider.orNull == "true")
-  if (enableReports) {
-    val reportsFolder = File(project.buildDir, "compose-reports")
-    metricParameters.add("-P")
-    metricParameters.add(
-      "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${reportsFolder.absolutePath}/compose_metrics"
-    )
-  }
-  return metricParameters.toList()
 }

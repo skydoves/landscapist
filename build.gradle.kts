@@ -5,6 +5,7 @@ plugins {
   alias(libs.plugins.kotlin.android) apply false
   alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.jetbrains.compose) apply false
+  alias(libs.plugins.compose.compiler) apply false
   alias(libs.plugins.kotlin.binary.compatibility) apply false
   alias(libs.plugins.baseline.profile) apply false
   alias(libs.plugins.hilt) apply false
