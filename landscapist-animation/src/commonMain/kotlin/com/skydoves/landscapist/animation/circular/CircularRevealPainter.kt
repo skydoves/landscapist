@@ -15,8 +15,12 @@
  */
 package com.skydoves.landscapist.animation.circular
 
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * CircularRevealPainter is a [Painter] which animates a clipping circle to reveal an image.
@@ -32,4 +36,10 @@ internal expect class CircularRevealPainter(
   internal val imageBitmap: ImageBitmap
   internal val painter: Painter
   internal var radius: Float
+  override fun DrawScope.onDraw()
+
+  override val intrinsicSize: Size
+  override fun applyAlpha(alpha: Float): Boolean
+  override fun applyColorFilter(colorFilter: ColorFilter?): Boolean
+  override fun applyLayoutDirection(layoutDirection: LayoutDirection): Boolean
 }

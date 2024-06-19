@@ -24,10 +24,11 @@ import com.bumptech.glide.request.target.Target
 internal class TestRequestListener(
   private val onComplete: (Any?) -> Unit,
 ) : RequestListener<Drawable> {
+
   override fun onLoadFailed(
     e: GlideException?,
     model: Any?,
-    target: Target<Drawable>?,
+    target: Target<Drawable>,
     isFirstResource: Boolean,
   ): Boolean {
     onComplete(model)
@@ -35,10 +36,10 @@ internal class TestRequestListener(
   }
 
   override fun onResourceReady(
-    resource: Drawable?,
-    model: Any?,
+    resource: Drawable,
+    model: Any,
     target: Target<Drawable>?,
-    dataSource: DataSource?,
+    dataSource: DataSource,
     isFirstResource: Boolean,
   ): Boolean {
     onComplete(model)

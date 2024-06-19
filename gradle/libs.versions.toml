@@ -1,31 +1,30 @@
 [versions]
-kotlin = "1.9.22"
+kotlin = "2.0.0"
 dokka = "1.9.20"
 jvmTarget = "11"
 nexusPlugin = "0.26.0"
-kotlinxCoroutines = "1.8.0"
+kotlinxCoroutines = "1.8.1"
 kotlinBinaryCompatibility = "0.14.0"
-androidGradlePlugin = "8.2.2"
-androidxActivity = "1.8.2"
-androidxMaterial = "1.11.0"
-androidxComposeBom = "2024.02.02"
-androidxComposeCompiler = "1.5.10"
+androidGradlePlugin = "8.5.0"
+androidxActivity = "1.9.0"
+androidxMaterial = "1.12.0"
+androidxComposeBom = "2024.06.00"
 androidxComposeConstraintLayout = "1.0.1"
-androidxCore = "1.12.0"
+androidxCore = "1.13.1"
 androidxTestRunner = "1.5.2"
 androidxTestRules = "1.5.0"
 androidxJunit = "1.1.5"
-androidxMacroBenchmark = "1.2.3"
+androidxMacroBenchmark = "1.3.0-beta01"
 androidxProfileinstaller = "1.3.1"
 androidxUiAutomator = "2.3.0"
-jetbrains-compose = "1.6.0"
+jetbrains-compose = "1.6.11"
 glide = "4.16.0"
-fresco = "3.1.3"
+fresco = "3.2.0"
 coil = "2.6.0"
 coil3 = "3.0.0-alpha06"
-ktor = "2.3.9"
+ktor = "2.3.11"
 palette = "3.1.0"
-hilt = "2.51"
+hilt = "2.51.1"
 spotless = "6.21.0"
 
 [libraries]
@@ -63,6 +62,7 @@ fresco-webp = { group = "com.facebook.fresco", name = "animated-webp", version.r
 fresco-gif = { group = "com.facebook.fresco", name = "animated-gif", version.ref = "fresco" }
 fresco-drawable = { group = "com.facebook.fresco", name = "animated-drawable", version.ref = "fresco" }
 fresco-websupport = { group = "com.facebook.fresco", name = "webpsupport", version.ref = "fresco" }
+fresco-middleware = { group = "com.facebook.fresco", name = "middleware", version.ref = "fresco" }
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coil" }
 coil3 = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil3" }
@@ -75,6 +75,7 @@ ktor-engine-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+compose-compiler-gradlePlugin = { group = "org.jetbrains.kotlin", name = "compose-compiler-gradle-plugin", version.ref = "kotlin" }
 spotless-gradlePlugin = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotless" }
 
 [plugins]
@@ -84,6 +85,7 @@ android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 nexus-plugin = { id = "com.vanniktech.maven.publish", version.ref = "nexusPlugin" }
 kotlin-binary-compatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibility" }

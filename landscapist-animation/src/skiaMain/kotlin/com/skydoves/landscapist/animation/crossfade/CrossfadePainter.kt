@@ -45,12 +45,12 @@ internal actual class CrossfadePainter actual constructor(
 ) : Painter() {
 
   /** return the dimension size of the [painter]'s intrinsic width and height. */
-  override val intrinsicSize: Size get() = painter.intrinsicSize
+  actual override val intrinsicSize: Size get() = painter.intrinsicSize
 
   /** color filter that will be applied to draw the [imageBitmap]. */
   actual var transitionColorFilter by mutableStateOf<ColorFilter?>(null)
 
-  override fun DrawScope.onDraw() {
+  actual override fun DrawScope.onDraw() {
     drawIntoCanvas { canvas ->
       var dx = 0f
       var dy = 0f
