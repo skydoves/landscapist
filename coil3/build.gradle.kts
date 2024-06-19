@@ -85,9 +85,6 @@ kotlin {
       }
     }
   }
-
-  explicitApi()
-  applyKotlinJsImplicitDependencyWorkaround()
 }
 
 android {
@@ -105,45 +102,6 @@ baselineProfile {
   baselineProfileOutputDir = "."
   filter {
     include("com.skydoves.landscapist.coil3.**")
-  }
-}
-
-// https://youtrack.jetbrains.com/issue/KT-56025
-fun Project.applyKotlinJsImplicitDependencyWorkaround() {
-  tasks {
-    val configureJs: Task.() -> Unit = {
-      dependsOn(named("jsDevelopmentLibraryCompileSync"))
-      dependsOn(named("jsDevelopmentExecutableCompileSync"))
-      dependsOn(named("jsProductionLibraryCompileSync"))
-      dependsOn(named("jsProductionExecutableCompileSync"))
-      dependsOn(named("jsTestTestDevelopmentExecutableCompileSync"))
-
-      dependsOn(getByPath(":coil3:jsDevelopmentLibraryCompileSync"))
-      dependsOn(getByPath(":coil3:jsDevelopmentExecutableCompileSync"))
-      dependsOn(getByPath(":coil3:jsProductionLibraryCompileSync"))
-      dependsOn(getByPath(":coil3:jsProductionExecutableCompileSync"))
-      dependsOn(getByPath(":coil3:jsTestTestDevelopmentExecutableCompileSync"))
-    }
-    named("jsBrowserProductionWebpack").configure(configureJs)
-    named("jsBrowserProductionLibraryDistribution").configure(configureJs)
-    named("jsNodeProductionLibraryDistribution").configure(configureJs)
-
-    val configureWasmJs: Task.() -> Unit = {
-      dependsOn(named("wasmJsDevelopmentLibraryCompileSync"))
-      dependsOn(named("wasmJsDevelopmentExecutableCompileSync"))
-      dependsOn(named("wasmJsProductionLibraryCompileSync"))
-      dependsOn(named("wasmJsProductionExecutableCompileSync"))
-      dependsOn(named("wasmJsTestTestDevelopmentExecutableCompileSync"))
-
-      dependsOn(getByPath(":coil3:wasmJsDevelopmentLibraryCompileSync"))
-      dependsOn(getByPath(":coil3:wasmJsDevelopmentExecutableCompileSync"))
-      dependsOn(getByPath(":coil3:wasmJsProductionLibraryCompileSync"))
-      dependsOn(getByPath(":coil3:wasmJsProductionExecutableCompileSync"))
-      dependsOn(getByPath(":coil3:wasmJsTestTestDevelopmentExecutableCompileSync"))
-    }
-    named("wasmJsBrowserProductionWebpack").configure(configureWasmJs)
-    named("wasmJsBrowserProductionLibraryDistribution").configure(configureWasmJs)
-    named("wasmJsNodeProductionLibraryDistribution").configure(configureWasmJs)
   }
 }
 
