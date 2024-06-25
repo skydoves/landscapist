@@ -19,23 +19,24 @@
 
 package com.skydoves.landscapist.fresco.websupport
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.painterResource
 import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder
+import com.facebook.drawee.drawable.ScalingUtils
 import com.facebook.drawee.generic.GenericDraweeHierarchy
 import com.facebook.drawee.generic.GenericDraweeHierarchyInflater
 import com.facebook.drawee.view.DraweeHolder
+import com.skydoves.landscapist.constraints.constraint
 import com.skydoves.landscapist.rememberDrawablePainter
 
 /**
@@ -87,15 +88,15 @@ public fun FrescoWebImage(
   modifier: Modifier = Modifier,
   contentDescription: String? = null,
   alignment: Alignment = Alignment.Center,
-  contentScale: ContentScale = ContentScale.Fit,
+  contentScale: ContentScale = ContentScale.Crop,
   alpha: Float = DefaultAlpha,
   colorFilter: ColorFilter? = null,
-  @DrawableRes previewPlaceholder: Int = 0,
+  previewPlaceholder: Painter? = null,
 ) {
-  if (LocalInspectionMode.current && previewPlaceholder != 0) {
+  if (LocalInspectionMode.current && previewPlaceholder != null) {
     Image(
       modifier = modifier,
-      painter = painterResource(id = previewPlaceholder),
+      painter = previewPlaceholder,
       alignment = alignment,
       contentScale = contentScale,
       alpha = alpha,
@@ -106,16 +107,18 @@ public fun FrescoWebImage(
   }
 
   val context = LocalContext.current
+  val builder = controllerBuilder()
   val hierarchy = GenericDraweeHierarchyInflater.inflateBuilder(context, null).build()
   val holder: DraweeHolder<GenericDraweeHierarchy> = DraweeHolder.create(hierarchy, context)
-  controllerBuilder().oldController = holder.controller
-  holder.controller = controllerBuilder().build()
+  builder.oldController = holder.controller.apply { this?.contentDescription = contentDescription }
+  holder.hierarchy.setActualImageScaleType(getScaleType(contentScale))
+  holder.controller = builder.build()
 
   val topLevelDrawable = holder.topLevelDrawable
-  Box(modifier = modifier) {
+  BoxWithConstraints(modifier = modifier) {
     if (topLevelDrawable != null) {
       Image(
-        modifier = modifier,
+        modifier = Modifier.constraint(this),
         painter = rememberDrawablePainter(topLevelDrawable),
         contentDescription = contentDescription,
         alignment = alignment,
@@ -124,5 +127,17 @@ public fun FrescoWebImage(
         colorFilter = colorFilter,
       )
     }
+  }
+}
+
+private fun getScaleType(contentScale: ContentScale): ScalingUtils.ScaleType {
+  return when (contentScale) {
+    ContentScale.Crop -> ScalingUtils.ScaleType.CENTER_CROP
+    ContentScale.FillWidth -> ScalingUtils.ScaleType.FIT_X
+    ContentScale.FillHeight -> ScalingUtils.ScaleType.FIT_Y
+    ContentScale.FillBounds -> ScalingUtils.ScaleType.FIT_XY
+    ContentScale.Fit -> ScalingUtils.ScaleType.FIT_CENTER
+    ContentScale.Inside -> ScalingUtils.ScaleType.CENTER_INSIDE
+    else -> ScalingUtils.ScaleType.CENTER_CROP
   }
 }
