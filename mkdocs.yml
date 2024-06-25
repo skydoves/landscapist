@@ -10,7 +10,6 @@ docs_dir: docs
 # Navigation
 nav:
   - 'Overview': index.md
-  - 'Snapshot': snapshot.md
   - 'Glide':
     - 'Overview': glide/overview.md
     - 'Custom Options': glide/options.md
