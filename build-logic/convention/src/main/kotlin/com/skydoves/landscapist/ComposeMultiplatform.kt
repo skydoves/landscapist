@@ -19,12 +19,8 @@
 package com.skydoves.landscapist
 
 import com.android.build.api.dsl.CommonExtension
-import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
@@ -49,6 +45,13 @@ internal fun Project.configureComposeMultiplatform(
           enabled = false
         }
       }
+      nodejs {
+        testTask {
+          enabled = false
+        }
+      }
+      binaries.executable()
+      binaries.library()
     }
 
     iosX64()
@@ -105,23 +108,6 @@ internal fun Project.configureComposeMultiplatform(
 // https://youtrack.jetbrains.com/issue/KT-56025
 fun Project.applyKotlinJsImplicitDependencyWorkaround() {
   tasks {
-    val configureJs: Task.() -> Unit = {
-      dependsOn(named("jsDevelopmentLibraryCompileSync"))
-      dependsOn(named("jsDevelopmentExecutableCompileSync"))
-      dependsOn(named("jsProductionLibraryCompileSync"))
-      dependsOn(named("jsProductionExecutableCompileSync"))
-      dependsOn(named("jsTestTestDevelopmentExecutableCompileSync"))
-
-      dependsOn(getByPath(":coil3:jsDevelopmentLibraryCompileSync"))
-      dependsOn(getByPath(":coil3:jsDevelopmentExecutableCompileSync"))
-      dependsOn(getByPath(":coil3:jsProductionLibraryCompileSync"))
-      dependsOn(getByPath(":coil3:jsProductionExecutableCompileSync"))
-      dependsOn(getByPath(":coil3:jsTestTestDevelopmentExecutableCompileSync"))
-    }
-    named("jsBrowserProductionWebpack").configure(configureJs)
-    named("jsBrowserProductionLibraryDistribution").configure(configureJs)
-    named("jsNodeProductionLibraryDistribution").configure(configureJs)
-
     val configureWasmJs: Task.() -> Unit = {
       dependsOn(named("wasmJsDevelopmentLibraryCompileSync"))
       dependsOn(named("wasmJsDevelopmentExecutableCompileSync"))
