@@ -88,7 +88,6 @@ internal fun Project.configureComposeMultiplatform(
     }
 
     explicitApi()
-    applyKotlinJsImplicitDependencyWorkaround()
   }
 
   commonExtension.apply {
@@ -101,26 +100,5 @@ internal fun Project.configureComposeMultiplatform(
         excludes.add("/META-INF/{AL2.0,LGPL2.1}")
       }
     }
-  }
-}
-
-// https://youtrack.jetbrains.com/issue/KT-56025
-fun Project.applyKotlinJsImplicitDependencyWorkaround() {
-  tasks {
-    val configureWasmJs: Task.() -> Unit = {
-      dependsOn(named("wasmJsDevelopmentLibraryCompileSync"))
-      dependsOn(named("wasmJsDevelopmentExecutableCompileSync"))
-      dependsOn(named("wasmJsProductionLibraryCompileSync"))
-      dependsOn(named("wasmJsProductionExecutableCompileSync"))
-      dependsOn(named("wasmJsTestTestDevelopmentExecutableCompileSync"))
-
-      dependsOn(getByPath(":coil3:wasmJsDevelopmentLibraryCompileSync"))
-      dependsOn(getByPath(":coil3:wasmJsDevelopmentExecutableCompileSync"))
-      dependsOn(getByPath(":coil3:wasmJsProductionLibraryCompileSync"))
-      dependsOn(getByPath(":coil3:wasmJsProductionExecutableCompileSync"))
-      dependsOn(getByPath(":coil3:wasmJsTestTestDevelopmentExecutableCompileSync"))
-    }
-    named("wasmJsBrowserProductionLibraryDistribution").configure(configureWasmJs)
-    named("wasmJsNodeProductionLibraryDistribution").configure(configureWasmJs)
   }
 }
