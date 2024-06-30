@@ -18,6 +18,7 @@ package com.skydoves.benchmark.landscapist.app
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
@@ -33,6 +34,6 @@ fun FrescoWebSupportProfiles() {
             "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
         )
     },
-    previewPlaceholder = R.drawable.poster,
+    previewPlaceholder = painterResource(id = R.drawable.poster),
   )
 }

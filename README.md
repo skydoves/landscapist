@@ -47,30 +47,6 @@ You can see the use cases of this library in the repositories below:
 - [skydoves/DisneyCompose](https://github.com/skydoves/disneycompose): 🧸 A demo Disney app using Jetpack Compose and Hilt based on modern Android tech-stacks and MVVM architecture.
 - [skydoves/MovieCompose](https://github.com/skydoves/MovieCompose): 🎞 A demo movie app using Jetpack Compose and Hilt based on modern Android tech stacks. <br>
 
-## SNAPSHOT
-
-<details>
- <summary>See how to import the snapshot</summary>
-
-### Including the SNAPSHOT
-[![Landscapist](https://img.shields.io/static/v1?label=snapshot&message=landscapist&logo=apache%20maven&color=C71A36)](https://oss.sonatype.org/content/repositories/snapshots/com/github/skydoves/landscapist/) <br>
-Snapshots of the current development version of Landscapist are available, which track [the latest versions](https://oss.sonatype.org/content/repositories/snapshots/com/github/skydoves/landscapist/).
-
-To import snapshot versions on your project, add the code snippet below on your gradle file:
-```Gradle
-repositories {
-   maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-}
-```
-
-Next, add the dependency below to your **module**'s `build.gradle` file:
-```gradle
-dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.3.2-SNAPSHOT"
-}
-```
-</details>
-
 <div class="header">
   <a href="https://github.com/bumptech/glide" target="_blank"> <img src="https://user-images.githubusercontent.com/24237865/95545537-1bc15200-0a39-11eb-883d-644f564da5d3.png" align="left" width="4%" alt="Glide" /></a>
   <h1>Glide</h1>
@@ -88,9 +64,10 @@ allprojects {
 ```
 
 Next, add the dependency below to your **module**'s `build.gradle` file:
+
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-glide:2.3.4"
+    implementation("com.github.skydoves:landscapist-glide:2.3.5")
 }
 ```
 
@@ -202,7 +179,7 @@ Add the dependency below to your **module**'s `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-coil:$version"
+    implementation("com.github.skydoves:landscapist-coil:$version")
 }
 ```
 
@@ -317,7 +294,7 @@ CoilImage(
 Add the dependency below to your **module**'s `build.gradle` file:
 ```gradle
 dependencies {
-    implementation "com.github.skydoves:landscapist-fresco:$version"
+    implementation("com.github.skydoves:landscapist-fresco:$version")
 }
 ```
 > **Note**: `Landscapist-Fresco` includes version `3.1.0` of Fresco. So please make sure your project is using the same Fresco version or exclude the Fresco dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
@@ -409,7 +386,7 @@ Add the below dependency to your **module**'s `build.gradle` file.
 
 ```gradle
 dependencies {
-  implementation "com.github.skydoves:landscapist-fresco-websupport:$version"
+  implementation("com.github.skydoves:landscapist-fresco-websupport:$version")
 }
 ```
 
@@ -630,9 +607,9 @@ CompositionLocalProvider(LocalImageComponent provides component) {
 The `landscapist-placeholder` package provides useful image plugins, such as loading & failure placeholder supports and shimmering animation.
 To use placeholder supports, add the dependency below:
 
-```groovy
+```kotlin
 dependencies {
-    implementation "com.github.skydoves:landscapist-placeholder:$version"
+    implementation("com.github.skydoves:landscapist-placeholder:$version")
 }
 ```
 
@@ -718,9 +695,9 @@ component = rememberImageComponent {
 The `landscapist-animation` package provides useful image plugins related to animations, such as crossfade and circular reveal animation.
 To use animation supports, add the dependency below:
 
-```groovy
+```kotlin
 dependencies {
-    implementation "com.github.skydoves:landscapist-animation:$version"
+    implementation("com.github.skydoves:landscapist-animation:$version")
 }
 ```
 
@@ -773,9 +750,9 @@ GlideImage(
 The `landscapist-transformation` package provides useful image transformation plugins, such as the blur effect.
 To use transformation supports, add the dependency below:
 
-```groovy
+```kotlin
 dependencies {
-    implementation "com.github.skydoves:landscapist-transformation:$version"
+    implementation("com.github.skydoves:landscapist-transformation:$version")
 }
 ```
 
@@ -801,9 +778,9 @@ GlideImage( // CoilImage, FrescoImage also can be used.
 The `landscapist-palette` package provides useful image plugins related to palette, such as extracting primary color sets.
 To use palette supports, add the dependency below:
 
-```groovy
+```kotlin
 dependencies {
-    implementation "com.github.skydoves:landscapist-palette:$version"
+    implementation("com.github.skydoves:landscapist-palette:$version")
 }
 ```
 
@@ -867,16 +844,16 @@ GlideImage( // CoilImage, FrescoImage also can be used.
 
  The landscapist Bill of Materials (BOM) lets you manage all of your landscapist library versions by specifying only the BOM’s version.
 
- ```groovy
+ ```kotlin
 dependencies {
     // Import the landscapist BOM
-    implementation "com.github.skydoves:landscapist-bom:$version"
+    implementation("com.github.skydoves:landscapist-bom:$version")
 
     // Import landscapist libraries
-    implementation "com.github.skydoves:landscapist-glide" // fresco or coil
-    implementation "com.github.skydoves:landscapist-placeholder"
-    implementation "com.github.skydoves:landscapist-palette"
-    implementation "com.github.skydoves:landscapist-transformation"
+    implementation("com.github.skydoves:landscapist-glide") // fresco or coil
+    implementation("com.github.skydoves:landscapist-placeholder")
+    implementation("com.github.skydoves:landscapist-palette")
+    implementation("com.github.skydoves:landscapist-transformation")
 }
  ```
 
