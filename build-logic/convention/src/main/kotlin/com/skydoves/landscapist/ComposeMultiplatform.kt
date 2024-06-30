@@ -50,7 +50,6 @@ internal fun Project.configureComposeMultiplatform(
           enabled = false
         }
       }
-      binaries.executable()
       binaries.library()
     }
 
@@ -121,7 +120,6 @@ fun Project.applyKotlinJsImplicitDependencyWorkaround() {
       dependsOn(getByPath(":coil3:wasmJsProductionExecutableCompileSync"))
       dependsOn(getByPath(":coil3:wasmJsTestTestDevelopmentExecutableCompileSync"))
     }
-    named("wasmJsBrowserProductionWebpack").configure(configureWasmJs)
     named("wasmJsBrowserProductionLibraryDistribution").configure(configureWasmJs)
     named("wasmJsNodeProductionLibraryDistribution").configure(configureWasmJs)
   }
