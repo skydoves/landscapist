@@ -19,12 +19,11 @@
 package com.skydoves.landscapist
 
 import com.android.build.api.dsl.CommonExtension
-import java.io.File
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.api.Task
+import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 /**
  * Configure Compose-Multiplatform-specific options
@@ -38,9 +37,26 @@ internal fun Project.configureComposeMultiplatform(
   kotlinMultiplatformExtension.apply {
     androidTarget { publishLibraryVariants("release") }
     jvm("desktop")
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+      browser {
+        testTask {
+          enabled = false
+        }
+      }
+      nodejs {
+        testTask {
+          enabled = false
+        }
+      }
+      binaries.library()
+    }
+
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+
     macosX64()
     macosArm64()
 
@@ -72,7 +88,6 @@ internal fun Project.configureComposeMultiplatform(
     }
 
     explicitApi()
-    task("testClasses")
   }
 
   commonExtension.apply {
