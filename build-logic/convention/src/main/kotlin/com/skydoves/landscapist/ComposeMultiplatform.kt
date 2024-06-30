@@ -42,19 +42,6 @@ internal fun Project.configureComposeMultiplatform(
     androidTarget { publishLibraryVariants("release") }
     jvm("desktop")
 
-    js {
-      browser()
-      nodejs {
-        testTask {
-          useMocha {
-            timeout = "60s"
-          }
-        }
-      }
-      binaries.executable()
-      binaries.library()
-    }
-
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
       browser {
@@ -62,13 +49,6 @@ internal fun Project.configureComposeMultiplatform(
           enabled = false
         }
       }
-      nodejs {
-        testTask {
-          enabled = false
-        }
-      }
-      binaries.executable()
-      binaries.library()
     }
 
     iosX64()
