@@ -24,7 +24,7 @@ coil = "2.7.0"
 coil3 = "3.0.0-alpha08"
 ktor = "2.3.11"
 palette = "3.1.0"
-hilt = "2.51.1"
+hilt = "2.52"
 spotless = "6.21.0"
 
 [libraries]
