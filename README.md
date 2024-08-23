@@ -20,7 +20,7 @@
 ## Who's using Landscapist?
 👉 [Check out who's using Landscapist](https://skydoves.github.io/landscapist/#whos-using-landscapist).
 
-Landscapist hits **+300,000 downloads every month** around the globe! 🚀
+Landscapist hits **+700,000 downloads every month** around the globe! 🚀
 
 ![globe](https://user-images.githubusercontent.com/24237865/196018576-a9c87534-81a2-4618-8519-0024b67964bf.png)
 
