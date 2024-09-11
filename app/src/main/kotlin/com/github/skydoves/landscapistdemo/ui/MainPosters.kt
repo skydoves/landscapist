@@ -60,7 +60,6 @@ import com.kmpalette.palette.graphics.Palette
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
-import com.skydoves.landscapist.coil3.CoilImage
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.glide.GlideImage
@@ -78,9 +77,9 @@ fun DisneyPosters(
   val poster: Poster by vm.poster
 
   Column(
-    Modifier
-      .verticalScroll(rememberScrollState())
-      .padding(paddingValues),
+      Modifier
+          .verticalScroll(rememberScrollState())
+          .padding(paddingValues),
   ) {
     LazyRow {
       item {
@@ -117,8 +116,8 @@ private fun PosterItem(
     FrescoImage(
       imageUrl = poster.image,
       modifier = Modifier
-        .size(50.dp)
-        .clickable { vm.poster.value = poster },
+          .size(50.dp)
+          .clickable { vm.poster.value = poster },
       imageOptions = ImageOptions(contentScale = ContentScale.Crop),
       component = rememberImageComponent {
         +CrossfadePlugin()
@@ -134,7 +133,7 @@ private fun SelectedPoster(
 ) {
   var palette by rememberPaletteState(null)
 
-  CoilImage(
+  GlideImage(
     imageModel = { poster.image },
     modifier = Modifier.aspectRatio(0.8f),
     component = rememberImageComponent {
@@ -180,9 +179,9 @@ private fun SelectedPoster(
   GlideImage(
     imageModel = { poster.gif },
     modifier = Modifier
-      .fillMaxWidth()
-      .padding(8.dp)
-      .clip(RoundedCornerShape(8.dp)),
+        .fillMaxWidth()
+        .padding(8.dp)
+        .clip(RoundedCornerShape(8.dp)),
     previewPlaceholder = painterResource(id = R.drawable.poster),
   )
 
@@ -201,14 +200,14 @@ private fun ColorPalettes(palette: Palette?) {
       Crossfade(
         targetState = color,
         modifier = Modifier
-          .padding(horizontal = 8.dp)
-          .size(45.dp),
+            .padding(horizontal = 8.dp)
+            .size(45.dp),
         label = "ColorPalettes",
       ) {
         Box(
           modifier = Modifier
-            .background(color = Color(it))
-            .fillMaxSize(),
+              .background(color = Color(it))
+              .fillMaxSize(),
         )
       }
     }
@@ -221,8 +220,8 @@ private fun SelectedPosterPreview() {
   DisneyComposeTheme(darkTheme = false) {
     Column(
       modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState()),
+          .fillMaxSize()
+          .verticalScroll(rememberScrollState()),
     ) {
       SelectedPoster(poster = MockUtil.getMockPoster())
     }
