@@ -223,6 +223,7 @@ Lcom/facebook/common/internal/ImmutableSet;
 HSPLcom/facebook/common/internal/ImmutableSet;-><init>(Ljava/util/Set;)V
 HSPLcom/facebook/common/internal/ImmutableSet;->of([Ljava/lang/Object;)Lcom/facebook/common/internal/ImmutableSet;
 Lcom/facebook/common/internal/Objects;
+HSPLcom/facebook/common/internal/Objects;->equal(Ljava/lang/Object;Ljava/lang/Object;)Z
 HSPLcom/facebook/common/internal/Objects;->toStringHelper(Ljava/lang/Object;)Lcom/facebook/common/internal/Objects$ToStringHelper;
 Lcom/facebook/common/internal/Objects$ToStringHelper;
 HSPLcom/facebook/common/internal/Objects$ToStringHelper;-><init>(Ljava/lang/String;)V
@@ -672,6 +673,7 @@ HSPLcom/facebook/drawee/drawable/ScaleTypeDrawable;->draw(Landroid/graphics/Canv
 HSPLcom/facebook/drawee/drawable/ScaleTypeDrawable;->getFocusPoint()Landroid/graphics/PointF;
 HSPLcom/facebook/drawee/drawable/ScaleTypeDrawable;->getScaleType()Lcom/facebook/drawee/drawable/ScalingUtils$ScaleType;
 HSPLcom/facebook/drawee/drawable/ScaleTypeDrawable;->onBoundsChange(Landroid/graphics/Rect;)V
+HSPLcom/facebook/drawee/drawable/ScaleTypeDrawable;->setScaleType(Lcom/facebook/drawee/drawable/ScalingUtils$ScaleType;)V
 Lcom/facebook/drawee/drawable/ScalingUtils$AbstractScaleType;
 HSPLcom/facebook/drawee/drawable/ScalingUtils$AbstractScaleType;-><init>()V
 HSPLcom/facebook/drawee/drawable/ScalingUtils$AbstractScaleType;->getTransform(Landroid/graphics/Matrix;Landroid/graphics/Rect;IIFF)Landroid/graphics/Matrix;
@@ -732,6 +734,7 @@ HSPLcom/facebook/drawee/generic/GenericDraweeHierarchy;->getScaleTypeDrawableAtI
 HSPLcom/facebook/drawee/generic/GenericDraweeHierarchy;->getTopLevelDrawable()Landroid/graphics/drawable/Drawable;
 HSPLcom/facebook/drawee/generic/GenericDraweeHierarchy;->hasScaleTypeDrawableAtIndex(I)Z
 HSPLcom/facebook/drawee/generic/GenericDraweeHierarchy;->resetFade()V
+HSPLcom/facebook/drawee/generic/GenericDraweeHierarchy;->setActualImageScaleType(Lcom/facebook/drawee/drawable/ScalingUtils$ScaleType;)V
 HSPLcom/facebook/drawee/generic/GenericDraweeHierarchy;->setControllerOverlay(Landroid/graphics/drawable/Drawable;)V
 HSPLcom/facebook/drawee/generic/GenericDraweeHierarchy;->setImage(Landroid/graphics/drawable/Drawable;FZ)V
 HSPLcom/facebook/drawee/generic/GenericDraweeHierarchy;->setProgress(F)V
@@ -786,6 +789,7 @@ HSPLcom/facebook/drawee/view/DraweeHolder;->attachController()V
 HSPLcom/facebook/drawee/view/DraweeHolder;->attachOrDetachController()V
 HSPLcom/facebook/drawee/view/DraweeHolder;->create(Lcom/facebook/drawee/interfaces/DraweeHierarchy;Landroid/content/Context;)Lcom/facebook/drawee/view/DraweeHolder;
 HSPLcom/facebook/drawee/view/DraweeHolder;->getController()Lcom/facebook/drawee/interfaces/DraweeController;
+HSPLcom/facebook/drawee/view/DraweeHolder;->getHierarchy()Lcom/facebook/drawee/interfaces/DraweeHierarchy;
 HSPLcom/facebook/drawee/view/DraweeHolder;->getTopLevelDrawable()Landroid/graphics/drawable/Drawable;
 HSPLcom/facebook/drawee/view/DraweeHolder;->isControllerValid()Z
 HSPLcom/facebook/drawee/view/DraweeHolder;->onDraw()V
@@ -2291,11 +2295,11 @@ HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Success;->getImageBitmap()L
 Lcom/skydoves/landscapist/fresco/FrescoImageStateKt;
 HSPLcom/skydoves/landscapist/fresco/FrescoImageStateKt;->toFrescoImageState(Lcom/skydoves/landscapist/ImageLoadState;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/fresco/FrescoImageState;
 Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;
-HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->$r8$lambda$PlQvUtVauf59rwvFybtPzJf01QU(Lcom/skydoves/landscapist/fresco/FrescoImageState;)Lkotlin/Unit;
-HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->$r8$lambda$SWyByqrGQmL7ePUBJeYh6PHJsZM(Lcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;Ljava/lang/String;IZLjava/lang/String;)V
+HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->$r8$lambda$5BAY7mA0J6kEafMdUSjJmU_-jtc(Lcom/skydoves/landscapist/fresco/FrescoImageState;)Lkotlin/Unit;
+HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->$r8$lambda$TgvjnsUiLvbuHeRMnfsKtgtrHzE(Lcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;Ljava/lang/String;IZLjava/lang/String;)V
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->FrescoImage$FrescoImage__FrescoImageKt(Ljava/lang/String;Lcom/skydoves/landscapist/ImageOptions;Lcom/skydoves/landscapist/StableHolder;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
-HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->FrescoImage$lambda$0$FrescoImage__FrescoImageKt(Lcom/skydoves/landscapist/fresco/FrescoImageState;)Lkotlin/Unit;
-HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->FrescoImage$lambda$6$lambda$5$FrescoImage__FrescoImageKt(Lcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;Ljava/lang/String;IZLjava/lang/String;)V
+HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->FrescoImage$lambda$1$lambda$0$FrescoImage__FrescoImageKt(Lcom/skydoves/landscapist/fresco/FrescoImageState;)Lkotlin/Unit;
+HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->FrescoImage$lambda$7$lambda$6$FrescoImage__FrescoImageKt(Lcom/skydoves/landscapist/fresco/FlowBaseBitmapDataSubscriber;Ljava/lang/String;IZLjava/lang/String;)V
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;->FrescoImage(Ljava/lang/String;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/graphics/painter/Painter;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
 Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda1;
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda1;-><init>()V
@@ -2336,6 +2340,11 @@ HSPLcom/skydoves/landscapist/fresco/LocalFrescoProviderKt$$ExternalSyntheticLamb
 Lcom/skydoves/landscapist/fresco/RememberCloseableRefKt;
 HSPLcom/skydoves/landscapist/fresco/RememberCloseableRefKt;->rememberCloseableRef(Lcom/facebook/common/references/CloseableReference;Landroidx/compose/runtime/Composer;I)Ljava/lang/Object;
 Lcom/skydoves/landscapist/fresco/websupport/FrescoWebImage;
-HSPLcom/skydoves/landscapist/fresco/websupport/FrescoWebImage;->FrescoWebImage(Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Ljava/lang/String;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;FLandroidx/compose/ui/graphics/ColorFilter;ILandroidx/compose/runtime/Composer;II)V
+HSPLcom/skydoves/landscapist/fresco/websupport/FrescoWebImage;->FrescoWebImage(Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Ljava/lang/String;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;FLandroidx/compose/ui/graphics/ColorFilter;Landroidx/compose/ui/graphics/painter/Painter;Landroidx/compose/runtime/Composer;II)V
 Lcom/skydoves/landscapist/fresco/websupport/FrescoWebImage__FrescoWebImageKt;
-HSPLcom/skydoves/landscapist/fresco/websupport/FrescoWebImage__FrescoWebImageKt;->FrescoWebImage(Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Ljava/lang/String;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;FLandroidx/compose/ui/graphics/ColorFilter;ILandroidx/compose/runtime/Composer;II)V
+HSPLcom/skydoves/landscapist/fresco/websupport/FrescoWebImage__FrescoWebImageKt;->FrescoWebImage(Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Ljava/lang/String;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;FLandroidx/compose/ui/graphics/ColorFilter;Landroidx/compose/ui/graphics/painter/Painter;Landroidx/compose/runtime/Composer;II)V
+HSPLcom/skydoves/landscapist/fresco/websupport/FrescoWebImage__FrescoWebImageKt;->getScaleType$FrescoWebImage__FrescoWebImageKt(Landroidx/compose/ui/layout/ContentScale;)Lcom/facebook/drawee/drawable/ScalingUtils$ScaleType;
+Lcom/skydoves/landscapist/fresco/websupport/FrescoWebImage__FrescoWebImageKt$FrescoWebImage$3;
+HSPLcom/skydoves/landscapist/fresco/websupport/FrescoWebImage__FrescoWebImageKt$FrescoWebImage$3;-><init>(Landroid/graphics/drawable/Drawable;Ljava/lang/String;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;FLandroidx/compose/ui/graphics/ColorFilter;)V
+HSPLcom/skydoves/landscapist/fresco/websupport/FrescoWebImage__FrescoWebImageKt$FrescoWebImage$3;->invoke(Landroidx/compose/foundation/layout/BoxWithConstraintsScope;Landroidx/compose/runtime/Composer;I)V
+HSPLcom/skydoves/landscapist/fresco/websupport/FrescoWebImage__FrescoWebImageKt$FrescoWebImage$3;->invoke(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
