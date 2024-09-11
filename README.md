@@ -4,7 +4,8 @@
 
 <p align="center">
   <a href="https://devlibrary.withgoogle.com/products/android/repos/skydoves-Landscapist"><img alt="Google" src="https://skydoves.github.io/badges/google-devlib.svg"/></a>
-  <a href="https://youtu.be/8y65xBHDHK0?feature=shared"><img alt="Google" src="https://skydoves.github.io/badges/youtube-landscapist.svg"/></a><br>
+  <a href="https://youtu.be/8y65xBHDHK0?feature=shared"><img alt="Google" src="https://skydoves.github.io/badges/youtube-landscapist.svg"/></a>
+  <a href="https://github.com/doveletter"><img alt="Profile" src="https://skydoves.github.io/badges/dove-letter.svg"/></a><br>
   <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
   <a href="https://android-arsenal.com/api?level=21"><img alt="API" src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat"/></a>
   <a href="https://github.com/skydoves/Landscapist/actions"><img alt="Build Status" src="https://github.com/skydoves/landscapist/workflows/Android%20CI/badge.svg"/></a>
@@ -20,7 +21,7 @@
 ## Who's using Landscapist?
 👉 [Check out who's using Landscapist](https://skydoves.github.io/landscapist/#whos-using-landscapist).
 
-Landscapist hits **+300,000 downloads every month** around the globe! 🚀
+Landscapist hits **+700,000 downloads every month** around the globe! 🚀
 
 ![globe](https://user-images.githubusercontent.com/24237865/196018576-a9c87534-81a2-4618-8519-0024b67964bf.png)
 
