@@ -47,7 +47,7 @@ kotlin {
       dependencies {
         api(project(":landscapist"))
         api(libs.coil3)
-        api(libs.coil3.network)
+        api(libs.coil3.network.ktor2)
         api(libs.ktor.core)
 
         implementation(compose.ui)
