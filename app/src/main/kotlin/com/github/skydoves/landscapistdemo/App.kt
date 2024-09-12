@@ -21,9 +21,10 @@ import android.content.Context
 import androidx.multidex.MultiDexApplication
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
-import coil3.network.ktor2.KtorNetworkFetcherFactory
+import coil3.network.ktor3.KtorNetworkFetcherFactory
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
+import com.facebook.imagepipeline.core.DownsampleMode
 import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 
@@ -38,7 +39,7 @@ class App : MultiDexApplication(), SingletonImageLoader.Factory {
       OkHttpImagePipelineConfigFactory
         .newBuilder(this, OkHttpClient.Builder().build())
         .setDiskCacheEnabled(true)
-        .setDownsampleEnabled(true)
+        .setDownsampleMode(DownsampleMode.AUTO)
         .setResizeAndRotateEnabledForNetwork(true)
         .build()
 

@@ -16,7 +16,7 @@
 import com.github.skydoves.landscapist.Configuration
 
 plugins {
-  id("landscapist.library.compose.multiplatform")
+  id("landscapist.library.compose.multiplatformWasm")
   id("landscapist.spotless")
 }
 
@@ -47,7 +47,7 @@ kotlin {
       dependencies {
         api(project(":landscapist"))
         api(libs.coil3)
-        api(libs.coil3.network.ktor2)
+        api(libs.coil3.network.ktor3)
         api(libs.ktor.core)
 
         implementation(compose.ui)
