@@ -78,6 +78,7 @@ internal fun Project.configureComposeMultiplatform(
               }
             }
             withJs()
+            withWasmJs()
           }
         }
       }
