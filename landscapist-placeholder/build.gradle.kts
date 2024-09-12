@@ -16,7 +16,7 @@
 import com.github.skydoves.landscapist.Configuration
 
 plugins {
-  id("landscapist.library.compose.multiplatform")
+  id("landscapist.library.compose.multiplatformWasm")
   id("landscapist.spotless")
 }
 

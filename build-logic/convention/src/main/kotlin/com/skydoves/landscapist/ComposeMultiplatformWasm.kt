@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 /**
  * Configure Compose-Multiplatform-specific options
  */
-internal fun Project.configureComposeMultiplatform(
+internal fun Project.configureComposeMultiplatformWasm(
   commonExtension: CommonExtension<*, *, *, *, *, *>,
   kotlinMultiplatformExtension: KotlinMultiplatformExtension,
 ) {
@@ -82,6 +82,7 @@ internal fun Project.configureComposeMultiplatform(
               }
             }
             withJs()
+            withWasmJs()
           }
         }
       }

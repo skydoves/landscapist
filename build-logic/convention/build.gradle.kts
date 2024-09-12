@@ -30,6 +30,10 @@ gradlePlugin {
       id = "landscapist.library.compose.multiplatform"
       implementationClass = "ComposeMultiplatformLibraryConventionPlugin"
     }
+    register("composeMultiplatformWasmLibrary") {
+      id = "landscapist.library.compose.multiplatformWasm"
+      implementationClass = "ComposeMultiplatformWasmLibraryConventionPlugin"
+    }
     register("spotless") {
       id = "landscapist.spotless"
       implementationClass = "SpotlessConventionPlugin"
