@@ -1,5 +1,3 @@
-
-
 ![landscapist](https://user-images.githubusercontent.com/24237865/127760344-bb042fe8-23e1-4014-b208-b7b549d32086.png)<br><br>
 
 <p align="center">
@@ -21,7 +19,7 @@
 ## Who's using Landscapist?
 👉 [Check out who's using Landscapist](https://skydoves.github.io/landscapist/#whos-using-landscapist).
 
-Landscapist hits **+700,000 downloads every month** around the globe! 🚀
+Landscapist hits **+900,000 downloads every month** around the globe! 🚀
 
 ![globe](https://user-images.githubusercontent.com/24237865/196018576-a9c87534-81a2-4618-8519-0024b67964bf.png)
 
