@@ -24,7 +24,9 @@ Additionally, Landscapist has been featured on the Google Play SDK Console after
 
 All issues raised by this library can be reported securely and safely. Impressively, Landscapist has reported zero crashes over the past year.
 
-![google-sdk](https://github.com/user-attachments/assets/8facc043-9a5b-4c62-ae79-314619f5c761)
+!!! note "See the Google Play SDK Console Crash Reports for Landscapist"
+
+    ![google-sdk](https://github.com/user-attachments/assets/8facc043-9a5b-4c62-ae79-314619f5c761)
 
 ## Who's using Landscapist?
 
