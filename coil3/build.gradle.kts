@@ -48,7 +48,7 @@ kotlin {
         api(project(":landscapist"))
         api(libs.coil3)
         api(libs.coil3.network.ktor3)
-        api(libs.ktor.core)
+        api(libs.kotlinx.serialization.json)
 
         implementation(compose.ui)
         implementation(compose.runtime)
@@ -58,21 +58,31 @@ kotlin {
       }
     }
 
-    val androidMain by getting {
+    androidMain {
       dependencies {
-        implementation(libs.androidx.core.ktx)
+        api(libs.coil3.network.okhttp)
+        api(libs.coil.gif)
+        api(libs.coil.video)
+        api(libs.androidx.core.ktx)
       }
     }
 
-    val jvmMain by getting {
+    appleMain {
+      dependencies {
+        api(libs.coil3.network.ktor3)
+        api(libs.ktor.engine.darwin)
+      }
+    }
+
+    jvmMain {
       dependencies {
         api(libs.ktor.okhttp)
       }
     }
 
-    val iosMain by getting {
+    named("wasmJsMain") {
       dependencies {
-        api(libs.ktor.engine.darwin)
+        api(libs.coil3.network.ktor3)
       }
     }
   }
