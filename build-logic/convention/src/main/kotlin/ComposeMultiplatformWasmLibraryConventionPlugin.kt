@@ -15,10 +15,7 @@
  */
 
 import com.android.build.gradle.LibraryExtension
-import com.skydoves.landscapist.configureAndroidCompose
-import com.skydoves.landscapist.configureComposeMultiplatform
-import com.skydoves.landscapist.configureKotlinAndroid
-import com.skydoves.landscapist.kotlinOptions
+import com.skydoves.landscapist.configureComposeMultiplatformWasm
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
@@ -40,7 +37,7 @@ class ComposeMultiplatformWasmLibraryConventionPlugin : Plugin<Project> {
 
       extensions.configure<LibraryExtension> libraryExtension@{
         extensions.configure<KotlinMultiplatformExtension> kmpExtension@{
-          configureComposeMultiplatform(this@libraryExtension, this@kmpExtension)
+          configureComposeMultiplatformWasm(this@libraryExtension, this@kmpExtension)
         }
       }
 
