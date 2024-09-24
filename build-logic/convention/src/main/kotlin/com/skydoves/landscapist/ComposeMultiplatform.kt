@@ -38,7 +38,6 @@ internal fun Project.configureComposeMultiplatform(
     androidTarget { publishLibraryVariants("release") }
     jvm("desktop")
 
-    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
       browser {
         testTask {
