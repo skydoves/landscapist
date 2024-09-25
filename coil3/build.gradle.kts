@@ -43,7 +43,8 @@ kotlin {
       languageSettings.optIn("com.skydoves.landscapist.InternalLandscapistApi")
       languageSettings.optIn("coil3.annotation.ExperimentalCoilApi")
     }
-    val commonMain by getting {
+
+    commonMain {
       dependencies {
         api(project(":landscapist"))
         api(libs.coil3)
@@ -53,7 +54,6 @@ kotlin {
         implementation(compose.ui)
         implementation(compose.runtime)
         implementation(compose.foundation)
-        @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
         implementation(compose.components.resources)
       }
     }

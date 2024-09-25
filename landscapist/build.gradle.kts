@@ -43,7 +43,7 @@ kotlin {
       languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
       languageSettings.optIn("com.skydoves.landscapist.InternalLandscapistApi")
     }
-    val commonMain by getting {
+    commonMain {
       dependencies {
         implementation(compose.ui)
         implementation(compose.runtime)
@@ -52,7 +52,7 @@ kotlin {
       }
     }
 
-    val androidMain by getting {
+    androidMain {
       dependencies {
         implementation(libs.androidx.core.ktx)
       }

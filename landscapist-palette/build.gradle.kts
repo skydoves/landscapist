@@ -42,7 +42,7 @@ kotlin {
       languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
       languageSettings.optIn("com.skydoves.landscapist.InternalLandscapistApi")
     }
-    val commonMain by getting {
+    commonMain {
       dependencies {
         api(project(":landscapist"))
         api(libs.palette)
