@@ -38,6 +38,10 @@ Landscapist is built with a lot of consideration to improve the performance of i
 
 For comprehensive information about Landscapist, please refer to the **[official documentation](https://skydoves.github.io/landscapist)**.
 
+## Technical Content
+
+For the more details of the history, performance, customizability, and how to load network images and implement placeholders, animations, and transformations with Landscapist, check out [Optimized Image Loading for Compose and Kotlin Multiplatform](https://medium.com/proandroiddev/optimized-image-loading-for-compose-and-kotlin-multiplatform-a45eb2e710c0).
+
 ## Demo projects
 You can see the use cases of this library in the repositories below:
 - [google/modernstorage](https://github.com/google/modernstorage/tree/e62cda539ca75884dd49df3bcf8629751f0a91e6/sample): ModernStorage is a group of libraries that provide an abstraction layer over storage on Android to simplify its interactions.
