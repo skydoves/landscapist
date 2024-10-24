@@ -21,6 +21,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -94,42 +95,37 @@ public fun Shimmer(
     min((1f + intensity + dropOff) / 2f, 1f),
   )
 
-  Box(modifier) {
-    Canvas(Modifier.matchParentSize()) {
+  Box(modifier = modifier) {
+    Canvas(modifier = Modifier.fillMaxSize()) {
       val gradientFrom = Offset(-size.width / 2, 0f)
       val gradientTo = -gradientFrom
       val tiltTan = tan(tilt.toDouble() * DEGREES_TO_RADIANS)
       val width = shimmerWidthPx ?: (size.width + tiltTan * size.height).toFloat()
 
-      try {
-        val dx = offset(-width, width * 1.5f, animatedProgress.value)
-        val shaderMatrix = Matrix().apply {
-          reset()
-          rotateX(size.width / 2f)
-          rotateY(size.height / 2f)
-          rotateZ(-tilt)
-          translate(dx, 0f)
-        }
+      val dx = offset(-width, width * 1.5f, animatedProgress.value)
+      val shaderMatrix = Matrix().apply {
+        reset()
+        rotateX(size.width / 2f)
+        rotateY(size.height / 2f)
+        rotateZ(-tilt)
+        translate(dx, 0f)
+      }
 
-        paint.shader = LinearGradientShader(
-          from = shaderMatrix.map(gradientFrom),
-          to = shaderMatrix.map(gradientTo),
-          colors = shaderColors,
-          colorStops = shaderColorStops,
-        )
+      paint.shader = LinearGradientShader(
+        from = shaderMatrix.map(gradientFrom),
+        to = shaderMatrix.map(gradientTo),
+        colors = shaderColors,
+        colorStops = shaderColorStops,
+      )
 
-        val drawArea = Rect(Offset(0f, 0f), size)
-        drawIntoCanvas { canvas ->
-          canvas.withSaveLayer(
-            bounds = drawArea,
-            paint = emptyPaint,
-          ) {
-            canvas.drawRect(drawArea, paint)
-          }
+      val drawArea = Rect(Offset(0f, 0f), size)
+      drawIntoCanvas { canvas ->
+        canvas.withSaveLayer(
+          bounds = drawArea,
+          paint = emptyPaint,
+        ) {
+          canvas.drawRect(drawArea, paint)
         }
-      } finally {
-        // resets the paint and release to the pool.
-        paint.asFrameworkPaint().reset()
       }
     }
   }

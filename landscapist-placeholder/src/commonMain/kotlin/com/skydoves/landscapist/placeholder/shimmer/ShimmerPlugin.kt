@@ -26,7 +26,7 @@ import com.skydoves.landscapist.plugins.ImagePlugin
 /**
  * Shimmer params holds attributes of the [ShimmerContainer] composable.
  *
- * @property A representation of Shimmer to be used with [ShimmerPlugin].
+ * @property shimmer A representation of Shimmer to be used with [ShimmerPlugin].
  */
 @Immutable
 public data class ShimmerPlugin(
