@@ -6,7 +6,6 @@ pluginManagement {
     gradlePluginPortal()
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
-    maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
 }
 dependencyResolutionManagement {
@@ -15,7 +14,6 @@ dependencyResolutionManagement {
     google()
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")
-    maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
 }
 
