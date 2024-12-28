@@ -45,8 +45,8 @@ dependencies {
     api(project(":landscapist-transformation"))
     api(project(":glide"))
     api(project(":coil"))
+    api(project(":coil3"))
     api(project(":fresco"))
     api(project(":fresco-websupport"))
   }
 }
-
