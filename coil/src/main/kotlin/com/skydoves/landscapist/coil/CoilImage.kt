@@ -214,11 +214,14 @@ public fun CoilImage(
     imageOptions = imageOptions,
     modifier = modifier,
   ) ImageRequest@{ imageState ->
-    when (
-      val coilImageState = imageState.toCoilImageState().apply {
+
+    val coilImageState: CoilImageState = remember(imageState) {
+      imageState.toCoilImageState().apply {
         onImageStateChanged.invoke(this)
       }
-    ) {
+    }
+
+    when (coilImageState) {
       is CoilImageState.None -> Unit
 
       is CoilImageState.Loading -> {
