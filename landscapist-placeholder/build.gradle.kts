@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 import com.github.skydoves.landscapist.Configuration
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
   id("landscapist.library.compose.multiplatformWasm")
@@ -86,10 +88,10 @@ baselineProfile {
   }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-  kotlinOptions {
-    jvmTarget = "1.8"
-    freeCompilerArgs += listOf(
+tasks.withType<KotlinJvmCompile>().configureEach {
+  compilerOptions {
+    jvmTarget.set(JvmTarget.JVM_1_8)
+    freeCompilerArgs.addAll(
       "-Xexplicit-api=strict",
       "-opt-in=kotlin.RequiresOptIn",
       "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
