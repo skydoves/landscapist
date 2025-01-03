@@ -104,7 +104,14 @@ fun DisneyPosters(
         PosterItem(poster, vm)
       }
     }
-    SelectedPoster(poster)
+
+    var palette by rememberPaletteState()
+
+    SelectedPoster(poster = poster, onPaletteUpdated = { palette = it })
+
+    palette?.let {
+      PosterInformation(poster = poster, it)
+    }
   }
 }
 
@@ -131,9 +138,8 @@ private fun PosterItem(
 @Composable
 private fun SelectedPoster(
   poster: Poster,
+  onPaletteUpdated: (Palette) -> Unit,
 ) {
-  var palette by rememberPaletteState(null)
-
   CoilImage(
     imageModel = { poster.image },
     modifier = Modifier.aspectRatio(0.8f),
@@ -149,11 +155,17 @@ private fun SelectedPoster(
         ),
       )
       +CircularRevealPlugin()
-      +PalettePlugin { palette = it }
+      +PalettePlugin { onPaletteUpdated.invoke(it) }
     },
     previewPlaceholder = painterResource(id = R.drawable.poster),
   )
+}
 
+@Composable
+private fun PosterInformation(
+  poster: Poster,
+  palette: Palette,
+) {
   ColorPalettes(palette)
 
   Text(
@@ -190,7 +202,7 @@ private fun SelectedPoster(
 }
 
 @Composable
-private fun ColorPalettes(palette: Palette?) {
+private fun ColorPalettes(palette: Palette) {
   val colorList: List<Int> = palette.paletteColorList()
 
   LazyRow(
@@ -224,7 +236,7 @@ private fun SelectedPosterPreview() {
         .fillMaxSize()
         .verticalScroll(rememberScrollState()),
     ) {
-      SelectedPoster(poster = MockUtil.getMockPoster())
+      SelectedPoster(poster = MockUtil.getMockPoster()) {}
     }
   }
 }

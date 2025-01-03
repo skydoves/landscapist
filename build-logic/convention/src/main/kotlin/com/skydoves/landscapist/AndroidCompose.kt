@@ -40,10 +40,6 @@ internal fun Project.configureAndroidCompose(
       compose = true
     }
 
-    composeOptions {
-      kotlinCompilerExtensionVersion = "1.5.14"
-    }
-
     packaging {
       resources {
         excludes.add("/META-INF/{AL2.0,LGPL2.1}")

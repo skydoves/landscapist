@@ -32,6 +32,8 @@ import com.kmpalette.palette.graphics.Palette
  */
 @Composable
 public fun rememberPaletteState(
-  value: Palette?,
+  value: Palette? = null,
   policy: SnapshotMutationPolicy<Palette?> = structuralEqualityPolicy(),
-): MutableState<Palette?> = remember { mutableStateOf(value = value, policy = policy) }
+): MutableState<Palette?> = remember(key1 = value) {
+  mutableStateOf(value = value, policy = policy)
+}

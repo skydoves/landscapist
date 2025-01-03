@@ -55,13 +55,13 @@ public fun <T : Any> ImageLoad(
   var state by remember(recomposeKey, imageOptions) {
     mutableStateOf<ImageLoadState>(ImageLoadState.None)
   }
-  LaunchedEffect(recomposeKey, imageOptions) {
-    executeImageLoading(
-      executeImageRequest,
-    ).collect {
+
+  LaunchedEffect(key1 = recomposeKey, key2 = imageOptions) {
+    executeImageLoading(executeImageRequest).collect {
       state = it
     }
   }
+
   BoxWithConstraints(
     modifier = modifier.imageSemantics(imageOptions),
     propagateMinConstraints = true,
@@ -85,7 +85,7 @@ public fun <T : Any> ImageLoad(
   }
 }
 
-private suspend fun executeImageLoading(
+private fun executeImageLoading(
   executeImageRequest: suspend () -> Flow<ImageLoadState>,
 ) = flow {
   // execute imager loading

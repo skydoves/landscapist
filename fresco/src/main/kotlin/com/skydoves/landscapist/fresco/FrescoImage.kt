@@ -121,11 +121,15 @@ public fun FrescoImage(
     imageRequest = StableHolder(imageRequest.invoke()),
     modifier = modifier,
   ) ImageRequest@{ imageState ->
-    when (
-      val frescoImageState = imageState.toFrescoImageState().apply {
+
+    val state: FrescoImageState = imageState.toFrescoImageState()
+    val frescoImageState = remember(state) {
+      state.apply {
         onImageStateChanged.invoke(this)
       }
-    ) {
+    }
+
+    when (frescoImageState) {
       is FrescoImageState.None -> Unit
 
       is FrescoImageState.Loading -> {
