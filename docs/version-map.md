@@ -5,6 +5,7 @@ The Landscapist utilizes varying Compose versions and JVM targets for each relea
 
 | Landscapist | Compose UI             | Jvm Target | Glide  | Coil  | Fresco |
 |-------------|------------------------|------------|--------|-------|--------|
+| 2.4.6       | 1.7.6 (BOM 2024.12.01) | 11         | 4.16.0 | 3.0.4 | 3.5.0  |
 | 2.4.5       | 1.7.6 (BOM 2024.12.01) | 11         | 4.16.0 | 3.0.4 | 3.5.0  |
 | 2.4.4       | 1.7.5 (BOM 2024.11.00) | 11         | 4.16.0 | 3.0.4 | 3.5.0  |
 | 2.4.3       | 1.7.5 (BOM 2024.11.00) | 11         | 4.16.0 | 3.0.3 | 3.3.0  |

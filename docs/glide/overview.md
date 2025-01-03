@@ -23,7 +23,7 @@ Next, add the dependency below to your **module**'s `build.gradle` file:
 
     ```Groovy
     dependencies {
-        implementation "com.github.skydoves:landscapist-glide:2.4.5"
+        implementation "com.github.skydoves:landscapist-glide:2.4.6"
     }
     ```
 
@@ -31,7 +31,7 @@ Next, add the dependency below to your **module**'s `build.gradle` file:
 
     ```kotlin
     dependencies {
-        implementation("com.github.skydoves:landscapist-glide:2.4.5")
+        implementation("com.github.skydoves:landscapist-glide:2.4.6")
     }
     ```
 
