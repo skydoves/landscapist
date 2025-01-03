@@ -25,6 +25,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -149,11 +151,14 @@ public fun GlideImage(
     clearTarget = clearTarget,
     modifier = modifier,
   ) ImageRequest@{ imageState ->
-    when (
-      val glideImageState = imageState.toGlideImageState(
+
+    val glideImageState: GlideImageState = remember(imageState) {
+      imageState.toGlideImageState(
         glideRequestType = glideRequestType,
       ).apply { onImageStateChanged.invoke(this) }
-    ) {
+    }
+
+    when (glideImageState) {
       is GlideImageState.None -> Unit
 
       is GlideImageState.Loading -> {
