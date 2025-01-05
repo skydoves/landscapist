@@ -55,6 +55,6 @@ GlideImage(
 
 ### Compose Metrics
 
-According to the [Compose Compoler Metrics](https://github.com/androidx/androidx/blob/androidx-main/compose/compiler/design/compiler-metrics.md), the `GlideImage` Composable function is marked as Restartable and Skippable. This means you don't have to worry about performance issues related to re-rendering or re-fetching problems that can occur during recomposition. The Composable function's restartable and skippable nature ensures that the necessary actions are taken to optimize rendering, making it more efficient and seamless.
+According to the [Compose Compiler Metrics](https://github.com/androidx/androidx/blob/androidx-main/compose/compiler/design/compiler-metrics.md), the `GlideImage` Composable function is marked as Restartable and Skippable. This means you don't have to worry about performance issues related to re-rendering or re-fetching problems that can occur during recomposition. The Composable function's restartable and skippable nature ensures that the necessary actions are taken to optimize rendering, making it more efficient and seamless.
 
 ![Compose Metrics](https://github.com/skydoves/landscapist/assets/24237865/bc83dd61-b10a-480d-8797-252df81a10d1)
