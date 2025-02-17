@@ -17,6 +17,7 @@ package com.skydoves.landscapist.animation.circular
 
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.runtime.Composable
@@ -46,7 +47,7 @@ internal fun Painter.rememberCircularRevealPainter(
   }
 
   // Our actual transition, which reads our transitionState
-  val transition = updateTransition(transitionState, label = null)
+  val transition = rememberTransition(transitionState, label = null)
 
   val radius: Float by transition.animateFloat(
     transitionSpec = { tween(durationMillis = durationMs) },
