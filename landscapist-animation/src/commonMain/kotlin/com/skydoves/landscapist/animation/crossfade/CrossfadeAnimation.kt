@@ -35,7 +35,7 @@ internal fun Painter.rememberCrossfadePainter(
   durationMs: Int,
 ): Painter {
   val size = Size(imageBitmap.width.toFloat(), imageBitmap.height.toFloat())
-  val colorMatrix = remember { ColorMatrix() }
+  val colorMatrix = remember(imageBitmap) { ColorMatrix() }
   val fadeInTransition = updateFadeInTransition(key = size, durationMs = durationMs)
   val transitionColorFilter = if (!fadeInTransition.isFinished) {
     colorMatrix.apply {
