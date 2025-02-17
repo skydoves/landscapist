@@ -445,7 +445,7 @@ HSPLcom/facebook/datasource/BaseDataSubscriber;->onProgressUpdate(Lcom/facebook/
 Lcom/facebook/datasource/DataSource;
 Lcom/facebook/datasource/DataSubscriber;
 Lcom/facebook/drawee/backends/pipeline/DefaultDrawableFactory;
-HSPLcom/facebook/drawee/backends/pipeline/DefaultDrawableFactory;-><init>(Landroid/content/res/Resources;Lcom/facebook/imagepipeline/drawable/DrawableFactory;)V
+HSPLcom/facebook/drawee/backends/pipeline/DefaultDrawableFactory;-><init>(Landroid/content/res/Resources;Lcom/facebook/imagepipeline/drawable/DrawableFactory;Lcom/facebook/imagepipeline/drawable/DrawableFactory;)V
 HSPLcom/facebook/drawee/backends/pipeline/DefaultDrawableFactory;->createDrawable(Lcom/facebook/imagepipeline/image/CloseableImage;)Landroid/graphics/drawable/Drawable;
 HSPLcom/facebook/drawee/backends/pipeline/DefaultDrawableFactory;->hasTransformableExifOrientation(Lcom/facebook/imagepipeline/image/CloseableStaticBitmap;)Z
 HSPLcom/facebook/drawee/backends/pipeline/DefaultDrawableFactory;->hasTransformableRotationAngle(Lcom/facebook/imagepipeline/image/CloseableStaticBitmap;)Z
@@ -460,7 +460,7 @@ HSPLcom/facebook/drawee/backends/pipeline/Fresco;->initializeDrawee(Landroid/con
 HSPLcom/facebook/drawee/backends/pipeline/Fresco;->newDraweeControllerBuilder()Lcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerBuilder;
 Lcom/facebook/drawee/backends/pipeline/PipelineDraweeController;
 HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeController;-><clinit>()V
-HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeController;-><init>(Landroid/content/res/Resources;Lcom/facebook/drawee/components/DeferredReleaser;Lcom/facebook/imagepipeline/drawable/DrawableFactory;Ljava/util/concurrent/Executor;Lcom/facebook/imagepipeline/cache/MemoryCache;Lcom/facebook/common/internal/ImmutableList;)V
+HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeController;-><init>(Landroid/content/res/Resources;Lcom/facebook/drawee/components/DeferredReleaser;Lcom/facebook/imagepipeline/drawable/DrawableFactory;Lcom/facebook/imagepipeline/drawable/DrawableFactory;Ljava/util/concurrent/Executor;Lcom/facebook/imagepipeline/cache/MemoryCache;Lcom/facebook/common/internal/ImmutableList;)V
 HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeController;->createDrawable(Lcom/facebook/common/references/CloseableReference;)Landroid/graphics/drawable/Drawable;
 HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeController;->createDrawable(Ljava/lang/Object;)Landroid/graphics/drawable/Drawable;
 HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeController;->getCachedImage()Lcom/facebook/common/references/CloseableReference;
@@ -500,8 +500,8 @@ HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerBuilderSupplie
 HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerBuilderSupplier;->get()Lcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerBuilder;
 Lcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerFactory;
 HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerFactory;-><init>()V
-HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerFactory;->init(Landroid/content/res/Resources;Lcom/facebook/drawee/components/DeferredReleaser;Lcom/facebook/imagepipeline/drawable/DrawableFactory;Ljava/util/concurrent/Executor;Lcom/facebook/imagepipeline/cache/MemoryCache;Lcom/facebook/common/internal/ImmutableList;Lcom/facebook/common/internal/Supplier;)V
-HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerFactory;->internalCreateController(Landroid/content/res/Resources;Lcom/facebook/drawee/components/DeferredReleaser;Lcom/facebook/imagepipeline/drawable/DrawableFactory;Ljava/util/concurrent/Executor;Lcom/facebook/imagepipeline/cache/MemoryCache;Lcom/facebook/common/internal/ImmutableList;)Lcom/facebook/drawee/backends/pipeline/PipelineDraweeController;
+HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerFactory;->init(Landroid/content/res/Resources;Lcom/facebook/drawee/components/DeferredReleaser;Lcom/facebook/imagepipeline/drawable/DrawableFactory;Lcom/facebook/imagepipeline/drawable/DrawableFactory;Ljava/util/concurrent/Executor;Lcom/facebook/imagepipeline/cache/MemoryCache;Lcom/facebook/common/internal/ImmutableList;Lcom/facebook/common/internal/Supplier;)V
+HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerFactory;->internalCreateController(Landroid/content/res/Resources;Lcom/facebook/drawee/components/DeferredReleaser;Lcom/facebook/imagepipeline/drawable/DrawableFactory;Lcom/facebook/imagepipeline/drawable/DrawableFactory;Ljava/util/concurrent/Executor;Lcom/facebook/imagepipeline/cache/MemoryCache;Lcom/facebook/common/internal/ImmutableList;)Lcom/facebook/drawee/backends/pipeline/PipelineDraweeController;
 HSPLcom/facebook/drawee/backends/pipeline/PipelineDraweeControllerFactory;->newController()Lcom/facebook/drawee/backends/pipeline/PipelineDraweeController;
 Lcom/facebook/drawee/backends/pipeline/info/ImageOriginListener;
 Lcom/facebook/drawee/backends/pipeline/info/ImageOriginRequestListener;
@@ -623,10 +623,14 @@ HSPLcom/facebook/drawee/drawable/ArrayDrawable$1;-><init>(Lcom/facebook/drawee/d
 HSPLcom/facebook/drawee/drawable/ArrayDrawable$1;->getDrawable()Landroid/graphics/drawable/Drawable;
 Lcom/facebook/drawee/drawable/DrawableParent;
 Lcom/facebook/drawee/drawable/DrawableProperties;
+HSPLcom/facebook/drawee/drawable/DrawableProperties;-><clinit>()V
 HSPLcom/facebook/drawee/drawable/DrawableProperties;-><init>()V
 HSPLcom/facebook/drawee/drawable/DrawableProperties;->applyTo(Landroid/graphics/drawable/Drawable;)V
 HSPLcom/facebook/drawee/drawable/DrawableProperties;->setAlpha(I)V
 HSPLcom/facebook/drawee/drawable/DrawableProperties;->setColorFilter(Landroid/graphics/ColorFilter;)V
+Lcom/facebook/drawee/drawable/DrawableProperties$Companion;
+HSPLcom/facebook/drawee/drawable/DrawableProperties$Companion;-><init>()V
+HSPLcom/facebook/drawee/drawable/DrawableProperties$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 Lcom/facebook/drawee/drawable/DrawableUtils;
 HSPLcom/facebook/drawee/drawable/DrawableUtils;-><clinit>()V
 HSPLcom/facebook/drawee/drawable/DrawableUtils;-><init>()V
@@ -1454,6 +1458,7 @@ HSPLcom/facebook/imagepipeline/core/ImagePipelineFactory;->getPlatformBitmapFact
 HSPLcom/facebook/imagepipeline/core/ImagePipelineFactory;->getPlatformDecoder()Lcom/facebook/imagepipeline/platform/PlatformDecoder;
 HSPLcom/facebook/imagepipeline/core/ImagePipelineFactory;->getProducerFactory()Lcom/facebook/imagepipeline/core/ProducerFactory;
 HSPLcom/facebook/imagepipeline/core/ImagePipelineFactory;->getProducerSequenceFactory()Lcom/facebook/imagepipeline/core/ProducerSequenceFactory;
+HSPLcom/facebook/imagepipeline/core/ImagePipelineFactory;->getXmlDrawableFactory()Lcom/facebook/imagepipeline/drawable/DrawableFactory;
 HSPLcom/facebook/imagepipeline/core/ImagePipelineFactory;->getXmlImageDecoder()Lcom/facebook/imagepipeline/decoder/ImageDecoder;
 HSPLcom/facebook/imagepipeline/core/ImagePipelineFactory;->initialize(Lcom/facebook/imagepipeline/core/ImagePipelineConfigInterface;)V
 Lcom/facebook/imagepipeline/core/NativeCodeSetup;
@@ -1572,6 +1577,7 @@ Lcom/facebook/imagepipeline/decoder/DefaultImageDecoder;
 HSPLcom/facebook/imagepipeline/decoder/DefaultImageDecoder;->-$$Nest$fgetmEnableEncodedImageColorSpaceUsage(Lcom/facebook/imagepipeline/decoder/DefaultImageDecoder;)Lcom/facebook/common/internal/Supplier;
 HSPLcom/facebook/imagepipeline/decoder/DefaultImageDecoder;-><init>(Lcom/facebook/imagepipeline/decoder/ImageDecoder;Lcom/facebook/imagepipeline/decoder/ImageDecoder;Lcom/facebook/imagepipeline/decoder/ImageDecoder;Lcom/facebook/imagepipeline/platform/PlatformDecoder;)V
 HSPLcom/facebook/imagepipeline/decoder/DefaultImageDecoder;-><init>(Lcom/facebook/imagepipeline/decoder/ImageDecoder;Lcom/facebook/imagepipeline/decoder/ImageDecoder;Lcom/facebook/imagepipeline/decoder/ImageDecoder;Lcom/facebook/imagepipeline/platform/PlatformDecoder;Ljava/util/Map;)V
+HSPLcom/facebook/imagepipeline/decoder/DefaultImageDecoder;-><init>(Lcom/facebook/imagepipeline/decoder/ImageDecoder;Lcom/facebook/imagepipeline/decoder/ImageDecoder;Lcom/facebook/imagepipeline/decoder/ImageDecoder;Lcom/facebook/imagepipeline/platform/PlatformDecoder;Ljava/util/Map;Lcom/facebook/common/internal/Supplier;)V
 HSPLcom/facebook/imagepipeline/decoder/DefaultImageDecoder;->decode(Lcom/facebook/imagepipeline/image/EncodedImage;ILcom/facebook/imagepipeline/image/QualityInfo;Lcom/facebook/imagepipeline/common/ImageDecodeOptions;)Lcom/facebook/imagepipeline/image/CloseableImage;
 HSPLcom/facebook/imagepipeline/decoder/DefaultImageDecoder;->decodeJpeg(Lcom/facebook/imagepipeline/image/EncodedImage;ILcom/facebook/imagepipeline/image/QualityInfo;Lcom/facebook/imagepipeline/common/ImageDecodeOptions;Landroid/graphics/ColorSpace;)Lcom/facebook/imagepipeline/image/CloseableStaticBitmap;
 Lcom/facebook/imagepipeline/decoder/DefaultImageDecoder$1;
@@ -2356,12 +2362,15 @@ Lcom/skydoves/landscapist/fresco/FrescoImageState$Failure;
 Lcom/skydoves/landscapist/fresco/FrescoImageState$Loading;
 HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Loading;-><clinit>()V
 HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Loading;-><init>()V
+HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Loading;->equals(Ljava/lang/Object;)Z
 Lcom/skydoves/landscapist/fresco/FrescoImageState$None;
 HSPLcom/skydoves/landscapist/fresco/FrescoImageState$None;-><clinit>()V
 HSPLcom/skydoves/landscapist/fresco/FrescoImageState$None;-><init>()V
+HSPLcom/skydoves/landscapist/fresco/FrescoImageState$None;->equals(Ljava/lang/Object;)Z
 Lcom/skydoves/landscapist/fresco/FrescoImageState$Success;
 HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Success;-><clinit>()V
 HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Success;-><init>(Landroidx/compose/ui/graphics/ImageBitmap;Lcom/skydoves/landscapist/DataSource;)V
+HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Success;->equals(Ljava/lang/Object;)Z
 HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Success;->getImageBitmap()Landroidx/compose/ui/graphics/ImageBitmap;
 Lcom/skydoves/landscapist/fresco/FrescoImageStateKt;
 HSPLcom/skydoves/landscapist/fresco/FrescoImageStateKt;->toFrescoImageState(Lcom/skydoves/landscapist/ImageLoadState;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/fresco/FrescoImageState;
