@@ -29,7 +29,7 @@ import com.skydoves.landscapist.plugins.ImagePlugin
  */
 @Immutable
 public class CrossfadePlugin(
-  private val duration: Int = 550,
+  private val duration: Int = 250,
 ) : ImagePlugin.PainterPlugin {
 
   @Composable
