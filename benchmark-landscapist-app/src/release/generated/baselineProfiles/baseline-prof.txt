@@ -573,7 +573,6 @@ HSPLandroidx/compose/animation/core/MutatorMutex$mutate$2;->create(Ljava/lang/Ob
 HSPLandroidx/compose/animation/core/MutatorMutex$mutate$2;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 HSPLandroidx/compose/animation/core/MutatorMutex$mutate$2;->invoke(Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 HSPLandroidx/compose/animation/core/MutatorMutex$mutate$2;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
-Landroidx/compose/animation/core/PreconditionsKt;
 Landroidx/compose/animation/core/RepeatMode;
 HSPLandroidx/compose/animation/core/RepeatMode;->$values()[Landroidx/compose/animation/core/RepeatMode;
 HSPLandroidx/compose/animation/core/RepeatMode;-><clinit>()V
@@ -1044,7 +1043,7 @@ HSPLandroidx/compose/foundation/layout/SizeElement;-><init>(FFFFZLkotlin/jvm/fun
 HSPLandroidx/compose/foundation/layout/SizeElement;-><init>(FFFFZLkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 HSPLandroidx/compose/foundation/layout/SizeElement;->create()Landroidx/compose/foundation/layout/SizeNode;
 HSPLandroidx/compose/foundation/layout/SizeElement;->create()Landroidx/compose/ui/Modifier$Node;
-HSPLandroidx/compose/foundation/layout/SizeElement;->equals(Ljava/lang/Object;)Z
+HPLandroidx/compose/foundation/layout/SizeElement;->equals(Ljava/lang/Object;)Z
 Landroidx/compose/foundation/layout/SizeKt;
 HSPLandroidx/compose/foundation/layout/SizeKt;-><clinit>()V
 HSPLandroidx/compose/foundation/layout/SizeKt;->fillMaxSize$default(Landroidx/compose/ui/Modifier;FILjava/lang/Object;)Landroidx/compose/ui/Modifier;
@@ -1267,7 +1266,7 @@ HSPLandroidx/compose/runtime/ComposerImpl;->updateProviderMapGroup(Landroidx/com
 HSPLandroidx/compose/runtime/ComposerImpl;->updateRememberedValue(Ljava/lang/Object;)V
 HSPLandroidx/compose/runtime/ComposerImpl;->updateSlot(Ljava/lang/Object;)V
 HSPLandroidx/compose/runtime/ComposerImpl;->updateValue(Ljava/lang/Object;)V
-HPLandroidx/compose/runtime/ComposerImpl;->updatedNodeCount(I)I
+HSPLandroidx/compose/runtime/ComposerImpl;->updatedNodeCount(I)I
 HSPLandroidx/compose/runtime/ComposerImpl;->useNode()V
 HSPLandroidx/compose/runtime/ComposerImpl;->validateNodeExpected()V
 HSPLandroidx/compose/runtime/ComposerImpl;->validateNodeNotExpected()V
@@ -1374,6 +1373,7 @@ HSPLandroidx/compose/runtime/CompositionImpl;->prepareCompose(Lkotlin/jvm/functi
 HSPLandroidx/compose/runtime/CompositionImpl;->recompose()Z
 HSPLandroidx/compose/runtime/CompositionImpl;->recomposeScopeReleased(Landroidx/compose/runtime/RecomposeScopeImpl;)V
 HSPLandroidx/compose/runtime/CompositionImpl;->recordModificationsOf(Ljava/util/Set;)V
+HSPLandroidx/compose/runtime/CompositionImpl;->recordReadOf(Ljava/lang/Object;)V
 HSPLandroidx/compose/runtime/CompositionImpl;->recordWriteOf(Ljava/lang/Object;)V
 HSPLandroidx/compose/runtime/CompositionImpl;->removeObservation$runtime_release(Ljava/lang/Object;Landroidx/compose/runtime/RecomposeScopeImpl;)V
 HSPLandroidx/compose/runtime/CompositionImpl;->setContent(Lkotlin/jvm/functions/Function2;)V
@@ -1867,6 +1867,7 @@ HSPLandroidx/compose/runtime/SlotReader;->beginEmpty()V
 HSPLandroidx/compose/runtime/SlotReader;->close()V
 HSPLandroidx/compose/runtime/SlotReader;->containsMark(I)Z
 HSPLandroidx/compose/runtime/SlotReader;->endEmpty()V
+HSPLandroidx/compose/runtime/SlotReader;->endGroup()V
 HSPLandroidx/compose/runtime/SlotReader;->extractKeys()Ljava/util/List;
 HSPLandroidx/compose/runtime/SlotReader;->getCurrentGroup()I
 HSPLandroidx/compose/runtime/SlotReader;->getGroupAux()Ljava/lang/Object;
@@ -13194,6 +13195,7 @@ HSPLcom/kmpalette/palette/internal/ColorCutQuantizer$Companion;-><init>(Lkotlin/
 HSPLcom/kmpalette/palette/internal/ColorCutQuantizer$Companion;->access$approximateToRgb888(Lcom/kmpalette/palette/internal/ColorCutQuantizer$Companion;I)I
 HSPLcom/kmpalette/palette/internal/ColorCutQuantizer$Companion;->access$quantizeFromRgb888(Lcom/kmpalette/palette/internal/ColorCutQuantizer$Companion;I)I
 HSPLcom/kmpalette/palette/internal/ColorCutQuantizer$Companion;->approximateToRgb888(I)I
+HSPLcom/kmpalette/palette/internal/ColorCutQuantizer$Companion;->approximateToRgb888(III)I
 HSPLcom/kmpalette/palette/internal/ColorCutQuantizer$Companion;->modifySignificantOctet([IIII)V
 HSPLcom/kmpalette/palette/internal/ColorCutQuantizer$Companion;->modifyWordWidth(III)I
 HSPLcom/kmpalette/palette/internal/ColorCutQuantizer$Companion;->quantizedBlue(I)I
@@ -15897,7 +15899,7 @@ HSPLkotlin/coroutines/CombinedContext;->contains(Lkotlin/coroutines/CoroutineCon
 HSPLkotlin/coroutines/CombinedContext;->containsAll(Lkotlin/coroutines/CombinedContext;)Z
 HSPLkotlin/coroutines/CombinedContext;->equals(Ljava/lang/Object;)Z
 HSPLkotlin/coroutines/CombinedContext;->fold(Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-HPLkotlin/coroutines/CombinedContext;->get(Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext$Element;
+HSPLkotlin/coroutines/CombinedContext;->get(Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext$Element;
 HSPLkotlin/coroutines/CombinedContext;->minusKey(Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext;
 HSPLkotlin/coroutines/CombinedContext;->plus(Lkotlin/coroutines/CoroutineContext;)Lkotlin/coroutines/CoroutineContext;
 HSPLkotlin/coroutines/CombinedContext;->size()I
@@ -15905,7 +15907,7 @@ Lkotlin/coroutines/Continuation;
 Lkotlin/coroutines/ContinuationInterceptor;
 HSPLkotlin/coroutines/ContinuationInterceptor;-><clinit>()V
 Lkotlin/coroutines/ContinuationInterceptor$DefaultImpls;
-HSPLkotlin/coroutines/ContinuationInterceptor$DefaultImpls;->get(Lkotlin/coroutines/ContinuationInterceptor;Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext$Element;
+HPLkotlin/coroutines/ContinuationInterceptor$DefaultImpls;->get(Lkotlin/coroutines/ContinuationInterceptor;Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext$Element;
 HSPLkotlin/coroutines/ContinuationInterceptor$DefaultImpls;->minusKey(Lkotlin/coroutines/ContinuationInterceptor;Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext;
 Lkotlin/coroutines/ContinuationInterceptor$Key;
 HSPLkotlin/coroutines/ContinuationInterceptor$Key;-><clinit>()V
@@ -16820,7 +16822,6 @@ Lkotlinx/coroutines/NotCompleted;
 Lkotlinx/coroutines/ParentJob;
 Lkotlinx/coroutines/ResumeAwaitOnCompletion;
 HSPLkotlinx/coroutines/ResumeAwaitOnCompletion;-><init>(Lkotlinx/coroutines/CancellableContinuationImpl;)V
-HSPLkotlinx/coroutines/ResumeAwaitOnCompletion;->getOnCancelling()Z
 HSPLkotlinx/coroutines/ResumeAwaitOnCompletion;->invoke(Ljava/lang/Throwable;)V
 Lkotlinx/coroutines/ResumeOnCompletion;
 HSPLkotlinx/coroutines/ResumeOnCompletion;-><init>(Lkotlin/coroutines/Continuation;)V
@@ -16943,7 +16944,6 @@ HSPLkotlinx/coroutines/channels/BufferedChannel;->onReceiveDequeued()V
 HSPLkotlinx/coroutines/channels/BufferedChannel;->onReceiveEnqueued()V
 HSPLkotlinx/coroutines/channels/BufferedChannel;->prepareReceiverForSuspension(Lkotlinx/coroutines/Waiter;Lkotlinx/coroutines/channels/ChannelSegment;I)V
 HSPLkotlinx/coroutines/channels/BufferedChannel;->removeUnprocessedElements(Lkotlinx/coroutines/channels/ChannelSegment;)V
-HSPLkotlinx/coroutines/channels/BufferedChannel;->resumeWaiterOnClosedChannel(Lkotlinx/coroutines/Waiter;Z)V
 HSPLkotlinx/coroutines/channels/BufferedChannel;->send$suspendImpl(Lkotlinx/coroutines/channels/BufferedChannel;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 HSPLkotlinx/coroutines/channels/BufferedChannel;->send(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 HSPLkotlinx/coroutines/channels/BufferedChannel;->shouldSendSuspend(J)Z
@@ -16951,7 +16951,6 @@ HSPLkotlinx/coroutines/channels/BufferedChannel;->tryResumeReceiver(Ljava/lang/O
 HSPLkotlinx/coroutines/channels/BufferedChannel;->trySend-JP2dKIU(Ljava/lang/Object;)Ljava/lang/Object;
 HSPLkotlinx/coroutines/channels/BufferedChannel;->updateCellReceive(Lkotlinx/coroutines/channels/ChannelSegment;IJLjava/lang/Object;)Ljava/lang/Object;
 HSPLkotlinx/coroutines/channels/BufferedChannel;->updateCellSend(Lkotlinx/coroutines/channels/ChannelSegment;ILjava/lang/Object;JLjava/lang/Object;Z)I
-HSPLkotlinx/coroutines/channels/BufferedChannel;->waitExpandBufferCompletion$kotlinx_coroutines_core(J)V
 Lkotlinx/coroutines/channels/BufferedChannel$BufferedChannelIterator;
 HSPLkotlinx/coroutines/channels/BufferedChannel$BufferedChannelIterator;-><init>(Lkotlinx/coroutines/channels/BufferedChannel;)V
 HSPLkotlinx/coroutines/channels/BufferedChannel$BufferedChannelIterator;->access$setContinuation$p(Lkotlinx/coroutines/channels/BufferedChannel$BufferedChannelIterator;Lkotlinx/coroutines/CancellableContinuationImpl;)V
@@ -16961,8 +16960,6 @@ HSPLkotlinx/coroutines/channels/BufferedChannel$BufferedChannelIterator;->invoke
 HSPLkotlinx/coroutines/channels/BufferedChannel$BufferedChannelIterator;->next()Ljava/lang/Object;
 HSPLkotlinx/coroutines/channels/BufferedChannel$BufferedChannelIterator;->onClosedHasNext()Z
 HSPLkotlinx/coroutines/channels/BufferedChannel$BufferedChannelIterator;->tryResumeHasNext(Ljava/lang/Object;)Z
-HSPLkotlinx/coroutines/channels/BufferedChannel$BufferedChannelIterator;->tryResumeHasNextOnClosedChannel()V
-Lkotlinx/coroutines/channels/BufferedChannel$SendBroadcast;
 Lkotlinx/coroutines/channels/BufferedChannelKt;
 HSPLkotlinx/coroutines/channels/BufferedChannelKt;-><clinit>()V
 HSPLkotlinx/coroutines/channels/BufferedChannelKt;->access$constructSendersAndCloseStatus(JI)J
@@ -16970,7 +16967,6 @@ HSPLkotlinx/coroutines/channels/BufferedChannelKt;->access$createSegment(JLkotli
 HSPLkotlinx/coroutines/channels/BufferedChannelKt;->access$getCLOSE_HANDLER_CLOSED$p()Lkotlinx/coroutines/internal/Symbol;
 HSPLkotlinx/coroutines/channels/BufferedChannelKt;->access$getCLOSE_HANDLER_INVOKED$p()Lkotlinx/coroutines/internal/Symbol;
 HSPLkotlinx/coroutines/channels/BufferedChannelKt;->access$getDONE_RCV$p()Lkotlinx/coroutines/internal/Symbol;
-HSPLkotlinx/coroutines/channels/BufferedChannelKt;->access$getEXPAND_BUFFER_COMPLETION_WAIT_ITERATIONS$p()I
 HSPLkotlinx/coroutines/channels/BufferedChannelKt;->access$getFAILED$p()Lkotlinx/coroutines/internal/Symbol;
 HSPLkotlinx/coroutines/channels/BufferedChannelKt;->access$getINTERRUPTED_SEND$p()Lkotlinx/coroutines/internal/Symbol;
 HSPLkotlinx/coroutines/channels/BufferedChannelKt;->access$getIN_BUFFER$p()Lkotlinx/coroutines/internal/Symbol;
@@ -17008,7 +17004,6 @@ HSPLkotlinx/coroutines/channels/ChannelCoroutine;->close(Ljava/lang/Throwable;)Z
 HSPLkotlinx/coroutines/channels/ChannelCoroutine;->getChannel()Lkotlinx/coroutines/channels/Channel;
 HSPLkotlinx/coroutines/channels/ChannelCoroutine;->get_channel()Lkotlinx/coroutines/channels/Channel;
 HSPLkotlinx/coroutines/channels/ChannelCoroutine;->invokeOnClose(Lkotlin/jvm/functions/Function1;)V
-HSPLkotlinx/coroutines/channels/ChannelCoroutine;->isClosedForSend()Z
 HSPLkotlinx/coroutines/channels/ChannelCoroutine;->iterator()Lkotlinx/coroutines/channels/ChannelIterator;
 HSPLkotlinx/coroutines/channels/ChannelCoroutine;->send(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 HSPLkotlinx/coroutines/channels/ChannelCoroutine;->trySend-JP2dKIU(Ljava/lang/Object;)Ljava/lang/Object;
@@ -17517,7 +17512,6 @@ HSPLkotlinx/coroutines/internal/FastServiceLoaderKt;->getANDROID_DETECTED()Z
 Lkotlinx/coroutines/internal/InlineList;
 HSPLkotlinx/coroutines/internal/InlineList;->constructor-impl$default(Ljava/lang/Object;ILkotlin/jvm/internal/DefaultConstructorMarker;)Ljava/lang/Object;
 HSPLkotlinx/coroutines/internal/InlineList;->constructor-impl(Ljava/lang/Object;)Ljava/lang/Object;
-HSPLkotlinx/coroutines/internal/InlineList;->plus-FjFbRPM(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 Lkotlinx/coroutines/internal/LimitedDispatcher;
 HSPLkotlinx/coroutines/internal/LimitedDispatcher;-><clinit>()V
 HSPLkotlinx/coroutines/internal/LimitedDispatcher;-><init>(Lkotlinx/coroutines/CoroutineDispatcher;ILjava/lang/String;)V
@@ -19045,7 +19039,6 @@ HSPLokio/AsyncTimeout;->access$getCompanion$p()Lokio/AsyncTimeout$Companion;
 HSPLokio/AsyncTimeout;->access$getCondition$cp()Ljava/util/concurrent/locks/Condition;
 HSPLokio/AsyncTimeout;->access$getHead$cp()Lokio/AsyncTimeout;
 HSPLokio/AsyncTimeout;->access$getIDLE_TIMEOUT_MILLIS$cp()J
-HSPLokio/AsyncTimeout;->access$getIDLE_TIMEOUT_NANOS$cp()J
 HSPLokio/AsyncTimeout;->access$getLock$cp()Ljava/util/concurrent/locks/ReentrantLock;
 HSPLokio/AsyncTimeout;->access$getNext$p(Lokio/AsyncTimeout;)Lokio/AsyncTimeout;
 HSPLokio/AsyncTimeout;->access$remainingNanos(Lokio/AsyncTimeout;J)J
