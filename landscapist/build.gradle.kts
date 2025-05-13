@@ -87,7 +87,7 @@ baselineProfile {
 
 tasks.withType<KotlinJvmCompile>().configureEach {
   compilerOptions {
-    jvmTarget.set(JvmTarget.JVM_1_8)
+    jvmTarget.set(JvmTarget.JVM_11)
 
   }
 }

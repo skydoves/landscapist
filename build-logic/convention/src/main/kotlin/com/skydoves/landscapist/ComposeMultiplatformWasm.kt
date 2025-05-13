@@ -34,6 +34,7 @@ internal fun Project.configureComposeMultiplatformWasm(
   kotlinMultiplatformExtension.apply {
     androidTarget { publishLibraryVariants("release") }
     jvm("desktop")
+    jvmToolchain(11)
     
     wasmJs {
       browser {
