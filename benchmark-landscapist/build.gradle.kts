@@ -39,6 +39,10 @@ android {
     targetCompatibility = JavaVersion.VERSION_17
   }
 
+  kotlinOptions {
+    jvmTarget = "17"
+  }
+
   targetProjectPath = ":benchmark-landscapist-app"
 
   testOptions.managedDevices.devices {
