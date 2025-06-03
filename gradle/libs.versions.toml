@@ -2,7 +2,7 @@
 kotlin = "2.1.10"
 dokka = "2.0.0"
 jvmTarget = "11"
-nexusPlugin = "0.30.0"
+nexusPlugin = "0.32.0"
 kotlinxCoroutines = "1.10.2"
 kotlinBinaryCompatibility = "0.17.0"
 androidGradlePlugin = "8.10.1"
