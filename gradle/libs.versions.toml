@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.1.10"
+kotlin = "2.1.21"
 dokka = "2.0.0"
 jvmTarget = "11"
 nexusPlugin = "0.32.0"
