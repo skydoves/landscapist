@@ -59,8 +59,8 @@ public final class com/skydoves/landscapist/coil3/CoilImageStateKt {
 public final class com/skydoves/landscapist/coil3/ComposableSingletons$CoilImageKt {
 	public static final field INSTANCE Lcom/skydoves/landscapist/coil3/ComposableSingletons$CoilImageKt;
 	public fun <init> ()V
-	public final fun getLambda-1$coil3_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$coil3_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1026879375$coil3_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$988760923$coil3_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/skydoves/landscapist/coil3/LocalCoilProviderKt {
