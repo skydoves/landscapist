@@ -50,7 +50,7 @@ kotlin {
       dependencies {
         api(project(":landscapist"))
         api(libs.coil3)
-        api(libs.coil3.network.ktor3)
+        api(libs.coil3.network.core)
         api(libs.kotlinx.serialization.json)
 
         implementation(compose.ui)
@@ -69,9 +69,14 @@ kotlin {
       }
     }
 
-    appleMain {
+    skiaMain {
       dependencies {
         api(libs.coil3.network.ktor3)
+      }
+    }
+
+    appleMain {
+      dependencies {
         api(libs.ktor.engine.darwin)
       }
     }

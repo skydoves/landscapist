@@ -28,6 +28,8 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.annotation.ExperimentalCoilApi
+import coil3.network.NetworkFetcher
+import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.ImageRequest
 import coil3.toBitmap
 import com.skydoves.landscapist.plugins.ImagePlugin
@@ -72,3 +74,5 @@ internal actual fun rememberImagePainter(image: Image, imagePlugins: List<ImageP
 internal fun bitmapPainter(image: Image): Painter {
   return BitmapPainter(image = image.toImageBitmap())
 }
+
+internal actual val networkFetcherFactory: NetworkFetcher.Factory = KtorNetworkFetcherFactory()
