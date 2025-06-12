@@ -96,6 +96,7 @@ HSPLcom/skydoves/landscapist/coil3/Platform;->$values()[Lcom/skydoves/landscapis
 HSPLcom/skydoves/landscapist/coil3/Platform;-><clinit>()V
 HSPLcom/skydoves/landscapist/coil3/Platform;-><init>(Ljava/lang/String;I)V
 Lcom/skydoves/landscapist/coil3/PlatformsKt;
+HSPLcom/skydoves/landscapist/coil3/PlatformsKt;-><clinit>()V
 HSPLcom/skydoves/landscapist/coil3/PlatformsKt;->buildImageRequest(Ljava/lang/Object;Lcoil3/request/ImageRequest$Listener;Landroidx/compose/runtime/Composer;I)Lcoil3/request/ImageRequest;
 HSPLcom/skydoves/landscapist/coil3/PlatformsKt;->getPlatform()Lcom/skydoves/landscapist/coil3/Platform;
 HSPLcom/skydoves/landscapist/coil3/PlatformsKt;->getPlatformContext(Landroidx/compose/runtime/Composer;I)Landroid/content/Context;
