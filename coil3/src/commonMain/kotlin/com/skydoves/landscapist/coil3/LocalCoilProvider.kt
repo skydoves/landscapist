@@ -20,7 +20,6 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
-import coil3.network.ktor3.KtorNetworkFetcherFactory
 
 /**
  * Local containing the preferred [ImageLoader] for providing the same instance
@@ -39,7 +38,7 @@ internal object LocalCoilProvider {
       if (getPlatform() == Platform.NonAndroid) {
         val defaultImageLoader = ImageLoader.Builder(platformContext)
           .components {
-            add(KtorNetworkFetcherFactory())
+            add(networkFetcherFactory)
           }
           .build()
         SingletonImageLoader.setSafe { defaultImageLoader }

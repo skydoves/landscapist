@@ -30,6 +30,8 @@ import coil3.PlatformContext
 import coil3.annotation.ExperimentalCoilApi
 import coil3.asDrawable
 import coil3.imageLoader
+import coil3.network.NetworkFetcher
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.ImageRequest
 import coil3.request.lifecycle
 import com.skydoves.landscapist.plugins.ImagePlugin
@@ -67,3 +69,5 @@ internal actual fun rememberImagePainter(image: Image, imagePlugins: List<ImageP
   val resource = platformContext.resources
   return rememberDrawablePainter(drawable = image.asDrawable(resource), imagePlugins = imagePlugins)
 }
+
+internal actual val networkFetcherFactory: NetworkFetcher.Factory = OkHttpNetworkFetcherFactory()
