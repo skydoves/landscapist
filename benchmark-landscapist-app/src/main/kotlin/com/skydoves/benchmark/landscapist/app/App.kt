@@ -21,7 +21,7 @@ import android.app.Application
 import android.content.Context
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
-import coil3.network.ktor3.KtorNetworkFetcherFactory
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import com.facebook.imagepipeline.core.DownsampleMode
@@ -47,7 +47,7 @@ class App : Application(), SingletonImageLoader.Factory {
   override fun newImageLoader(context: Context): ImageLoader {
     return ImageLoader.Builder(context)
       .components {
-        add(KtorNetworkFetcherFactory())
+        add(OkHttpNetworkFetcherFactory())
       }
       .build()
   }
