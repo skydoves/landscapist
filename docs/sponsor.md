@@ -22,14 +22,17 @@ These are the sponsors who have supported Landscapist.
 
 ### 🚀 Rocket Sponsor
 
-<a href="https://www.hemisphere.com/">
-    <img src="https://www.hemisphere.com/images/logo.png">
+<a href="https://www.coderabbit.ai/">
+    <img src="https://www.coderabbit.ai/_next/image?url=https%3A%2F%2Fvictorious-bubble-f69a016683.media.strapiapp.com%2FCr_logo_dark_f656abe8e3.png&w=384&q=75">
 </a>
-
 
 ### ✈️ Airplane Sponsor
 
 ### 🚢 Cruise Sponsor
+
+<a href="https://www.hemisphere.com/">
+    <img src="https://www.hemisphere.com/images/logo.png">
+</a>
 
 ### 🚂 Train Sponsor
 
