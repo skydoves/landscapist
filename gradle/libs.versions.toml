@@ -73,6 +73,8 @@ coil3-network-core = { group = "io.coil-kt.coil3", name = "coil-network-core", v
 coil3-network-ktor2 = { group = "io.coil-kt.coil3", name = "coil-network-ktor2", version.ref = "coil3" }
 coil3-network-ktor3 = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil3" }
 coil3-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil3" }
+coil3-gif = { group = "io.coil-kt.coil3", name = "coil-gif", version.ref = "coil3" }
+coil3-video = { group = "io.coil-kt.coil3", name = "coil-video", version.ref = "coil3" }
 ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 ktor-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 ktor-engine-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
