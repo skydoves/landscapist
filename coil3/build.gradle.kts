@@ -63,8 +63,8 @@ kotlin {
     androidMain {
       dependencies {
         api(libs.coil3.network.okhttp)
-        api(libs.coil.gif)
-        api(libs.coil.video)
+        api(libs.coil3.gif)
+        api(libs.coil3.video)
         api(libs.androidx.core.ktx)
       }
     }
