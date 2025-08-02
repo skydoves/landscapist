@@ -85,7 +85,7 @@ baselineProfile {
 
 tasks.withType<KotlinJvmCompile>().configureEach {
   compilerOptions {
-    jvmTarget.set(JvmTarget.JVM_11)
+    jvmTarget.set(JvmTarget.JVM_17)
     freeCompilerArgs.addAll(
       "-Xexplicit-api=strict",
       "-opt-in=kotlin.RequiresOptIn",

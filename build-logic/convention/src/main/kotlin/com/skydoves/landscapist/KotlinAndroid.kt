@@ -22,11 +22,11 @@ import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 /**
  * Configure base Kotlin with Android options
@@ -39,25 +39,25 @@ internal fun Project.configureKotlinAndroid(
   commonExtension.apply {
 
     compileOptions {
-      sourceCompatibility = JavaVersion.VERSION_11
-      targetCompatibility = JavaVersion.VERSION_11
+      sourceCompatibility = JavaVersion.VERSION_17
+      targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-      jvmTarget = libs.findVersion("jvmTarget").get().toString()
-      freeCompilerArgs = freeCompilerArgs + listOf(
-        "-opt-in=kotlin.RequiresOptIn",
-        "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-        "-opt-in=com.skydoves.landscapist.InternalLandscapistApi",
-      )
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
+      compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget(libs.findVersion("jvmTarget").get().toString()))
+        freeCompilerArgs.addAll(
+          listOf(
+            "-opt-in=kotlin.RequiresOptIn",
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-opt-in=com.skydoves.landscapist.InternalLandscapistApi",
+          )
+        )
+      }
     }
 
     lint {
       abortOnError = false
     }
   }
-}
-
-fun CommonExtension<*, *, *, *, *, *>.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
-  (this as ExtensionAware).extensions.configure("kotlinOptions", block)
 }
