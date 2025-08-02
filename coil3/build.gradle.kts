@@ -124,7 +124,7 @@ baselineProfile {
 
 tasks.withType<KotlinJvmCompile>().configureEach {
   compilerOptions {
-    jvmTarget.set(JvmTarget.JVM_11)
+    jvmTarget.set(JvmTarget.JVM_17)
     freeCompilerArgs.addAll(
       "-opt-in=coil3.annotation.ExperimentalCoilApi",
     )

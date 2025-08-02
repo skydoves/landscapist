@@ -16,7 +16,6 @@
 
 import com.github.skydoves.landscapist.Configuration
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
   id("landscapist.application.compose")
   id("landscapist.spotless")
