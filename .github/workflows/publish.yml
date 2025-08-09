@@ -20,11 +20,11 @@ jobs:
           java-version: 17
 
       - name: Release build
-        run: ./gradlew assemble --scan -x :coil:javaDocReleaseGeneration -x :benchmark-landscapist:pixel6api31Setup -x :benchmark-landscapist:pixel6api31NonMinifiedReleaseAndroidTest -x :benchmark-landscapist:collectNonMinifiedReleaseBaselineProfile
+        run: ./gradlew assemble --scan -x :benchmark-landscapist:pixel6api31Setup -x :benchmark-landscapist:pixel6api31NonMinifiedReleaseAndroidTest -x :benchmark-landscapist:collectNonMinifiedReleaseBaselineProfile
 
       - name: Publish to MavenCentral
         run: |
-          ./gradlew publishAllPublicationsToMavenCentral --no-configuration-cache
+          ./gradlew publishAllPublicationsToMavenCentral --no-configuration-cache -x :coil:javaDocReleaseGeneration
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
