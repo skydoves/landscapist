@@ -41,7 +41,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
       # Sets gradle up
       - name: Setup Gradle
