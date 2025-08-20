@@ -42,6 +42,12 @@ For comprehensive information about Landscapist, please refer to the **[official
 
 For the more details of the history, performance, customizability, and how to load network images and implement placeholders, animations, and transformations with Landscapist, check out [Optimized Image Loading for Compose and Kotlin Multiplatform](https://medium.com/proandroiddev/optimized-image-loading-for-compose-and-kotlin-multiplatform-a45eb2e710c0).
 
+## Sponsors 💝
+
+<a href="https://www.coderabbit.ai/?utm_source=github&utm_medium=referral&utm_content=&utm_campaign=Jaewoong_github_2025" target="_blank"> <img width="300" alt="coderabbit" src="https://www.coderabbit.ai/_next/image?url=https%3A%2F%2Fvictorious-bubble-f69a016683.media.strapiapp.com%2FCr_logo_dark_f656abe8e3.png&w=384&q=75" /></a>
+
+<a href="https://getstream.io/chat/sdk/android/?utm_source=github&utm_medium=referral&utm_content=&utm_campaign=Jaewoong_github_2025" target="_blank"> <img width="260" alt="stream" src="https://github.com/user-attachments/assets/87a69228-4fef-4f48-ad98-1e2c606c5b7e" /></a>
+
 ## Demo projects
 You can see the use cases of this library in the repositories below:
 - [google/modernstorage](https://github.com/google/modernstorage/tree/e62cda539ca75884dd49df3bcf8629751f0a91e6/sample): ModernStorage is a group of libraries that provide an abstraction layer over storage on Android to simplify its interactions.
