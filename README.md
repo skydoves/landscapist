@@ -42,7 +42,7 @@ For comprehensive information about Landscapist, please refer to the **[official
 
 For the more details of the history, performance, customizability, and how to load network images and implement placeholders, animations, and transformations with Landscapist, check out [Optimized Image Loading for Compose and Kotlin Multiplatform](https://medium.com/proandroiddev/optimized-image-loading-for-compose-and-kotlin-multiplatform-a45eb2e710c0).
 
-## Sponsors 💝
+## 💝 Sponsors
 
 <a href="https://www.coderabbit.ai/?utm_source=github&utm_medium=referral&utm_content=&utm_campaign=Jaewoong_github_2025" target="_blank"> <img width="300" alt="coderabbit" src="https://www.coderabbit.ai/_next/image?url=https%3A%2F%2Fvictorious-bubble-f69a016683.media.strapiapp.com%2FCr_logo_dark_f656abe8e3.png&w=384&q=75" /></a>
 
