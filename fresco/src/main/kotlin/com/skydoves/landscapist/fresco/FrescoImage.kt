@@ -245,7 +245,7 @@ private fun FrescoImage(
       suspendCancellableCoroutine { cont ->
         datasource.subscribe(subscriber, CallerThreadExecutor.getInstance())
 
-        cont.resume(subscriber.imageLoadStateFlow) {
+        cont.resume(subscriber.imageLoadStateFlow) { cause, _, _ ->
           // close the fresco datasource request if cancelled.
           datasource.close()
         }
