@@ -17,8 +17,8 @@ package com.skydoves.landscapist.animation.crossfade
 
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
@@ -43,9 +43,9 @@ internal fun updateFadeInTransition(key: Any, durationMs: Int): FadeInTransition
   }
 
   // Our actual transition, which reads our transitionState
-  val transition = updateTransition(
-    transitionState = transitionState,
-    label = "Image fadeIn",
+  val transition = rememberTransition(
+    transitionState,
+    "Image fadeIn",
   )
 
   // Alpha animates over the first 50%
