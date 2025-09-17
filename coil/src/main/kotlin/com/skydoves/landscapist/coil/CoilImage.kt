@@ -56,6 +56,8 @@ import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.constraints.Constrainable
 import com.skydoves.landscapist.constraints.constraint
+import com.skydoves.landscapist.crossfade.CrossfadePlugin
+import com.skydoves.landscapist.crossfade.CrossfadeWithEffect
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
 import kotlinx.coroutines.channels.trySendBlocking
@@ -221,58 +223,67 @@ public fun CoilImage(
       }
     }
 
-    when (coilImageState) {
-      is CoilImageState.None -> Unit
+    val crossfadePlugin = component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
 
-      is CoilImageState.Loading -> {
-        component.ComposeLoadingStatePlugins(
-          modifier = Modifier.constraint(this),
-          imageOptions = imageOptions,
-          executor = { size ->
-            CoilThumbnail(
-              requestSize = size,
-              recomposeKey = StableHolder(imageRequest.invoke()),
-              imageLoader = StableHolder(imageLoader.invoke()),
-              imageOptions = imageOptions,
-            )
-          },
-        )
-        loading?.invoke(this, coilImageState)
-      }
+    CrossfadeWithEffect(
+      targetState = coilImageState,
+      durationMs = crossfadePlugin?.duration ?: 0,
+      contentKey = { coilImageState },
+      enabled = crossfadePlugin != null,
+    ) {
+      when (coilImageState) {
+        is CoilImageState.None -> Unit
 
-      is CoilImageState.Failure -> {
-        component.ComposeFailureStatePlugins(
-          modifier = Modifier.constraint(this),
-          imageOptions = imageOptions,
-          reason = coilImageState.reason,
-        )
-        failure?.invoke(this, coilImageState)
-      }
-
-      is CoilImageState.Success -> {
-        component.ComposeSuccessStatePlugins(
-          modifier = Modifier.constraint(this),
-          imageModel = imageRequest.invoke().data,
-          imageOptions = imageOptions,
-          imageBitmap = coilImageState.drawable?.toBitmap()
-            ?.copy(Bitmap.Config.ARGB_8888, true)?.asImageBitmap(),
-        )
-
-        val drawable = coilImageState.drawable ?: return@ImageRequest
-        val painter = rememberDrawablePainter(
-          drawable = drawable,
-          imagePlugins = component.imagePlugins,
-        )
-
-        if (success != null) {
-          success.invoke(this, coilImageState, painter)
-        } else {
-          imageOptions.LandscapistImage(
-            modifier = Modifier
-              .constraint(this)
-              .testTag(imageOptions.tag),
-            painter = painter,
+        is CoilImageState.Loading -> {
+          component.ComposeLoadingStatePlugins(
+            modifier = Modifier.constraint(this),
+            imageOptions = imageOptions,
+            executor = { size ->
+              CoilThumbnail(
+                requestSize = size,
+                recomposeKey = StableHolder(imageRequest.invoke()),
+                imageLoader = StableHolder(imageLoader.invoke()),
+                imageOptions = imageOptions,
+              )
+            },
           )
+          loading?.invoke(this, coilImageState)
+        }
+
+        is CoilImageState.Failure -> {
+          component.ComposeFailureStatePlugins(
+            modifier = Modifier.constraint(this),
+            imageOptions = imageOptions,
+            reason = coilImageState.reason,
+          )
+          failure?.invoke(this, coilImageState)
+        }
+
+        is CoilImageState.Success -> {
+          component.ComposeSuccessStatePlugins(
+            modifier = Modifier.constraint(this),
+            imageModel = imageRequest.invoke().data,
+            imageOptions = imageOptions,
+            imageBitmap = coilImageState.drawable?.toBitmap()
+              ?.copy(Bitmap.Config.ARGB_8888, true)?.asImageBitmap(),
+          )
+
+          val drawable = coilImageState.drawable ?: return@CrossfadeWithEffect
+          val painter = rememberDrawablePainter(
+            drawable = drawable,
+            imagePlugins = component.imagePlugins,
+          )
+
+          if (success != null) {
+            success.invoke(this, coilImageState, painter)
+          } else {
+            imageOptions.LandscapistImage(
+              modifier = Modifier
+                .constraint(this)
+                .testTag(imageOptions.tag),
+              painter = painter,
+            )
+          }
         }
       }
     }

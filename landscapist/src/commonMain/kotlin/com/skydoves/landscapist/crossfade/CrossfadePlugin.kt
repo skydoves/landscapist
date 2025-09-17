@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist.animation.crossfade
+package com.skydoves.landscapist.crossfade
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -21,21 +21,23 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import com.skydoves.landscapist.plugins.ImagePlugin
 
-@Deprecated(
-  message = "CrossfadePlugin has moved to com.skydoves.landscapist.crossfade package.",
-  replaceWith = ReplaceWith("com.skydoves.landscapist.crossfade.CrossfadePlugin"),
-  level = DeprecationLevel.ERROR,
-)
+/**
+ * CrossfadePlugin adds crossfade animation while rendering an image.
+ * An image plugin that extends [ImagePlugin.PainterPlugin] to be executed while rendering painters.
+ *
+ * @property duration milli-second times from start to finish animation.
+ */
 @Immutable
 public data class CrossfadePlugin(
   public val duration: Int = 250,
 ) : ImagePlugin.PainterPlugin {
 
+  init {
+    require(duration >= 0) { "CrossfadePlugin.duration must be >= 0" }
+  }
+
   @Composable
-  override fun compose(
-    imageBitmap: ImageBitmap,
-    painter: Painter,
-  ): Painter {
+  override fun compose(imageBitmap: ImageBitmap, painter: Painter): Painter {
     return painter
   }
 }
