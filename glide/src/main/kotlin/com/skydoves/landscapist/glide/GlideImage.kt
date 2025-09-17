@@ -200,7 +200,7 @@ public fun GlideImage(
         is GlideImageState.Success -> {
           component.ComposeSuccessStatePlugins(
             modifier = Modifier.constraint(this),
-            imageModel = imageModel,
+            imageModel = imageModel.invoke(),
             imageOptions = imageOptions,
             imageBitmap = glideImageState.data.toImageBitmap(
               glideRequestType = glideRequestType,

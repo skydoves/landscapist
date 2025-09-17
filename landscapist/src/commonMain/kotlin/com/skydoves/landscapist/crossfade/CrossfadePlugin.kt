@@ -32,6 +32,10 @@ public data class CrossfadePlugin(
   public val duration: Int = 250,
 ) : ImagePlugin.PainterPlugin {
 
+  init {
+    require(duration >= 0) { "CrossfadePlugin.duration must be >= 0" }
+  }
+
   @Composable
   override fun compose(imageBitmap: ImageBitmap, painter: Painter): Painter {
     return painter

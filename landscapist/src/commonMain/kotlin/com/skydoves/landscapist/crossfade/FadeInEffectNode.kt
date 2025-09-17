@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.InspectorInfo
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -54,14 +55,10 @@ private class FadeInEffectNode(
           brightness.snapTo(0.8f)
           saturation.snapTo(0f)
 
-          launch {
-            alpha.animateTo(1f, tween(durationMillis = durationMs / 2))
-          }
-          launch {
-            brightness.animateTo(1f, tween(durationMillis = durationMs * 3 / 4))
-          }
-          launch {
-            saturation.animateTo(1f, tween(durationMillis = durationMs))
+          coroutineScope {
+            launch { alpha.animateTo(1f, tween(durationMillis = durationMs / 2)) }
+            launch { brightness.animateTo(1f, tween(durationMillis = durationMs * 3 / 4)) }
+            launch { saturation.animateTo(1f, tween(durationMillis = durationMs)) }
           }
         }
     }
