@@ -46,6 +46,8 @@ import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.constraints.constraint
+import com.skydoves.landscapist.crossfade.CrossfadePlugin
+import com.skydoves.landscapist.crossfade.CrossfadeWithEffect
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberBitmapPainter
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -122,64 +124,73 @@ public fun FrescoImage(
     modifier = modifier,
   ) ImageRequest@{ imageState ->
 
-    val state: FrescoImageState = imageState.toFrescoImageState()
-    val frescoImageState = remember(state) {
-      state.apply {
-        onImageStateChanged.invoke(this)
-      }
-    }
+    val crossfadePlugin = component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
 
-    when (frescoImageState) {
-      is FrescoImageState.None -> Unit
-
-      is FrescoImageState.Loading -> {
-        component.ComposeLoadingStatePlugins(
-          modifier = Modifier.constraint(this),
-          imageOptions = imageOptions,
-          executor = { size ->
-            FrescoImageThumbnail(
-              requestSize = size,
-              recomposeKey = imageUrl,
-              imageOptions = imageOptions,
-              imageRequest = StableHolder(imageRequest.invoke()),
-            )
-          },
-        )
-        loading?.invoke(this, frescoImageState)
+    CrossfadeWithEffect(
+      targetState = imageState,
+      durationMs = crossfadePlugin?.duration ?: 0,
+      contentKey = { imageState },
+      enabled = crossfadePlugin != null,
+    ) {
+      val state: FrescoImageState = imageState.toFrescoImageState()
+      val frescoImageState = remember(state) {
+        state.apply {
+          onImageStateChanged.invoke(this)
+        }
       }
 
-      is FrescoImageState.Failure -> {
-        component.ComposeFailureStatePlugins(
-          modifier = Modifier.constraint(this),
-          imageOptions = imageOptions,
-          reason = frescoImageState.reason,
-        )
-        failure?.invoke(this, frescoImageState)
-      }
+      when (frescoImageState) {
+        is FrescoImageState.None -> Unit
 
-      is FrescoImageState.Success -> {
-        component.ComposeSuccessStatePlugins(
-          modifier = Modifier.constraint(this),
-          imageModel = imageUrl,
-          imageOptions = imageOptions,
-          imageBitmap = frescoImageState.imageBitmap,
-        )
-
-        val imageBitmap = frescoImageState.imageBitmap ?: return@ImageRequest
-        val painter = rememberBitmapPainter(
-          imagePlugins = component.imagePlugins,
-          imageBitmap = imageBitmap,
-        )
-
-        if (success != null) {
-          success.invoke(this, frescoImageState, painter)
-        } else {
-          imageOptions.LandscapistImage(
-            modifier = Modifier
-              .constraint(this)
-              .testTag(imageOptions.tag),
-            painter = painter,
+        is FrescoImageState.Loading -> {
+          component.ComposeLoadingStatePlugins(
+            modifier = Modifier.constraint(this),
+            imageOptions = imageOptions,
+            executor = { size ->
+              FrescoImageThumbnail(
+                requestSize = size,
+                recomposeKey = imageUrl,
+                imageOptions = imageOptions,
+                imageRequest = StableHolder(imageRequest.invoke()),
+              )
+            },
           )
+          loading?.invoke(this, frescoImageState)
+        }
+
+        is FrescoImageState.Failure -> {
+          component.ComposeFailureStatePlugins(
+            modifier = Modifier.constraint(this),
+            imageOptions = imageOptions,
+            reason = frescoImageState.reason,
+          )
+          failure?.invoke(this, frescoImageState)
+        }
+
+        is FrescoImageState.Success -> {
+          component.ComposeSuccessStatePlugins(
+            modifier = Modifier.constraint(this),
+            imageModel = imageUrl,
+            imageOptions = imageOptions,
+            imageBitmap = frescoImageState.imageBitmap,
+          )
+
+          val imageBitmap = frescoImageState.imageBitmap ?: return@CrossfadeWithEffect
+          val painter = rememberBitmapPainter(
+            imagePlugins = component.imagePlugins,
+            imageBitmap = imageBitmap,
+          )
+
+          if (success != null) {
+            success.invoke(this, frescoImageState, painter)
+          } else {
+            imageOptions.LandscapistImage(
+              modifier = Modifier
+                .constraint(this)
+                .testTag(imageOptions.tag),
+              painter = painter,
+            )
+          }
         }
       }
     }

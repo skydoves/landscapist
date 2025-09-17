@@ -25,7 +25,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -49,6 +48,8 @@ import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.constraints.constraint
+import com.skydoves.landscapist.crossfade.CrossfadePlugin
+import com.skydoves.landscapist.crossfade.CrossfadeWithEffect
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberBitmapPainter
 import com.skydoves.landscapist.rememberDrawablePainter
@@ -152,74 +153,83 @@ public fun GlideImage(
     modifier = modifier,
   ) ImageRequest@{ imageState ->
 
-    val glideImageState: GlideImageState = remember(imageState) {
-      imageState.toGlideImageState(
-        glideRequestType = glideRequestType,
-      ).apply { onImageStateChanged.invoke(this) }
-    }
+    val crossfadePlugin = component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
 
-    when (glideImageState) {
-      is GlideImageState.None -> Unit
-
-      is GlideImageState.Loading -> {
-        component.ComposeLoadingStatePlugins(
-          modifier = Modifier.constraint(this),
-          imageOptions = imageOptions,
-          executor = { size ->
-            GlideThumbnail(
-              requestSize = size,
-              recomposeKey = StableHolder(imageModel.invoke()),
-              imageOptions = imageOptions,
-              builder = StableHolder(
-                requestBuilder.invoke().load(imageModel.invoke()) as RequestBuilder<Any>,
-              ),
-            )
-          },
-        )
-        loading?.invoke(this, glideImageState)
+    CrossfadeWithEffect(
+      targetState = imageState,
+      durationMs = crossfadePlugin?.duration ?: 0,
+      contentKey = { imageState },
+      enabled = crossfadePlugin != null,
+    ) {
+      val glideImageState: GlideImageState = remember(imageState) {
+        imageState.toGlideImageState(
+          glideRequestType = glideRequestType,
+        ).apply { onImageStateChanged.invoke(this) }
       }
 
-      is GlideImageState.Failure -> {
-        component.ComposeFailureStatePlugins(
-          modifier = Modifier.constraint(this),
-          imageOptions = imageOptions,
-          reason = glideImageState.reason,
-        )
-        failure?.invoke(this, glideImageState)
-      }
+      when (glideImageState) {
+        is GlideImageState.None -> Unit
 
-      is GlideImageState.Success -> {
-        component.ComposeSuccessStatePlugins(
-          modifier = Modifier.constraint(this),
-          imageModel = imageModel,
-          imageOptions = imageOptions,
-          imageBitmap = glideImageState.data.toImageBitmap(
-            glideRequestType = glideRequestType,
-          ),
-        )
-
-        val data = glideImageState.data ?: return@ImageRequest
-        val painter = if (data is Drawable) {
-          rememberDrawablePainter(
-            drawable = data,
-            imagePlugins = component.imagePlugins,
+        is GlideImageState.Loading -> {
+          component.ComposeLoadingStatePlugins(
+            modifier = Modifier.constraint(this),
+            imageOptions = imageOptions,
+            executor = { size ->
+              GlideThumbnail(
+                requestSize = size,
+                recomposeKey = StableHolder(imageModel.invoke()),
+                imageOptions = imageOptions,
+                builder = StableHolder(
+                  requestBuilder.invoke().load(imageModel.invoke()) as RequestBuilder<Any>,
+                ),
+              )
+            },
           )
-        } else {
-          rememberBitmapPainter(
-            imageBitmap = data.toImageBitmap(glideRequestType = glideRequestType),
-            imagePlugins = component.imagePlugins,
-          )
+          loading?.invoke(this, glideImageState)
         }
 
-        if (success != null) {
-          success.invoke(this, glideImageState, painter)
-        } else {
-          imageOptions.LandscapistImage(
-            modifier = Modifier
-              .constraint(this)
-              .testTag(imageOptions.tag),
-            painter = painter,
+        is GlideImageState.Failure -> {
+          component.ComposeFailureStatePlugins(
+            modifier = Modifier.constraint(this),
+            imageOptions = imageOptions,
+            reason = glideImageState.reason,
           )
+          failure?.invoke(this, glideImageState)
+        }
+
+        is GlideImageState.Success -> {
+          component.ComposeSuccessStatePlugins(
+            modifier = Modifier.constraint(this),
+            imageModel = imageModel,
+            imageOptions = imageOptions,
+            imageBitmap = glideImageState.data.toImageBitmap(
+              glideRequestType = glideRequestType,
+            ),
+          )
+
+          val data = glideImageState.data ?: return@CrossfadeWithEffect
+          val painter = if (data is Drawable) {
+            rememberDrawablePainter(
+              drawable = data,
+              imagePlugins = component.imagePlugins,
+            )
+          } else {
+            rememberBitmapPainter(
+              imageBitmap = data.toImageBitmap(glideRequestType = glideRequestType),
+              imagePlugins = component.imagePlugins,
+            )
+          }
+
+          if (success != null) {
+            success.invoke(this, glideImageState, painter)
+          } else {
+            imageOptions.LandscapistImage(
+              modifier = Modifier
+                .constraint(this)
+                .testTag(imageOptions.tag),
+              painter = painter,
+            )
+          }
         }
       }
     }

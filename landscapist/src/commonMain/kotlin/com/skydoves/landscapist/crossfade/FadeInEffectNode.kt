@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist.animation.crossfade
+package com.skydoves.landscapist.crossfade
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -30,49 +30,51 @@ import androidx.compose.ui.platform.InspectorInfo
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-private class FadeOutEffectNode(
+private class FadeInEffectNode(
   var key: Any,
   var durationMs: Int,
 ) : Modifier.Node(), DrawModifierNode {
 
-  // Initial values are set to the "fully visible" state
-  private val alpha = Animatable(1f)
-  private val brightness = Animatable(1f)
-  private val saturation = Animatable(1f)
+  private val alpha = Animatable(0f)
+  private val brightness = Animatable(0.8f)
+  private val saturation = Animatable(0f)
 
   private val colorMatrix = ColorMatrix()
   private val paint = Paint()
 
+  // This gets called when the node is first attached or when the coroutineScope is available
   override fun onAttach() {
     coroutineScope.launch {
+      // snapshotFlow observes changes to our `key` state.
+      // collectLatest ensures that if the key changes mid-animation,
+      // the old animation is cancelled and the new one starts.
       snapshotFlow { key }
         .collectLatest {
-          // Reset to the starting (visible) state before animating out
-          alpha.snapTo(1f)
-          brightness.snapTo(1f)
-          saturation.snapTo(1f)
+          alpha.snapTo(0f)
+          brightness.snapTo(0.8f)
+          saturation.snapTo(0f)
 
-          // Launch animations to fade out
           launch {
-            alpha.animateTo(0f, tween(durationMillis = durationMs / 2))
+            alpha.animateTo(1f, tween(durationMillis = durationMs / 2))
           }
           launch {
-            brightness.animateTo(0.8f, tween(durationMillis = durationMs * 3 / 4))
+            brightness.animateTo(1f, tween(durationMillis = durationMs * 3 / 4))
           }
           launch {
-            saturation.animateTo(0f, tween(durationMillis = durationMs))
+            saturation.animateTo(1f, tween(durationMillis = durationMs))
           }
         }
     }
   }
 
+  // This is the draw implementation from DrawModifierNode
   override fun ContentDrawScope.draw() {
     val alphaValue = alpha.value
     val brightnessValue = brightness.value
     val saturationValue = saturation.value
 
-    // Apply effects as long as the content is not fully transparent
-    if (alphaValue > 0f) {
+    // If animation is running, apply effects. Otherwise, just draw content.
+    if (alphaValue < 1f || brightnessValue < 1f || saturationValue < 1f) {
       colorMatrix.apply {
         updateBrightness(brightnessValue)
         updateSaturation(saturationValue)
@@ -83,32 +85,33 @@ private class FadeOutEffectNode(
       drawContext.canvas.saveLayer(size.toRect(), paint)
       drawContent()
       drawContext.canvas.restore()
+    } else {
+      drawContent()
     }
-    // If alpha is 0, we don't need to draw anything.
   }
 }
 
-private data class FadeOutEffectElement(
+private data class FadeInEffectElement(
   val key: Any,
   val durationMs: Int,
-) : ModifierNodeElement<FadeOutEffectNode>() {
+) : ModifierNodeElement<FadeInEffectNode>() {
 
-  override fun create(): FadeOutEffectNode {
-    return FadeOutEffectNode(key, durationMs)
+  override fun create(): FadeInEffectNode {
+    return FadeInEffectNode(key, durationMs)
   }
 
-  override fun update(node: FadeOutEffectNode) {
+  override fun update(node: FadeInEffectNode) {
     node.key = key
     node.durationMs = durationMs
   }
 
   override fun InspectorInfo.inspectableProperties() {
-    name = "fadeOutWithEffect"
+    name = "fadeInWithEffect"
     properties["key"] = key
     properties["durationMs"] = durationMs
   }
 }
 
-internal fun Modifier.fadeOutWithEffect(key: Any, durationMs: Int): Modifier {
-  return this.then(FadeOutEffectElement(key, durationMs))
+internal fun Modifier.fadeInWithEffect(key: Any, durationMs: Int): Modifier {
+  return this.then(FadeInEffectElement(key, durationMs))
 }
