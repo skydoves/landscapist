@@ -28,7 +28,7 @@ import com.skydoves.landscapist.plugins.ImagePlugin
  * @property duration milli-second times from start to finish animation.
  */
 @Immutable
-public class CrossfadePlugin(
+public data class CrossfadePlugin(
   private val duration: Int = 250,
 ) : ImagePlugin.PainterPlugin {
 

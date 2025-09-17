@@ -30,5 +30,10 @@ public final class com/skydoves/landscapist/animation/crossfade/CrossfadePlugin 
 	public fun <init> (I)V
 	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun compose (Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/ui/graphics/painter/Painter;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
+	public final fun copy (I)Lcom/skydoves/landscapist/animation/crossfade/CrossfadePlugin;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/animation/crossfade/CrossfadePlugin;IILjava/lang/Object;)Lcom/skydoves/landscapist/animation/crossfade/CrossfadePlugin;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 

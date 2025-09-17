@@ -76,11 +76,72 @@ internal fun updateFadeInTransition(key: Any, durationMs: Int): FadeInTransition
   }
 }
 
+/**
+ * Update fadeOut transition.
+ *
+ * This animation reverses the fadeIn effect, transitioning an image from
+ * a loaded state to an empty (or transparent) state.
+ */
+@Composable
+internal fun updateFadeOutTransition(key: Any, durationMs: Int): FadeOutTransition {
+  // Create our transition state, starting from Loaded and targeting Empty.
+  val transitionState = remember(key) {
+    MutableTransitionState(ImageLoadTransitionState.Loaded).apply {
+      targetState = ImageLoadTransitionState.Empty
+    }
+  }
+
+  // Our actual transition, which reads our transitionState
+  val transition = rememberTransition(
+    transitionState,
+    "Image fadeOut",
+  )
+
+  // Alpha animates from 1f to 0f over the first 50%
+  val alpha = transition.animateFloat(
+    transitionSpec = { tween(durationMillis = durationMs / 2) },
+    targetValueByState = { if (it == ImageLoadTransitionState.Loaded) 1f else 0f },
+    label = "Image fadeOut alpha",
+  )
+
+  // Brightness animates from 1f to 0.8f over the first 75%
+  val brightness = transition.animateFloat(
+    transitionSpec = { tween(durationMillis = durationMs * 3 / 4) },
+    targetValueByState = { if (it == ImageLoadTransitionState.Loaded) 1f else 0.8f },
+    label = "Image fadeOut brightness",
+  )
+
+  // Saturation animates from 1f to 0f over the whole duration
+  val saturation = transition.animateFloat(
+    transitionSpec = { tween(durationMillis = durationMs) },
+    targetValueByState = { if (it == ImageLoadTransitionState.Loaded) 1f else 0f },
+    label = "Image fadeOut saturation",
+  )
+
+  return remember(transition) {
+    FadeOutTransition(alpha, brightness, saturation)
+  }.apply {
+    this.isFinished = transitionState.currentState == ImageLoadTransitionState.Empty
+  }
+}
+
 @Stable
 internal class FadeInTransition(
   alpha: State<Float> = mutableStateOf(0f),
   brightness: State<Float> = mutableStateOf(0f),
   saturation: State<Float> = mutableStateOf(0f),
+) {
+  val alpha by alpha
+  val brightness by brightness
+  val saturation by saturation
+  var isFinished by mutableStateOf(false)
+}
+
+@Stable
+internal class FadeOutTransition(
+  alpha: State<Float> = mutableStateOf(1f),
+  brightness: State<Float> = mutableStateOf(1f),
+  saturation: State<Float> = mutableStateOf(1f),
 ) {
   val alpha by alpha
   val brightness by brightness
