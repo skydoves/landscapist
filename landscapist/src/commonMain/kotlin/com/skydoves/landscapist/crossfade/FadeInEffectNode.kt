@@ -17,6 +17,9 @@ package com.skydoves.landscapist.crossfade
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.toRect
@@ -32,7 +35,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 private class FadeInEffectNode(
-  var key: Any,
+  var key: State<Any>,
   var durationMs: Int,
 ) : Modifier.Node(), DrawModifierNode {
 
@@ -89,7 +92,7 @@ private class FadeInEffectNode(
 }
 
 private data class FadeInEffectElement(
-  val key: Any,
+  val key: State<Any>,
   val durationMs: Int,
 ) : ModifierNodeElement<FadeInEffectNode>() {
 
@@ -104,11 +107,13 @@ private data class FadeInEffectElement(
 
   override fun InspectorInfo.inspectableProperties() {
     name = "fadeInWithEffect"
-    properties["key"] = key
+    properties["key"] = key.value
     properties["durationMs"] = durationMs
   }
 }
 
+@Composable
 internal fun Modifier.fadeInWithEffect(key: Any, durationMs: Int): Modifier {
-  return this.then(FadeInEffectElement(key, durationMs))
+  val state: State<Any> = mutableStateOf(key)
+  return this.then(FadeInEffectElement(state, durationMs))
 }
