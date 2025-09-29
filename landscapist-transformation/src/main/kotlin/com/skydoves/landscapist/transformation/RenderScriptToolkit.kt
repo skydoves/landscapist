@@ -280,7 +280,7 @@ internal object RenderScriptToolkit {
   private var nativeHandle: Long = 0
 
   init {
-    System.loadLibrary("renderscript-toolkit")
+    System.loadLibrary("landscapist-renderscript-toolkit")
     nativeHandle = createNative()
   }
 

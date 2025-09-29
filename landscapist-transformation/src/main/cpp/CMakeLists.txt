@@ -59,7 +59,7 @@ endif ()
 # Gradle automatically packages shared libraries with your APK.
 
 add_library(# Sets the name of the library.
-        renderscript-toolkit
+        landscapist-renderscript-toolkit
         # Sets the library as a shared library.
         SHARED
         # Provides a relative path to your source file(s).
@@ -88,7 +88,7 @@ find_library(# Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries(# Specifies the target library.
-        renderscript-toolkit
+        landscapist-renderscript-toolkit
 
         cpufeatures
         jnigraphics
