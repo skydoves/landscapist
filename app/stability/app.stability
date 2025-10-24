@@ -6,11 +6,11 @@
 
 @Composable
 public fun com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme(darkTheme: kotlin.Boolean, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - darkTheme: STABLE (primitive type)
-    - content: RUNTIME (requires runtime check)
+    - content: STABLE (composable function type)
 
 @Composable
 private fun com.github.skydoves.landscapistdemo.ui.ColorPalettes(palette: com.kmpalette.palette.graphics.Palette): kotlin.Unit

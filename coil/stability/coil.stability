@@ -11,7 +11,7 @@ public fun com.skydoves.landscapist.coil.CoilImage(imageModel: kotlin.Function0<
   params:
     - imageModel: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
-    - imageLoader: RUNTIME (requires runtime check)
+    - imageLoader: STABLE (composable function type)
 
 @Composable
 public fun com.skydoves.landscapist.coil.CoilImage(imageRequest: kotlin.Function0<coil.request.ImageRequest>, modifier: androidx.compose.ui.Modifier, imageLoader: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<coil.ImageLoader>): kotlin.Unit
@@ -20,18 +20,18 @@ public fun com.skydoves.landscapist.coil.CoilImage(imageRequest: kotlin.Function
   params:
     - imageRequest: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
-    - imageLoader: RUNTIME (requires runtime check)
+    - imageLoader: STABLE (composable function type)
 
 @Composable
 private fun com.skydoves.landscapist.coil.CoilImage(recomposeKey: com.skydoves.landscapist.StableHolder<coil.request.ImageRequest>, modifier: androidx.compose.ui.Modifier, imageOptions: com.skydoves.landscapist.ImageOptions, imageLoader: com.skydoves.landscapist.StableHolder<coil.ImageLoader>, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxWithConstraintsScope, @[ParameterName(name = \): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - recomposeKey: STABLE (marked @Stable or @Immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
     - imageOptions: STABLE (marked @Stable or @Immutable)
     - imageLoader: STABLE (marked @Stable or @Immutable)
-    - content: RUNTIME (requires runtime check)
+    - content: STABLE (composable function type)
 
 @Composable
 private fun com.skydoves.landscapist.coil.CoilThumbnail(requestSize: androidx.compose.ui.unit.IntSize, recomposeKey: com.skydoves.landscapist.StableHolder<coil.request.ImageRequest>, imageOptions: com.skydoves.landscapist.ImageOptions, imageLoader: com.skydoves.landscapist.StableHolder<coil.ImageLoader>): kotlin.Unit

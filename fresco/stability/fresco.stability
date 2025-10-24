@@ -11,18 +11,18 @@ public fun com.skydoves.landscapist.fresco.FrescoImage(imageUrl: kotlin.String?,
   params:
     - imageUrl: STABLE
     - modifier: STABLE (marked @Stable or @Immutable)
-    - imageRequest: RUNTIME (requires runtime check)
+    - imageRequest: STABLE (composable function type)
 
 @Composable
 private fun com.skydoves.landscapist.fresco.FrescoImage(recomposeKey: kotlin.String?, imageOptions: com.skydoves.landscapist.ImageOptions, imageRequest: com.skydoves.landscapist.StableHolder<com.facebook.imagepipeline.request.ImageRequestBuilder>, modifier: androidx.compose.ui.Modifier, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxWithConstraintsScope, @[ParameterName(name = \): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - recomposeKey: STABLE
     - imageOptions: STABLE (marked @Stable or @Immutable)
     - imageRequest: STABLE (marked @Stable or @Immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
-    - content: RUNTIME (requires runtime check)
+    - content: STABLE (composable function type)
 
 @Composable
 private fun com.skydoves.landscapist.fresco.FrescoImageThumbnail(requestSize: androidx.compose.ui.unit.IntSize, recomposeKey: kotlin.String?, imageOptions: com.skydoves.landscapist.ImageOptions, imageRequest: com.skydoves.landscapist.StableHolder<com.facebook.imagepipeline.request.ImageRequestBuilder>): kotlin.Unit
