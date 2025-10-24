@@ -5,22 +5,37 @@
 //   ./gradlew :coil:stabilityDump
 
 @Composable
-public fun com.skydoves.landscapist.coil.CoilImage(imageModel: kotlin.Function0<kotlin.Any?>, modifier: androidx.compose.ui.Modifier, imageLoader: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<coil.ImageLoader>): kotlin.Unit
+public fun com.skydoves.landscapist.coil.CoilImage(imageModel: kotlin.Function0<kotlin.Any?>, modifier: androidx.compose.ui.Modifier, imageLoader: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<coil.ImageLoader>, component: com.skydoves.landscapist.components.ImageComponent, requestListener: kotlin.Function0<coil.request.ImageRequest.Listener>?, imageOptions: com.skydoves.landscapist.ImageOptions, onImageStateChanged: kotlin.Function1<com.skydoves.landscapist.coil.CoilImageState, kotlin.Unit>, previewPlaceholder: androidx.compose.ui.graphics.painter.Painter?, loading: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, success: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction3<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, failure: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - imageModel: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
     - imageLoader: STABLE (composable function type)
+    - component: STABLE (marked @Stable or @Immutable)
+    - requestListener: STABLE (function type)
+    - imageOptions: STABLE (marked @Stable or @Immutable)
+    - onImageStateChanged: STABLE (function type)
+    - previewPlaceholder: RUNTIME (requires runtime check)
+    - loading: STABLE (composable function type)
+    - success: STABLE (composable function type)
+    - failure: STABLE (composable function type)
 
 @Composable
-public fun com.skydoves.landscapist.coil.CoilImage(imageRequest: kotlin.Function0<coil.request.ImageRequest>, modifier: androidx.compose.ui.Modifier, imageLoader: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<coil.ImageLoader>): kotlin.Unit
+public fun com.skydoves.landscapist.coil.CoilImage(imageRequest: kotlin.Function0<coil.request.ImageRequest>, modifier: androidx.compose.ui.Modifier, imageLoader: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<coil.ImageLoader>, component: com.skydoves.landscapist.components.ImageComponent, imageOptions: com.skydoves.landscapist.ImageOptions, onImageStateChanged: kotlin.Function1<com.skydoves.landscapist.coil.CoilImageState, kotlin.Unit>, previewPlaceholder: androidx.compose.ui.graphics.painter.Painter?, loading: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, success: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction3<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, failure: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - imageRequest: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
     - imageLoader: STABLE (composable function type)
+    - component: STABLE (marked @Stable or @Immutable)
+    - imageOptions: STABLE (marked @Stable or @Immutable)
+    - onImageStateChanged: STABLE (function type)
+    - previewPlaceholder: RUNTIME (requires runtime check)
+    - loading: STABLE (composable function type)
+    - success: STABLE (composable function type)
+    - failure: STABLE (composable function type)
 
 @Composable
 private fun com.skydoves.landscapist.coil.CoilImage(recomposeKey: com.skydoves.landscapist.StableHolder<coil.request.ImageRequest>, modifier: androidx.compose.ui.Modifier, imageOptions: com.skydoves.landscapist.ImageOptions, imageLoader: com.skydoves.landscapist.StableHolder<coil.ImageLoader>, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxWithConstraintsScope, @[ParameterName(name = \): kotlin.Unit

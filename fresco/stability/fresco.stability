@@ -5,13 +5,20 @@
 //   ./gradlew :fresco:stabilityDump
 
 @Composable
-public fun com.skydoves.landscapist.fresco.FrescoImage(imageUrl: kotlin.String?, modifier: androidx.compose.ui.Modifier, imageRequest: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<com.facebook.imagepipeline.request.ImageRequestBuilder>): kotlin.Unit
+public fun com.skydoves.landscapist.fresco.FrescoImage(imageUrl: kotlin.String?, modifier: androidx.compose.ui.Modifier, imageRequest: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<com.facebook.imagepipeline.request.ImageRequestBuilder>, component: com.skydoves.landscapist.components.ImageComponent, imageOptions: com.skydoves.landscapist.ImageOptions, onImageStateChanged: kotlin.Function1<com.skydoves.landscapist.fresco.FrescoImageState, kotlin.Unit>, previewPlaceholder: androidx.compose.ui.graphics.painter.Painter?, loading: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, success: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction3<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, failure: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - imageUrl: STABLE
     - modifier: STABLE (marked @Stable or @Immutable)
     - imageRequest: STABLE (composable function type)
+    - component: STABLE (marked @Stable or @Immutable)
+    - imageOptions: STABLE (marked @Stable or @Immutable)
+    - onImageStateChanged: STABLE (function type)
+    - previewPlaceholder: RUNTIME (requires runtime check)
+    - loading: STABLE (composable function type)
+    - success: STABLE (composable function type)
+    - failure: STABLE (composable function type)
 
 @Composable
 private fun com.skydoves.landscapist.fresco.FrescoImage(recomposeKey: kotlin.String?, imageOptions: com.skydoves.landscapist.ImageOptions, imageRequest: com.skydoves.landscapist.StableHolder<com.facebook.imagepipeline.request.ImageRequestBuilder>, modifier: androidx.compose.ui.Modifier, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxWithConstraintsScope, @[ParameterName(name = \): kotlin.Unit

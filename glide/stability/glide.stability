@@ -5,7 +5,7 @@
 //   ./gradlew :glide:stabilityDump
 
 @Composable
-public fun com.skydoves.landscapist.glide.GlideImage(imageModel: kotlin.Function0<kotlin.Any?>, modifier: androidx.compose.ui.Modifier, glideRequestType: com.skydoves.landscapist.glide.GlideRequestType, requestBuilder: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<com.bumptech.glide.RequestBuilder<*>>): kotlin.Unit
+public fun com.skydoves.landscapist.glide.GlideImage(imageModel: kotlin.Function0<kotlin.Any?>, modifier: androidx.compose.ui.Modifier, glideRequestType: com.skydoves.landscapist.glide.GlideRequestType, requestBuilder: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<com.bumptech.glide.RequestBuilder<*>>, requestOptions: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<com.bumptech.glide.request.RequestOptions>, requestListener: kotlin.Function0<com.bumptech.glide.request.RequestListener<kotlin.Any>>?, component: com.skydoves.landscapist.components.ImageComponent, imageOptions: com.skydoves.landscapist.ImageOptions, clearTarget: kotlin.Boolean, onImageStateChanged: kotlin.Function1<com.skydoves.landscapist.glide.GlideImageState, kotlin.Unit>, previewPlaceholder: androidx.compose.ui.graphics.painter.Painter?, loading: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, success: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction3<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, failure: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \): kotlin.Unit
   skippable: false
   restartable: true
   params:
@@ -13,6 +13,16 @@ public fun com.skydoves.landscapist.glide.GlideImage(imageModel: kotlin.Function
     - modifier: STABLE (marked @Stable or @Immutable)
     - glideRequestType: STABLE
     - requestBuilder: STABLE (composable function type)
+    - requestOptions: STABLE (composable function type)
+    - requestListener: STABLE (function type)
+    - component: STABLE (marked @Stable or @Immutable)
+    - imageOptions: STABLE (marked @Stable or @Immutable)
+    - clearTarget: STABLE (primitive type)
+    - onImageStateChanged: STABLE (function type)
+    - previewPlaceholder: RUNTIME (requires runtime check)
+    - loading: STABLE (composable function type)
+    - success: STABLE (composable function type)
+    - failure: STABLE (composable function type)
 
 @Composable
 private fun com.skydoves.landscapist.glide.GlideImage(recomposeKey: com.skydoves.landscapist.StableHolder<kotlin.Any?>, modifier: androidx.compose.ui.Modifier, imageOptions: com.skydoves.landscapist.ImageOptions, glideRequestType: com.skydoves.landscapist.glide.GlideRequestType, clearTarget: kotlin.Boolean, builder: com.skydoves.landscapist.StableHolder<com.bumptech.glide.RequestBuilder<kotlin.Any>>, requestListener: com.skydoves.landscapist.StableHolder<com.bumptech.glide.request.RequestListener<kotlin.Any>?>, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxWithConstraintsScope, @[ParameterName(name = \): kotlin.Unit
