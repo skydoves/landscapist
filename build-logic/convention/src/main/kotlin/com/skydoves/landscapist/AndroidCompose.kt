@@ -34,6 +34,7 @@ internal fun Project.configureAndroidCompose(
   commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
   pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
+  pluginManager.apply("com.github.skydoves.compose.stability.analyzer")
 
   commonExtension.apply {
     buildFeatures {

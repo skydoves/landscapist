@@ -57,6 +57,7 @@ import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background
 import com.kmpalette.palette.graphics.Palette
+import com.skydoves.compose.stability.runtime.TraceRecomposition
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.coil3.CoilImage
@@ -116,6 +117,7 @@ fun DisneyPosters(
 }
 
 @Composable
+@TraceRecomposition
 private fun PosterItem(
   poster: Poster,
   vm: MainViewModel,
@@ -136,6 +138,7 @@ private fun PosterItem(
 }
 
 @Composable
+@TraceRecomposition
 private fun SelectedPoster(
   poster: Poster,
   onPaletteUpdated: (Palette) -> Unit,
@@ -162,6 +165,7 @@ private fun SelectedPoster(
 }
 
 @Composable
+@TraceRecomposition
 private fun PosterInformation(
   poster: Poster,
   palette: Palette,
@@ -202,6 +206,7 @@ private fun PosterInformation(
 }
 
 @Composable
+@TraceRecomposition
 private fun ColorPalettes(palette: Palette) {
   val colorList: List<Int> = palette.paletteColorList()
 
