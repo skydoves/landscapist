@@ -36,6 +36,11 @@ android {
   }
 }
 
+// Configure stability analyzer
+composeStabilityAnalyzer {
+  enabled.set(true)
+}
+
 dependencies {
   // landscapist
   implementation(project(":landscapist"))
