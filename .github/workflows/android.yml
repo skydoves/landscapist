@@ -71,8 +71,9 @@ jobs:
               testDebugUnitTest
 
   stability_check:
-    name: Compose Stability check
+    name: Compose Stability Check
     runs-on: macos-latest
+    needs: build
     steps:
       - name: Check out code
         uses: actions/checkout@v5.0.0
