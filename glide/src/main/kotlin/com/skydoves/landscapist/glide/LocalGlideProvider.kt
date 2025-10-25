@@ -23,7 +23,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
-import com.skydoves.compose.stability.runtime.TraceRecomposition
 
 /**
  * Local containing the preferred [RequestOptions] for providing the same instance
@@ -65,7 +64,6 @@ internal object LocalGlideProvider {
 
   /** Returns the current or default [RequestManager] for the `GlideImage` processor. */
   @Composable
-  @TraceRecomposition
   fun getGlideRequestManager(): RequestManager {
     // By default Glide tries to install lifecycle listeners to automatically re-trigger
     // requests when resumed. We don't want that with Compose, since we rely on composition

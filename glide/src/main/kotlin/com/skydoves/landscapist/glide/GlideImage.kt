@@ -36,7 +36,6 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
-import com.skydoves.compose.stability.runtime.TraceRecomposition
 import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
@@ -100,7 +99,6 @@ import kotlinx.coroutines.flow.callbackFlow
  * @param failure Content to be displayed when the request is failed.
  */
 @Composable
-@TraceRecomposition
 public fun GlideImage(
   imageModel: () -> Any?,
   modifier: Modifier = Modifier,
