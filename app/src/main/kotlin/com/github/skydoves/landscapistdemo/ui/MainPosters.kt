@@ -57,6 +57,7 @@ import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background
 import com.kmpalette.palette.graphics.Palette
+import com.skydoves.compose.stability.runtime.IgnoreStabilityReport
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.coil3.CoilImage
@@ -229,6 +230,7 @@ private fun ColorPalettes(palette: Palette) {
 
 @Preview
 @Composable
+@IgnoreStabilityReport
 private fun SelectedPosterPreview() {
   DisneyComposeTheme(darkTheme = false) {
     Column(

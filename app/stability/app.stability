@@ -58,9 +58,3 @@ private fun com.github.skydoves.landscapistdemo.ui.SelectedPoster(poster: com.gi
     - poster: STABLE (marked @Stable or @Immutable)
     - onPaletteUpdated: STABLE (function type)
 
-@Composable
-private fun com.github.skydoves.landscapistdemo.ui.SelectedPosterPreview(): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-
