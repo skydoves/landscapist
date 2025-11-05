@@ -17,7 +17,7 @@ private fun com.github.skydoves.landscapistdemo.ui.ColorPalettes(palette: com.km
   skippable: false
   restartable: true
   params:
-    - palette: RUNTIME (requires runtime check)
+    - palette: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
 public fun com.github.skydoves.landscapistdemo.ui.DisneyPosters(posters: kotlin.collections.List<com.github.skydoves.landscapistdemo.model.Poster>, paddingValues: androidx.compose.foundation.layout.PaddingValues, vm: com.github.skydoves.landscapistdemo.ui.MainViewModel): kotlin.Unit
@@ -40,7 +40,7 @@ private fun com.github.skydoves.landscapistdemo.ui.PosterInformation(poster: com
   restartable: true
   params:
     - poster: STABLE (marked @Stable or @Immutable)
-    - palette: RUNTIME (requires runtime check)
+    - palette: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
 private fun com.github.skydoves.landscapistdemo.ui.PosterItem(poster: com.github.skydoves.landscapistdemo.model.Poster, vm: com.github.skydoves.landscapistdemo.ui.MainViewModel): kotlin.Unit
