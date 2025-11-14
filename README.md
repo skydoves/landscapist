@@ -19,7 +19,7 @@
 ## Who's using Landscapist?
 👉 [Check out who's using Landscapist](https://skydoves.github.io/landscapist/#whos-using-landscapist).
 
-Landscapist hits **+900,000 downloads every month** around the globe! 🚀
+Landscapist hits **+1,100,000 downloads every month** around the globe! 🚀
 
 ![globe](https://user-images.githubusercontent.com/24237865/196018576-a9c87534-81a2-4618-8519-0024b67964bf.png)
 
@@ -40,11 +40,11 @@ For comprehensive information about Landscapist, please refer to the **[official
 
 ## Technical Content
 
-For the more details of the history, performance, customizability, and how to load network images and implement placeholders, animations, and transformations with Landscapist, check out [Optimized Image Loading for Compose and Kotlin Multiplatform](https://medium.com/proandroiddev/optimized-image-loading-for-compose-and-kotlin-multiplatform-a45eb2e710c0).
+For more details of the history, performance, customizability, and how to load network images and implement placeholders, animations, and transformations with Landscapist, check out [Optimized Image Loading for Compose and Kotlin Multiplatform](https://medium.com/proandroiddev/optimized-image-loading-for-compose-and-kotlin-multiplatform-a45eb2e710c0).
 
 ## 💝 Sponsors
 
-<a href="https://coderabbit.link/Jaewoong" target="_blank"> <img width="300" alt="coderabbit" src="https://www.coderabbit.ai/_next/image?url=https%3A%2F%2Fvictorious-bubble-f69a016683.media.strapiapp.com%2FCr_logo_dark_f656abe8e3.png&w=384&q=75" /></a>
+<a href="https://coderabbit.link/Jaewoong" target="_blank"> <img width="300" alt="coderabbit" src="https://github.com/user-attachments/assets/9823e1d3-8467-4d4d-8a53-94b3c0adc630" /></a>
 
 <a href="https://getstream.io/chat/sdk/android/?utm_source=github&utm_medium=referral&utm_content=&utm_campaign=Jaewoong_github_2025" target="_blank"> <img width="260" alt="stream" src="https://github.com/user-attachments/assets/87a69228-4fef-4f48-ad98-1e2c606c5b7e" /></a>
 
