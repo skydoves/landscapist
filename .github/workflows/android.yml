@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v5.0.1
       - name: Set up JDK
         uses: actions/setup-java@v5.0.0
         with:
@@ -26,7 +26,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v5.0.1
       - name: Set up JDK
         uses: actions/setup-java@v5.0.0
         with:
@@ -39,7 +39,7 @@ jobs:
     name: Build and Tests
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v5.0.0
+      - uses: actions/checkout@v5.0.1
 
       - name: set up JDK
         uses: actions/setup-java@v5.0.0
@@ -76,7 +76,7 @@ jobs:
     needs: build
     steps:
       - name: Check out code
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v5.0.1
       - name: Set up JDK
         uses: actions/setup-java@v5.0.0
         with:
