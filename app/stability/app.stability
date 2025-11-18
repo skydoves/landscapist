@@ -26,7 +26,7 @@ public fun com.github.skydoves.landscapistdemo.ui.DisneyPosters(posters: kotlin.
   params:
     - posters: RUNTIME (requires runtime check)
     - paddingValues: STABLE (marked @Stable or @Immutable)
-    - vm: STABLE
+    - vm: STABLE (class with no mutable properties)
 
 @Composable
 private fun com.github.skydoves.landscapistdemo.ui.PosterAppBar(): kotlin.Unit
@@ -48,7 +48,7 @@ private fun com.github.skydoves.landscapistdemo.ui.PosterItem(poster: com.github
   restartable: true
   params:
     - poster: STABLE (marked @Stable or @Immutable)
-    - vm: STABLE
+    - vm: STABLE (class with no mutable properties)
 
 @Composable
 private fun com.github.skydoves.landscapistdemo.ui.SelectedPoster(poster: com.github.skydoves.landscapistdemo.model.Poster, onPaletteUpdated: kotlin.Function1<com.kmpalette.palette.graphics.Palette, kotlin.Unit>): kotlin.Unit

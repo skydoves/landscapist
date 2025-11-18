@@ -11,7 +11,7 @@ public fun com.skydoves.landscapist.fresco.websupport.FrescoWebImage(controllerB
   params:
     - controllerBuilder: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
-    - contentDescription: STABLE
+    - contentDescription: STABLE (class with no mutable properties)
     - alignment: STABLE (marked @Stable or @Immutable)
     - contentScale: STABLE (marked @Stable or @Immutable)
     - alpha: STABLE (primitive type)

@@ -70,7 +70,7 @@ public fun com.skydoves.landscapist.coil.rememberCoilImageState(initialState: co
   restartable: true
   params:
     - initialState: STABLE (marked @Stable or @Immutable)
-    - key: STABLE
+    - key: STABLE (class with no mutable properties)
 
 @Composable
 internal fun com.skydoves.landscapist.coil.rememberRequestWithConstraints(request: coil.request.ImageRequest, imageOptions: com.skydoves.landscapist.ImageOptions): coil.request.ImageRequest
