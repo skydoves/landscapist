@@ -68,11 +68,11 @@ public fun com.skydoves.landscapist.glide.LocalGlideProvider.getGlideRequestOpti
 
 @Composable
 public fun com.skydoves.landscapist.glide.rememberGlideImageState(initialState: com.skydoves.landscapist.glide.GlideImageState, key: kotlin.Any?): androidx.compose.runtime.MutableState<com.skydoves.landscapist.glide.GlideImageState>
-  skippable: true
+  skippable: false
   restartable: true
   params:
     - initialState: STABLE (marked @Stable or @Immutable)
-    - key: STABLE (class with no mutable properties)
+    - key: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
 internal fun com.skydoves.landscapist.glide.rememberTarget(target: com.skydoves.landscapist.glide.FlowCustomTarget, imageOptions: com.skydoves.landscapist.ImageOptions, clearTarget: kotlin.Boolean): com.skydoves.landscapist.glide.FlowCustomTarget

@@ -25,10 +25,8 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import com.facebook.imagepipeline.core.DownsampleMode
-import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 
-@HiltAndroidApp
 class App : MultiDexApplication(), SingletonImageLoader.Factory {
 
   override fun onCreate() {

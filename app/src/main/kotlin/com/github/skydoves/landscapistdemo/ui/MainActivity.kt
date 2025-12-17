@@ -38,9 +38,7 @@ import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background
 import com.github.skydoves.landscapistdemo.theme.purple200
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
   private val vm: MainViewModel by viewModels()

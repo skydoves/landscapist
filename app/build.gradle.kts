@@ -19,8 +19,6 @@ import com.github.skydoves.landscapist.Configuration
 plugins {
   id("landscapist.application.compose")
   id("landscapist.spotless")
-  id(libs.plugins.hilt.get().pluginId)
-  kotlin("kapt")
 }
 
 android {
@@ -59,10 +57,6 @@ dependencies {
 
   // androidx jetpack
   implementation(libs.androidx.core.ktx)
-
-  // hilt
-  implementation(libs.hilt.android)
-  kapt(libs.hilt.compiler)
 
   // compose
   implementation(libs.androidx.activity.compose)

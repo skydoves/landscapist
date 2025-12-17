@@ -57,11 +57,11 @@ internal fun com.skydoves.landscapist.fresco.rememberCloseableRef(ref: com.faceb
 
 @Composable
 public fun com.skydoves.landscapist.fresco.rememberFrescoImageState(initialState: com.skydoves.landscapist.fresco.FrescoImageState, key: kotlin.Any?): androidx.compose.runtime.MutableState<com.skydoves.landscapist.fresco.FrescoImageState>
-  skippable: true
+  skippable: false
   restartable: true
   params:
     - initialState: STABLE (marked @Stable or @Immutable)
-    - key: STABLE (class with no mutable properties)
+    - key: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
 public fun com.skydoves.landscapist.fresco.toFrescoImageState(): com.skydoves.landscapist.fresco.FrescoImageState
