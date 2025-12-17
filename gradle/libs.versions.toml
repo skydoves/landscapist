@@ -1,8 +1,8 @@
 [versions]
-kotlin = "2.2.21"
+kotlin = "2.3.0"
 dokka = "2.1.0"
 jvmTarget = "17"
-nexusPlugin = "0.34.0"
+nexusPlugin = "0.35.0"
 kotlinxCoroutines = "1.10.2"
 kotlinBinaryCompatibility = "0.18.1"
 androidGradlePlugin = "8.13.2"
@@ -26,7 +26,7 @@ coil = "2.7.0"
 coil3 = "3.3.0"
 ktor = "3.3.3"
 palette = "3.1.0"
-hilt = "2.57.2"
+ksp = "2.3.4"
 spotless = "6.21.0"
 
 [libraries]
@@ -54,8 +54,6 @@ androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiaut
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 palette = { group = "com.kmpalette", name = "kmpalette-core", version.ref = "palette" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 fresco = { group = "com.facebook.fresco", name = "fresco", version.ref = "fresco" }
@@ -100,6 +98,6 @@ stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", ve
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 nexus-plugin = { id = "com.vanniktech.maven.publish", version.ref = "nexusPlugin" }
 kotlin-binary-compatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibility" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 baseline-profile = { id = "androidx.baselineprofile", version.ref = "androidxMacroBenchmark" }
