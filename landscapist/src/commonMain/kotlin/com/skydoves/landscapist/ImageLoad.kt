@@ -94,7 +94,9 @@ public fun <T : Any> ImageLoad(
 private fun executeImageLoading(
   executeImageRequest: suspend () -> Flow<ImageLoadState>,
 ) = flow {
-  // execute imager loading
+  // emit loading state
+  emit(ImageLoadState.Loading)
+  // execute image loading
   emitAll(executeImageRequest())
 }.catch {
   // emit a failure loading state

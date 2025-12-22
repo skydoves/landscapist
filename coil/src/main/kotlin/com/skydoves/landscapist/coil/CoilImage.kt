@@ -232,9 +232,9 @@ public fun CoilImage(
       enabled = crossfadePlugin != null,
     ) {
       when (coilImageState) {
-        is CoilImageState.None -> Unit
-
-        is CoilImageState.Loading -> {
+        is CoilImageState.None,
+        is CoilImageState.Loading,
+        -> {
           component.ComposeLoadingStatePlugins(
             modifier = Modifier.constraint(this),
             imageOptions = imageOptions,
@@ -247,7 +247,7 @@ public fun CoilImage(
               )
             },
           )
-          loading?.invoke(this, coilImageState)
+          loading?.invoke(this, CoilImageState.Loading)
         }
 
         is CoilImageState.Failure -> {
