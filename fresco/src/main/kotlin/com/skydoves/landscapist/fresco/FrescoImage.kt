@@ -140,9 +140,9 @@ public fun FrescoImage(
       }
 
       when (frescoImageState) {
-        is FrescoImageState.None -> Unit
-
-        is FrescoImageState.Loading -> {
+        is FrescoImageState.None,
+        is FrescoImageState.Loading,
+        -> {
           component.ComposeLoadingStatePlugins(
             modifier = Modifier.constraint(this),
             imageOptions = imageOptions,
@@ -155,7 +155,7 @@ public fun FrescoImage(
               )
             },
           )
-          loading?.invoke(this, frescoImageState)
+          loading?.invoke(this, FrescoImageState.Loading)
         }
 
         is FrescoImageState.Failure -> {

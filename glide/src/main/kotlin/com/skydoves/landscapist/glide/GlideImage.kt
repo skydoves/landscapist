@@ -168,9 +168,9 @@ public fun GlideImage(
       }
 
       when (glideImageState) {
-        is GlideImageState.None -> Unit
-
-        is GlideImageState.Loading -> {
+        is GlideImageState.None,
+        is GlideImageState.Loading,
+        -> {
           component.ComposeLoadingStatePlugins(
             modifier = Modifier.constraint(this),
             imageOptions = imageOptions,
@@ -185,7 +185,7 @@ public fun GlideImage(
               )
             },
           )
-          loading?.invoke(this, glideImageState)
+          loading?.invoke(this, GlideImageState.Loading)
         }
 
         is GlideImageState.Failure -> {
