@@ -50,7 +50,28 @@ public data class ImageOptions(
   public val isValidSize: Boolean
     inline get() = requestSize.width > 0 && requestSize.height > 0
 
+  /**
+   * Returns a key that represents only the loading-related properties.
+   * This key should be used for image loading decisions to prevent unnecessary reloads
+   * when only rendering properties (colorFilter, alpha, alignment, contentScale, contentDescription) change.
+   */
+  @InternalLandscapistApi
+  public val loadingOptionsKey: Any
+    get() = LoadingOptionsKey(requestSize = requestSize, tag = tag)
+
   private companion object {
     const val DEFAULT_IMAGE_SIZE: Int = -1
   }
 }
+
+/**
+ * Internal data class that holds only the loading-related properties of [ImageOptions].
+ * Used as a stable key for image loading operations to prevent unnecessary reloads
+ * when only rendering properties change.
+ */
+@InternalLandscapistApi
+@Immutable
+public data class LoadingOptionsKey(
+  public val requestSize: IntSize,
+  public val tag: String,
+)

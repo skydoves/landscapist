@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.flowOn
  * @param modifier adjust the drawing image layout or drawing decoration of the content.
  * @param content the image content to be loaded from executing for given states.
  */
+@OptIn(InternalLandscapistApi::class)
 @Composable
 public fun <T : Any> ImageLoad(
   recomposeKey: T?,
@@ -52,11 +53,16 @@ public fun <T : Any> ImageLoad(
   constrainable: Constrainable? = null,
   content: @Composable BoxWithConstraintsScope.(imageState: ImageLoadState) -> Unit,
 ) {
-  var state by remember(recomposeKey, imageOptions) {
+  // Use loadingOptionsKey to only trigger reload when loading-related properties change.
+  // Rendering properties (colorFilter, alpha, alignment, contentScale, contentDescription)
+  // should not cause image reloads.
+  val loadingKey = imageOptions.loadingOptionsKey
+
+  var state by remember(recomposeKey, loadingKey) {
     mutableStateOf<ImageLoadState>(ImageLoadState.None)
   }
 
-  LaunchedEffect(key1 = recomposeKey, key2 = imageOptions) {
+  LaunchedEffect(key1 = recomposeKey, key2 = loadingKey) {
     executeImageLoading(executeImageRequest).collect {
       state = it
     }
@@ -66,7 +72,7 @@ public fun <T : Any> ImageLoad(
     modifier = modifier.imageSemantics(imageOptions),
     propagateMinConstraints = true,
   ) {
-    LaunchedEffect(key1 = recomposeKey, key2 = imageOptions) {
+    LaunchedEffect(key1 = recomposeKey, key2 = loadingKey) {
       val updatedConstraints = if (imageOptions.isValidSize) {
         val size = imageOptions.requestSize
         constraints.copy(
