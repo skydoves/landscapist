@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.IntSize
 import com.skydoves.landscapist.zoomable.ContentTransformation
 import com.skydoves.landscapist.zoomable.SubSamplingConfig
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -165,13 +166,16 @@ public class SubSamplingState internal constructor(
     visibleTiles = visible
 
     // Load tiles that are visible but not yet cached
+    // Launch all tile loads in parallel on IO dispatcher for better performance
     visible.filter { it.bitmap == null && !loadingJobs.containsKey(it.key) }
       .forEach { tile ->
         loadTile(tile) { bitmap ->
           if (bitmap != null) {
             tileCache[tile.key] = bitmap
-            // Trigger recomposition by updating visible tiles
-            updateVisibleTiles(transformation, viewportSize, fitScale)
+            // Update visible tiles to include newly loaded bitmap
+            visibleTiles = visibleTiles.map { t ->
+              if (t.key == tile.key) t.copy(bitmap = bitmap) else t
+            }
           }
         }
       }
@@ -222,10 +226,10 @@ public class SubSamplingState internal constructor(
   }
 
   /**
-   * Loads a tile asynchronously.
+   * Loads a tile asynchronously on IO dispatcher.
    */
   private fun loadTile(tile: Tile, onLoaded: (ImageBitmap?) -> Unit) {
-    val job = scope.launch {
+    val job = scope.launch(Dispatchers.IO) {
       val bitmap = decoder.decodeRegion(
         region = tile.bounds,
         sampleSize = tile.sampleSize,

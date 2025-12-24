@@ -47,11 +47,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.skydoves.landscapistdemo.R
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
@@ -134,14 +132,9 @@ private fun PosterItem(
       component = rememberImageComponent {
         +CrossfadePlugin()
       },
-      previewPlaceholder = painterResource(id = R.drawable.poster),
     )
   }
 }
-
-private const val SAMPLE_IMAGE_URL =
-  "https://unsplash.com/photos/f0d83M-PkNw/download?" +
-    "ixid=M3wxMjA3fDB8MXxhbGx8fHx8fHx8fHwxNzQ3ODMzODU2fA&force=true"
 
 @Composable
 private fun SelectedPoster(
@@ -151,8 +144,8 @@ private fun SelectedPoster(
   val zoomableState = rememberZoomableState()
 
   CoilImage(
-    imageModel = { SAMPLE_IMAGE_URL },
-    modifier = Modifier.aspectRatio(0.8f),
+    imageModel = { poster.image },
+    modifier = Modifier.aspectRatio(0.75f),
     component = rememberImageComponent {
       +ShimmerPlugin(
         Shimmer.Resonate(
@@ -170,14 +163,13 @@ private fun SelectedPoster(
         config = ZoomableConfig(
           enableSubSampling = true,
           maxZoom = 100f,
-          doubleTapZoom = 10f,
+          doubleTapZoom = 20f,
         ),
       )
 
       +PalettePlugin { onPaletteUpdated.invoke(it) }
       +CircularRevealPlugin()
     },
-    previewPlaceholder = painterResource(id = R.drawable.poster),
   )
 }
 
@@ -215,7 +207,6 @@ private fun PosterInformation(
       .fillMaxWidth()
       .padding(8.dp)
       .clip(RoundedCornerShape(8.dp)),
-    previewPlaceholder = painterResource(id = R.drawable.poster),
   )
 
   Spacer(modifier = Modifier.height(12.dp))

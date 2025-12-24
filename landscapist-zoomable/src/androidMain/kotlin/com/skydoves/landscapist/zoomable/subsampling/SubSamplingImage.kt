@@ -28,6 +28,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
@@ -146,21 +147,28 @@ public fun SubSamplingImage(
           srcSize = IntSize(baseBitmap.width, baseBitmap.height),
           dstOffset = IntOffset.Zero,
           dstSize = IntSize(imageSize.width, imageSize.height),
+          filterQuality = FilterQuality.Low,
         )
       }
 
       // Draw visible foreground tiles (scaled from sampled size to tile bounds)
+      // Add 1 pixel overlap to hide gaps caused by floating-point rounding
       subSamplingState.visibleTiles.forEach { tile ->
         tile.bitmap?.let { bitmap ->
           val tileWidth = tile.bounds.right - tile.bounds.left
           val tileHeight = tile.bounds.bottom - tile.bounds.top
+
+          // Add overlap except at image edges to prevent gaps between tiles
+          val overlapRight = if (tile.bounds.right < imageSize.width) 1 else 0
+          val overlapBottom = if (tile.bounds.bottom < imageSize.height) 1 else 0
 
           drawImage(
             image = bitmap,
             srcOffset = IntOffset.Zero,
             srcSize = IntSize(bitmap.width, bitmap.height),
             dstOffset = IntOffset(tile.bounds.left, tile.bounds.top),
-            dstSize = IntSize(tileWidth, tileHeight),
+            dstSize = IntSize(tileWidth + overlapRight, tileHeight + overlapBottom),
+            filterQuality = FilterQuality.None,
           )
         }
       }

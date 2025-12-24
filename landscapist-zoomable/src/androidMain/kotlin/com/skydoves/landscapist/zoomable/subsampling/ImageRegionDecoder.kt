@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import java.io.Closeable
 import java.io.InputStream
@@ -35,6 +35,7 @@ import java.io.InputStream
  * A wrapper around [BitmapRegionDecoder] for decoding regions of large images.
  *
  * This class provides thread-safe region decoding with configurable options.
+ * Uses a semaphore to allow limited parallelism for better performance.
  *
  * @property decoder The underlying [BitmapRegionDecoder].
  * @property dispatcher The dispatcher to use for decoding operations.
@@ -44,7 +45,9 @@ public class ImageRegionDecoder private constructor(
   private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Closeable {
 
-  private val mutex = Mutex()
+  // Allow up to 4 concurrent decode operations for better parallelism
+  // BitmapRegionDecoder is thread-safe for decodeRegion calls
+  private val semaphore = Semaphore(4)
   private var isClosed = false
 
   /**
@@ -58,16 +61,16 @@ public class ImageRegionDecoder private constructor(
    *
    * @param region The region to decode in image coordinates.
    * @param sampleSize The sample size for decoding (power of 2).
-   * @param config The bitmap config to use.
+   * @param config The bitmap config to use (RGB_565 for better performance).
    * @return The decoded [ImageBitmap], or null if decoding failed.
    */
   public suspend fun decodeRegion(
     region: IntRect,
     sampleSize: Int = 1,
-    config: Bitmap.Config = Bitmap.Config.ARGB_8888,
+    config: Bitmap.Config = Bitmap.Config.RGB_565,
   ): ImageBitmap? = withContext(dispatcher) {
-    mutex.withLock {
-      if (isClosed) return@withContext null
+    semaphore.withPermit {
+      if (isClosed) return@withPermit null
 
       try {
         val options = BitmapFactory.Options().apply {
@@ -82,10 +85,7 @@ public class ImageRegionDecoder private constructor(
           region.bottom,
         )
 
-        decoder.decodeRegion(rect, options)?.let { bitmap ->
-          bitmap.prepareToDraw()
-          bitmap.asImageBitmap()
-        }
+        decoder.decodeRegion(rect, options)?.asImageBitmap()
       } catch (e: Exception) {
         null
       }
