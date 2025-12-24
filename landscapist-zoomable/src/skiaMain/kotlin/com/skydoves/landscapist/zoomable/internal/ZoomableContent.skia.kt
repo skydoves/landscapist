@@ -17,22 +17,71 @@ package com.skydoves.landscapist.zoomable.internal
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
+import com.skydoves.landscapist.zoomable.LocalImageRegionDecoder
 import com.skydoves.landscapist.zoomable.ZoomableConfig
 import com.skydoves.landscapist.zoomable.ZoomableState
+import com.skydoves.landscapist.zoomable.subsampling.SubSamplingImage
+import com.skydoves.landscapist.zoomable.subsampling.rememberSubSamplingState
 
 /**
  * Skia implementation of [ZoomableContent].
  *
- * Sub-sampling is not available on Skia platforms, so this always uses
- * the standard graphicsLayer approach for zoom/pan transformations.
+ * When sub-sampling is enabled and an [ImageRegionDecoder] is available via [LocalImageRegionDecoder],
+ * this uses [SubSamplingImage] for efficient tiled rendering of large images.
+ * Otherwise, it falls back to the standard graphicsLayer approach.
  */
 @Composable
 internal actual fun ZoomableContent(
+  zoomableState: ZoomableState,
+  config: ZoomableConfig,
+  enabled: Boolean,
+  content: @Composable () -> Unit,
+) {
+  // Get decoder from LocalImageRegionDecoder (explicitly provided)
+  val decoder = LocalImageRegionDecoder.current
+
+  // Clean up decoder when it changes or composable leaves composition
+  DisposableEffect(decoder) {
+    onDispose {
+      // Don't close the decoder as it's managed externally
+    }
+  }
+
+  // Use sub-sampling when enabled and decoder is available
+  if (config.enableSubSampling && decoder != null) {
+    val subSamplingState = rememberSubSamplingState(
+      decoder = decoder,
+      config = config.subSamplingConfig,
+    )
+
+    SubSamplingImage(
+      subSamplingState = subSamplingState,
+      zoomableState = zoomableState,
+      config = config,
+      enabled = enabled,
+    )
+  } else {
+    // Standard graphicsLayer approach
+    StandardZoomableContent(
+      zoomableState = zoomableState,
+      config = config,
+      enabled = enabled,
+      content = content,
+    )
+  }
+}
+
+/**
+ * Standard zoomable content using graphicsLayer for transformations.
+ */
+@Composable
+internal fun StandardZoomableContent(
   zoomableState: ZoomableState,
   config: ZoomableConfig,
   enabled: Boolean,

@@ -23,37 +23,30 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
-import java.io.Closeable
 import java.io.InputStream
 
 /**
- * A wrapper around [BitmapRegionDecoder] for decoding regions of large images.
+ * Android implementation of [ImageRegionDecoder] using [BitmapRegionDecoder].
  *
  * This class provides thread-safe region decoding with configurable options.
  * Uses a semaphore to allow limited parallelism for better performance.
- *
- * @property decoder The underlying [BitmapRegionDecoder].
- * @property dispatcher The dispatcher to use for decoding operations.
  */
-public class ImageRegionDecoder private constructor(
+public actual class ImageRegionDecoder private constructor(
   private val decoder: BitmapRegionDecoder,
-  private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : Closeable {
+) {
 
   // Allow up to 2 concurrent decode operations to balance performance and memory
-  // BitmapRegionDecoder is thread-safe for decodeRegion calls
   private val semaphore = Semaphore(2)
   private var isClosed = false
 
   /**
    * The size of the full image.
    */
-  public val imageSize: IntSize
+  public actual val imageSize: IntSize
     get() = IntSize(decoder.width, decoder.height)
 
   /**
@@ -61,21 +54,19 @@ public class ImageRegionDecoder private constructor(
    *
    * @param region The region to decode in image coordinates.
    * @param sampleSize The sample size for decoding (power of 2).
-   * @param config The bitmap config to use (RGB_565 for better performance).
    * @return The decoded [ImageBitmap], or null if decoding failed.
    */
-  public suspend fun decodeRegion(
+  public actual suspend fun decodeRegion(
     region: IntRect,
-    sampleSize: Int = 1,
-    config: Bitmap.Config = Bitmap.Config.RGB_565,
-  ): ImageBitmap? = withContext(dispatcher) {
+    sampleSize: Int,
+  ): ImageBitmap? = withContext(Dispatchers.IO) {
     semaphore.withPermit {
       if (isClosed) return@withPermit null
 
       try {
         val options = BitmapFactory.Options().apply {
           inSampleSize = sampleSize
-          inPreferredConfig = config
+          inPreferredConfig = Bitmap.Config.RGB_565
         }
 
         val rect = Rect(
@@ -95,47 +86,55 @@ public class ImageRegionDecoder private constructor(
   /**
    * Closes the decoder and releases resources.
    */
-  override fun close() {
+  public actual fun close() {
     isClosed = true
     decoder.recycle()
   }
 
-  public companion object {
+  public actual companion object {
     /**
-     * Creates an [ImageRegionDecoder] from an [InputStream].
+     * Creates an [ImageRegionDecoder] from a file path.
      *
-     * @param inputStream The input stream containing the image data.
-     * @param dispatcher The dispatcher to use for decoding operations.
+     * @param path The path to the image file.
      * @return An [ImageRegionDecoder], or null if creation failed.
      */
     @Suppress("DEPRECATION")
-    public fun create(
-      inputStream: InputStream,
-      dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): ImageRegionDecoder? {
+    public actual fun create(path: String): ImageRegionDecoder? {
       return try {
-        val decoder = BitmapRegionDecoder.newInstance(inputStream, false)
-        decoder?.let { ImageRegionDecoder(it, dispatcher) }
+        val decoder = BitmapRegionDecoder.newInstance(path, false)
+        decoder?.let { ImageRegionDecoder(it) }
       } catch (e: Exception) {
         null
       }
     }
 
     /**
-     * Creates an [ImageRegionDecoder] from a file path.
+     * Creates an [ImageRegionDecoder] from byte array.
      *
-     * @param path The path to the image file.
-     * @param dispatcher The dispatcher to use for decoding operations.
+     * @param data The image data as a byte array.
      * @return An [ImageRegionDecoder], or null if creation failed.
      */
     @Suppress("DEPRECATION")
-    public fun create(
-      path: String,
-      dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): ImageRegionDecoder? {
+    public actual fun create(data: ByteArray): ImageRegionDecoder? {
       return try {
-        val decoder = BitmapRegionDecoder.newInstance(path, false)
-        decoder?.let { ImageRegionDecoder(it, dispatcher) }
+        val decoder = BitmapRegionDecoder.newInstance(data, 0, data.size, false)
+        decoder?.let { ImageRegionDecoder(it) }
+      } catch (e: Exception) {
+        null
+      }
+    }
+
+    /**
+     * Creates an [ImageRegionDecoder] from an [InputStream].
+     *
+     * @param inputStream The input stream containing the image data.
+     * @return An [ImageRegionDecoder], or null if creation failed.
+     */
+    @Suppress("DEPRECATION")
+    public fun create(inputStream: InputStream): ImageRegionDecoder? {
+      return try {
+        val decoder = BitmapRegionDecoder.newInstance(inputStream, false)
+        decoder?.let { ImageRegionDecoder(it) }
       } catch (e: Exception) {
         null
       }

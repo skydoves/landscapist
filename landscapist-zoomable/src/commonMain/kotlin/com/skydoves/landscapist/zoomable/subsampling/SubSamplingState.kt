@@ -243,10 +243,10 @@ public class SubSamplingState internal constructor(
   }
 
   /**
-   * Loads a tile asynchronously on IO dispatcher.
+   * Loads a tile asynchronously on Default dispatcher.
    */
   private fun loadTile(tile: Tile, onLoaded: (ImageBitmap?) -> Unit) {
-    val job = scope.launch(Dispatchers.IO) {
+    val job = scope.launch(Dispatchers.Default) {
       val bitmap = decoder.decodeRegion(
         region = tile.bounds,
         sampleSize = tile.sampleSize,

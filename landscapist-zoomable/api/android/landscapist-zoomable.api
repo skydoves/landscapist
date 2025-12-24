@@ -132,21 +132,19 @@ public final class com/skydoves/landscapist/zoomable/ZoomableState_androidKt {
 	public static final fun rememberZoomableState (Lcom/skydoves/landscapist/zoomable/ZoomableConfig;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/zoomable/ZoomableState;
 }
 
-public final class com/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder : java/io/Closeable {
+public final class com/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder {
 	public static final field $stable I
 	public static final field Companion Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder$Companion;
-	public synthetic fun <init> (Landroid/graphics/BitmapRegionDecoder;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun close ()V
-	public final fun decodeRegion (Landroidx/compose/ui/unit/IntRect;ILandroid/graphics/Bitmap$Config;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun decodeRegion$default (Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;Landroidx/compose/ui/unit/IntRect;ILandroid/graphics/Bitmap$Config;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public synthetic fun <init> (Landroid/graphics/BitmapRegionDecoder;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun close ()V
+	public final fun decodeRegion (Landroidx/compose/ui/unit/IntRect;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getImageSize-YbymL2g ()J
 }
 
 public final class com/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder$Companion {
-	public final fun create (Ljava/io/InputStream;Lkotlinx/coroutines/CoroutineDispatcher;)Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;
-	public final fun create (Ljava/lang/String;Lkotlinx/coroutines/CoroutineDispatcher;)Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;
-	public static synthetic fun create$default (Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder$Companion;Ljava/io/InputStream;Lkotlinx/coroutines/CoroutineDispatcher;ILjava/lang/Object;)Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;
-	public static synthetic fun create$default (Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder$Companion;Ljava/lang/String;Lkotlinx/coroutines/CoroutineDispatcher;ILjava/lang/Object;)Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;
+	public final fun create (Ljava/io/InputStream;)Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;
+	public final fun create (Ljava/lang/String;)Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;
+	public final fun create ([B)Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;
 }
 
 public final class com/skydoves/landscapist/zoomable/subsampling/SubSamplingImageKt {

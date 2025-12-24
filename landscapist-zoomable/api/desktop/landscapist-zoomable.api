@@ -22,6 +22,11 @@ public final class com/skydoves/landscapist/zoomable/ContentTransformation$Compa
 	public final fun getIdentity ()Lcom/skydoves/landscapist/zoomable/ContentTransformation;
 }
 
+public final class com/skydoves/landscapist/zoomable/LocalImageRegionDecoderKt {
+	public static final fun ProvideImageRegionDecoder (Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)V
+	public static final fun getLocalImageRegionDecoder ()Landroidx/compose/runtime/ProvidableCompositionLocal;
+}
+
 public final class com/skydoves/landscapist/zoomable/SubSamplingConfig {
 	public static final field $stable I
 	public synthetic fun <init> (FFILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -125,5 +130,101 @@ public final class com/skydoves/landscapist/zoomable/ZoomableState {
 
 public final class com/skydoves/landscapist/zoomable/ZoomableState_skiaKt {
 	public static final fun rememberZoomableState (Lcom/skydoves/landscapist/zoomable/ZoomableConfig;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/zoomable/ZoomableState;
+}
+
+public final class com/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder {
+	public static final field $stable I
+	public static final field Companion Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder$Companion;
+	public synthetic fun <init> (Lorg/jetbrains/skia/Image;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun close ()V
+	public final fun decodeRegion (Landroidx/compose/ui/unit/IntRect;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getImageSize-YbymL2g ()J
+}
+
+public final class com/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder$Companion {
+	public final fun create (Ljava/lang/String;)Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;
+	public final fun create ([B)Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;
+}
+
+public final class com/skydoves/landscapist/zoomable/subsampling/SubSamplingImageKt {
+	public static final fun SubSamplingImage (Lcom/skydoves/landscapist/zoomable/subsampling/SubSamplingState;Lcom/skydoves/landscapist/zoomable/ZoomableState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;ZLandroidx/compose/ui/Modifier;Ljava/lang/String;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class com/skydoves/landscapist/zoomable/subsampling/SubSamplingState {
+	public static final field $stable I
+	public final fun clear ()V
+	public final fun getBaseTileBitmap ()Landroidx/compose/ui/graphics/ImageBitmap;
+	public final fun getImageSize-YbymL2g ()J
+	public final fun getVisibleTiles ()Ljava/util/List;
+	public final fun initialize-ozmzZPI (J)V
+	public final fun isBaseLoaded ()Z
+	public final fun updateVisibleTiles-JVtK1S4 (Lcom/skydoves/landscapist/zoomable/ContentTransformation;JF)V
+	public static synthetic fun updateVisibleTiles-JVtK1S4$default (Lcom/skydoves/landscapist/zoomable/subsampling/SubSamplingState;Lcom/skydoves/landscapist/zoomable/ContentTransformation;JFILjava/lang/Object;)V
+}
+
+public final class com/skydoves/landscapist/zoomable/subsampling/SubSamplingStateKt {
+	public static final fun rememberSubSamplingState (Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;Lcom/skydoves/landscapist/zoomable/SubSamplingConfig;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/zoomable/subsampling/SubSamplingState;
+}
+
+public final class com/skydoves/landscapist/zoomable/subsampling/Tile {
+	public static final field $stable I
+	public fun <init> (Landroidx/compose/ui/unit/IntRect;ILandroidx/compose/ui/graphics/ImageBitmap;ZZZ)V
+	public synthetic fun <init> (Landroidx/compose/ui/unit/IntRect;ILandroidx/compose/ui/graphics/ImageBitmap;ZZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Landroidx/compose/ui/unit/IntRect;
+	public final fun component2 ()I
+	public final fun component3 ()Landroidx/compose/ui/graphics/ImageBitmap;
+	public final fun component4 ()Z
+	public final fun component5 ()Z
+	public final fun component6 ()Z
+	public final fun copy (Landroidx/compose/ui/unit/IntRect;ILandroidx/compose/ui/graphics/ImageBitmap;ZZZ)Lcom/skydoves/landscapist/zoomable/subsampling/Tile;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/zoomable/subsampling/Tile;Landroidx/compose/ui/unit/IntRect;ILandroidx/compose/ui/graphics/ImageBitmap;ZZZILjava/lang/Object;)Lcom/skydoves/landscapist/zoomable/subsampling/Tile;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBitmap ()Landroidx/compose/ui/graphics/ImageBitmap;
+	public final fun getBounds ()Landroidx/compose/ui/unit/IntRect;
+	public final fun getKey ()Lcom/skydoves/landscapist/zoomable/subsampling/TileKey;
+	public final fun getSampleSize ()I
+	public fun hashCode ()I
+	public final fun isBase ()Z
+	public final fun isLoaded ()Z
+	public final fun isLoading ()Z
+	public final fun isVisible ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/zoomable/subsampling/TileGrid {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/skydoves/landscapist/zoomable/subsampling/TileGrid;
+	public final fun calculateSampleSizeForZoom (F)I
+	public final fun filterVisibleTiles (Ljava/util/List;Landroidx/compose/ui/unit/IntRect;)Ljava/util/List;
+	public final fun generate-e0twbBA (JJI)Lcom/skydoves/landscapist/zoomable/subsampling/TileGridResult;
+	public static synthetic fun generate-e0twbBA$default (Lcom/skydoves/landscapist/zoomable/subsampling/TileGrid;JJIILjava/lang/Object;)Lcom/skydoves/landscapist/zoomable/subsampling/TileGridResult;
+}
+
+public final class com/skydoves/landscapist/zoomable/subsampling/TileGridResult {
+	public static final field $stable I
+	public fun <init> (Ljava/util/Map;Lcom/skydoves/landscapist/zoomable/subsampling/Tile;)V
+	public final fun component1 ()Ljava/util/Map;
+	public final fun component2 ()Lcom/skydoves/landscapist/zoomable/subsampling/Tile;
+	public final fun copy (Ljava/util/Map;Lcom/skydoves/landscapist/zoomable/subsampling/Tile;)Lcom/skydoves/landscapist/zoomable/subsampling/TileGridResult;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/zoomable/subsampling/TileGridResult;Ljava/util/Map;Lcom/skydoves/landscapist/zoomable/subsampling/Tile;ILjava/lang/Object;)Lcom/skydoves/landscapist/zoomable/subsampling/TileGridResult;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBase ()Lcom/skydoves/landscapist/zoomable/subsampling/Tile;
+	public final fun getForeground ()Ljava/util/Map;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/zoomable/subsampling/TileKey {
+	public static final field $stable I
+	public fun <init> (Landroidx/compose/ui/unit/IntRect;I)V
+	public final fun component1 ()Landroidx/compose/ui/unit/IntRect;
+	public final fun component2 ()I
+	public final fun copy (Landroidx/compose/ui/unit/IntRect;I)Lcom/skydoves/landscapist/zoomable/subsampling/TileKey;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/zoomable/subsampling/TileKey;Landroidx/compose/ui/unit/IntRect;IILjava/lang/Object;)Lcom/skydoves/landscapist/zoomable/subsampling/TileKey;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBounds ()Landroidx/compose/ui/unit/IntRect;
+	public final fun getSampleSize ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
