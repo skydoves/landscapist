@@ -17,6 +17,13 @@ package com.github.skydoves.landscapistdemo.model
 
 object MockUtil {
 
+  private val largeImageUrls = listOf(
+    "https://unsplash.com/photos/UpFk7QQm33k/download",
+    "https://unsplash.com/photos/_Yc7OtfFn-0/download",
+    "https://unsplash.com/photos/5TK1F5VfdIk/download",
+    "https://unsplash.com/photos/t2Sai-AqIpI/download",
+  )
+
   fun getMockPosters(): List<Poster> {
     return listOf(
       Poster(
@@ -38,8 +45,7 @@ object MockUtil {
           " newcomers " +
           "Sterling K. Brown, Evan Rachel Wood, Alfred Molina, Martha Plimpton, Jason Ritter, " +
           "Rachel Matthews, and Jeremy Sisto.",
-        "https://user-images.githubusercontent.com/" +
-          "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
+        largeImageUrls[0],
         "https://media2.giphy.com/media/aQYR1p8saOQla/" +
           "giphy.gif?cid=ecf05e4701sln9u63lr3z17lh5f3n3h3owrk54zh1183hqmi&rid=giphy.gif&ct=g",
       ),
@@ -66,8 +72,7 @@ object MockUtil {
           "Christina Hendricks, Keanu Reeves, and Ally Maki, who voice the new characters. " +
           "The film also posthumously features Don Rickles, who appears through use of " +
           "archived voice recordings.",
-        "https://user-images.githubusercontent.com/24237865/" +
-          "75087934-5a53dc00-553e-11ea-94f1-494c1c68a574.jpg",
+        largeImageUrls[1],
         "https://media0.giphy.com/media/sgswHaZw5yklq/" +
           "giphy.gif?cid=ecf05e473wd424bhp29tw5i4clg60djlvz4aridyzgxua96q&rid=giphy.gif&ct=g",
       ),
@@ -87,8 +92,7 @@ object MockUtil {
           "the" +
           " unlikely partnership between a rabbit police officer and a red fox con artist, " +
           "as they uncover a criminal conspiracy involving the disappearance of predators.",
-        "https://user-images.githubusercontent.com/" +
-          "24237865/75087937-5c1d9f80-553e-11ea-8fc9-a7e520addde0.jpg",
+        largeImageUrls[2],
         "https://media0.giphy.com/media/mHcEcam5FtKQE/" +
           "giphy.gif?cid=ecf05e473an8u0cwv7mao8mm6hxb8hsf62l34p0zblcfmmwp&rid=giphy.gif&ct=g",
       ),
@@ -107,8 +111,7 @@ object MockUtil {
           "(replacing Alexander Gould), Ed O'Neill, Kaitlin Olson, Ty Burrell, Diane Keaton, " +
           "and Eugene Levy joining the cast. The film focuses on the amnesiac fish Dory, who" +
           " journeys to be reunited with her parents.[10]",
-        "https://user-images.githubusercontent.com/" +
-          "24237865/75088201-0ba84100-5542-11ea-8587-0c2823b05351.jpg",
+        largeImageUrls[3],
         "https://media1.giphy.com/media/yUt0xuAPgFpSM/" +
           "giphy.gif?cid=ecf05e47xl77vojzdfyfsq05jj6lok315g8vdhbwpedj1ja6&rid=giphy.gif&ct=g",
       ),
@@ -129,8 +132,7 @@ object MockUtil {
           " newcomers " +
           "Sterling K. Brown, Evan Rachel Wood, Alfred Molina, Martha Plimpton, Jason Ritter, " +
           "Rachel Matthews, and Jeremy Sisto.",
-        "https://user-images.githubusercontent.com/24237865/" +
-          "75087801-a56cef80-553c-11ea-9ae5-cf203c6ea8c2.jpg",
+        largeImageUrls[0],
         "https://media3.giphy.com/media/52SvdzXWPjdOo/" +
           "giphy.gif?cid=ecf05e47uuv6gjcgscfqe3ec5bc6edasuv2e36278j870i4n&rid=giphy.gif&ct=g",
       ),
@@ -159,8 +161,7 @@ object MockUtil {
           "Christina Hendricks, Keanu Reeves, and Ally Maki, who voice the new characters. " +
           "The film also posthumously features Don Rickles, who appears through use of archived " +
           "voice recordings.",
-        "https://user-images.githubusercontent.com/" +
-          "24237865/75088277-dea85e00-5542-11ea-961b-7f0942cd8f47.jpg",
+        largeImageUrls[1],
         "https://media3.giphy.com/media/KFcACgXTXkzKAGDZ05/" +
           "giphy.gif?cid=ecf05e47ku475ue16rb920a6ykl6roi9l0odvqo00flmikvs&rid=giphy.gif&ct=g",
       ),
@@ -181,8 +182,7 @@ object MockUtil {
           "(replacing Alexander Gould), Ed O'Neill, Kaitlin Olson, Ty Burrell, Diane Keaton, " +
           "and Eugene Levy joining the cast. The film focuses on the amnesiac fish Dory, " +
           "who journeys to be reunited with her parents.[10]",
-        "https://user-images.githubusercontent.com/24237865/" +
-          "75088202-0d720480-5542-11ea-85f3-8726e69a9a26.jpg",
+        largeImageUrls[2],
         "https://media3.giphy.com/media/Y713FQ3mfWDWU/" +
           "giphy.gif?cid=ecf05e47ksc6l561mp74ljpctaox6u0hkzv0pzap9kt9653g&rid=giphy.gif&ct=g",
       ),
@@ -199,8 +199,7 @@ object MockUtil {
           "and Shakira. It details the unlikely partnership between a rabbit police officer" +
           " and a red fox con artist, as they uncover a criminal conspiracy involving the" +
           " disappearance of predators.",
-        "https://user-images.githubusercontent.com/24237865/" +
-          "75087937-5c1d9f80-553e-11ea-8fc9-a7e520addde0.jpg",
+        largeImageUrls[3],
         "https://media3.giphy.com/media/26tPpStnC0XthM19u/" +
           "giphy.gif?cid=ecf05e471xnhh2e78pvhmgegmc1y27f06qcfvbg326p98gup&rid=giphy.gif&ct=g",
       ),
@@ -223,8 +222,7 @@ object MockUtil {
         " Idina Menzel, Josh Gad, Jonathan Groff, and Ciarán Hinds return as their previous" +
         " characters, and they are joined by newcomers Sterling K. Brown, Evan Rachel Wood, " +
         "Alfred Molina, Martha Plimpton, Jason Ritter, Rachel Matthews, and Jeremy Sisto.",
-      "https://user-images.githubusercontent.com/24237865/" +
-        "75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
+      largeImageUrls[0],
       "https://media2.giphy.com/media/" +
         "aQYR1p8saOQla/" +
         "giphy.gif?cid=ecf05e4701sln9u63lr3z17lh5f3n3h3owrk54zh1183hqmi&rid=giphy.gif&ct=g",

@@ -47,11 +47,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.skydoves.landscapistdemo.R
 import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.model.Poster
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
@@ -69,6 +67,9 @@ import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.palette.rememberPaletteState
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import com.skydoves.landscapist.zoomable.ZoomableConfig
+import com.skydoves.landscapist.zoomable.ZoomablePlugin
+import com.skydoves.landscapist.zoomable.rememberZoomableState
 
 @Composable
 fun DisneyPosters(
@@ -131,7 +132,6 @@ private fun PosterItem(
       component = rememberImageComponent {
         +CrossfadePlugin()
       },
-      previewPlaceholder = painterResource(id = R.drawable.poster),
     )
   }
 }
@@ -141,9 +141,18 @@ private fun SelectedPoster(
   poster: Poster,
   onPaletteUpdated: (Palette) -> Unit,
 ) {
+  val zoomableState = rememberZoomableState(
+    config = ZoomableConfig(
+      enableSubSampling = true,
+      maxZoom = 40f,
+      doubleTapZoom = 20f,
+    ),
+    resetKey = poster.image,
+  )
+
   CoilImage(
     imageModel = { poster.image },
-    modifier = Modifier.aspectRatio(0.8f),
+    modifier = Modifier.aspectRatio(0.75f),
     component = rememberImageComponent {
       +ShimmerPlugin(
         Shimmer.Resonate(
@@ -155,10 +164,14 @@ private fun SelectedPoster(
           highlightColor = Color.LightGray,
         ),
       )
-      +CircularRevealPlugin()
+
+      +ZoomablePlugin(
+        state = zoomableState,
+      )
+
       +PalettePlugin { onPaletteUpdated.invoke(it) }
+      +CircularRevealPlugin()
     },
-    previewPlaceholder = painterResource(id = R.drawable.poster),
   )
 }
 
@@ -196,7 +209,6 @@ private fun PosterInformation(
       .fillMaxWidth()
       .padding(8.dp)
       .clip(RoundedCornerShape(8.dp)),
-    previewPlaceholder = painterResource(id = R.drawable.poster),
   )
 
   Spacer(modifier = Modifier.height(12.dp))

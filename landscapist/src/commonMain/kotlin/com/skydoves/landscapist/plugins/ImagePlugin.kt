@@ -79,6 +79,21 @@ public sealed interface ImagePlugin {
       reason: Throwable?,
     ): ImagePlugin
   }
+
+  /**
+   * A pluggable composable plugin that wraps the image content with additional behavior.
+   * This is useful for adding gestures, overlays, or other interactive features to the image.
+   */
+  public interface ComposablePlugin : ImagePlugin {
+
+    /**
+     * Wraps the image content with additional composable behavior.
+     *
+     * @param content The image content to wrap.
+     */
+    @Composable
+    public fun compose(content: @Composable () -> Unit)
+  }
 }
 
 /**

@@ -78,3 +78,27 @@ public fun ImageComponent.ComposeFailureStatePlugins(
     plugin.compose(modifier = modifier, imageOptions = imageOptions, reason = reason)
   }
 }
+
+/**
+ * Wraps the content with composable plugins from the given [ImageComponent].
+ * Composable plugins are applied in order, with each plugin wrapping the previous content.
+ *
+ * @param content The content to wrap with composable plugins.
+ */
+@Composable
+@InternalLandscapistApi
+public fun ImageComponent.ComposeWithComposablePlugins(
+  content: @Composable () -> Unit,
+) {
+  val composablePlugins = imagePlugins.filterIsInstance<ImagePlugin.ComposablePlugin>()
+  if (composablePlugins.isEmpty()) {
+    content()
+  } else {
+    // Wrap content with each plugin, innermost first
+    composablePlugins.fold(content) { acc, plugin ->
+      {
+        plugin.compose(content = acc)
+      }
+    }.invoke()
+  }
+}
