@@ -92,17 +92,15 @@ public final class com/skydoves/landscapist/zoomable/ZoomablePainterKt {
 public final class com/skydoves/landscapist/zoomable/ZoomablePlugin : com/skydoves/landscapist/plugins/ImagePlugin$ComposablePlugin {
 	public static final field $stable I
 	public fun <init> ()V
-	public fun <init> (Lcom/skydoves/landscapist/zoomable/ZoomableState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;ZLkotlin/jvm/functions/Function1;)V
-	public synthetic fun <init> (Lcom/skydoves/landscapist/zoomable/ZoomableState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;ZLkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lcom/skydoves/landscapist/zoomable/ZoomableState;ZLkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (Lcom/skydoves/landscapist/zoomable/ZoomableState;ZLkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Lcom/skydoves/landscapist/zoomable/ZoomableState;
-	public final fun component2 ()Lcom/skydoves/landscapist/zoomable/ZoomableConfig;
-	public final fun component3 ()Z
-	public final fun component4 ()Lkotlin/jvm/functions/Function1;
+	public final fun component2 ()Z
+	public final fun component3 ()Lkotlin/jvm/functions/Function1;
 	public fun compose (Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)V
-	public final fun copy (Lcom/skydoves/landscapist/zoomable/ZoomableState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;ZLkotlin/jvm/functions/Function1;)Lcom/skydoves/landscapist/zoomable/ZoomablePlugin;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/zoomable/ZoomablePlugin;Lcom/skydoves/landscapist/zoomable/ZoomableState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/skydoves/landscapist/zoomable/ZoomablePlugin;
+	public final fun copy (Lcom/skydoves/landscapist/zoomable/ZoomableState;ZLkotlin/jvm/functions/Function1;)Lcom/skydoves/landscapist/zoomable/ZoomablePlugin;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/zoomable/ZoomablePlugin;Lcom/skydoves/landscapist/zoomable/ZoomableState;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/skydoves/landscapist/zoomable/ZoomablePlugin;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getConfig ()Lcom/skydoves/landscapist/zoomable/ZoomableConfig;
 	public final fun getEnabled ()Z
 	public final fun getOnTransformChanged ()Lkotlin/jvm/functions/Function1;
 	public final fun getState ()Lcom/skydoves/landscapist/zoomable/ZoomableState;
@@ -129,7 +127,7 @@ public final class com/skydoves/landscapist/zoomable/ZoomableState {
 }
 
 public final class com/skydoves/landscapist/zoomable/ZoomableState_skiaKt {
-	public static final fun rememberZoomableState (Lcom/skydoves/landscapist/zoomable/ZoomableConfig;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/zoomable/ZoomableState;
+	public static final fun rememberZoomableState (Lcom/skydoves/landscapist/zoomable/ZoomableConfig;Ljava/lang/Object;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/zoomable/ZoomableState;
 }
 
 public final class com/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder {

@@ -20,6 +20,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -34,13 +35,28 @@ import androidx.compose.ui.unit.IntSize
  * Creates and remembers a [ZoomableState] for managing zoom and pan transformations.
  *
  * @param config The configuration for zoom behavior.
+ * @param resetKey When this key changes, the zoom state will be reset to initial state.
  * @return A remembered [ZoomableState] instance.
  */
 @Composable
 public actual fun rememberZoomableState(
   config: ZoomableConfig,
+  resetKey: Any?,
 ): ZoomableState {
-  return remember(config) { ZoomableState(config) }
+  val state = remember(config) { ZoomableState(config) }
+
+  // Reset zoom when resetKey changes (but not on initial composition)
+  if (resetKey != null) {
+    var lastResetKey by remember { mutableStateOf<Any?>(null) }
+    LaunchedEffect(resetKey) {
+      if (lastResetKey != null && lastResetKey != resetKey) {
+        state.resetZoom()
+      }
+      lastResetKey = resetKey
+    }
+  }
+
+  return state
 }
 
 /**

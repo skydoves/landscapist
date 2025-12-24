@@ -141,7 +141,14 @@ private fun SelectedPoster(
   poster: Poster,
   onPaletteUpdated: (Palette) -> Unit,
 ) {
-  val zoomableState = rememberZoomableState()
+  val zoomableState = rememberZoomableState(
+    config = ZoomableConfig(
+      enableSubSampling = true,
+      maxZoom = 40f,
+      doubleTapZoom = 20f,
+    ),
+    resetKey = poster.image,
+  )
 
   CoilImage(
     imageModel = { poster.image },
@@ -160,11 +167,6 @@ private fun SelectedPoster(
 
       +ZoomablePlugin(
         state = zoomableState,
-        config = ZoomableConfig(
-          enableSubSampling = true,
-          maxZoom = 50f,
-          doubleTapZoom = 20f,
-        ),
       )
 
       +PalettePlugin { onPaletteUpdated.invoke(it) }

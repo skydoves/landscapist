@@ -24,7 +24,7 @@ import com.skydoves.landscapist.zoomable.internal.ZoomableContent
  * A plugin that enables zoomable functionality for images.
  *
  * This plugin wraps the image content with zoom and pan gesture handling,
- * allowing users to pinch-to-zoom, pan, and double-tap to zoom images.
+ * allowing users to pinch-to-zoom, pan, and double-tap to zoom/unzoom images.
  *
  * **Usage:**
  * ```kotlin
@@ -59,16 +59,26 @@ import com.skydoves.landscapist.zoomable.internal.ZoomableContent
  * }
  * ```
  *
+ * **Reset zoom when image changes:**
+ * ```kotlin
+ * val zoomableState = rememberZoomableState(resetKey = imageUrl)
+ *
+ * GlideImage(
+ *   imageModel = { imageUrl },
+ *   component = rememberImageComponent {
+ *     +ZoomablePlugin(state = zoomableState)
+ *   },
+ * )
+ * ```
+ *
  * @property state The [ZoomableState] that manages zoom and pan transformations.
  *   If null, a new state will be created internally.
- * @property config The [ZoomableConfig] for customizing zoom behavior.
  * @property enabled Whether zoom gestures are enabled.
  * @property onTransformChanged Callback invoked when the transformation changes.
  */
 @Immutable
 public data class ZoomablePlugin(
   public val state: ZoomableState? = null,
-  public val config: ZoomableConfig = ZoomableConfig(),
   public val enabled: Boolean = true,
   public val onTransformChanged: ((ContentTransformation) -> Unit)? = null,
 ) : ImagePlugin.ComposablePlugin {
@@ -84,7 +94,7 @@ public data class ZoomablePlugin(
    */
   @Composable
   override fun compose(content: @Composable () -> Unit) {
-    val zoomableState = state ?: rememberZoomableState(config)
+    val zoomableState = state ?: rememberZoomableState()
 
     // Notify callback when transformation changes
     val transformation = zoomableState.transformation
@@ -92,7 +102,7 @@ public data class ZoomablePlugin(
 
     ZoomableContent(
       zoomableState = zoomableState,
-      config = config,
+      config = zoomableState.config,
       enabled = enabled,
       content = content,
     )

@@ -46,43 +46,7 @@ internal fun Modifier.zoomGestures(
   val scope = rememberCoroutineScope()
 
   this
-    // Handle pinch-to-zoom and pan gestures with nested scroll support
-    .pointerInput(state, config) {
-      awaitEachGesture {
-        awaitFirstDown(requireUnconsumed = false)
-        do {
-          val event = awaitPointerEvent(PointerEventPass.Main)
-          val pointers = event.changes.filter { it.pressed }
-
-          if (pointers.isNotEmpty()) {
-            val zoom = event.calculateZoom()
-            val pan = event.calculatePan()
-            val centroid = event.calculateCentroid(useCurrent = true)
-
-            // Handle pinch zoom (multi-touch)
-            if (zoom != 1f) {
-              state.onGestureZoom(zoom, centroid)
-              // Consume all changes for pinch gesture
-              event.changes.forEach { if (it.positionChanged()) it.consume() }
-            } else if (pan != Offset.Zero) {
-              // Handle pan
-              val isPinching = pointers.size > 1
-
-              if (isPinching || state.isZoomed) {
-                // Consume pan when pinching or when zoomed
-                val consumed = state.onGesturePan(pan)
-                // Only consume if we actually moved
-                if (consumed != Offset.Zero) {
-                  event.changes.forEach { if (it.positionChanged()) it.consume() }
-                }
-              }
-              // When not zoomed and single finger, don't consume - let parent scroll
-            }
-          }
-        } while (event.changes.any { it.pressed })
-      }
-    }
-    // Handle double-tap to zoom
+    // Handle double-tap to zoom FIRST (before pan gesture can interfere)
     .then(
       if (config.enableDoubleTapZoom) {
         Modifier.pointerInput(state, config) {
@@ -102,4 +66,43 @@ internal fun Modifier.zoomGestures(
         Modifier
       },
     )
+    // Handle pinch-to-zoom and pan gestures with nested scroll support
+    // Use PointerEventPass.Initial to intercept multi-touch before parent scroll
+    .pointerInput(state, config) {
+      awaitEachGesture {
+        awaitFirstDown(requireUnconsumed = false)
+        do {
+          val event = awaitPointerEvent(PointerEventPass.Initial)
+          val pointers = event.changes.filter { it.pressed }
+
+          if (pointers.isNotEmpty()) {
+            val isMultiTouch = pointers.size > 1
+            val zoom = event.calculateZoom()
+            val pan = event.calculatePan()
+            val centroid = event.calculateCentroid(useCurrent = true)
+
+            // Immediately consume all events when multi-touch to prevent parent scroll
+            if (isMultiTouch) {
+              event.changes.forEach { it.consume() }
+            }
+
+            // Handle pinch zoom (multi-touch)
+            if (zoom != 1f) {
+              state.onGestureZoom(zoom, centroid)
+            } else if (pan != Offset.Zero) {
+              // Handle pan
+              if (isMultiTouch || state.isZoomed) {
+                // Apply pan when pinching or when zoomed
+                val consumed = state.onGesturePan(pan)
+                // Consume if we actually moved (for single-finger pan when zoomed)
+                if (!isMultiTouch && consumed != Offset.Zero) {
+                  event.changes.forEach { if (it.positionChanged()) it.consume() }
+                }
+              }
+              // When not zoomed and single finger, don't consume - let parent scroll
+            }
+          }
+        } while (event.changes.any { it.pressed })
+      }
+    }
 }

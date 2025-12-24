@@ -26,11 +26,14 @@ import androidx.compose.ui.unit.IntSize
  * Creates and remembers a [ZoomableState] for managing zoom and pan transformations.
  *
  * @param config The configuration for zoom behavior.
+ * @param resetKey When this key changes, the zoom state will be reset to initial state.
+ *   Useful for resetting zoom when the image model changes.
  * @return A remembered [ZoomableState] instance.
  */
 @Composable
 public expect fun rememberZoomableState(
   config: ZoomableConfig = ZoomableConfig(),
+  resetKey: Any? = null,
 ): ZoomableState
 
 /**
