@@ -36,7 +36,9 @@ import androidx.compose.ui.unit.IntSize
 import com.skydoves.landscapist.zoomable.ZoomableConfig
 import com.skydoves.landscapist.zoomable.ZoomableState
 import com.skydoves.landscapist.zoomable.internal.zoomGestures
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 
 /**
  * A composable that displays a sub-sampled image with zoom and pan support.
@@ -71,9 +73,11 @@ public fun SubSamplingImage(
     }
   }
 
-  // Update visible tiles when transformation changes
+  // Update visible tiles when transformation changes (debounced to reduce load)
+  @OptIn(FlowPreview::class)
   LaunchedEffect(subSamplingState, zoomableState, currentFitScale) {
     snapshotFlow { zoomableState.transformation }
+      .debounce(50) // Wait 50ms after last change before updating tiles
       .collectLatest { transformation ->
         if (viewportSize != IntSize.Zero && currentFitScale > 0f) {
           subSamplingState.updateVisibleTiles(transformation, viewportSize, currentFitScale)

@@ -222,8 +222,7 @@ object MockUtil {
         " Idina Menzel, Josh Gad, Jonathan Groff, and Ciarán Hinds return as their previous" +
         " characters, and they are joined by newcomers Sterling K. Brown, Evan Rachel Wood, " +
         "Alfred Molina, Martha Plimpton, Jason Ritter, Rachel Matthews, and Jeremy Sisto.",
-      "https://user-images.githubusercontent.com/24237865/" +
-        "75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
+      largeImageUrls[0],
       "https://media2.giphy.com/media/" +
         "aQYR1p8saOQla/" +
         "giphy.gif?cid=ecf05e4701sln9u63lr3z17lh5f3n3h3owrk54zh1183hqmi&rid=giphy.gif&ct=g",

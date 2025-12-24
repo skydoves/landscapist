@@ -148,6 +148,17 @@ public class SubSamplingState internal constructor(
 
     // The effective scale includes both the user's zoom and the fit scale
     val effectiveScale = transformation.scaleValue * fitScale
+
+    // Only load foreground tiles when zoomed beyond 1.5x
+    // At lower zoom levels, the base tile is sufficient
+    if (transformation.scaleValue < 1.5f) {
+      visibleTiles = emptyList()
+      // Cancel any pending loads
+      loadingJobs.values.forEach { it.cancel() }
+      loadingJobs.clear()
+      return
+    }
+
     val sampleSize = TileGrid.calculateSampleSizeForZoom(effectiveScale)
 
     // Get tiles for the current sample size
@@ -166,19 +177,25 @@ public class SubSamplingState internal constructor(
     visibleTiles = visible
 
     // Load tiles that are visible but not yet cached
-    // Launch all tile loads in parallel on IO dispatcher for better performance
-    visible.filter { it.bitmap == null && !loadingJobs.containsKey(it.key) }
-      .forEach { tile ->
-        loadTile(tile) { bitmap ->
-          if (bitmap != null) {
-            tileCache[tile.key] = bitmap
-            // Update visible tiles to include newly loaded bitmap
-            visibleTiles = visibleTiles.map { t ->
+    // Limit concurrent loads to prevent overwhelming the system
+    val tilesToLoad = visible
+      .filter { it.bitmap == null && !loadingJobs.containsKey(it.key) }
+      .take(2) // Only load up to 2 tiles at a time
+
+    tilesToLoad.forEach { tile ->
+      loadTile(tile) { bitmap ->
+        if (bitmap != null) {
+          tileCache[tile.key] = bitmap
+          // Only update if this tile is still in the visible list
+          val currentVisible = visibleTiles
+          if (currentVisible.any { it.key == tile.key }) {
+            visibleTiles = currentVisible.map { t ->
               if (t.key == tile.key) t.copy(bitmap = bitmap) else t
             }
           }
         }
       }
+    }
 
     // Cancel loading jobs for tiles that are no longer visible
     val visibleKeys = visible.map { it.key }.toSet()

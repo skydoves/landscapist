@@ -45,9 +45,9 @@ public class ImageRegionDecoder private constructor(
   private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Closeable {
 
-  // Allow up to 4 concurrent decode operations for better parallelism
+  // Allow up to 2 concurrent decode operations to balance performance and memory
   // BitmapRegionDecoder is thread-safe for decodeRegion calls
-  private val semaphore = Semaphore(4)
+  private val semaphore = Semaphore(2)
   private var isClosed = false
 
   /**
