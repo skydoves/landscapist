@@ -15,6 +15,9 @@
  */
 package com.skydoves.landscapist.zoomable
 
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+
 /**
  * Default values for [ZoomableConfig].
  */
@@ -35,15 +38,16 @@ public object ZoomableDefaults {
   public const val DoubleTapZoom: Float = 2.5f
 
   /**
-   * Default tile size for sub-sampling in pixels.
+   * Default tile size for sub-sampling.
+   * Each tile will be this size, balancing between memory usage and number of tiles.
    */
-  public const val TileSize: Int = 512
+  public val TileSize: Dp = 256.dp
 
   /**
    * Default threshold for the image size to enable sub-sampling automatically.
    * Images larger than this (in either dimension) will benefit from sub-sampling.
    */
-  public const val SubSamplingThreshold: Int = 2048
+  public val SubSamplingThreshold: Dp = 1024.dp
 
   /**
    * Default animation duration in milliseconds for zoom animations.

@@ -19,13 +19,20 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import com.skydoves.landscapist.zoomable.ZoomableConfig
 import com.skydoves.landscapist.zoomable.ZoomableState
 import com.skydoves.landscapist.zoomable.internal.zoomGestures
 import kotlinx.coroutines.flow.collectLatest
@@ -38,6 +45,8 @@ import kotlinx.coroutines.flow.collectLatest
  *
  * @param subSamplingState The [SubSamplingState] managing tile loading.
  * @param zoomableState The [ZoomableState] managing zoom transformations.
+ * @param config The [ZoomableConfig] for zoom behavior.
+ * @param enabled Whether zoom gestures are enabled.
  * @param modifier The modifier to apply to the composable.
  * @param contentDescription The content description for accessibility.
  */
@@ -45,10 +54,14 @@ import kotlinx.coroutines.flow.collectLatest
 public fun SubSamplingImage(
   subSamplingState: SubSamplingState,
   zoomableState: ZoomableState,
+  config: ZoomableConfig = ZoomableConfig(),
+  enabled: Boolean = true,
   modifier: Modifier = Modifier,
   contentDescription: String? = null,
 ) {
-  var viewportSize = IntSize.Zero
+  var viewportSize by remember { mutableStateOf(IntSize.Zero) }
+  var currentFitScale by remember { mutableFloatStateOf(1f) }
+  val imageSize = subSamplingState.imageSize
 
   // Initialize tile grid when viewport size is known
   LaunchedEffect(subSamplingState, viewportSize) {
@@ -58,11 +71,11 @@ public fun SubSamplingImage(
   }
 
   // Update visible tiles when transformation changes
-  LaunchedEffect(subSamplingState, zoomableState) {
+  LaunchedEffect(subSamplingState, zoomableState, currentFitScale) {
     snapshotFlow { zoomableState.transformation }
       .collectLatest { transformation ->
-        if (viewportSize != IntSize.Zero) {
-          subSamplingState.updateVisibleTiles(transformation, viewportSize)
+        if (viewportSize != IntSize.Zero && currentFitScale > 0f) {
+          subSamplingState.updateVisibleTiles(transformation, viewportSize, currentFitScale)
         }
       }
   }
@@ -70,17 +83,31 @@ public fun SubSamplingImage(
   Canvas(
     modifier = modifier
       .fillMaxSize()
+      .clipToBounds()
       .onSizeChanged { size ->
         viewportSize = size
+        zoomableState.setLayoutSize(size)
         subSamplingState.initialize(size)
+        // Calculate and update fitScale when size changes
+        if (imageSize.width > 0 && imageSize.height > 0) {
+          currentFitScale = minOf(
+            size.width.toFloat() / imageSize.width,
+            size.height.toFloat() / imageSize.height,
+          )
+        }
       }
-      .zoomGestures(
-        state = zoomableState,
-        config = zoomableState.config,
+      .then(
+        if (enabled) {
+          Modifier.zoomGestures(
+            state = zoomableState,
+            config = config,
+          )
+        } else {
+          Modifier
+        },
       ),
   ) {
     val transformation = zoomableState.transformation
-    val imageSize = subSamplingState.imageSize
 
     if (imageSize.width <= 0 || imageSize.height <= 0) return@Canvas
 
@@ -89,6 +116,11 @@ public fun SubSamplingImage(
       size.width / imageSize.width,
       size.height / imageSize.height,
     )
+
+    // Update currentFitScale if it changed
+    if (fitScale != currentFitScale && fitScale > 0f) {
+      currentFitScale = fitScale
+    }
 
     withTransform({
       // Apply user transformation
@@ -106,32 +138,29 @@ public fun SubSamplingImage(
         top = -imageSize.height / 2f,
       )
     }) {
-      // Draw base tile as fallback
+      // Draw base tile as fallback (scaled from sampled size to full image size)
       subSamplingState.baseTileBitmap?.let { baseBitmap ->
         drawImage(
           image = baseBitmap,
+          srcOffset = IntOffset.Zero,
+          srcSize = IntSize(baseBitmap.width, baseBitmap.height),
+          dstOffset = IntOffset.Zero,
           dstSize = IntSize(imageSize.width, imageSize.height),
         )
       }
 
-      // Draw visible foreground tiles
+      // Draw visible foreground tiles (scaled from sampled size to tile bounds)
       subSamplingState.visibleTiles.forEach { tile ->
         tile.bitmap?.let { bitmap ->
-          val tileSize = Size(
-            width = (tile.bounds.right - tile.bounds.left).toFloat(),
-            height = (tile.bounds.bottom - tile.bounds.top).toFloat(),
-          )
+          val tileWidth = tile.bounds.right - tile.bounds.left
+          val tileHeight = tile.bounds.bottom - tile.bounds.top
 
           drawImage(
             image = bitmap,
-            dstOffset = androidx.compose.ui.unit.IntOffset(
-              tile.bounds.left,
-              tile.bounds.top,
-            ),
-            dstSize = IntSize(
-              tileSize.width.toInt(),
-              tileSize.height.toInt(),
-            ),
+            srcOffset = IntOffset.Zero,
+            srcSize = IntSize(bitmap.width, bitmap.height),
+            dstOffset = IntOffset(tile.bounds.left, tile.bounds.top),
+            dstSize = IntSize(tileWidth, tileHeight),
           )
         }
       }

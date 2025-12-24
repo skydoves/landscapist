@@ -59,6 +59,7 @@ import com.github.skydoves.landscapistdemo.theme.background
 import com.kmpalette.palette.graphics.Palette
 import com.skydoves.compose.stability.runtime.IgnoreStabilityReport
 import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.coil3.CoilImage
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.crossfade.CrossfadePlugin
@@ -68,7 +69,6 @@ import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.palette.rememberPaletteState
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
-import com.skydoves.landscapist.zoomable.SubSamplingConfig
 import com.skydoves.landscapist.zoomable.ZoomableConfig
 import com.skydoves.landscapist.zoomable.ZoomablePlugin
 import com.skydoves.landscapist.zoomable.rememberZoomableState
@@ -139,6 +139,10 @@ private fun PosterItem(
   }
 }
 
+private const val SAMPLE_IMAGE_URL =
+  "https://unsplash.com/photos/f0d83M-PkNw/download?" +
+    "ixid=M3wxMjA3fDB8MXxhbGx8fHx8fHx8fHwxNzQ3ODMzODU2fA&force=true"
+
 @Composable
 private fun SelectedPoster(
   poster: Poster,
@@ -147,7 +151,7 @@ private fun SelectedPoster(
   val zoomableState = rememberZoomableState()
 
   CoilImage(
-    imageModel = { R.drawable.image },
+    imageModel = { SAMPLE_IMAGE_URL },
     modifier = Modifier.aspectRatio(0.8f),
     component = rememberImageComponent {
       +ShimmerPlugin(
@@ -165,14 +169,13 @@ private fun SelectedPoster(
         state = zoomableState,
         config = ZoomableConfig(
           enableSubSampling = true,
-          maxZoom = 20f,
+          maxZoom = 100f,
           doubleTapZoom = 10f,
-          subSamplingConfig = SubSamplingConfig(
-            tileSize = 25,
-          ),
         ),
       )
+
       +PalettePlugin { onPaletteUpdated.invoke(it) }
+      +CircularRevealPlugin()
     },
     previewPlaceholder = painterResource(id = R.drawable.poster),
   )

@@ -121,6 +121,11 @@ public final class com/skydoves/landscapist/LoadingOptionsKey {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class com/skydoves/landscapist/LocalImageSourceFileKt {
+	public static final fun ProvideImageSourceFile (Ljava/io/File;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)V
+	public static final fun getLocalImageSourceFile ()Landroidx/compose/runtime/ProvidableCompositionLocal;
+}
+
 public final class com/skydoves/landscapist/RememberDrawablePainterKt {
 	public static final fun rememberDrawablePainter (Landroid/graphics/drawable/Drawable;Ljava/util/List;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
 }

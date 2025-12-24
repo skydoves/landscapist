@@ -16,6 +16,7 @@
 package com.skydoves.landscapist.zoomable
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.unit.Dp
 
 /**
  * Configuration for [ZoomablePlugin] behavior.
@@ -36,17 +37,27 @@ public data class ZoomableConfig(
   public val enableDoubleTapZoom: Boolean = true,
   public val enableFling: Boolean = true,
   public val enableSubSampling: Boolean = false,
-  public val subSamplingConfig: SubSamplingConfig? = null,
+  public val subSamplingConfig: SubSamplingConfig = SubSamplingConfig(),
 )
 
 /**
  * Configuration for sub-sampling behavior.
  *
- * @property tileSize The size of each tile in pixels. Defaults to [ZoomableDefaults.TileSize].
- * @property threshold The minimum image dimension to enable sub-sampling. Defaults to [ZoomableDefaults.SubSamplingThreshold].
+ * Sub-sampling enables efficient rendering of very large images by loading only
+ * the visible tiles at the appropriate resolution. This is useful for images
+ * that are too large to fit in memory when fully decoded.
+ *
+ * **Note:** Sub-sampling requires the image source to support region decoding
+ * (e.g., local files, content URIs). Network images may need to be cached first.
+ *
+ * @property tileSize The size of each tile. Larger tiles mean fewer tiles but more memory per tile.
+ *   Defaults to [ZoomableDefaults.TileSize].
+ * @property threshold The minimum image dimension (in either width or height) to enable sub-sampling.
+ *   Images smaller than this will be rendered normally without tiling.
+ *   Defaults to [ZoomableDefaults.SubSamplingThreshold].
  */
 @Immutable
 public data class SubSamplingConfig(
-  public val tileSize: Int = ZoomableDefaults.TileSize,
-  public val threshold: Int = ZoomableDefaults.SubSamplingThreshold,
+  public val tileSize: Dp = ZoomableDefaults.TileSize,
+  public val threshold: Dp = ZoomableDefaults.SubSamplingThreshold,
 )

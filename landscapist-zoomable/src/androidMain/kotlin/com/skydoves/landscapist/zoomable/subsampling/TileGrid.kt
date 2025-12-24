@@ -17,7 +17,6 @@ package com.skydoves.landscapist.zoomable.subsampling
 
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
-import com.skydoves.landscapist.zoomable.ZoomableDefaults
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -28,17 +27,22 @@ import kotlin.math.min
 public object TileGrid {
 
   /**
+   * Default tile size in pixels.
+   */
+  private const val DEFAULT_TILE_SIZE_PX = 256
+
+  /**
    * Generates tiles for a given image and viewport size.
    *
    * @param imageSize The original image size in pixels.
    * @param viewportSize The viewport size in pixels.
-   * @param tileSize The target tile size in pixels.
+   * @param tileSizePx The target tile size in pixels.
    * @return A map of sample sizes to their corresponding tile lists.
    */
   public fun generate(
     imageSize: IntSize,
     viewportSize: IntSize,
-    tileSize: Int = ZoomableDefaults.TileSize,
+    tileSizePx: Int = DEFAULT_TILE_SIZE_PX,
   ): TileGridResult {
     if (imageSize.width <= 0 || imageSize.height <= 0) {
       return TileGridResult(emptyMap(), null)
@@ -61,7 +65,7 @@ public object TileGrid {
     while (sampleSize >= 1) {
       val tiles = generateTilesForSampleSize(
         imageSize = imageSize,
-        tileSize = tileSize,
+        tileSizePx = tileSizePx,
         sampleSize = sampleSize,
       )
       foregroundTiles[sampleSize] = tiles
@@ -91,13 +95,13 @@ public object TileGrid {
    */
   private fun generateTilesForSampleSize(
     imageSize: IntSize,
-    tileSize: Int,
+    tileSizePx: Int,
     sampleSize: Int,
   ): List<Tile> {
     val tiles = mutableListOf<Tile>()
 
     // Calculate effective tile size at this sample level
-    val effectiveTileSize = tileSize * sampleSize
+    val effectiveTileSize = tileSizePx * sampleSize
 
     // Calculate number of tiles in each dimension
     val tilesX = ceil(imageSize.width.toFloat() / effectiveTileSize).toInt()

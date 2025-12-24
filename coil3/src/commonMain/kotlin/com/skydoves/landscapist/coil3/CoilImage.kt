@@ -240,9 +240,12 @@ public fun CoilImage(
 
         is CoilImageState.Success -> {
           val boxScope = this
+          val loader = imageLoader.invoke()
+          val model = imageRequest.invoke().data
+
           component.ComposeSuccessStatePlugins(
             modifier = Modifier.constraint(this),
-            imageModel = imageRequest.invoke().data,
+            imageModel = model,
             imageOptions = imageOptions,
             imageBitmap = coilImageState.imageBitmap,
           )
@@ -250,16 +253,23 @@ public fun CoilImage(
           val image = coilImageState.image ?: return@CrossfadeWithEffect
           val painter = rememberImagePainter(image = image, imagePlugins = component.imagePlugins)
 
-          component.ComposeWithComposablePlugins {
-            if (success != null) {
-              success.invoke(boxScope, coilImageState, painter)
-            } else {
-              imageOptions.LandscapistImage(
-                modifier = Modifier
-                  .constraint(boxScope)
-                  .testTag(imageOptions.tag),
-                painter = painter,
-              )
+          // Wrap with source file provider for sub-sampling support (Android only)
+          ProvideCoilSourceFile(
+            imageLoader = loader,
+            imageModel = model,
+            dataSource = coilImageState.dataSource,
+          ) {
+            component.ComposeWithComposablePlugins {
+              if (success != null) {
+                success.invoke(boxScope, coilImageState, painter)
+              } else {
+                imageOptions.LandscapistImage(
+                  modifier = Modifier
+                    .constraint(boxScope)
+                    .testTag(imageOptions.tag),
+                  painter = painter,
+                )
+              }
             }
           }
         }

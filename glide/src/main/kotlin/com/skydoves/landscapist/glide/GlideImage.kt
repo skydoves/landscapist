@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.IntSize
@@ -40,6 +41,7 @@ import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.LandscapistImage
+import com.skydoves.landscapist.ProvideImageSourceFile
 import com.skydoves.landscapist.StableHolder
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
@@ -200,9 +202,12 @@ public fun GlideImage(
 
         is GlideImageState.Success -> {
           val boxScope = this
+          val context = LocalContext.current
+          val model = imageModel.invoke()
+
           component.ComposeSuccessStatePlugins(
             modifier = Modifier.constraint(this),
-            imageModel = imageModel.invoke(),
+            imageModel = model,
             imageOptions = imageOptions,
             imageBitmap = glideImageState.data.toImageBitmap(
               glideRequestType = glideRequestType,
@@ -222,16 +227,25 @@ public fun GlideImage(
             )
           }
 
-          component.ComposeWithComposablePlugins {
-            if (success != null) {
-              success.invoke(boxScope, glideImageState, painter)
-            } else {
-              imageOptions.LandscapistImage(
-                modifier = Modifier
-                  .constraint(boxScope)
-                  .testTag(imageOptions.tag),
-                painter = painter,
-              )
+          // Get the source file for sub-sampling support
+          val sourceFile = rememberImageSourceFile(
+            context = context,
+            imageModel = model,
+            dataSource = glideImageState.dataSource,
+          )
+
+          ProvideImageSourceFile(file = sourceFile) {
+            component.ComposeWithComposablePlugins {
+              if (success != null) {
+                success.invoke(boxScope, glideImageState, painter)
+              } else {
+                imageOptions.LandscapistImage(
+                  modifier = Modifier
+                    .constraint(boxScope)
+                    .testTag(imageOptions.tag),
+                  painter = painter,
+                )
+              }
             }
           }
         }

@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import com.skydoves.landscapist.zoomable.ContentTransformation
@@ -46,8 +47,10 @@ public fun rememberSubSamplingState(
   config: SubSamplingConfig = SubSamplingConfig(),
 ): SubSamplingState {
   val scope = rememberCoroutineScope()
-  return remember(decoder, config) {
-    SubSamplingState(decoder, config, scope)
+  val density = LocalDensity.current
+  val tileSizePx = with(density) { config.tileSize.roundToPx() }
+  return remember(decoder, config, tileSizePx) {
+    SubSamplingState(decoder, tileSizePx, scope)
   }
 }
 
@@ -58,13 +61,13 @@ public fun rememberSubSamplingState(
  * and zoom level, efficiently loading only the visible portions of large images.
  *
  * @property decoder The [ImageRegionDecoder] for loading image regions.
- * @property config The sub-sampling configuration.
+ * @property tileSizePx The tile size in pixels.
  * @property scope The coroutine scope for loading operations.
  */
 @Stable
 public class SubSamplingState internal constructor(
   private val decoder: ImageRegionDecoder,
-  private val config: SubSamplingConfig,
+  private val tileSizePx: Int,
   private val scope: CoroutineScope,
 ) {
   /**
@@ -117,7 +120,7 @@ public class SubSamplingState internal constructor(
     tileGrid = TileGrid.generate(
       imageSize = imageSize,
       viewportSize = viewportSize,
-      tileSize = config.tileSize,
+      tileSizePx = tileSizePx,
     )
 
     // Load the base tile immediately
@@ -133,21 +136,24 @@ public class SubSamplingState internal constructor(
    *
    * @param transformation The current zoom/pan transformation.
    * @param viewportSize The size of the viewport in pixels.
+   * @param fitScale The scale factor used to fit the image in the viewport.
    */
   public fun updateVisibleTiles(
     transformation: ContentTransformation,
     viewportSize: IntSize,
+    fitScale: Float = 1f,
   ) {
     val grid = tileGrid ?: return
 
-    val scale = transformation.scaleValue
-    val sampleSize = TileGrid.calculateSampleSizeForZoom(scale)
+    // The effective scale includes both the user's zoom and the fit scale
+    val effectiveScale = transformation.scaleValue * fitScale
+    val sampleSize = TileGrid.calculateSampleSizeForZoom(effectiveScale)
 
     // Get tiles for the current sample size
     val tilesForSampleSize = grid.foreground[sampleSize] ?: return
 
     // Calculate the visible region in image coordinates
-    val visibleRegion = calculateVisibleRegion(transformation, viewportSize)
+    val visibleRegion = calculateVisibleRegion(transformation, viewportSize, fitScale)
 
     // Filter to visible tiles and update their bitmaps from cache
     val visible = TileGrid.filterVisibleTiles(tilesForSampleSize, visibleRegion)
@@ -165,7 +171,7 @@ public class SubSamplingState internal constructor(
           if (bitmap != null) {
             tileCache[tile.key] = bitmap
             // Trigger recomposition by updating visible tiles
-            updateVisibleTiles(transformation, viewportSize)
+            updateVisibleTiles(transformation, viewportSize, fitScale)
           }
         }
       }
@@ -180,22 +186,37 @@ public class SubSamplingState internal constructor(
 
   /**
    * Calculates the visible region in image coordinates.
+   *
+   * @param transformation The current zoom/pan transformation.
+   * @param viewportSize The size of the viewport in pixels.
+   * @param fitScale The scale factor used to fit the image in the viewport.
    */
   private fun calculateVisibleRegion(
     transformation: ContentTransformation,
     viewportSize: IntSize,
+    fitScale: Float,
   ): IntRect {
-    val scale = transformation.scaleValue
+    // The effective scale combines user zoom and fit scale
+    val effectiveScale = transformation.scaleValue * fitScale
     val offsetX = transformation.offset.x
     val offsetY = transformation.offset.y
 
-    // Calculate the visible region in image coordinates
-    val left = (-offsetX / scale).roundToInt().coerceAtLeast(0)
-    val top = (-offsetY / scale).roundToInt().coerceAtLeast(0)
-    val right = ((-offsetX + viewportSize.width) / scale).roundToInt()
-      .coerceAtMost(imageSize.width)
-    val bottom = ((-offsetY + viewportSize.height) / scale).roundToInt()
-      .coerceAtMost(imageSize.height)
+    // The image is centered in the viewport, so we need to account for centering
+    val scaledImageWidth = imageSize.width * effectiveScale
+    val scaledImageHeight = imageSize.height * effectiveScale
+
+    // Calculate the offset from the image's top-left corner
+    // The image is centered, so at offset (0,0), the image center is at viewport center
+    val imageOffsetX = (viewportSize.width - scaledImageWidth) / 2 + offsetX
+    val imageOffsetY = (viewportSize.height - scaledImageHeight) / 2 + offsetY
+
+    // Calculate visible region in image coordinates
+    val left = ((-imageOffsetX) / effectiveScale).roundToInt().coerceIn(0, imageSize.width)
+    val top = ((-imageOffsetY) / effectiveScale).roundToInt().coerceIn(0, imageSize.height)
+    val right = ((viewportSize.width - imageOffsetX) / effectiveScale).roundToInt()
+      .coerceIn(0, imageSize.width)
+    val bottom = ((viewportSize.height - imageOffsetY) / effectiveScale).roundToInt()
+      .coerceIn(0, imageSize.height)
 
     return IntRect(left, top, right, bottom)
   }

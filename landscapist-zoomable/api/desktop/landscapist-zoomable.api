@@ -24,16 +24,15 @@ public final class com/skydoves/landscapist/zoomable/ContentTransformation$Compa
 
 public final class com/skydoves/landscapist/zoomable/SubSamplingConfig {
 	public static final field $stable I
-	public fun <init> ()V
-	public fun <init> (II)V
-	public synthetic fun <init> (IIILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1 ()I
-	public final fun component2 ()I
-	public final fun copy (II)Lcom/skydoves/landscapist/zoomable/SubSamplingConfig;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/zoomable/SubSamplingConfig;IIILjava/lang/Object;)Lcom/skydoves/landscapist/zoomable/SubSamplingConfig;
+	public synthetic fun <init> (FFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (FFLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-D9Ej5fM ()F
+	public final fun component2-D9Ej5fM ()F
+	public final fun copy-YgX7TsA (FF)Lcom/skydoves/landscapist/zoomable/SubSamplingConfig;
+	public static synthetic fun copy-YgX7TsA$default (Lcom/skydoves/landscapist/zoomable/SubSamplingConfig;FFILjava/lang/Object;)Lcom/skydoves/landscapist/zoomable/SubSamplingConfig;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getThreshold ()I
-	public final fun getTileSize ()I
+	public final fun getThreshold-D9Ej5fM ()F
+	public final fun getTileSize-D9Ej5fM ()F
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -72,14 +71,8 @@ public final class com/skydoves/landscapist/zoomable/ZoomableDefaults {
 	public static final field INSTANCE Lcom/skydoves/landscapist/zoomable/ZoomableDefaults;
 	public static final field MaxZoom F
 	public static final field MinZoom F
-	public static final field SubSamplingThreshold I
-	public static final field TileSize I
-}
-
-public final class com/skydoves/landscapist/zoomable/ZoomableImageKt {
-	public static final fun ZoomableImage (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/zoomable/ZoomableState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;ZLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;II)V
-	public static final fun zoomable (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/zoomable/ZoomableState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;Z)Landroidx/compose/ui/Modifier;
-	public static synthetic fun zoomable$default (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/zoomable/ZoomableState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;ZILjava/lang/Object;)Landroidx/compose/ui/Modifier;
+	public final fun getSubSamplingThreshold-D9Ej5fM ()F
+	public final fun getTileSize-D9Ej5fM ()F
 }
 
 public final class com/skydoves/landscapist/zoomable/ZoomablePainter : androidx/compose/ui/graphics/painter/Painter {

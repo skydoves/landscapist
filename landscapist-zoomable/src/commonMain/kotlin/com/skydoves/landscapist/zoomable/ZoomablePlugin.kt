@@ -15,16 +15,10 @@
  */
 package com.skydoves.landscapist.zoomable
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.onSizeChanged
 import com.skydoves.landscapist.plugins.ImagePlugin
-import com.skydoves.landscapist.zoomable.internal.zoomGestures
+import com.skydoves.landscapist.zoomable.internal.ZoomableContent
 
 /**
  * A plugin that enables zoomable functionality for images.
@@ -82,6 +76,10 @@ public data class ZoomablePlugin(
   /**
    * Wraps the image content with zoomable behavior.
    *
+   * On Android, when [ZoomableConfig.enableSubSampling] is true and an [ImageRegionDecoder]
+   * is available via [LocalImageRegionDecoder], sub-sampling will be used for efficient
+   * rendering of large images.
+   *
    * @param content The image content to wrap.
    */
   @Composable
@@ -92,34 +90,11 @@ public data class ZoomablePlugin(
     val transformation = zoomableState.transformation
     onTransformChanged?.invoke(transformation)
 
-    Box(
-      modifier = Modifier
-        // Clip content to container bounds so zoomed image doesn't overflow
-        .clipToBounds()
-        // Track the container size for pan constraints
-        .onSizeChanged { size ->
-          zoomableState.setLayoutSize(size)
-        }
-        .then(
-          if (enabled) {
-            Modifier.zoomGestures(
-              state = zoomableState,
-              config = config,
-            )
-          } else {
-            Modifier
-          },
-        )
-        .graphicsLayer {
-          scaleX = transformation.scale.scaleX
-          scaleY = transformation.scale.scaleY
-          translationX = transformation.offset.x
-          translationY = transformation.offset.y
-          rotationZ = transformation.rotationZ
-        },
-      contentAlignment = Alignment.Center,
-    ) {
-      content()
-    }
+    ZoomableContent(
+      zoomableState = zoomableState,
+      config = config,
+      enabled = enabled,
+      content = content,
+    )
   }
 }

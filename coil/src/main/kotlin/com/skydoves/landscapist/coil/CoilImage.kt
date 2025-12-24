@@ -47,6 +47,7 @@ import com.skydoves.landscapist.ImageLoad
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.LandscapistImage
+import com.skydoves.landscapist.ProvideImageSourceFile
 import com.skydoves.landscapist.StableHolder
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
@@ -262,9 +263,13 @@ public fun CoilImage(
 
         is CoilImageState.Success -> {
           val boxScope = this
+          val context = LocalContext.current
+          val loader = imageLoader.invoke()
+          val model = imageRequest.invoke().data
+
           component.ComposeSuccessStatePlugins(
             modifier = Modifier.constraint(this),
-            imageModel = imageRequest.invoke().data,
+            imageModel = model,
             imageOptions = imageOptions,
             imageBitmap = coilImageState.drawable?.toBitmap()
               ?.copy(Bitmap.Config.ARGB_8888, true)?.asImageBitmap(),
@@ -276,16 +281,26 @@ public fun CoilImage(
             imagePlugins = component.imagePlugins,
           )
 
-          component.ComposeWithComposablePlugins {
-            if (success != null) {
-              success.invoke(boxScope, coilImageState, painter)
-            } else {
-              imageOptions.LandscapistImage(
-                modifier = Modifier
-                  .constraint(boxScope)
-                  .testTag(imageOptions.tag),
-                painter = painter,
-              )
+          // Get the source file for sub-sampling support
+          val sourceFile = rememberImageSourceFile(
+            context = context,
+            imageLoader = loader,
+            imageModel = model,
+            dataSource = coilImageState.dataSource,
+          )
+
+          ProvideImageSourceFile(file = sourceFile) {
+            component.ComposeWithComposablePlugins {
+              if (success != null) {
+                success.invoke(boxScope, coilImageState, painter)
+              } else {
+                imageOptions.LandscapistImage(
+                  modifier = Modifier
+                    .constraint(boxScope)
+                    .testTag(imageOptions.tag),
+                  painter = painter,
+                )
+              }
             }
           }
         }
