@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.Dp
  * @property maxZoom The maximum zoom scale. Defaults to [ZoomableDefaults.MaxZoom].
  * @property doubleTapZoom The zoom scale to apply when double-tapping. Defaults to [ZoomableDefaults.DoubleTapZoom].
  * @property enableDoubleTapZoom Whether double-tap to zoom gesture is enabled. Defaults to true.
- * @property enableFling Whether fling gesture after pan is enabled. Defaults to true.
  * @property enableSubSampling Whether sub-sampling (tiling) for large images is enabled. Defaults to false (opt-in).
  * @property subSamplingConfig Optional configuration for sub-sampling behavior.
  */
@@ -35,7 +34,6 @@ public data class ZoomableConfig(
   public val maxZoom: Float = ZoomableDefaults.MaxZoom,
   public val doubleTapZoom: Float = ZoomableDefaults.DoubleTapZoom,
   public val enableDoubleTapZoom: Boolean = true,
-  public val enableFling: Boolean = true,
   public val enableSubSampling: Boolean = false,
   public val subSamplingConfig: SubSamplingConfig = SubSamplingConfig(),
 )
