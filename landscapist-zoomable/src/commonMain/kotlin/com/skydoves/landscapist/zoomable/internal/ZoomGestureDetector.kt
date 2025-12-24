@@ -15,19 +15,26 @@
  */
 package com.skydoves.landscapist.zoomable.internal
 
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChanged
 import com.skydoves.landscapist.zoomable.ZoomableConfig
 import com.skydoves.landscapist.zoomable.ZoomableState
 import kotlinx.coroutines.launch
 
 /**
  * Modifier that detects zoom and pan gestures for zoomable content.
+ * Supports nested scrolling - when not zoomed, single-finger drag events pass to parent.
  *
  * @param state The [ZoomableState] to update based on gestures.
  * @param config The [ZoomableConfig] for gesture behavior configuration.
@@ -39,18 +46,40 @@ internal fun Modifier.zoomGestures(
   val scope = rememberCoroutineScope()
 
   this
-    // Handle pinch-to-zoom and pan gestures
+    // Handle pinch-to-zoom and pan gestures with nested scroll support
     .pointerInput(state, config) {
-      detectTransformGestures { centroid, pan, zoom, _ ->
-        // Apply zoom if there's a significant change
-        if (zoom != 1f) {
-          state.onGestureZoom(zoom, centroid)
-        }
+      awaitEachGesture {
+        awaitFirstDown(requireUnconsumed = false)
+        do {
+          val event = awaitPointerEvent(PointerEventPass.Main)
+          val pointers = event.changes.filter { it.pressed }
 
-        // Apply pan - allow panning when zoomed
-        if (pan != Offset.Zero && state.isZoomed) {
-          state.onGesturePan(pan)
-        }
+          if (pointers.isNotEmpty()) {
+            val zoom = event.calculateZoom()
+            val pan = event.calculatePan()
+            val centroid = event.calculateCentroid(useCurrent = true)
+
+            // Handle pinch zoom (multi-touch)
+            if (zoom != 1f) {
+              state.onGestureZoom(zoom, centroid)
+              // Consume all changes for pinch gesture
+              event.changes.forEach { if (it.positionChanged()) it.consume() }
+            } else if (pan != Offset.Zero) {
+              // Handle pan
+              val isPinching = pointers.size > 1
+
+              if (isPinching || state.isZoomed) {
+                // Consume pan when pinching or when zoomed
+                val consumed = state.onGesturePan(pan)
+                // Only consume if we actually moved
+                if (consumed != Offset.Zero) {
+                  event.changes.forEach { if (it.positionChanged()) it.consume() }
+                }
+              }
+              // When not zoomed and single finger, don't consume - let parent scroll
+            }
+          }
+        } while (event.changes.any { it.pressed })
       }
     }
     // Handle double-tap to zoom

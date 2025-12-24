@@ -132,6 +132,9 @@ public expect class ZoomableState {
   /**
    * Internal function to update offset directly from gesture input.
    * The offset will be constrained to keep the image within bounds.
+   *
+   * @param pan The pan offset to apply.
+   * @return The actually consumed offset (may be less than requested if hitting bounds).
    */
-  internal fun onGesturePan(pan: Offset)
+  internal fun onGesturePan(pan: Offset): Offset
 }

@@ -162,7 +162,7 @@ private fun SelectedPoster(
         state = zoomableState,
         config = ZoomableConfig(
           enableSubSampling = true,
-          maxZoom = 100f,
+          maxZoom = 50f,
           doubleTapZoom = 20f,
         ),
       )

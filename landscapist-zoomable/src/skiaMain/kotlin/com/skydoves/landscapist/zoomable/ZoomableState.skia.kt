@@ -199,9 +199,15 @@ public actual class ZoomableState internal constructor(
   /**
    * Internal function to update offset directly from gesture input.
    * The offset will be constrained to keep the image within bounds.
+   *
+   * @param pan The pan offset to apply.
+   * @return The actually consumed offset (may be less than requested if hitting bounds).
    */
-  internal actual fun onGesturePan(pan: Offset) {
+  internal actual fun onGesturePan(pan: Offset): Offset {
+    val oldOffset = _offset
     _offset = constrainOffset(_offset + pan)
+    // Return the actually consumed offset
+    return _offset - oldOffset
   }
 
   /**
