@@ -42,6 +42,7 @@ import com.skydoves.landscapist.StableHolder
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
 import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
+import com.skydoves.landscapist.components.ComposeWithComposablePlugins
 import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -168,6 +169,7 @@ public fun FrescoImage(
         }
 
         is FrescoImageState.Success -> {
+          val boxScope = this
           component.ComposeSuccessStatePlugins(
             modifier = Modifier.constraint(this),
             imageModel = imageUrl,
@@ -181,15 +183,17 @@ public fun FrescoImage(
             imageBitmap = imageBitmap,
           )
 
-          if (success != null) {
-            success.invoke(this, frescoImageState, painter)
-          } else {
-            imageOptions.LandscapistImage(
-              modifier = Modifier
-                .constraint(this)
-                .testTag(imageOptions.tag),
-              painter = painter,
-            )
+          component.ComposeWithComposablePlugins {
+            if (success != null) {
+              success.invoke(boxScope, frescoImageState, painter)
+            } else {
+              imageOptions.LandscapistImage(
+                modifier = Modifier
+                  .constraint(boxScope)
+                  .testTag(imageOptions.tag),
+                painter = painter,
+              )
+            }
           }
         }
       }

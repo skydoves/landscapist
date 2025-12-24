@@ -140,6 +140,7 @@ public final class com/skydoves/landscapist/components/ImageComponentExtensionsK
 	public static final fun ComposeFailureStatePlugins (Lcom/skydoves/landscapist/components/ImageComponent;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Ljava/lang/Throwable;Landroidx/compose/runtime/Composer;I)V
 	public static final fun ComposeLoadingStatePlugins (Lcom/skydoves/landscapist/components/ImageComponent;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)V
 	public static final fun ComposeSuccessStatePlugins (Lcom/skydoves/landscapist/components/ImageComponent;Landroidx/compose/ui/Modifier;Ljava/lang/Object;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/runtime/Composer;I)V
+	public static final fun ComposeWithComposablePlugins (Lcom/skydoves/landscapist/components/ImageComponent;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)V
 	public static final fun getImagePlugins (Lcom/skydoves/landscapist/components/ImageComponent;)Ljava/util/List;
 }
 
@@ -197,6 +198,10 @@ public final class com/skydoves/landscapist/crossfade/CrossfadeWithEffectKt {
 }
 
 public abstract interface class com/skydoves/landscapist/plugins/ImagePlugin {
+}
+
+public abstract interface class com/skydoves/landscapist/plugins/ImagePlugin$ComposablePlugin : com/skydoves/landscapist/plugins/ImagePlugin {
+	public abstract fun compose (Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)V
 }
 
 public abstract interface class com/skydoves/landscapist/plugins/ImagePlugin$FailureStatePlugin : com/skydoves/landscapist/plugins/ImagePlugin {

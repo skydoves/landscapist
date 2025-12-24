@@ -51,6 +51,7 @@ import com.skydoves.landscapist.StableHolder
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
 import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
+import com.skydoves.landscapist.components.ComposeWithComposablePlugins
 import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -260,6 +261,7 @@ public fun CoilImage(
         }
 
         is CoilImageState.Success -> {
+          val boxScope = this
           component.ComposeSuccessStatePlugins(
             modifier = Modifier.constraint(this),
             imageModel = imageRequest.invoke().data,
@@ -274,15 +276,17 @@ public fun CoilImage(
             imagePlugins = component.imagePlugins,
           )
 
-          if (success != null) {
-            success.invoke(this, coilImageState, painter)
-          } else {
-            imageOptions.LandscapistImage(
-              modifier = Modifier
-                .constraint(this)
-                .testTag(imageOptions.tag),
-              painter = painter,
-            )
+          component.ComposeWithComposablePlugins {
+            if (success != null) {
+              success.invoke(boxScope, coilImageState, painter)
+            } else {
+              imageOptions.LandscapistImage(
+                modifier = Modifier
+                  .constraint(boxScope)
+                  .testTag(imageOptions.tag),
+                painter = painter,
+              )
+            }
           }
         }
       }
