@@ -20,6 +20,7 @@ The Landscapist Bill of Materials (BOM) simplifies the management of all Landsca
         implementation "com.github.skydoves:landscapist-placeholder"
         implementation "com.github.skydoves:landscapist-palette"
         implementation "com.github.skydoves:landscapist-transformation"
+        implementation "com.github.skydoves:landscapist-zoomable"
     }
     ```
 
@@ -39,6 +40,7 @@ The Landscapist Bill of Materials (BOM) simplifies the management of all Landsca
         implementation("com.github.skydoves:landscapist-placeholder")
         implementation("com.github.skydoves:landscapist-palette")
         implementation("com.github.skydoves:landscapist-transformation")
+        implementation("com.github.skydoves:landscapist-zoomable")
     }
     ```
 

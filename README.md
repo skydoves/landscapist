@@ -25,7 +25,7 @@ Landscapist hits **+1,100,000 downloads every month** around the globe! 🚀
 
 ## Why Landscapist?
 
-Landscapist is built with a lot of consideration to improve the performance of image loadings in Jetpack Compose. Most composable functions of Landscapist are Restartable and Skippable, which indicates fairly improved recomposition performance according to the Compose compiler metrics. Also, the library performance was improved with [Baseline Profiles](https://android-developers.googleblog.com/2022/01/improving-app-performance-with-baseline.html) and it supports many pluggable features, such as [ImageOptions](https://github.com/skydoves/landscapist#imageoptions), [listening image state changes](https://github.com/skydoves/landscapist#listening-image-state-changes), [custom composables](https://github.com/skydoves/landscapist#custom-composables), [preview on Android Studio](https://github.com/skydoves/landscapist#preview-on-android-studio), [ImageComponent and ImagePlugin](https://github.com/skydoves/landscapist#imagecomponent-and-imageplugin), [placeholder](https://github.com/skydoves/landscapist#placeholder), [animations (circular reveal, crossfade)](https://github.com/skydoves/landscapist#animation), [transformation (blur)](https://github.com/skydoves/landscapist#transformation), and [palette](https://github.com/skydoves/landscapist#palette).
+Landscapist is built with a lot of consideration to improve the performance of image loadings in Jetpack Compose. Most composable functions of Landscapist are Restartable and Skippable, which indicates fairly improved recomposition performance according to the Compose compiler metrics. Also, the library performance was improved with [Baseline Profiles](https://android-developers.googleblog.com/2022/01/improving-app-performance-with-baseline.html) and it supports many pluggable features, such as [ImageOptions](https://github.com/skydoves/landscapist#imageoptions), [listening image state changes](https://github.com/skydoves/landscapist#listening-image-state-changes), [custom composables](https://github.com/skydoves/landscapist#custom-composables), [preview on Android Studio](https://github.com/skydoves/landscapist#preview-on-android-studio), [ImageComponent and ImagePlugin](https://github.com/skydoves/landscapist#imagecomponent-and-imageplugin), [placeholder](https://github.com/skydoves/landscapist#placeholder), [animations (circular reveal, crossfade)](https://github.com/skydoves/landscapist#animation), [transformation (blur)](https://github.com/skydoves/landscapist#transformation), [palette](https://github.com/skydoves/landscapist#palette), and [zoomable](https://github.com/skydoves/landscapist#zoomable).
 
 <details>
  <summary>See the Compose compiler metrics for Landscapist</summary>
@@ -76,7 +76,7 @@ Next, add the dependency below to your **module**'s `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation("com.github.skydoves:landscapist-glide:2.6.2")
+    implementation("com.github.skydoves:landscapist-glide:2.7.0")
 }
 ```
 
@@ -847,6 +847,86 @@ GlideImage( // CoilImage, FrescoImage also can be used.
 ```
  > **Note**: You can also use the Palette for **`CoilImage`** and **`FrescoImage`**.
 
+## Zoomable
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
+
+<img src="preview/sample0.gif" align="right" width="32%"/>
+
+The `landscapist-zoomable` package provides a `ZoomablePlugin` that enables zoom and pan gestures for images. This plugin supports both Android and Kotlin Multiplatform (iOS, Desktop).
+
+To use zoomable supports, add the dependency below:
+
+```kotlin
+dependencies {
+    implementation("com.github.skydoves:landscapist-zoomable:$version")
+}
+```
+
+### ZoomablePlugin
+
+You can implement zoom and pan gestures by adding `ZoomablePlugin` to your image component:
+
+```kotlin
+GlideImage( // CoilImage, FrescoImage also can be used.
+  imageModel = { poster.image },
+  component = rememberImageComponent {
+    +ZoomablePlugin()
+  }
+)
+```
+
+### ZoomableState
+
+You can create and remember a `ZoomableState` with `rememberZoomableState` to customize the zoom behavior and access the current transformation state:
+
+```kotlin
+val zoomableState = rememberZoomableState(
+  config = ZoomableConfig(
+    minZoom = 30f,           // Minimum zoom scale
+    maxZoom = 4f,           // Maximum zoom scale
+    doubleTapZoom = 20f,     // Zoom scale on double-tap
+    enableDoubleTapZoom = true,
+  )
+)
+
+GlideImage( // or CoilImage
+  imageModel = { poster.image },
+  component = rememberImageComponent {
+    +ZoomablePlugin(state = zoomableState)
+  }
+)
+
+// Access current zoom state
+val currentScale = zoomableState.transformation.scale
+val currentOffset = zoomableState.transformation.offset
+```
+
+### Sub-Sampling
+
+For very large images, Landscapist supports sub-sampling to efficiently display high-resolution images without running out of memory:
+
+```kotlin
+val zoomableState = rememberZoomableState(
+  config = ZoomableConfig(
+    enableSubSampling = true,
+    subSamplingConfig = SubSamplingConfig(
+      tileSize = 512.dp,
+      threshold = 2000.dp,
+    )
+  )
+)
+
+GlideImage( // or CoilImage
+  imageModel = { poster.image },
+  component = rememberImageComponent {
+    +ZoomablePlugin(state = zoomableState)
+  }
+)
+```
+
+ > **Note**: Sub-sampling is supported on Android (Glide, Coil3) and Kotlin Multiplatform (Coil3, targeting Android, iOS/macOS, and Destkop).
+
  ## BOM
 
  [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
@@ -863,6 +943,7 @@ dependencies {
     implementation("com.github.skydoves:landscapist-placeholder")
     implementation("com.github.skydoves:landscapist-palette")
     implementation("com.github.skydoves:landscapist-transformation")
+    implementation("com.github.skydoves:landscapist-zoomable")
 }
  ```
 
