@@ -15,28 +15,34 @@
  */
 package com.skydoves.landscapist.zoomable.subsampling
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.BitmapRegionDecoder
-import android.graphics.Rect
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
-import java.io.InputStream
+import java.awt.Rectangle
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.io.File
+import javax.imageio.ImageIO
+import javax.imageio.ImageReadParam
+import javax.imageio.ImageReader
+import javax.imageio.stream.ImageInputStream
 
 /**
- * Android implementation of [ImageRegionDecoder] using [BitmapRegionDecoder].
+ * Desktop (JVM) implementation of [ImageRegionDecoder] using javax.imageio.
  *
- * This class provides thread-safe region decoding with configurable options.
- * Uses a semaphore to allow limited parallelism for better performance.
+ * This implementation uses [ImageReader] with [ImageReadParam.setSourceRegion] for efficient
+ * region-based decoding. JPEG images support true partial decoding, while other formats
+ * may require loading the full image.
  */
 public actual class ImageRegionDecoder private constructor(
-  private val decoder: BitmapRegionDecoder,
+  private val imageInputStream: ImageInputStream,
+  private val reader: ImageReader,
+  private val _imageSize: IntSize,
 ) {
 
   // Allow up to 2 concurrent decode operations to balance performance and memory
@@ -47,7 +53,7 @@ public actual class ImageRegionDecoder private constructor(
    * The size of the full image.
    */
   public actual val imageSize: IntSize
-    get() = IntSize(decoder.width, decoder.height)
+    get() = _imageSize
 
   /**
    * Decodes a region of the image.
@@ -64,19 +70,23 @@ public actual class ImageRegionDecoder private constructor(
       if (isClosed) return@withPermit null
 
       try {
-        val options = BitmapFactory.Options().apply {
-          inSampleSize = sampleSize
-          inPreferredConfig = Bitmap.Config.RGB_565
+        val param = reader.defaultReadParam.apply {
+          sourceRegion = Rectangle(
+            region.left,
+            region.top,
+            region.right - region.left,
+            region.bottom - region.top,
+          )
+          // Set subsampling (equivalent to Android's inSampleSize)
+          setSourceSubsampling(sampleSize, sampleSize, 0, 0)
         }
 
-        val rect = Rect(
-          region.left,
-          region.top,
-          region.right,
-          region.bottom,
-        )
+        val bufferedImage: BufferedImage = synchronized(reader) {
+          reader.read(0, param)
+        }
 
-        decoder.decodeRegion(rect, options)?.asImageBitmap()
+        // Convert to Skia Image then to Compose ImageBitmap
+        bufferedImage.toComposeImageBitmap()
       } catch (e: Exception) {
         null
       }
@@ -88,7 +98,12 @@ public actual class ImageRegionDecoder private constructor(
    */
   public actual fun close() {
     isClosed = true
-    decoder.recycle()
+    try {
+      reader.dispose()
+      imageInputStream.close()
+    } catch (_: Exception) {
+      // Ignore close errors
+    }
   }
 
   public actual companion object {
@@ -98,11 +113,13 @@ public actual class ImageRegionDecoder private constructor(
      * @param path The path to the image file.
      * @return An [ImageRegionDecoder], or null if creation failed.
      */
-    @Suppress("DEPRECATION")
     public actual fun create(path: String): ImageRegionDecoder? {
       return try {
-        val decoder = BitmapRegionDecoder.newInstance(path, false)
-        ImageRegionDecoder(decoder)
+        val file = File(path)
+        if (!file.exists()) return null
+
+        val imageInputStream = ImageIO.createImageInputStream(file) ?: return null
+        createFromInputStream(imageInputStream)
       } catch (e: Exception) {
         null
       }
@@ -114,30 +131,34 @@ public actual class ImageRegionDecoder private constructor(
      * @param data The image data as a byte array.
      * @return An [ImageRegionDecoder], or null if creation failed.
      */
-    @Suppress("DEPRECATION")
     public actual fun create(data: ByteArray): ImageRegionDecoder? {
       return try {
-        val decoder = BitmapRegionDecoder.newInstance(data, 0, data.size, false)
-        ImageRegionDecoder(decoder)
+        val byteArrayInputStream = ByteArrayInputStream(data)
+        val imageInputStream = ImageIO.createImageInputStream(byteArrayInputStream) ?: return null
+        createFromInputStream(imageInputStream)
       } catch (e: Exception) {
         null
       }
     }
 
-    /**
-     * Creates an [ImageRegionDecoder] from an [InputStream].
-     *
-     * @param inputStream The input stream containing the image data.
-     * @return An [ImageRegionDecoder], or null if creation failed.
-     */
-    @Suppress("DEPRECATION")
-    public fun create(inputStream: InputStream): ImageRegionDecoder? {
-      return try {
-        val decoder = BitmapRegionDecoder.newInstance(inputStream, false)
-        decoder?.let { ImageRegionDecoder(it) }
-      } catch (e: Exception) {
-        null
+    private fun createFromInputStream(imageInputStream: ImageInputStream): ImageRegionDecoder? {
+      val readers = ImageIO.getImageReaders(imageInputStream)
+      if (!readers.hasNext()) {
+        imageInputStream.close()
+        return null
       }
+
+      val reader = readers.next()
+      reader.input = imageInputStream
+
+      val width = reader.getWidth(0)
+      val height = reader.getHeight(0)
+
+      return ImageRegionDecoder(
+        imageInputStream = imageInputStream,
+        reader = reader,
+        _imageSize = IntSize(width, height),
+      )
     }
   }
 }
