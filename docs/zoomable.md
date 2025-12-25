@@ -40,17 +40,6 @@ You can implement zoom and pan gestures by adding `ZoomablePlugin` to your image
     )
     ```
 
-=== "Fresco"
-
-    ```kotlin
-    FrescoImage(
-      imageUrl = imageUrl,
-      component = rememberImageComponent {
-        +ZoomablePlugin()
-      }
-    )
-    ```
-
 ## ZoomableState
 
 You can create and remember a `ZoomableState` with `rememberZoomableState` to customize the zoom behavior and access the current transformation state:
@@ -108,11 +97,10 @@ The `ZoomablePlugin` supports the following gestures:
 - **Pinch to zoom**: Use two fingers to zoom in/out
 - **Double-tap to zoom**: Double-tap to toggle between original and zoomed state
 - **Pan**: Drag to pan around when zoomed in
-- **Fling**: Quick swipe to fling with momentum
 
-## Sub-Sampling (Tiling)
+## Sub-Sampling
 
-For very large images, Landscapist supports sub-sampling (tiled rendering) to efficiently display high-resolution images without running out of memory. This feature loads only the visible tiles at the appropriate resolution.
+For very large images, Landscapist supports sub-sampling to efficiently display high-resolution images without running out of memory. This feature loads only the visible tiles at the appropriate resolution.
 
 ### Enabling Sub-Sampling
 
@@ -148,7 +136,6 @@ GlideImage(
 |--------------|---------|-------------|
 | **Coil3** | Supported (network + local) | Supported (network + local) |
 | **Glide** | Supported (network + local) | N/A (Android only) |
-| **Fresco** | Supported (local files only) | N/A (Android only) |
 
 !!! note
     Sub-sampling requires the image source to support region decoding. For network images, the image is first cached to disk before sub-sampling can be used.
