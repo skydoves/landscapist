@@ -35,6 +35,7 @@ import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 import com.skydoves.landscapist.transformation.blur.BlurTransformationPlugin
+import com.skydoves.landscapist.zoomable.ZoomablePlugin
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
         +PlaceholderPlugin.Loading(painterResource(id = R.drawable.poster))
         +PlaceholderPlugin.Failure(painterResource(id = R.drawable.poster))
         +ShimmerPlugin()
+        +ZoomablePlugin()
         +CrossfadePlugin()
         +CircularRevealPlugin()
         +BlurTransformationPlugin()
