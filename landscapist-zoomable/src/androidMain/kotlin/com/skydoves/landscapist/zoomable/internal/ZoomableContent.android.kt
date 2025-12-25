@@ -35,9 +35,10 @@ import com.skydoves.landscapist.zoomable.subsampling.rememberSubSamplingState
 /**
  * Android implementation of [ZoomableContent].
  *
- * When sub-sampling is enabled and an [ImageRegionDecoder] is available via [LocalImageRegionDecoder]
- * or can be created from [LocalImageSourceFile], this uses [SubSamplingImage] for efficient
- * tiled rendering of large images. Otherwise, it falls back to the standard graphicsLayer approach.
+ * When sub-sampling is enabled and an [ImageRegionDecoder] is available via
+ * [LocalImageRegionDecoder] or can be created from [LocalImageSourceFile],
+ * this uses [SubSamplingImage] for efficient tiled rendering of large images.
+ * Otherwise, it falls back to the standard graphicsLayer approach.
  */
 @Composable
 internal actual fun ZoomableContent(
@@ -79,11 +80,14 @@ internal actual fun ZoomableContent(
       config = config.subSamplingConfig,
     )
 
-    SubSamplingImage(
+    // Show SubSamplingImage with the original content as placeholder
+    // The original content is shown until the base tile is loaded
+    SubSamplingImageWithPlaceholder(
       subSamplingState = subSamplingState,
       zoomableState = zoomableState,
       config = config,
       enabled = enabled,
+      content = content,
     )
   } else {
     // Standard graphicsLayer approach
@@ -93,6 +97,40 @@ internal actual fun ZoomableContent(
       enabled = enabled,
       content = content,
     )
+  }
+}
+
+/**
+ * SubSamplingImage with placeholder content shown until the base tile is loaded.
+ */
+@Composable
+private fun SubSamplingImageWithPlaceholder(
+  subSamplingState: com.skydoves.landscapist.zoomable.subsampling.SubSamplingState,
+  zoomableState: ZoomableState,
+  config: ZoomableConfig,
+  enabled: Boolean,
+  content: @Composable () -> Unit,
+) {
+  val isBaseLoaded = subSamplingState.isBaseLoaded
+
+  Box(modifier = Modifier.clipToBounds()) {
+    // Always render SubSamplingImage so it can initialize and load tiles
+    SubSamplingImage(
+      subSamplingState = subSamplingState,
+      zoomableState = zoomableState,
+      config = config,
+      enabled = enabled,
+    )
+
+    // Show original content as placeholder on top until base tile is loaded
+    if (!isBaseLoaded) {
+      StandardZoomableContent(
+        zoomableState = zoomableState,
+        config = config,
+        enabled = false, // Disable gestures on placeholder
+        content = content,
+      )
+    }
   }
 }
 

@@ -23,9 +23,11 @@ import androidx.compose.ui.unit.Dp
  *
  * @property minZoom The minimum zoom scale. Defaults to [ZoomableDefaults.MinZoom].
  * @property maxZoom The maximum zoom scale. Defaults to [ZoomableDefaults.MaxZoom].
- * @property doubleTapZoom The zoom scale to apply when double-tapping. Defaults to [ZoomableDefaults.DoubleTapZoom].
+ * @property doubleTapZoom The zoom scale to apply when double-tapping.
+ *   Defaults to [ZoomableDefaults.DoubleTapZoom].
  * @property enableDoubleTapZoom Whether double-tap to zoom gesture is enabled. Defaults to true.
- * @property enableSubSampling Whether sub-sampling (tiling) for large images is enabled. Defaults to false (opt-in).
+ * @property enableSubSampling Whether sub-sampling (tiling) for large images is enabled.
+ *   Defaults to false (opt-in).
  * @property subSamplingConfig Optional configuration for sub-sampling behavior.
  */
 @Immutable
@@ -48,10 +50,10 @@ public data class ZoomableConfig(
  * **Note:** Sub-sampling requires the image source to support region decoding
  * (e.g., local files, content URIs). Network images may need to be cached first.
  *
- * @property tileSize The size of each tile. Larger tiles mean fewer tiles but more memory per tile.
- *   Defaults to [ZoomableDefaults.TileSize].
- * @property threshold The minimum image dimension (in either width or height) to enable sub-sampling.
- *   Images smaller than this will be rendered normally without tiling.
+ * @property tileSize The size of each tile. Larger tiles mean fewer tiles but more
+ *   memory per tile. Defaults to [ZoomableDefaults.TileSize].
+ * @property threshold The minimum image dimension (in either width or height) to enable
+ *   sub-sampling. Images smaller than this will be rendered normally without tiling.
  *   Defaults to [ZoomableDefaults.SubSamplingThreshold].
  */
 @Immutable

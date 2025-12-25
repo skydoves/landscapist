@@ -131,7 +131,7 @@ public final class com/skydoves/landscapist/zoomable/ZoomableState_skiaKt {
 public final class com/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder {
 	public static final field $stable I
 	public static final field Companion Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder$Companion;
-	public synthetic fun <init> (Lorg/jetbrains/skia/Image;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljavax/imageio/stream/ImageInputStream;Ljavax/imageio/ImageReader;JLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun close ()V
 	public final fun decodeRegion (Landroidx/compose/ui/unit/IntRect;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getImageSize-YbymL2g ()J
