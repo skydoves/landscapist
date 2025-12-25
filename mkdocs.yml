@@ -29,6 +29,7 @@ nav:
   - 'Animation': animation.md
   - 'Transformation': transformation.md
   - 'Palette': palette.md
+  - 'Zoomable': zoomable.md
   - 'Image Component and Plugin': image-component-and-plugin.md
   - 'BOM': bom.md
   - 'Snapshots With Paparazzi': snapshots-with-paparazzi.md
