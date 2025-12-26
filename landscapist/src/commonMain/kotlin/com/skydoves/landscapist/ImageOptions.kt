@@ -35,6 +35,9 @@ import androidx.compose.ui.unit.IntSize
  * @property alpha The alpha parameter used to apply for the image when it is rendered onscreen.
  * @property requestSize The [IntSize] that will be used to request remote images.
  * @property tag An optional tag feature can be utilized either to trigger recomposition or to attach a test tag to your image.
+ * @property placeholderAspectRatio The aspect ratio (width/height) to use for the container before the image loads.
+ * This prevents layout shifts by reserving space immediately. For example, use 16f/9f for 16:9 images,
+ * 4f/3f for 4:3 images, or 1f for square images. If null, no aspect ratio constraint is applied.
  */
 @Immutable
 public data class ImageOptions(
@@ -45,6 +48,7 @@ public data class ImageOptions(
   public val alpha: Float = DefaultAlpha,
   public val requestSize: IntSize = IntSize(DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE),
   public val tag: String = "",
+  public val placeholderAspectRatio: Float? = null,
 ) {
   /** Returns true if the [requestSize] is valid. */
   public val isValidSize: Boolean

@@ -19,17 +19,29 @@ import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import com.skydoves.landscapist.InternalLandscapistApi
 
 @InternalLandscapistApi
-public fun Modifier.constraint(boxConstraints: BoxWithConstraintsScope): Modifier = then(
-  widthIn(
-    min = boxConstraints.minWidth,
-    max = boxConstraints.maxWidth,
-  ),
-).then(
-  heightIn(
-    min = boxConstraints.minHeight,
-    max = boxConstraints.maxHeight,
-  ),
-)
+public fun Modifier.constraint(boxConstraints: BoxWithConstraintsScope): Modifier {
+  val hasValidWidth = boxConstraints.maxWidth.isFinite()
+  val hasValidHeight = boxConstraints.maxHeight.isFinite()
+
+  return this
+    .then(
+      if (hasValidWidth) {
+        Modifier.widthIn(min = boxConstraints.minWidth, max = boxConstraints.maxWidth)
+      } else {
+        Modifier
+      },
+    )
+    .then(
+      if (hasValidHeight) {
+        Modifier.heightIn(min = boxConstraints.minHeight, max = boxConstraints.maxHeight)
+      } else {
+        Modifier
+      },
+    )
+}
+
+private fun Dp.isFinite(): Boolean = this != Dp.Infinity && this != Dp.Unspecified

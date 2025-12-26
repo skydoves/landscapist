@@ -18,7 +18,11 @@ package com.skydoves.landscapist.zoomable.internal
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -31,6 +35,8 @@ import com.skydoves.landscapist.zoomable.ZoomableState
 import com.skydoves.landscapist.zoomable.subsampling.ImageRegionDecoder
 import com.skydoves.landscapist.zoomable.subsampling.SubSamplingImage
 import com.skydoves.landscapist.zoomable.subsampling.rememberSubSamplingState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Android implementation of [ZoomableContent].
@@ -52,31 +58,47 @@ internal actual fun ZoomableContent(
   val explicitDecoder = LocalImageRegionDecoder.current
   val sourceFile = LocalImageSourceFile.current
 
-  val decoder = remember(explicitDecoder, sourceFile) {
-    explicitDecoder ?: sourceFile?.let { file ->
-      if (file.exists() && file.canRead()) {
-        ImageRegionDecoder.create(file.absolutePath)
-      } else {
-        null
+  // Use state to hold the decoder created asynchronously
+  var createdDecoder by remember { mutableStateOf<ImageRegionDecoder?>(null) }
+
+  // Create decoder on background thread to avoid blocking main thread
+  // BitmapRegionDecoder.newInstance() does blocking I/O
+  LaunchedEffect(sourceFile) {
+    // Close any previously created decoder first
+    createdDecoder?.close()
+    createdDecoder = null
+
+    // Only create decoder from source file if no explicit decoder is provided
+    if (explicitDecoder == null && sourceFile != null) {
+      val newDecoder = sourceFile.let { file ->
+        if (file.exists() && file.canRead()) {
+          withContext(Dispatchers.IO) {
+            ImageRegionDecoder.create(file.absolutePath)
+          }
+        } else {
+          null
+        }
       }
+      createdDecoder = newDecoder
     }
   }
 
-  // Clean up decoder when it changes or composable leaves composition
-  DisposableEffect(decoder) {
+  // Clean up decoder we created when composable leaves composition
+  DisposableEffect(Unit) {
     onDispose {
-      // Only close the decoder if we created it from source file
-      // Don't close explicitly provided decoders as they're managed externally
-      if (explicitDecoder == null && decoder != null) {
-        decoder.close()
-      }
+      // Close the decoder we created (not explicitly provided ones)
+      createdDecoder?.close()
     }
   }
+
+  // Use explicit decoder if provided, otherwise use the one we created
+  val decoder = explicitDecoder ?: createdDecoder
 
   // Use sub-sampling when enabled and decoder is available
-  if (config.enableSubSampling && decoder != null) {
+  val currentDecoder = decoder
+  if (config.enableSubSampling && currentDecoder != null) {
     val subSamplingState = rememberSubSamplingState(
-      decoder = decoder,
+      decoder = currentDecoder,
       config = config.subSamplingConfig,
     )
 

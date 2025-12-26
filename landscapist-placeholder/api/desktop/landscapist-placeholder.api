@@ -1,3 +1,18 @@
+public final class com/skydoves/landscapist/placeholder/blurhash/BlurHashDecoder {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/skydoves/landscapist/placeholder/blurhash/BlurHashDecoder;
+	public final fun decode (Ljava/lang/String;IIF)[I
+	public static synthetic fun decode$default (Lcom/skydoves/landscapist/placeholder/blurhash/BlurHashDecoder;Ljava/lang/String;IIFILjava/lang/Object;)[I
+	public final fun isValidBlurHash (Ljava/lang/String;)Z
+}
+
+public final class com/skydoves/landscapist/placeholder/blurhash/BlurHashPlugin : com/skydoves/landscapist/plugins/ImagePlugin$LoadingStatePlugin {
+	public static final field $stable I
+	public fun <init> (Ljava/lang/String;IIF)V
+	public synthetic fun <init> (Ljava/lang/String;IIFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+}
+
 public abstract class com/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin {
 	public static final field $stable I
 }
@@ -26,6 +41,36 @@ public final class com/skydoves/landscapist/placeholder/placeholder/PlaceholderP
 	public final fun getSource ()Ljava/lang/Object;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/placeholder/progressive/ProgressiveImageState {
+	public static final field $stable I
+	public fun <init> ()V
+	public final fun getFullBitmap ()Landroidx/compose/ui/graphics/ImageBitmap;
+	public final fun getHasImage ()Z
+	public final fun getPreviewBitmap ()Landroidx/compose/ui/graphics/ImageBitmap;
+	public final fun getProgress ()F
+	public final fun isComplete ()Z
+}
+
+public final class com/skydoves/landscapist/placeholder/progressive/ProgressiveLoadingPlugin : com/skydoves/landscapist/plugins/ImagePlugin$LoadingStatePlugin {
+	public static final field $stable I
+	public static final field Companion Lcom/skydoves/landscapist/placeholder/progressive/ProgressiveLoadingPlugin$Companion;
+	public fun <init> ()V
+	public fun <init> (FI)V
+	public synthetic fun <init> (FIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+}
+
+public final class com/skydoves/landscapist/placeholder/progressive/ProgressiveLoadingPlugin$Companion {
+	public final fun default ()Lcom/skydoves/landscapist/placeholder/progressive/ProgressiveLoadingPlugin;
+	public final fun fast ()Lcom/skydoves/landscapist/placeholder/progressive/ProgressiveLoadingPlugin;
+	public final fun smooth ()Lcom/skydoves/landscapist/placeholder/progressive/ProgressiveLoadingPlugin;
+}
+
+public final class com/skydoves/landscapist/placeholder/progressive/ProgressiveLoadingPluginKt {
+	public static final fun ProgressiveImage (Lcom/skydoves/landscapist/placeholder/progressive/ProgressiveImageState;FILcom/skydoves/landscapist/ImageOptions;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
+	public static final fun rememberProgressiveImageState (Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/placeholder/progressive/ProgressiveImageState;
 }
 
 public final class com/skydoves/landscapist/placeholder/shimmer/FlashShimmerKt {
@@ -122,6 +167,42 @@ public final class com/skydoves/landscapist/placeholder/shimmer/ShimmerPlugin : 
 	public final fun getShimmer ()Lcom/skydoves/landscapist/placeholder/shimmer/Shimmer;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/placeholder/thumbhash/ThumbHashDecoder {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/skydoves/landscapist/placeholder/thumbhash/ThumbHashDecoder;
+	public final fun decode ([B)Lcom/skydoves/landscapist/placeholder/thumbhash/ThumbHashDecoder$ThumbHashImage;
+	public final fun decodeBase64 (Ljava/lang/String;)Lcom/skydoves/landscapist/placeholder/thumbhash/ThumbHashDecoder$ThumbHashImage;
+	public final fun thumbHashToApproximateAspectRatio ([B)Ljava/lang/Float;
+}
+
+public final class com/skydoves/landscapist/placeholder/thumbhash/ThumbHashDecoder$ThumbHashImage {
+	public static final field $stable I
+	public fun <init> (II[B)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun component3 ()[B
+	public final fun copy (II[B)Lcom/skydoves/landscapist/placeholder/thumbhash/ThumbHashDecoder$ThumbHashImage;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/placeholder/thumbhash/ThumbHashDecoder$ThumbHashImage;II[BILjava/lang/Object;)Lcom/skydoves/landscapist/placeholder/thumbhash/ThumbHashDecoder$ThumbHashImage;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeight ()I
+	public final fun getRgba ()[B
+	public final fun getWidth ()I
+	public fun hashCode ()I
+	public final fun toArgbIntArray ()[I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/placeholder/thumbhash/ThumbHashPlugin : com/skydoves/landscapist/plugins/ImagePlugin$LoadingStatePlugin {
+	public static final field $stable I
+	public static final field Companion Lcom/skydoves/landscapist/placeholder/thumbhash/ThumbHashPlugin$Companion;
+	public fun <init> ([B)V
+	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+}
+
+public final class com/skydoves/landscapist/placeholder/thumbhash/ThumbHashPlugin$Companion {
+	public final fun fromBase64 (Ljava/lang/String;)Lcom/skydoves/landscapist/placeholder/thumbhash/ThumbHashPlugin;
 }
 
 public final class com/skydoves/landscapist/placeholder/thumbnail/ThumbnailPlugin : com/skydoves/landscapist/plugins/ImagePlugin$LoadingStatePlugin {

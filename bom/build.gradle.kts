@@ -44,6 +44,8 @@ dependencies {
     api(project(":landscapist-placeholder"))
     api(project(":landscapist-transformation"))
     api(project(":landscapist-zoomable"))
+    api(project(":landscapist-core"))
+    api(project(":landscapist-image"))
     api(project(":glide"))
     api(project(":coil"))
     api(project(":coil3"))
