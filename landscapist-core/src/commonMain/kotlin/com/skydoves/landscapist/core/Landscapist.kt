@@ -21,6 +21,7 @@ import com.skydoves.landscapist.core.cache.DiskCache
 import com.skydoves.landscapist.core.cache.LruMemoryCache
 import com.skydoves.landscapist.core.cache.MemoryCache
 import com.skydoves.landscapist.core.cache.TwoTierMemoryCache
+import com.skydoves.landscapist.core.decoder.AnimatedImageDetector
 import com.skydoves.landscapist.core.decoder.DecodeResult
 import com.skydoves.landscapist.core.decoder.ImageDecoder
 import com.skydoves.landscapist.core.decoder.ProgressiveDecodeResult
@@ -155,8 +156,8 @@ public class Landscapist private constructor(
         val bytes = snapshot.data().buffer().readByteArray()
         val diskPath = snapshot.dataPath.toString()
 
-        // Use progressive decoding for disk cache if enabled
-        if (request.progressiveEnabled) {
+        // Use progressive decoding for disk cache if enabled (skip for animated images)
+        if (request.progressiveEnabled && !AnimatedImageDetector.isAnimated(bytes, null)) {
           emitProgressiveDecode(
             bytes = bytes,
             mimeType = null,
@@ -230,8 +231,9 @@ public class Landscapist private constructor(
           }
         }
 
-        // Use progressive decoding for network fetch if enabled
-        if (request.progressiveEnabled) {
+        // Use progressive decoding for network fetch if enabled (skip for animated images)
+        val isAnimated = AnimatedImageDetector.isAnimated(fetchResult.data, fetchResult.mimeType)
+        if (request.progressiveEnabled && !isAnimated) {
           emitProgressiveDecode(
             bytes = fetchResult.data,
             mimeType = fetchResult.mimeType,

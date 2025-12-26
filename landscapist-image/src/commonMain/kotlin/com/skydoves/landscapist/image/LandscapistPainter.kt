@@ -17,6 +17,7 @@ package com.skydoves.landscapist.image
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import com.skydoves.landscapist.ImageOptions
 
@@ -32,15 +33,18 @@ public expect fun rememberLandscapistPainter(data: Any?): Painter
 /**
  * Default content for successfully loaded images.
  *
+ * @param modifier The modifier to apply to the image.
  * @param painter The painter to use for rendering.
  * @param imageOptions The image display options.
  */
 @Composable
 internal fun DefaultSuccessContent(
+  modifier: Modifier,
   painter: Painter,
   imageOptions: ImageOptions,
 ) {
   Image(
+    modifier = modifier,
     painter = painter,
     contentDescription = imageOptions.contentDescription,
     contentScale = imageOptions.contentScale,

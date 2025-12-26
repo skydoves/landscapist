@@ -31,6 +31,7 @@ android {
     versionCode = Configuration.versionCode
     versionName = Configuration.versionName
     multiDexEnabled = true
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 }
 
@@ -72,4 +73,11 @@ dependencies {
   implementation(libs.androidx.compose.constraintlayout)
 
   implementation("androidx.multidex:multidex:2.0.1")
+
+  // Test dependencies
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.androidx.test.rules)
+  androidTestImplementation(libs.androidx.test.junit)
+  androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+  debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

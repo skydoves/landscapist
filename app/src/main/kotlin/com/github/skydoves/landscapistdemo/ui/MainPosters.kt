@@ -18,6 +18,7 @@ package com.github.skydoves.landscapistdemo.ui
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -59,11 +60,11 @@ import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.crossfade.CrossfadePlugin
-import com.skydoves.landscapist.fresco.FrescoImage
 import com.skydoves.landscapist.image.LandscapistImage
 import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.palette.rememberPaletteState
-import com.skydoves.landscapist.placeholder.progressive.ProgressiveLoadingPlugin
+import com.skydoves.landscapist.placeholder.shimmer.Shimmer
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 import com.skydoves.landscapist.zoomable.ZoomableConfig
 import com.skydoves.landscapist.zoomable.ZoomablePlugin
 import com.skydoves.landscapist.zoomable.rememberZoomableState
@@ -120,8 +121,8 @@ private fun PosterItem(
   vm: MainViewModel,
 ) {
   Card(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
-    FrescoImage(
-      imageUrl = poster.image,
+    LandscapistImage(
+      imageModel = { poster.image },
       modifier = Modifier
         .size(50.dp)
         .clickable { vm.poster.value = poster },
@@ -149,13 +150,21 @@ private fun SelectedPoster(
 
   LandscapistImage(
     imageModel = { poster.image },
+    imageOptions = ImageOptions(),
     modifier = Modifier.aspectRatio(0.75f),
     component = rememberImageComponent {
-      +ProgressiveLoadingPlugin.smooth()
-
-      +ZoomablePlugin(
-        state = zoomableState,
+      +ShimmerPlugin(
+        Shimmer.Resonate(
+          baseColor = if (isSystemInDarkTheme()) {
+            background
+          } else {
+            Color.White
+          },
+          highlightColor = Color.LightGray,
+        ),
       )
+
+      +ZoomablePlugin(state = zoomableState)
 
       +PalettePlugin { onPaletteUpdated.invoke(it) }
       +CircularRevealPlugin()

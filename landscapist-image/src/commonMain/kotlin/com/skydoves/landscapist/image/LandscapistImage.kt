@@ -16,12 +16,22 @@
 package com.skydoves.landscapist.image
 
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import com.skydoves.landscapist.ImageLoad
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Constraints
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.StableHolder
@@ -30,12 +40,20 @@ import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
 import com.skydoves.landscapist.components.ComposeSuccessStatePlugins
 import com.skydoves.landscapist.components.ComposeWithComposablePlugins
 import com.skydoves.landscapist.components.ImageComponent
+import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.constraints.Constrainable
+import com.skydoves.landscapist.constraints.constraint
 import com.skydoves.landscapist.core.ImageRequest
 import com.skydoves.landscapist.core.Landscapist
 import com.skydoves.landscapist.core.model.ImageResult
-import kotlinx.coroutines.flow.channelFlow
+import com.skydoves.landscapist.crossfade.CrossfadePlugin
+import com.skydoves.landscapist.crossfade.CrossfadeWithEffect
+import com.skydoves.landscapist.plugins.composePainterPlugins
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 /**
  * Loads and displays an image using the Landscapist core image loading engine.
@@ -72,6 +90,9 @@ public fun LandscapistImage(
     }.build()
   }
 
+  // Check for CrossfadePlugin to enable crossfade animation
+  val crossfadePlugin = component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+
   LandscapistImageInternal(
     request = StableHolder(request),
     landscapist = StableHolder(landscapist),
@@ -82,59 +103,77 @@ public fun LandscapistImage(
     val landscapistState = imageResult.toLandscapistImageState()
     onImageStateChanged?.invoke(landscapistState)
 
-    when (val state = landscapistState) {
-      is LandscapistImageState.None,
-      is LandscapistImageState.Loading,
-      -> {
-        component.ComposeLoadingStatePlugins(
-          modifier = Modifier,
-          imageOptions = imageOptions,
-          executor = { _ ->
-            loading?.invoke(this, LandscapistImageState.Loading)
-          },
-        )
-      }
-
-      is LandscapistImageState.Success -> {
-        val boxScope = this
-        val painter = rememberLandscapistPainter(state.data)
-        val imageBitmap = remember(state.data) {
-          state.data?.let { convertToImageBitmap(it) }
+    // Wrap with CrossfadeWithEffect when CrossfadePlugin is present
+    CrossfadeWithEffect(
+      targetState = landscapistState,
+      durationMs = crossfadePlugin?.duration ?: 0,
+      contentKey = { it },
+      enabled = crossfadePlugin != null,
+    ) { state ->
+      when (state) {
+        is LandscapistImageState.None,
+        is LandscapistImageState.Loading,
+        -> {
+          component.ComposeLoadingStatePlugins(
+            modifier = Modifier.constraint(this@LandscapistImageInternal),
+            imageOptions = imageOptions,
+            executor = { _ ->
+              loading?.invoke(this@LandscapistImageInternal, LandscapistImageState.Loading)
+            },
+          )
         }
 
-        component.ComposeSuccessStatePlugins(
-          modifier = Modifier,
-          imageModel = model,
-          imageOptions = imageOptions,
-          imageBitmap = imageBitmap,
-        )
+        is LandscapistImageState.Success -> {
+          val basePainter = rememberLandscapistPainter(state.data)
+          val imageBitmap = remember(state.data) {
+            state.data?.let { convertToImageBitmap(it) }
+          }
 
-        // Provide source data for sub-sampling support (zoomable plugin)
-        ProvideImageSource(
-          diskCachePath = state.diskCachePath,
-          rawData = state.rawData,
-        ) {
-          component.ComposeWithComposablePlugins {
-            if (success != null) {
-              success.invoke(boxScope, state, painter)
-            } else {
-              DefaultSuccessContent(
-                painter = painter,
-                imageOptions = imageOptions,
-              )
+          // Apply PainterPlugins (like CircularRevealPlugin) to the painter
+          val painter = if (imageBitmap != null) {
+            basePainter.composePainterPlugins(
+              imagePlugins = component.imagePlugins,
+              imageBitmap = imageBitmap,
+            )
+          } else {
+            basePainter
+          }
+
+          component.ComposeSuccessStatePlugins(
+            modifier = Modifier.constraint(this@LandscapistImageInternal),
+            imageModel = model,
+            imageOptions = imageOptions,
+            imageBitmap = imageBitmap,
+          )
+
+          // Provide source data for sub-sampling support (zoomable plugin)
+          ProvideImageSource(
+            diskCachePath = state.diskCachePath,
+            rawData = state.rawData,
+          ) {
+            component.ComposeWithComposablePlugins {
+              if (success != null) {
+                success.invoke(this@LandscapistImageInternal, state, painter)
+              } else {
+                DefaultSuccessContent(
+                  modifier = Modifier.constraint(this@LandscapistImageInternal),
+                  painter = painter,
+                  imageOptions = imageOptions,
+                )
+              }
             }
           }
         }
-      }
 
-      is LandscapistImageState.Failure -> {
-        component.ComposeFailureStatePlugins(
-          modifier = Modifier,
-          imageOptions = imageOptions,
-          reason = state.reason,
-        )
+        is LandscapistImageState.Failure -> {
+          component.ComposeFailureStatePlugins(
+            modifier = Modifier.constraint(this@LandscapistImageInternal),
+            imageOptions = imageOptions,
+            reason = state.reason,
+          )
 
-        failure?.invoke(this, state)
+          failure?.invoke(this@LandscapistImageInternal, state)
+        }
       }
     }
   }
@@ -142,6 +181,7 @@ public fun LandscapistImage(
 
 /**
  * Internal implementation that uses ImageResult directly to preserve rawData and diskCachePath.
+ * Uses BoxWithConstraints to get the available size and loads the image at appropriate resolution.
  */
 @Composable
 private fun LandscapistImageInternal(
@@ -152,73 +192,109 @@ private fun LandscapistImageInternal(
   imageOptions: ImageOptions,
   content: @Composable BoxWithConstraintsScope.(imageResult: ImageResult) -> Unit,
 ) {
-  val constraintsSizeResolver = remember { ConstraintsSizeResolver() }
+  val loadingKey = imageOptions.loadingOptionsKey
 
-  // Build request with target size from constraints or imageOptions
-  val sizedRequest = remember(request.value, imageOptions) {
-    val originalRequest = request.value
-    if (originalRequest.targetWidth != null && originalRequest.targetHeight != null) {
-      // Request already has size set
-      originalRequest
-    } else if (imageOptions.isValidSize) {
-      // Use size from imageOptions
-      ImageRequest.builder().apply {
-        model(originalRequest.model)
-        memoryCachePolicy(originalRequest.memoryCachePolicy)
-        diskCachePolicy(originalRequest.diskCachePolicy)
-        headers(originalRequest.headers)
-        transformations(originalRequest.transformations)
-        tag(originalRequest.tag)
-        size(imageOptions.requestSize.width, imageOptions.requestSize.height)
-      }.build()
+  var state by remember(request, loadingKey) {
+    mutableStateOf<ImageLoadState>(ImageLoadState.None)
+  }
+
+  // Apply aspect ratio modifier if specified to reserve space before image loads
+  val aspectRatio = imageOptions.placeholderAspectRatio
+  val containerModifier = remember(modifier, aspectRatio) {
+    if (aspectRatio != null && aspectRatio > 0f) {
+      modifier.aspectRatio(aspectRatio)
     } else {
-      originalRequest
+      modifier
     }
   }
 
-  ImageLoad(
-    recomposeKey = StableHolder(sizedRequest),
-    executeImageRequest = {
-      channelFlow {
-        // Wait for constraints if we don't have a target size yet
-        val finalRequest = if (
-          sizedRequest.targetWidth == null || sizedRequest.targetHeight == null
-        ) {
-          // Use constraints if available
-          val targetSize = constraintsSizeResolver.getTargetSize()
-          if (targetSize != null && (targetSize.first > 0 || targetSize.second > 0)) {
-            ImageRequest.builder().apply {
-              model(sizedRequest.model)
-              memoryCachePolicy(sizedRequest.memoryCachePolicy)
-              diskCachePolicy(sizedRequest.diskCachePolicy)
-              headers(sizedRequest.headers)
-              transformations(sizedRequest.transformations)
-              tag(sizedRequest.tag)
-              if (targetSize.first > 0 && targetSize.second > 0) {
-                size(targetSize.first, targetSize.second)
-              }
-            }.build()
-          } else {
-            sizedRequest
-          }
-        } else {
-          sizedRequest
-        }
+  BoxWithConstraints(
+    modifier = containerModifier.imageSemantics(imageOptions),
+    propagateMinConstraints = true,
+  ) {
+    // Build request with target size from constraints
+    val sizedRequest = remember(request.value, imageOptions, constraints) {
+      buildSizedRequest(request.value, imageOptions, constraints)
+    }
 
-        landscapist.value.load(finalRequest).collect { result ->
-          send(result.toImageLoadState())
-        }
+    // Load image when request or constraints change
+    LaunchedEffect(sizedRequest, loadingKey) {
+      executeImageLoading(landscapist.value, sizedRequest).collect {
+        state = it
       }
-    },
-    modifier = modifier,
-    imageOptions = imageOptions,
-    constrainable = constraintsSizeResolver,
-  ) { imageLoadState ->
-    // Convert back to ImageResult to access all properties
-    val imageResult = imageLoadState.toImageResult()
+    }
+
+    // Convert to ImageResult and render content
+    val imageResult = state.toImageResult()
     content(imageResult)
   }
 }
+
+/**
+ * Builds an ImageRequest with appropriate target size based on constraints.
+ * Uses constraints to downsample large images and prevent memory issues.
+ */
+private fun buildSizedRequest(
+  originalRequest: ImageRequest,
+  imageOptions: ImageOptions,
+  constraints: Constraints,
+): ImageRequest {
+  // If request already has size set, use it
+  if (originalRequest.targetWidth != null && originalRequest.targetHeight != null) {
+    return originalRequest
+  }
+
+  // If imageOptions has valid size, use it
+  if (imageOptions.isValidSize) {
+    return ImageRequest.builder().apply {
+      model(originalRequest.model)
+      memoryCachePolicy(originalRequest.memoryCachePolicy)
+      diskCachePolicy(originalRequest.diskCachePolicy)
+      headers(originalRequest.headers)
+      transformations(originalRequest.transformations)
+      tag(originalRequest.tag)
+      size(imageOptions.requestSize.width, imageOptions.requestSize.height)
+    }.build()
+  }
+
+  // Calculate target size from constraints
+  val targetWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else null
+  val targetHeight = if (constraints.hasBoundedHeight) constraints.maxHeight else null
+
+  // If we have at least one bounded dimension, use it for downsampling
+  if (targetWidth != null || targetHeight != null) {
+    return ImageRequest.builder().apply {
+      model(originalRequest.model)
+      memoryCachePolicy(originalRequest.memoryCachePolicy)
+      diskCachePolicy(originalRequest.diskCachePolicy)
+      headers(originalRequest.headers)
+      transformations(originalRequest.transformations)
+      tag(originalRequest.tag)
+      // Use the bounded dimension(s) for sizing
+      // For unbounded dimensions, use Int.MAX_VALUE to signal "no constraint" while still
+      // passing the decoder's > 0 check. The decoder will maintain aspect ratio.
+      size(targetWidth ?: Int.MAX_VALUE, targetHeight ?: Int.MAX_VALUE)
+    }.build()
+  }
+
+  // No size constraints - load at original size (this should be rare)
+  return originalRequest
+}
+
+/**
+ * Executes image loading and emits states.
+ */
+private fun executeImageLoading(
+  landscapist: Landscapist,
+  request: ImageRequest,
+) = flow {
+  emit(ImageLoadState.Loading)
+  landscapist.load(request).collect { result ->
+    emit(result.toImageLoadState())
+  }
+}.catch {
+  emit(ImageLoadState.Failure(null, it))
+}.distinctUntilChanged().flowOn(Dispatchers.Default)
 
 /**
  * Converts [ImageResult] to [ImageLoadState].
@@ -303,43 +379,15 @@ private data class LandscapistSuccessData(
 }
 
 /**
- * Size resolver for constraints.
- * Stores constraints from BoxWithConstraints and provides target size for image requests.
+ * Extension to add image semantics to a modifier.
  */
-internal class ConstraintsSizeResolver : Constrainable {
-  private val _constraints = kotlinx.coroutines.flow.MutableStateFlow(
-    androidx.compose.ui.unit.Constraints.fixed(0, 0),
-  )
-
-  /**
-   * Returns the current constraints.
-   */
-  val constraints: androidx.compose.ui.unit.Constraints
-    get() = _constraints.value
-
-  /**
-   * Returns true if valid constraints have been set.
-   */
-  val hasValidConstraints: Boolean
-    get() = !_constraints.value.isZero
-
-  /**
-   * Returns the target size if constraints are already available, otherwise null.
-   */
-  fun getTargetSize(): Pair<Int, Int>? {
-    val c = _constraints.value
-    if (c.isZero) return null
-    return if (c.hasBoundedWidth || c.hasBoundedHeight) {
-      Pair(
-        if (c.hasBoundedWidth) c.maxWidth else 0,
-        if (c.hasBoundedHeight) c.maxHeight else 0,
-      )
-    } else {
-      null
+private fun Modifier.imageSemantics(imageOptions: ImageOptions): Modifier {
+  return if (imageOptions.contentDescription != null) {
+    this.semantics {
+      contentDescription = imageOptions.contentDescription!!
+      role = Role.Image
     }
-  }
-
-  override fun setConstraints(constraints: androidx.compose.ui.unit.Constraints) {
-    _constraints.value = constraints
+  } else {
+    this
   }
 }
