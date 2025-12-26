@@ -63,6 +63,13 @@ kotlin {
       }
     }
 
+    commonTest {
+      dependencies {
+        implementation(kotlin("test"))
+        implementation(libs.kotlinx.coroutines.test)
+      }
+    }
+
     androidMain {
       dependencies {
         implementation(libs.ktor.okhttp)
@@ -112,8 +119,13 @@ android {
 tasks.withType<KotlinJvmCompile>().configureEach {
   compilerOptions {
     jvmTarget.set(JvmTarget.JVM_17)
+    // Only apply explicit API mode to main sources, not tests
+    if (!name.contains("Test")) {
+      freeCompilerArgs.addAll(
+        "-Xexplicit-api=strict",
+      )
+    }
     freeCompilerArgs.addAll(
-      "-Xexplicit-api=strict",
       "-opt-in=kotlin.RequiresOptIn",
       "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
     )
