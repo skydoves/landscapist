@@ -22,10 +22,10 @@ import kotlin.test.assertTrue
 class DataSourceTest {
 
   @Test
-  fun `DataSource has four values`() {
+  fun `DataSource has seven values`() {
     val values = DataSource.entries
 
-    assertEquals(4, values.size)
+    assertEquals(7, values.size)
   }
 
   @Test
@@ -49,10 +49,28 @@ class DataSourceTest {
   }
 
   @Test
+  fun `DataSource contains LOCAL`() {
+    assertTrue(DataSource.entries.contains(DataSource.LOCAL))
+  }
+
+  @Test
+  fun `DataSource contains RESOURCE`() {
+    assertTrue(DataSource.entries.contains(DataSource.RESOURCE))
+  }
+
+  @Test
+  fun `DataSource contains INLINE`() {
+    assertTrue(DataSource.entries.contains(DataSource.INLINE))
+  }
+
+  @Test
   fun `DataSource valueOf returns correct value`() {
     assertEquals(DataSource.MEMORY, DataSource.valueOf("MEMORY"))
     assertEquals(DataSource.DISK, DataSource.valueOf("DISK"))
     assertEquals(DataSource.NETWORK, DataSource.valueOf("NETWORK"))
+    assertEquals(DataSource.LOCAL, DataSource.valueOf("LOCAL"))
+    assertEquals(DataSource.RESOURCE, DataSource.valueOf("RESOURCE"))
+    assertEquals(DataSource.INLINE, DataSource.valueOf("INLINE"))
     assertEquals(DataSource.UNKNOWN, DataSource.valueOf("UNKNOWN"))
   }
 
@@ -61,6 +79,9 @@ class DataSourceTest {
     assertEquals("MEMORY", DataSource.MEMORY.name)
     assertEquals("DISK", DataSource.DISK.name)
     assertEquals("NETWORK", DataSource.NETWORK.name)
+    assertEquals("LOCAL", DataSource.LOCAL.name)
+    assertEquals("RESOURCE", DataSource.RESOURCE.name)
+    assertEquals("INLINE", DataSource.INLINE.name)
     assertEquals("UNKNOWN", DataSource.UNKNOWN.name)
   }
 

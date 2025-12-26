@@ -13,30 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.skydoves.landscapist.core.model
+package com.skydoves.landscapist.core.fetcher
+
+import androidx.annotation.DrawableRes
 
 /**
- * Represents the source from which an image was loaded.
+ * Wrapper for drawable resource IDs to distinguish them from regular Int values.
+ *
+ * Use this class to pass drawable resource IDs (like R.drawable.image) to LandscapistImage.
+ *
+ * Example:
+ * ```kotlin
+ * LandscapistImage(
+ *   imageModel = { DrawableResModel(R.drawable.my_image) },
+ *   ...
+ * )
+ * ```
+ *
+ * @property resId The drawable resource ID.
  */
-public enum class DataSource {
-  /** Image was loaded from memory cache. */
-  MEMORY,
-
-  /** Image was loaded from disk cache. */
-  DISK,
-
-  /** Image was loaded from network. */
-  NETWORK,
-
-  /** Image was loaded from local file system (File, content:// URI, file:// URI). */
-  LOCAL,
-
-  /** Image was loaded from Android resources (android.resource://, DrawableRes). */
-  RESOURCE,
-
-  /** Image was passed directly as already-decoded data (Bitmap, Drawable). */
-  INLINE,
-
-  /** Image source is unknown. */
-  UNKNOWN,
-}
+@JvmInline
+public value class DrawableResModel(@DrawableRes public val resId: Int)

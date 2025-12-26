@@ -32,6 +32,21 @@ public enum class DataSource {
   NETWORK,
 
   /**
+   * Represents a local file system data source (File, content:// URI, file:// URI).
+   */
+  LOCAL,
+
+  /**
+   * Represents an Android resource data source (android.resource://, DrawableRes).
+   */
+  RESOURCE,
+
+  /**
+   * Represents a directly passed, already-decoded data source (Bitmap, Drawable).
+   */
+  INLINE,
+
+  /**
    * Represents an unknown data source.
    */
   UNKNOWN,

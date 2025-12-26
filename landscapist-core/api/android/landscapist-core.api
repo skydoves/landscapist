@@ -873,6 +873,85 @@ public final class com/skydoves/landscapist/core/event/MetricsEventListener : co
 	public fun onEvent (Lcom/skydoves/landscapist/core/event/ImageLoadEvent;)V
 }
 
+public final class com/skydoves/landscapist/core/fetcher/AndroidContextProvider {
+	public static final field INSTANCE Lcom/skydoves/landscapist/core/fetcher/AndroidContextProvider;
+	public final fun get ()Landroid/content/Context;
+	public final fun getOrNull ()Landroid/content/Context;
+	public final fun initialize (Landroid/content/Context;)V
+}
+
+public final class com/skydoves/landscapist/core/fetcher/AndroidFetchers {
+	public static final field INSTANCE Lcom/skydoves/landscapist/core/fetcher/AndroidFetchers;
+	public final fun create ([Lcom/skydoves/landscapist/core/network/ImageFetcher;)Lcom/skydoves/landscapist/core/network/CompositeFetcher;
+	public final fun createDefault (Lcom/skydoves/landscapist/core/NetworkConfig;)Lcom/skydoves/landscapist/core/network/CompositeFetcher;
+	public final fun createDefault (Lcom/skydoves/landscapist/core/network/ImageFetcher;)Lcom/skydoves/landscapist/core/network/CompositeFetcher;
+	public static synthetic fun createDefault$default (Lcom/skydoves/landscapist/core/fetcher/AndroidFetchers;Lcom/skydoves/landscapist/core/NetworkConfig;ILjava/lang/Object;)Lcom/skydoves/landscapist/core/network/CompositeFetcher;
+}
+
+public final class com/skydoves/landscapist/core/fetcher/BitmapFetcher : com/skydoves/landscapist/core/network/ImageFetcher {
+	public fun <init> ()V
+	public fun canHandle (Ljava/lang/Object;)Z
+	public fun fetch (Lcom/skydoves/landscapist/core/ImageRequest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/skydoves/landscapist/core/fetcher/ByteArrayFetcher : com/skydoves/landscapist/core/network/ImageFetcher {
+	public fun <init> ()V
+	public fun canHandle (Ljava/lang/Object;)Z
+	public fun fetch (Lcom/skydoves/landscapist/core/ImageRequest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/skydoves/landscapist/core/fetcher/ByteBufferFetcher : com/skydoves/landscapist/core/network/ImageFetcher {
+	public fun <init> ()V
+	public fun canHandle (Ljava/lang/Object;)Z
+	public fun fetch (Lcom/skydoves/landscapist/core/ImageRequest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/skydoves/landscapist/core/fetcher/DrawableFetcher : com/skydoves/landscapist/core/network/ImageFetcher {
+	public fun <init> ()V
+	public fun canHandle (Ljava/lang/Object;)Z
+	public fun fetch (Lcom/skydoves/landscapist/core/ImageRequest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/skydoves/landscapist/core/fetcher/DrawableResFetcher : com/skydoves/landscapist/core/network/ImageFetcher {
+	public fun <init> ()V
+	public fun canHandle (Ljava/lang/Object;)Z
+	public fun fetch (Lcom/skydoves/landscapist/core/ImageRequest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/skydoves/landscapist/core/fetcher/DrawableResModel {
+	public static final synthetic fun box-impl (I)Lcom/skydoves/landscapist/core/fetcher/DrawableResModel;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getResId ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class com/skydoves/landscapist/core/fetcher/FileFetcher : com/skydoves/landscapist/core/network/ImageFetcher {
+	public fun <init> ()V
+	public fun canHandle (Ljava/lang/Object;)Z
+	public fun fetch (Lcom/skydoves/landscapist/core/ImageRequest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/skydoves/landscapist/core/fetcher/IntResourceFetcher : com/skydoves/landscapist/core/network/ImageFetcher {
+	public fun <init> ()V
+	public fun canHandle (Ljava/lang/Object;)Z
+	public fun fetch (Lcom/skydoves/landscapist/core/ImageRequest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/skydoves/landscapist/core/fetcher/UriFetcher : com/skydoves/landscapist/core/network/ImageFetcher {
+	public fun <init> ()V
+	public fun <init> (Lcom/skydoves/landscapist/core/network/ImageFetcher;)V
+	public synthetic fun <init> (Lcom/skydoves/landscapist/core/network/ImageFetcher;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun canHandle (Ljava/lang/Object;)Z
+	public fun fetch (Lcom/skydoves/landscapist/core/ImageRequest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public final class com/skydoves/landscapist/core/interceptor/HeaderInterceptor : com/skydoves/landscapist/core/interceptor/Interceptor {
 	public fun <init> (Ljava/util/Map;)V
 	public fun intercept (Lcom/skydoves/landscapist/core/interceptor/Interceptor$Chain;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -951,8 +1030,11 @@ public final class com/skydoves/landscapist/core/model/CachePolicy : java/lang/E
 
 public final class com/skydoves/landscapist/core/model/DataSource : java/lang/Enum {
 	public static final field DISK Lcom/skydoves/landscapist/core/model/DataSource;
+	public static final field INLINE Lcom/skydoves/landscapist/core/model/DataSource;
+	public static final field LOCAL Lcom/skydoves/landscapist/core/model/DataSource;
 	public static final field MEMORY Lcom/skydoves/landscapist/core/model/DataSource;
 	public static final field NETWORK Lcom/skydoves/landscapist/core/model/DataSource;
+	public static final field RESOURCE Lcom/skydoves/landscapist/core/model/DataSource;
 	public static final field UNKNOWN Lcom/skydoves/landscapist/core/model/DataSource;
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcom/skydoves/landscapist/core/model/DataSource;
@@ -1011,7 +1093,36 @@ public final class com/skydoves/landscapist/core/model/ImageResult$Success : com
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class com/skydoves/landscapist/core/network/CompositeFetcher : com/skydoves/landscapist/core/network/ImageFetcher {
+	public static final field Companion Lcom/skydoves/landscapist/core/network/CompositeFetcher$Companion;
+	public fun <init> (Ljava/util/List;)V
+	public fun canHandle (Ljava/lang/Object;)Z
+	public fun fetch (Lcom/skydoves/landscapist/core/ImageRequest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/skydoves/landscapist/core/network/CompositeFetcher$Companion {
+	public final fun create ([Lcom/skydoves/landscapist/core/network/ImageFetcher;)Lcom/skydoves/landscapist/core/network/CompositeFetcher;
+}
+
 public abstract class com/skydoves/landscapist/core/network/FetchResult {
+}
+
+public final class com/skydoves/landscapist/core/network/FetchResult$Decoded : com/skydoves/landscapist/core/network/FetchResult {
+	public fun <init> (Ljava/lang/Object;IILcom/skydoves/landscapist/core/model/DataSource;)V
+	public synthetic fun <init> (Ljava/lang/Object;IILcom/skydoves/landscapist/core/model/DataSource;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun component4 ()Lcom/skydoves/landscapist/core/model/DataSource;
+	public final fun copy (Ljava/lang/Object;IILcom/skydoves/landscapist/core/model/DataSource;)Lcom/skydoves/landscapist/core/network/FetchResult$Decoded;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/network/FetchResult$Decoded;Ljava/lang/Object;IILcom/skydoves/landscapist/core/model/DataSource;ILjava/lang/Object;)Lcom/skydoves/landscapist/core/network/FetchResult$Decoded;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDataSource ()Lcom/skydoves/landscapist/core/model/DataSource;
+	public final fun getHeight ()I
+	public final fun getImage ()Ljava/lang/Object;
+	public final fun getWidth ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/skydoves/landscapist/core/network/FetchResult$Error : com/skydoves/landscapist/core/network/FetchResult {

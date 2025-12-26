@@ -84,4 +84,21 @@ public sealed class FetchResult {
   public data class Error(
     val throwable: Throwable,
   ) : FetchResult()
+
+  /**
+   * Pre-decoded image that skips the decode step.
+   *
+   * Use this for image types that are already decoded (e.g., Bitmap, Drawable).
+   *
+   * @property image The decoded image (e.g., Bitmap or Drawable on Android).
+   * @property width The width of the image in pixels.
+   * @property height The height of the image in pixels.
+   * @property dataSource The source from which the data was fetched.
+   */
+  public data class Decoded(
+    val image: Any,
+    val width: Int,
+    val height: Int,
+    val dataSource: DataSource = DataSource.INLINE,
+  ) : FetchResult()
 }

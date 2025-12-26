@@ -18,6 +18,8 @@ package com.skydoves.landscapist.core
 import android.content.Context
 import com.skydoves.landscapist.core.cache.DiskCache
 import com.skydoves.landscapist.core.cache.DiskLruCache
+import com.skydoves.landscapist.core.fetcher.AndroidContextProvider
+import com.skydoves.landscapist.core.fetcher.AndroidFetchers
 import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 import java.io.File
@@ -40,9 +42,27 @@ public fun Landscapist.Companion.builder(context: Context): AndroidBuilder {
 
 /**
  * Builder for creating [Landscapist] instances on Android with context.
+ *
+ * This builder automatically configures:
+ * - Disk cache in the app's cache directory
+ * - Android-specific fetchers for various image model types:
+ *   - [android.graphics.Bitmap]
+ *   - [android.graphics.drawable.Drawable]
+ *   - [ByteArray]
+ *   - [java.nio.ByteBuffer]
+ *   - [java.io.File]
+ *   - [android.net.Uri] (content://, file://, android.resource://, http://, https://)
+ *   - [com.skydoves.landscapist.core.fetcher.DrawableResModel] (for R.drawable.* resources)
+ *   - [Int] drawable resource IDs (e.g., R.drawable.image)
+ *   - [String] URLs (http://, https://)
  */
 public class AndroidBuilder(private val context: Context) {
   private var config: LandscapistConfig = LandscapistConfig()
+
+  init {
+    // Initialize the context provider for Android fetchers
+    AndroidContextProvider.initialize(context)
+  }
 
   /** Sets the configuration. */
   public fun config(config: LandscapistConfig): AndroidBuilder = apply {
@@ -58,9 +78,13 @@ public class AndroidBuilder(private val context: Context) {
       fileSystem = FileSystem.SYSTEM,
     )
 
+    // Create Android-specific fetcher with all supported model types
+    val fetcher = AndroidFetchers.createDefault(config.networkConfig)
+
     return Landscapist.builder()
       .config(config)
       .diskCache(diskCache)
+      .fetcher(fetcher)
       .build()
   }
 }

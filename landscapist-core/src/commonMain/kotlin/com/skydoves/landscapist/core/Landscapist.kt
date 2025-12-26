@@ -289,6 +289,29 @@ public class Landscapist private constructor(
       is FetchResult.Error -> {
         emit(ImageResult.Failure(fetchResult.throwable))
       }
+
+      is FetchResult.Decoded -> {
+        // Pre-decoded image - skip decode step
+        val image = applyTransformations(fetchResult.image, request)
+
+        // Update memory cache (skip disk cache for pre-decoded types)
+        if (request.memoryCachePolicy.writeEnabled) {
+          memoryCache[cacheKey] = CachedImage(
+            data = image,
+            dataSource = fetchResult.dataSource,
+            sizeBytes = estimateBitmapSize(fetchResult.width, fetchResult.height),
+          )
+        }
+
+        emit(
+          ImageResult.Success(
+            data = image,
+            dataSource = fetchResult.dataSource,
+            originalWidth = fetchResult.width,
+            originalHeight = fetchResult.height,
+          ),
+        )
+      }
     }
   }.flowOn(dispatcher)
 

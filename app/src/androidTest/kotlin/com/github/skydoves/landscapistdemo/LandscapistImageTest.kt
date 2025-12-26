@@ -54,8 +54,111 @@ class LandscapistImageTest {
   companion object {
     private const val TAG_IMAGE = "LandscapistImageTag"
     private const val TAG_LOADING = "LoadingTag"
+    private const val TAG_FAILURE = "FailureTag"
     private const val IMAGE_URL = "https://user-images.githubusercontent.com/" +
       "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg"
+  }
+
+  @Test
+  fun testDrawableResourceLoading() {
+    var imageState by mutableStateOf<LandscapistImageState>(LandscapistImageState.None)
+    val stateHistory = mutableListOf<String>()
+    var failureReason: Throwable? = null
+    val latch = CountDownLatch(1)
+
+    composeTestRule.setContent {
+      LandscapistImage(
+        imageModel = { R.drawable.poster },
+        modifier = Modifier
+          .size(200.dp)
+          .testTag(TAG_IMAGE),
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+        onImageStateChanged = { state ->
+          stateHistory.add(state::class.simpleName ?: "Unknown")
+          imageState = state
+          if (state is LandscapistImageState.Failure) {
+            failureReason = state.reason
+          }
+          if (state is LandscapistImageState.Success || state is LandscapistImageState.Failure) {
+            latch.countDown()
+          }
+        },
+        loading = {
+          Box(modifier = Modifier.testTag(TAG_LOADING))
+        },
+        failure = {
+          Box(modifier = Modifier.testTag(TAG_FAILURE))
+        },
+      )
+    }
+
+    // Wait for image to load (max 5 seconds - should be fast for local resource)
+    val loaded = latch.await(5, TimeUnit.SECONDS)
+    assert(loaded) {
+      "Drawable resource failed to load within timeout. " +
+        "State history: $stateHistory, Final state: ${imageState::class.simpleName}, " +
+        "Failure reason: ${failureReason?.message ?: "none"}"
+    }
+
+    composeTestRule.onNodeWithTag(TAG_IMAGE)
+      .assertIsDisplayed()
+
+    composeTestRule.runOnIdle {
+      assert(imageState is LandscapistImageState.Success) {
+        "Expected Success state but got: ${imageState::class.simpleName}. " +
+          "State history: $stateHistory, " +
+          "Failure reason: ${failureReason?.message ?: "none"}, " +
+          "Stack trace: ${failureReason?.stackTraceToString() ?: "none"}"
+      }
+    }
+  }
+
+  @Test
+  fun testDrawableResourceWithIntDirectly() {
+    // Test passing the Int resource ID directly
+    var imageState by mutableStateOf<LandscapistImageState>(LandscapistImageState.None)
+    val stateHistory = mutableListOf<String>()
+    var failureReason: Throwable? = null
+    val latch = CountDownLatch(1)
+
+    val drawableResId: Int = R.drawable.poster
+
+    composeTestRule.setContent {
+      LandscapistImage(
+        imageModel = { drawableResId },
+        modifier = Modifier
+          .size(150.dp)
+          .testTag(TAG_IMAGE),
+        imageOptions = ImageOptions(contentScale = ContentScale.Fit),
+        onImageStateChanged = { state ->
+          val detail = when (state) {
+            is LandscapistImageState.Success -> "data=${state.data?.javaClass?.simpleName}"
+            is LandscapistImageState.Failure -> "reason=${state.reason?.message}"
+            else -> ""
+          }
+          stateHistory.add("${state::class.simpleName}($detail)")
+          imageState = state
+          if (state is LandscapistImageState.Failure) {
+            failureReason = state.reason
+          }
+          if (state is LandscapistImageState.Success || state is LandscapistImageState.Failure) {
+            latch.countDown()
+          }
+        },
+      )
+    }
+
+    val loaded = latch.await(5, TimeUnit.SECONDS)
+    assert(loaded) {
+      "Drawable resource (Int) failed to load. State history: $stateHistory"
+    }
+
+    composeTestRule.runOnIdle {
+      assert(imageState is LandscapistImageState.Success) {
+        "Expected Success but got ${imageState::class.simpleName}. " +
+          "History: $stateHistory, Error: ${failureReason?.stackTraceToString()}"
+      }
+    }
   }
 
   @Test
