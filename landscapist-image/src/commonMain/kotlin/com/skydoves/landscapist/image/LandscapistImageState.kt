@@ -43,6 +43,8 @@ public sealed class LandscapistImageState : ImageState {
    *
    * @property data The loaded image data (platform-specific bitmap).
    * @property dataSource The source from which the image was loaded.
+   * @property originalWidth The original width of the image before any transformations.
+   * @property originalHeight The original height of the image before any transformations.
    * @property rawData The raw image bytes for sub-sampling support.
    * @property diskCachePath The disk cache file path, if available.
    */
@@ -50,6 +52,8 @@ public sealed class LandscapistImageState : ImageState {
   public data class Success(
     val data: Any?,
     val dataSource: DataSource,
+    val originalWidth: Int = 0,
+    val originalHeight: Int = 0,
     val rawData: ByteArray? = null,
     val diskCachePath: String? = null,
   ) : LandscapistImageState() {
@@ -61,6 +65,8 @@ public sealed class LandscapistImageState : ImageState {
 
       if (data != other.data) return false
       if (dataSource != other.dataSource) return false
+      if (originalWidth != other.originalWidth) return false
+      if (originalHeight != other.originalHeight) return false
       if (rawData != null) {
         if (other.rawData == null) return false
         if (!rawData.contentEquals(other.rawData)) return false
@@ -73,6 +79,8 @@ public sealed class LandscapistImageState : ImageState {
     override fun hashCode(): Int {
       var result = data?.hashCode() ?: 0
       result = 31 * result + dataSource.hashCode()
+      result = 31 * result + originalWidth
+      result = 31 * result + originalHeight
       result = 31 * result + (rawData?.contentHashCode() ?: 0)
       result = 31 * result + (diskCachePath?.hashCode() ?: 0)
       return result
@@ -98,6 +106,8 @@ internal fun ImageResult.toLandscapistImageState(): LandscapistImageState = when
   is ImageResult.Success -> LandscapistImageState.Success(
     data = data,
     dataSource = dataSource,
+    originalWidth = originalWidth,
+    originalHeight = originalHeight,
     rawData = rawData,
     diskCachePath = diskCachePath,
   )

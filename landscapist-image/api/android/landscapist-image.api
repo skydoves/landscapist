@@ -46,18 +46,22 @@ public final class com/skydoves/landscapist/image/LandscapistImageState$None : c
 
 public final class com/skydoves/landscapist/image/LandscapistImageState$Success : com/skydoves/landscapist/image/LandscapistImageState {
 	public static final field $stable I
-	public fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;[BLjava/lang/String;)V
-	public synthetic fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;[BLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/Object;
 	public final fun component2 ()Lcom/skydoves/landscapist/core/model/DataSource;
-	public final fun component3 ()[B
-	public final fun component4 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;[BLjava/lang/String;)Lcom/skydoves/landscapist/image/LandscapistImageState$Success;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/image/LandscapistImageState$Success;Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;[BLjava/lang/String;ILjava/lang/Object;)Lcom/skydoves/landscapist/image/LandscapistImageState$Success;
+	public final fun component3 ()I
+	public final fun component4 ()I
+	public final fun component5 ()[B
+	public final fun component6 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;)Lcom/skydoves/landscapist/image/LandscapistImageState$Success;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/image/LandscapistImageState$Success;Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;ILjava/lang/Object;)Lcom/skydoves/landscapist/image/LandscapistImageState$Success;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getData ()Ljava/lang/Object;
 	public final fun getDataSource ()Lcom/skydoves/landscapist/core/model/DataSource;
 	public final fun getDiskCachePath ()Ljava/lang/String;
+	public final fun getOriginalHeight ()I
+	public final fun getOriginalWidth ()I
 	public final fun getRawData ()[B
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

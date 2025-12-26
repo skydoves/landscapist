@@ -154,11 +154,58 @@ private fun LandscapistImageInternal(
 ) {
   val constraintsSizeResolver = remember { ConstraintsSizeResolver() }
 
+  // Build request with target size from constraints or imageOptions
+  val sizedRequest = remember(request.value, imageOptions) {
+    val originalRequest = request.value
+    if (originalRequest.targetWidth != null && originalRequest.targetHeight != null) {
+      // Request already has size set
+      originalRequest
+    } else if (imageOptions.isValidSize) {
+      // Use size from imageOptions
+      ImageRequest.builder().apply {
+        model(originalRequest.model)
+        memoryCachePolicy(originalRequest.memoryCachePolicy)
+        diskCachePolicy(originalRequest.diskCachePolicy)
+        headers(originalRequest.headers)
+        transformations(originalRequest.transformations)
+        tag(originalRequest.tag)
+        size(imageOptions.requestSize.width, imageOptions.requestSize.height)
+      }.build()
+    } else {
+      originalRequest
+    }
+  }
+
   ImageLoad(
-    recomposeKey = request,
+    recomposeKey = StableHolder(sizedRequest),
     executeImageRequest = {
       channelFlow {
-        landscapist.value.load(request.value).collect { result ->
+        // Wait for constraints if we don't have a target size yet
+        val finalRequest = if (
+          sizedRequest.targetWidth == null || sizedRequest.targetHeight == null
+        ) {
+          // Use constraints if available
+          val targetSize = constraintsSizeResolver.getTargetSize()
+          if (targetSize != null && (targetSize.first > 0 || targetSize.second > 0)) {
+            ImageRequest.builder().apply {
+              model(sizedRequest.model)
+              memoryCachePolicy(sizedRequest.memoryCachePolicy)
+              diskCachePolicy(sizedRequest.diskCachePolicy)
+              headers(sizedRequest.headers)
+              transformations(sizedRequest.transformations)
+              tag(sizedRequest.tag)
+              if (targetSize.first > 0 && targetSize.second > 0) {
+                size(targetSize.first, targetSize.second)
+              }
+            }.build()
+          } else {
+            sizedRequest
+          }
+        } else {
+          sizedRequest
+        }
+
+        landscapist.value.load(finalRequest).collect { result ->
           send(result.toImageLoadState())
         }
       }
@@ -175,13 +222,15 @@ private fun LandscapistImageInternal(
 
 /**
  * Converts [ImageResult] to [ImageLoadState].
- * Note: This loses rawData and diskCachePath for ImageLoad compatibility.
+ * Note: We wrap the data to preserve additional fields for ImageLoad compatibility.
  */
 private fun ImageResult.toImageLoadState(): ImageLoadState = when (this) {
   is ImageResult.Loading -> ImageLoadState.Loading
   is ImageResult.Success -> ImageLoadState.Success(
     data = LandscapistSuccessData(
       bitmap = data,
+      originalWidth = originalWidth,
+      originalHeight = originalHeight,
       rawData = rawData,
       diskCachePath = diskCachePath,
     ),
@@ -204,6 +253,8 @@ private fun ImageLoadState.toImageResult(): ImageResult = when (this) {
     ImageResult.Success(
       data = successData?.bitmap ?: data ?: Unit,
       dataSource = com.skydoves.landscapist.core.model.DataSource.valueOf(dataSource.name),
+      originalWidth = successData?.originalWidth ?: 0,
+      originalHeight = successData?.originalHeight ?: 0,
       rawData = successData?.rawData,
       diskCachePath = successData?.diskCachePath,
     )
@@ -218,6 +269,8 @@ private fun ImageLoadState.toImageResult(): ImageResult = when (this) {
  */
 private data class LandscapistSuccessData(
   val bitmap: Any,
+  val originalWidth: Int,
+  val originalHeight: Int,
   val rawData: ByteArray?,
   val diskCachePath: String?,
 ) {
@@ -228,6 +281,8 @@ private data class LandscapistSuccessData(
     other as LandscapistSuccessData
 
     if (bitmap != other.bitmap) return false
+    if (originalWidth != other.originalWidth) return false
+    if (originalHeight != other.originalHeight) return false
     if (rawData != null) {
       if (other.rawData == null) return false
       if (!rawData.contentEquals(other.rawData)) return false
@@ -239,6 +294,8 @@ private data class LandscapistSuccessData(
 
   override fun hashCode(): Int {
     var result = bitmap.hashCode()
+    result = 31 * result + originalWidth
+    result = 31 * result + originalHeight
     result = 31 * result + (rawData?.contentHashCode() ?: 0)
     result = 31 * result + (diskCachePath?.hashCode() ?: 0)
     return result
@@ -247,9 +304,42 @@ private data class LandscapistSuccessData(
 
 /**
  * Size resolver for constraints.
+ * Stores constraints from BoxWithConstraints and provides target size for image requests.
  */
 internal class ConstraintsSizeResolver : Constrainable {
+  private val _constraints = kotlinx.coroutines.flow.MutableStateFlow(
+    androidx.compose.ui.unit.Constraints.fixed(0, 0),
+  )
+
+  /**
+   * Returns the current constraints.
+   */
+  val constraints: androidx.compose.ui.unit.Constraints
+    get() = _constraints.value
+
+  /**
+   * Returns true if valid constraints have been set.
+   */
+  val hasValidConstraints: Boolean
+    get() = !_constraints.value.isZero
+
+  /**
+   * Returns the target size if constraints are already available, otherwise null.
+   */
+  fun getTargetSize(): Pair<Int, Int>? {
+    val c = _constraints.value
+    if (c.isZero) return null
+    return if (c.hasBoundedWidth || c.hasBoundedHeight) {
+      Pair(
+        if (c.hasBoundedWidth) c.maxWidth else 0,
+        if (c.hasBoundedHeight) c.maxHeight else 0,
+      )
+    } else {
+      null
+    }
+  }
+
   override fun setConstraints(constraints: androidx.compose.ui.unit.Constraints) {
-    // Store constraints for size resolution
+    _constraints.value = constraints
   }
 }

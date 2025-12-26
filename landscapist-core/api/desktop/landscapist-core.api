@@ -327,17 +327,20 @@ public final class com/skydoves/landscapist/core/decoder/DecodeResult$Error : co
 }
 
 public final class com/skydoves/landscapist/core/decoder/DecodeResult$Success : com/skydoves/landscapist/core/decoder/DecodeResult {
-	public fun <init> (Ljava/lang/Object;II)V
+	public fun <init> (Ljava/lang/Object;IIZ)V
+	public synthetic fun <init> (Ljava/lang/Object;IIZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/Object;
 	public final fun component2 ()I
 	public final fun component3 ()I
-	public final fun copy (Ljava/lang/Object;II)Lcom/skydoves/landscapist/core/decoder/DecodeResult$Success;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/decoder/DecodeResult$Success;Ljava/lang/Object;IIILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/DecodeResult$Success;
+	public final fun component4 ()Z
+	public final fun copy (Ljava/lang/Object;IIZ)Lcom/skydoves/landscapist/core/decoder/DecodeResult$Success;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/decoder/DecodeResult$Success;Ljava/lang/Object;IIZILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/DecodeResult$Success;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBitmap ()Ljava/lang/Object;
 	public final fun getHeight ()I
 	public final fun getWidth ()I
 	public fun hashCode ()I
+	public final fun isAnimated ()Z
 	public fun toString ()Ljava/lang/String;
 }
 

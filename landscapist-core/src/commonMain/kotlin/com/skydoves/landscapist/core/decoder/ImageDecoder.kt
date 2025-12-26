@@ -50,11 +50,13 @@ public sealed class DecodeResult {
    * @property bitmap The decoded bitmap (platform-specific type).
    * @property width The width of the decoded image.
    * @property height The height of the decoded image.
+   * @property isAnimated Whether the image is animated (GIF, APNG, animated WebP).
    */
   public data class Success(
     val bitmap: Any,
     val width: Int,
     val height: Int,
+    val isAnimated: Boolean = false,
   ) : DecodeResult()
 
   /**
