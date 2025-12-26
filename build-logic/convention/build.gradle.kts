@@ -38,5 +38,9 @@ gradlePlugin {
       id = "landscapist.spotless"
       implementationClass = "SpotlessConventionPlugin"
     }
+    register("kmpLibrary") {
+      id = "landscapist.library.kmp"
+      implementationClass = "KmpLibraryConventionPlugin"
+    }
   }
 }
