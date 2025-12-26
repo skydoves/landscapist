@@ -27,15 +27,21 @@ import kotlinx.atomicfu.locks.synchronized
  * @property maxSize Maximum size of the cache in bytes.
  */
 public class LruMemoryCache(
-  override val maxSize: Long,
+  private var _maxSize: Long,
 ) : MemoryCache {
 
   private val lock = SynchronizedObject()
   private val cache = linkedMapOf<String, CachedImage>()
   private val currentSize = atomic(0L)
 
+  override val maxSize: Long
+    get() = _maxSize
+
   override val size: Long
     get() = currentSize.value
+
+  override val count: Int
+    get() = synchronized(lock) { cache.size }
 
   override fun get(key: CacheKey): CachedImage? = synchronized(lock) {
     val memoryKey = key.memoryKey
@@ -82,6 +88,11 @@ public class LruMemoryCache(
         currentSize.addAndGet(-eldest.value.sizeBytes)
       }
     }
+  }
+
+  override fun resize(newMaxSize: Long): Unit = synchronized(lock) {
+    _maxSize = newMaxSize
+    trimToSize(newMaxSize)
   }
 
   private fun evictIfNeeded(requiredSpace: Long) {

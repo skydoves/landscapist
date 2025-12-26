@@ -17,6 +17,8 @@ package com.skydoves.landscapist.core
 
 import com.skydoves.landscapist.core.cache.DiskCache
 import com.skydoves.landscapist.core.cache.MemoryCache
+import com.skydoves.landscapist.core.event.EventListener
+import com.skydoves.landscapist.core.interceptor.Interceptor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,6 +32,10 @@ import kotlin.time.Duration.Companion.seconds
  * @property networkConfig Network configuration settings.
  * @property maxBitmapSize Maximum dimension for decoded bitmaps.
  * @property allowRgb565 Whether to allow RGB_565 format for images without alpha.
+ * @property bitmapConfig Configuration for bitmap decoding.
+ * @property weakReferencesEnabled Whether to use weak references for evicted cache entries.
+ * @property eventListenerFactory Factory for creating event listeners.
+ * @property interceptors List of interceptors for request/response modification.
  */
 public data class LandscapistConfig(
   val memoryCacheSize: Long = DEFAULT_MEMORY_CACHE_SIZE,
@@ -39,6 +45,10 @@ public data class LandscapistConfig(
   val networkConfig: NetworkConfig = NetworkConfig(),
   val maxBitmapSize: Int = DEFAULT_MAX_BITMAP_SIZE,
   val allowRgb565: Boolean = false,
+  val bitmapConfig: BitmapConfig = BitmapConfig(),
+  val weakReferencesEnabled: Boolean = true,
+  val eventListenerFactory: EventListener.Factory = EventListener.NONE_FACTORY,
+  val interceptors: List<Interceptor> = emptyList(),
 ) {
   public companion object {
     /** Default memory cache size: 25% of available memory, max 256MB. */

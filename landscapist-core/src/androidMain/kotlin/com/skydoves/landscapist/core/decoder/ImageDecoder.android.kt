@@ -17,6 +17,7 @@ package com.skydoves.landscapist.core.decoder
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import com.skydoves.landscapist.core.LandscapistConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,6 +31,11 @@ public actual fun createPlatformDecoder(): ImageDecoder = AndroidImageDecoder()
 
 /**
  * Android implementation of [ImageDecoder] using BitmapFactory.
+ *
+ * Supports:
+ * - Downsampling for memory efficiency
+ * - RGB_565 for images without alpha
+ * - Hardware bitmaps (API 26+) for faster rendering
  */
 internal class AndroidImageDecoder : ImageDecoder {
 
@@ -65,20 +71,50 @@ internal class AndroidImageDecoder : ImageDecoder {
         maxSize = config.maxBitmapSize,
       )
 
+      // Determine if we can use hardware bitmaps
+      val useHardware = config.bitmapConfig.allowHardware &&
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+        !hasAlpha(mimeType) // Hardware bitmaps work best with opaque images
+
       // Second pass: decode with options
       val decodeOptions = BitmapFactory.Options().apply {
         inSampleSize = sampleSize
-        inPreferredConfig = if (config.allowRgb565 && !hasAlpha(mimeType)) {
-          Bitmap.Config.RGB_565
-        } else {
-          Bitmap.Config.ARGB_8888
+        inPreferredConfig = when {
+          useHardware && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
+            Bitmap.Config.HARDWARE
+          }
+          config.allowRgb565 && !hasAlpha(mimeType) -> {
+            Bitmap.Config.RGB_565
+          }
+          else -> {
+            Bitmap.Config.ARGB_8888
+          }
         }
       }
 
-      val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size, decodeOptions)
+      var bitmap = BitmapFactory.decodeByteArray(data, 0, data.size, decodeOptions)
         ?: return@withContext DecodeResult.Error(
           IllegalArgumentException("Failed to decode bitmap"),
         )
+
+      // If hardware bitmap failed (can happen with certain image types), fall back
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+        bitmap.config == Bitmap.Config.HARDWARE &&
+        useHardware
+      ) {
+        // Hardware bitmap succeeded, no action needed
+      } else if (useHardware && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        // Hardware bitmap was requested but failed, try to copy to hardware
+        try {
+          val hardwareBitmap = bitmap.copy(Bitmap.Config.HARDWARE, false)
+          if (hardwareBitmap != null) {
+            bitmap.recycle()
+            bitmap = hardwareBitmap
+          }
+        } catch (_: Exception) {
+          // Failed to copy to hardware, keep the original bitmap
+        }
+      }
 
       DecodeResult.Success(
         bitmap = bitmap,

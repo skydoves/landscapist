@@ -27,6 +27,10 @@ public interface MemoryCache {
   /** Maximum size of the cache in bytes. */
   public val maxSize: Long
 
+  /** Number of entries in the cache. */
+  public val count: Int
+    get() = 0
+
   /**
    * Gets a cached image by its key.
    *
@@ -62,6 +66,18 @@ public interface MemoryCache {
    * @param size The target size in bytes.
    */
   public fun trimToSize(size: Long)
+
+  /**
+   * Resizes the cache to the new maximum size.
+   * If the new size is smaller than current size, entries will be evicted.
+   *
+   * @param newMaxSize The new maximum size in bytes.
+   */
+  public fun resize(newMaxSize: Long) {
+    if (newMaxSize < size) {
+      trimToSize(newMaxSize)
+    }
+  }
 }
 
 /**

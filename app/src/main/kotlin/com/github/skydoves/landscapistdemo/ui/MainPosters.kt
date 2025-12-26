@@ -58,11 +58,10 @@ import com.kmpalette.palette.graphics.Palette
 import com.skydoves.compose.stability.runtime.IgnoreStabilityReport
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
-import com.skydoves.landscapist.coil3.CoilImage
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.fresco.FrescoImage
-import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.image.LandscapistImage
 import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.palette.rememberPaletteState
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
@@ -150,7 +149,7 @@ private fun SelectedPoster(
     resetKey = poster.image,
   )
 
-  CoilImage(
+  LandscapistImage(
     imageModel = { poster.image },
     modifier = Modifier.aspectRatio(0.75f),
     component = rememberImageComponent {
@@ -203,7 +202,7 @@ private fun PosterInformation(
     modifier = Modifier.padding(8.dp),
   )
 
-  GlideImage(
+  LandscapistImage(
     imageModel = { poster.gif },
     modifier = Modifier
       .fillMaxWidth()

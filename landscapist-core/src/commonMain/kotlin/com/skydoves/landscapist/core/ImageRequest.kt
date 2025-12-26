@@ -28,6 +28,7 @@ import com.skydoves.landscapist.core.transformation.Transformation
  * @property transformations List of transformations to apply.
  * @property targetWidth Target width for the loaded image.
  * @property targetHeight Target height for the loaded image.
+ * @property tag Optional tag for grouping and managing requests.
  */
 public data class ImageRequest(
   val model: Any?,
@@ -37,6 +38,7 @@ public data class ImageRequest(
   val transformations: List<Transformation> = emptyList(),
   val targetWidth: Int? = null,
   val targetHeight: Int? = null,
+  val tag: String? = null,
 ) {
   /**
    * Builder for creating [ImageRequest] instances.
@@ -49,6 +51,7 @@ public data class ImageRequest(
     private var transformations: MutableList<Transformation> = mutableListOf()
     private var targetWidth: Int? = null
     private var targetHeight: Int? = null
+    private var tag: String? = null
 
     /** Sets the image source. */
     public fun model(model: Any?): Builder = apply { this.model = model }
@@ -91,6 +94,11 @@ public data class ImageRequest(
       this.targetHeight = height
     }
 
+    /** Sets a tag for grouping and managing this request. */
+    public fun tag(tag: String?): Builder = apply {
+      this.tag = tag
+    }
+
     /** Builds the [ImageRequest]. */
     public fun build(): ImageRequest = ImageRequest(
       model = model,
@@ -100,6 +108,7 @@ public data class ImageRequest(
       transformations = transformations.toList(),
       targetWidth = targetWidth,
       targetHeight = targetHeight,
+      tag = tag,
     )
   }
 
