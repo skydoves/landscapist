@@ -31,9 +31,10 @@ public final class com/skydoves/landscapist/core/DownsamplingStrategy : java/lan
 
 public final class com/skydoves/landscapist/core/ImageRequest {
 	public static final field Companion Lcom/skydoves/landscapist/core/ImageRequest$Companion;
-	public fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/CachePolicy;Lcom/skydoves/landscapist/core/model/CachePolicy;Ljava/util/Map;Ljava/util/List;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V
-	public synthetic fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/CachePolicy;Lcom/skydoves/landscapist/core/model/CachePolicy;Ljava/util/Map;Ljava/util/List;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/CachePolicy;Lcom/skydoves/landscapist/core/model/CachePolicy;Ljava/util/Map;Ljava/util/List;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Lcom/skydoves/landscapist/core/scheduler/DecodePriority;Z)V
+	public synthetic fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/CachePolicy;Lcom/skydoves/landscapist/core/model/CachePolicy;Ljava/util/Map;Ljava/util/List;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Lcom/skydoves/landscapist/core/scheduler/DecodePriority;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/Object;
+	public final fun component10 ()Z
 	public final fun component2 ()Lcom/skydoves/landscapist/core/model/CachePolicy;
 	public final fun component3 ()Lcom/skydoves/landscapist/core/model/CachePolicy;
 	public final fun component4 ()Ljava/util/Map;
@@ -41,13 +42,16 @@ public final class com/skydoves/landscapist/core/ImageRequest {
 	public final fun component6 ()Ljava/lang/Integer;
 	public final fun component7 ()Ljava/lang/Integer;
 	public final fun component8 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/CachePolicy;Lcom/skydoves/landscapist/core/model/CachePolicy;Ljava/util/Map;Ljava/util/List;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)Lcom/skydoves/landscapist/core/ImageRequest;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/ImageRequest;Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/CachePolicy;Lcom/skydoves/landscapist/core/model/CachePolicy;Ljava/util/Map;Ljava/util/List;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;ILjava/lang/Object;)Lcom/skydoves/landscapist/core/ImageRequest;
+	public final fun component9 ()Lcom/skydoves/landscapist/core/scheduler/DecodePriority;
+	public final fun copy (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/CachePolicy;Lcom/skydoves/landscapist/core/model/CachePolicy;Ljava/util/Map;Ljava/util/List;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Lcom/skydoves/landscapist/core/scheduler/DecodePriority;Z)Lcom/skydoves/landscapist/core/ImageRequest;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/ImageRequest;Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/CachePolicy;Lcom/skydoves/landscapist/core/model/CachePolicy;Ljava/util/Map;Ljava/util/List;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Lcom/skydoves/landscapist/core/scheduler/DecodePriority;ZILjava/lang/Object;)Lcom/skydoves/landscapist/core/ImageRequest;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDiskCachePolicy ()Lcom/skydoves/landscapist/core/model/CachePolicy;
 	public final fun getHeaders ()Ljava/util/Map;
 	public final fun getMemoryCachePolicy ()Lcom/skydoves/landscapist/core/model/CachePolicy;
 	public final fun getModel ()Ljava/lang/Object;
+	public final fun getPriority ()Lcom/skydoves/landscapist/core/scheduler/DecodePriority;
+	public final fun getProgressiveEnabled ()Z
 	public final fun getTag ()Ljava/lang/String;
 	public final fun getTargetHeight ()Ljava/lang/Integer;
 	public final fun getTargetWidth ()Ljava/lang/Integer;
@@ -65,6 +69,8 @@ public final class com/skydoves/landscapist/core/ImageRequest$Builder {
 	public final fun headers (Ljava/util/Map;)Lcom/skydoves/landscapist/core/ImageRequest$Builder;
 	public final fun memoryCachePolicy (Lcom/skydoves/landscapist/core/model/CachePolicy;)Lcom/skydoves/landscapist/core/ImageRequest$Builder;
 	public final fun model (Ljava/lang/Object;)Lcom/skydoves/landscapist/core/ImageRequest$Builder;
+	public final fun priority (Lcom/skydoves/landscapist/core/scheduler/DecodePriority;)Lcom/skydoves/landscapist/core/ImageRequest$Builder;
+	public final fun progressiveEnabled (Z)Lcom/skydoves/landscapist/core/ImageRequest$Builder;
 	public final fun size (II)Lcom/skydoves/landscapist/core/ImageRequest$Builder;
 	public final fun tag (Ljava/lang/String;)Lcom/skydoves/landscapist/core/ImageRequest$Builder;
 	public final fun transformations (Ljava/util/List;)Lcom/skydoves/landscapist/core/ImageRequest$Builder;
@@ -176,6 +182,59 @@ public final class com/skydoves/landscapist/core/NetworkConfig {
 	public final fun getUserAgent ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/core/bitmappool/BitmapFormat : java/lang/Enum {
+	public static final field ARGB_8888 Lcom/skydoves/landscapist/core/bitmappool/BitmapFormat;
+	public static final field HARDWARE Lcom/skydoves/landscapist/core/bitmappool/BitmapFormat;
+	public static final field RGB_565 Lcom/skydoves/landscapist/core/bitmappool/BitmapFormat;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/skydoves/landscapist/core/bitmappool/BitmapFormat;
+	public static fun values ()[Lcom/skydoves/landscapist/core/bitmappool/BitmapFormat;
+}
+
+public abstract interface class com/skydoves/landscapist/core/bitmappool/BitmapPool {
+	public abstract fun clear ()V
+	public abstract fun get (IILcom/skydoves/landscapist/core/bitmappool/BitmapFormat;)Ljava/lang/Object;
+	public abstract fun getCurrentSize ()J
+	public abstract fun getMaxSize ()J
+	public abstract fun getReusable (IILcom/skydoves/landscapist/core/bitmappool/BitmapFormat;)Ljava/lang/Object;
+	public abstract fun getStats ()Lcom/skydoves/landscapist/core/bitmappool/BitmapPoolStats;
+	public abstract fun put (Ljava/lang/Object;)Z
+	public abstract fun trimToSize (J)V
+}
+
+public final class com/skydoves/landscapist/core/bitmappool/BitmapPoolStats {
+	public fun <init> (JJIJJ)V
+	public final fun component1 ()J
+	public final fun component2 ()J
+	public final fun component3 ()I
+	public final fun component4 ()J
+	public final fun component5 ()J
+	public final fun copy (JJIJJ)Lcom/skydoves/landscapist/core/bitmappool/BitmapPoolStats;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/bitmappool/BitmapPoolStats;JJIJJILjava/lang/Object;)Lcom/skydoves/landscapist/core/bitmappool/BitmapPoolStats;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEvictions ()J
+	public final fun getHitRate ()F
+	public final fun getHits ()J
+	public final fun getMisses ()J
+	public final fun getPooledBytes ()J
+	public final fun getPooledCount ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/core/bitmappool/BitmapPool_skiaKt {
+	public static final fun createBitmapPool (J)Lcom/skydoves/landscapist/core/bitmappool/BitmapPool;
+	public static synthetic fun createBitmapPool$default (JILjava/lang/Object;)Lcom/skydoves/landscapist/core/bitmappool/BitmapPool;
+}
+
+public final class com/skydoves/landscapist/core/bitmappool/GlobalBitmapPool {
+	public static final field INSTANCE Lcom/skydoves/landscapist/core/bitmappool/GlobalBitmapPool;
+	public final fun clear ()V
+	public final fun get ()Lcom/skydoves/landscapist/core/bitmappool/BitmapPool;
+	public final fun initialize (J)V
+	public final fun trim (F)V
 }
 
 public final class com/skydoves/landscapist/core/cache/CacheKey {
@@ -352,6 +411,96 @@ public final class com/skydoves/landscapist/core/decoder/ImageDecoder_desktopKt 
 	public static final fun createPlatformDecoder ()Lcom/skydoves/landscapist/core/decoder/ImageDecoder;
 }
 
+public final class com/skydoves/landscapist/core/decoder/ImageRegion {
+	public static final field Companion Lcom/skydoves/landscapist/core/decoder/ImageRegion$Companion;
+	public fun <init> (IIII)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun component4 ()I
+	public final fun copy (IIII)Lcom/skydoves/landscapist/core/decoder/ImageRegion;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/decoder/ImageRegion;IIIIILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/ImageRegion;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBottom ()I
+	public final fun getHeight ()I
+	public final fun getLeft ()I
+	public final fun getRight ()I
+	public final fun getTop ()I
+	public final fun getWidth ()I
+	public fun hashCode ()I
+	public final fun isValid ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/core/decoder/ImageRegion$Companion {
+	public final fun fromSize (IIII)Lcom/skydoves/landscapist/core/decoder/ImageRegion;
+}
+
+public abstract class com/skydoves/landscapist/core/decoder/ProgressiveDecodeResult {
+}
+
+public final class com/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Complete : com/skydoves/landscapist/core/decoder/ProgressiveDecodeResult {
+	public fun <init> (Ljava/lang/Object;II)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun copy (Ljava/lang/Object;II)Lcom/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Complete;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Complete;Ljava/lang/Object;IIILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Complete;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBitmap ()Ljava/lang/Object;
+	public final fun getHeight ()I
+	public final fun getWidth ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Error : com/skydoves/landscapist/core/decoder/ProgressiveDecodeResult {
+	public fun <init> (Ljava/lang/Throwable;)V
+	public final fun component1 ()Ljava/lang/Throwable;
+	public final fun copy (Ljava/lang/Throwable;)Lcom/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Error;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Error;Ljava/lang/Throwable;ILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Error;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getThrowable ()Ljava/lang/Throwable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Intermediate : com/skydoves/landscapist/core/decoder/ProgressiveDecodeResult {
+	public fun <init> (Ljava/lang/Object;IIFZ)V
+	public synthetic fun <init> (Ljava/lang/Object;IIFZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun component4 ()F
+	public final fun component5 ()Z
+	public final fun copy (Ljava/lang/Object;IIFZ)Lcom/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Intermediate;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Intermediate;Ljava/lang/Object;IIFZILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/ProgressiveDecodeResult$Intermediate;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBitmap ()Ljava/lang/Object;
+	public final fun getHeight ()I
+	public final fun getProgress ()F
+	public final fun getWidth ()I
+	public fun hashCode ()I
+	public final fun isPreview ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/skydoves/landscapist/core/decoder/ProgressiveDecoder {
+	public abstract fun decodeProgressive ([BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Lcom/skydoves/landscapist/core/LandscapistConfig;)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun supportsProgressiveDecode ([BLjava/lang/String;)Z
+}
+
+public final class com/skydoves/landscapist/core/decoder/ProgressiveDecoder_skiaKt {
+	public static final fun createProgressiveDecoder ()Lcom/skydoves/landscapist/core/decoder/ProgressiveDecoder;
+}
+
+public final class com/skydoves/landscapist/core/decoder/ProgressiveImageDetector {
+	public static final field INSTANCE Lcom/skydoves/landscapist/core/decoder/ProgressiveImageDetector;
+	public final fun isInterlacedPng ([B)Z
+	public final fun isProgressiveJpeg ([B)Z
+	public final fun supportsProgressive ([BLjava/lang/String;)Z
+}
+
 public final class com/skydoves/landscapist/core/decoder/RawImageData {
 	public fun <init> ([BLjava/lang/String;)V
 	public final fun component1 ()[B
@@ -363,6 +512,102 @@ public final class com/skydoves/landscapist/core/decoder/RawImageData {
 	public final fun getMimeType ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public abstract class com/skydoves/landscapist/core/decoder/RegionDecodeResult {
+}
+
+public final class com/skydoves/landscapist/core/decoder/RegionDecodeResult$Error : com/skydoves/landscapist/core/decoder/RegionDecodeResult {
+	public fun <init> (Ljava/lang/Throwable;Lcom/skydoves/landscapist/core/decoder/ImageRegion;)V
+	public final fun component1 ()Ljava/lang/Throwable;
+	public final fun component2 ()Lcom/skydoves/landscapist/core/decoder/ImageRegion;
+	public final fun copy (Ljava/lang/Throwable;Lcom/skydoves/landscapist/core/decoder/ImageRegion;)Lcom/skydoves/landscapist/core/decoder/RegionDecodeResult$Error;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/decoder/RegionDecodeResult$Error;Ljava/lang/Throwable;Lcom/skydoves/landscapist/core/decoder/ImageRegion;ILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/RegionDecodeResult$Error;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRegion ()Lcom/skydoves/landscapist/core/decoder/ImageRegion;
+	public final fun getThrowable ()Ljava/lang/Throwable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/core/decoder/RegionDecodeResult$Success : com/skydoves/landscapist/core/decoder/RegionDecodeResult {
+	public fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/decoder/ImageRegion;I)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()Lcom/skydoves/landscapist/core/decoder/ImageRegion;
+	public final fun component3 ()I
+	public final fun copy (Ljava/lang/Object;Lcom/skydoves/landscapist/core/decoder/ImageRegion;I)Lcom/skydoves/landscapist/core/decoder/RegionDecodeResult$Success;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/decoder/RegionDecodeResult$Success;Ljava/lang/Object;Lcom/skydoves/landscapist/core/decoder/ImageRegion;IILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/RegionDecodeResult$Success;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBitmap ()Ljava/lang/Object;
+	public final fun getRegion ()Lcom/skydoves/landscapist/core/decoder/ImageRegion;
+	public final fun getSampleSize ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/skydoves/landscapist/core/decoder/RegionDecoder {
+	public abstract fun decodeRegion (Lcom/skydoves/landscapist/core/decoder/ImageRegion;I)Lcom/skydoves/landscapist/core/decoder/RegionDecodeResult;
+	public static synthetic fun decodeRegion$default (Lcom/skydoves/landscapist/core/decoder/RegionDecoder;Lcom/skydoves/landscapist/core/decoder/ImageRegion;IILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/RegionDecodeResult;
+	public abstract fun getImageHeight ()I
+	public abstract fun getImageWidth ()I
+	public abstract fun isRecycled ()Z
+	public abstract fun recycle ()V
+}
+
+public final class com/skydoves/landscapist/core/decoder/RegionDecoder$DefaultImpls {
+	public static synthetic fun decodeRegion$default (Lcom/skydoves/landscapist/core/decoder/RegionDecoder;Lcom/skydoves/landscapist/core/decoder/ImageRegion;IILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/RegionDecodeResult;
+}
+
+public final class com/skydoves/landscapist/core/decoder/RegionDecoderKt {
+	public static final fun calculateVisibleTiles (Lcom/skydoves/landscapist/core/decoder/ImageRegion;IILcom/skydoves/landscapist/core/decoder/TileConfig;I)Ljava/util/List;
+	public static final fun supportsRegionDecoding ([B)Z
+}
+
+public final class com/skydoves/landscapist/core/decoder/RegionDecoder_skiaKt {
+	public static final fun createRegionDecoder ([B)Lcom/skydoves/landscapist/core/decoder/RegionDecoder;
+}
+
+public final class com/skydoves/landscapist/core/decoder/Tile {
+	public fun <init> (IILcom/skydoves/landscapist/core/decoder/ImageRegion;I)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun component3 ()Lcom/skydoves/landscapist/core/decoder/ImageRegion;
+	public final fun component4 ()I
+	public final fun copy (IILcom/skydoves/landscapist/core/decoder/ImageRegion;I)Lcom/skydoves/landscapist/core/decoder/Tile;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/decoder/Tile;IILcom/skydoves/landscapist/core/decoder/ImageRegion;IILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/Tile;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getColumn ()I
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getRegion ()Lcom/skydoves/landscapist/core/decoder/ImageRegion;
+	public final fun getRow ()I
+	public final fun getSampleSize ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/core/decoder/TileConfig {
+	public static final field Companion Lcom/skydoves/landscapist/core/decoder/TileConfig$Companion;
+	public static final field DEFAULT_MAX_TILES I
+	public static final field DEFAULT_TILE_SIZE I
+	public fun <init> ()V
+	public fun <init> (IIZI)V
+	public synthetic fun <init> (IIZIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun component3 ()Z
+	public final fun component4 ()I
+	public final fun copy (IIZI)Lcom/skydoves/landscapist/core/decoder/TileConfig;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/decoder/TileConfig;IIZIILjava/lang/Object;)Lcom/skydoves/landscapist/core/decoder/TileConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMaxTilesInMemory ()I
+	public final fun getPrefetchDistance ()I
+	public final fun getPrefetchEnabled ()Z
+	public final fun getTileSize ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/core/decoder/TileConfig$Companion {
 }
 
 public final class com/skydoves/landscapist/core/event/CompositeEventListener : com/skydoves/landscapist/core/event/EventListener {
@@ -719,24 +964,29 @@ public final class com/skydoves/landscapist/core/model/ImageResult$Loading : com
 }
 
 public final class com/skydoves/landscapist/core/model/ImageResult$Success : com/skydoves/landscapist/core/model/ImageResult {
-	public fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;)V
-	public synthetic fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;ZF)V
+	public synthetic fun <init> (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;ZFILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/Object;
 	public final fun component2 ()Lcom/skydoves/landscapist/core/model/DataSource;
 	public final fun component3 ()I
 	public final fun component4 ()I
 	public final fun component5 ()[B
 	public final fun component6 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;)Lcom/skydoves/landscapist/core/model/ImageResult$Success;
-	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/model/ImageResult$Success;Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;ILjava/lang/Object;)Lcom/skydoves/landscapist/core/model/ImageResult$Success;
+	public final fun component7 ()Z
+	public final fun component8 ()F
+	public final fun copy (Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;ZF)Lcom/skydoves/landscapist/core/model/ImageResult$Success;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/model/ImageResult$Success;Ljava/lang/Object;Lcom/skydoves/landscapist/core/model/DataSource;II[BLjava/lang/String;ZFILjava/lang/Object;)Lcom/skydoves/landscapist/core/model/ImageResult$Success;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getData ()Ljava/lang/Object;
 	public final fun getDataSource ()Lcom/skydoves/landscapist/core/model/DataSource;
 	public final fun getDiskCachePath ()Ljava/lang/String;
 	public final fun getOriginalHeight ()I
 	public final fun getOriginalWidth ()I
+	public final fun getProgress ()F
 	public final fun getRawData ()[B
 	public fun hashCode ()I
+	public final fun isFinal ()Z
+	public final fun isIntermediate ()Z
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -810,6 +1060,62 @@ public final class com/skydoves/landscapist/core/request/RequestManager {
 	public final fun getActiveRequestIds ()Ljava/util/List;
 	public final fun getActiveRequestIdsByTag (Ljava/lang/String;)Ljava/util/List;
 	public final fun hasActiveRequest (Ljava/lang/Object;)Z
+}
+
+public final class com/skydoves/landscapist/core/scheduler/DecodePriority : java/lang/Enum {
+	public static final field BACKGROUND Lcom/skydoves/landscapist/core/scheduler/DecodePriority;
+	public static final field HIGH Lcom/skydoves/landscapist/core/scheduler/DecodePriority;
+	public static final field IMMEDIATE Lcom/skydoves/landscapist/core/scheduler/DecodePriority;
+	public static final field LOW Lcom/skydoves/landscapist/core/scheduler/DecodePriority;
+	public static final field NORMAL Lcom/skydoves/landscapist/core/scheduler/DecodePriority;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getValue ()I
+	public static fun valueOf (Ljava/lang/String;)Lcom/skydoves/landscapist/core/scheduler/DecodePriority;
+	public static fun values ()[Lcom/skydoves/landscapist/core/scheduler/DecodePriority;
+}
+
+public final class com/skydoves/landscapist/core/scheduler/DecodeScheduler {
+	public static final field Companion Lcom/skydoves/landscapist/core/scheduler/DecodeScheduler$Companion;
+	public static final field DEFAULT_PARALLELISM I
+	public fun <init> ()V
+	public fun <init> (ILkotlinx/coroutines/CoroutineDispatcher;)V
+	public synthetic fun <init> (ILkotlinx/coroutines/CoroutineDispatcher;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun activeCount (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun boostPriority (Ljava/lang/String;Lcom/skydoves/landscapist/core/scheduler/DecodePriority;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun cancel (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun cancelByTag (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun clearPending (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun pendingCount (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun schedule (Ljava/lang/String;Lcom/skydoves/landscapist/core/scheduler/DecodePriority;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/Deferred;
+	public static synthetic fun schedule$default (Lcom/skydoves/landscapist/core/scheduler/DecodeScheduler;Ljava/lang/String;Lcom/skydoves/landscapist/core/scheduler/DecodePriority;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/Deferred;
+}
+
+public final class com/skydoves/landscapist/core/scheduler/DecodeScheduler$Companion {
+	public final fun global ()Lcom/skydoves/landscapist/core/scheduler/DecodeScheduler;
+	public final fun initialize (I)V
+	public static synthetic fun initialize$default (Lcom/skydoves/landscapist/core/scheduler/DecodeScheduler$Companion;IILjava/lang/Object;)V
+}
+
+public final class com/skydoves/landscapist/core/scheduler/PrioritizedRequest : java/lang/Comparable {
+	public fun <init> (Ljava/lang/String;Lcom/skydoves/landscapist/core/scheduler/DecodePriority;JLjava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (Ljava/lang/String;Lcom/skydoves/landscapist/core/scheduler/DecodePriority;JLjava/lang/String;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun compareTo (Lcom/skydoves/landscapist/core/scheduler/PrioritizedRequest;)I
+	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lcom/skydoves/landscapist/core/scheduler/DecodePriority;
+	public final fun component3 ()J
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Lkotlin/jvm/functions/Function1;
+	public final fun copy (Ljava/lang/String;Lcom/skydoves/landscapist/core/scheduler/DecodePriority;JLjava/lang/String;Lkotlin/jvm/functions/Function1;)Lcom/skydoves/landscapist/core/scheduler/PrioritizedRequest;
+	public static synthetic fun copy$default (Lcom/skydoves/landscapist/core/scheduler/PrioritizedRequest;Ljava/lang/String;Lcom/skydoves/landscapist/core/scheduler/DecodePriority;JLjava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/skydoves/landscapist/core/scheduler/PrioritizedRequest;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCreatedAt ()J
+	public final fun getDecoder ()Lkotlin/jvm/functions/Function1;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getPriority ()Lcom/skydoves/landscapist/core/scheduler/DecodePriority;
+	public final fun getTag ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public abstract interface class com/skydoves/landscapist/core/transformation/Transformation {

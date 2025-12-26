@@ -16,6 +16,7 @@
 package com.skydoves.landscapist.core
 
 import com.skydoves.landscapist.core.model.CachePolicy
+import com.skydoves.landscapist.core.scheduler.DecodePriority
 import com.skydoves.landscapist.core.transformation.Transformation
 
 /**
@@ -29,6 +30,8 @@ import com.skydoves.landscapist.core.transformation.Transformation
  * @property targetWidth Target width for the loaded image.
  * @property targetHeight Target height for the loaded image.
  * @property tag Optional tag for grouping and managing requests.
+ * @property priority The decode priority for this request. Higher priority loads first.
+ * @property progressiveEnabled Whether to use progressive loading with intermediate results.
  */
 public data class ImageRequest(
   val model: Any?,
@@ -39,6 +42,8 @@ public data class ImageRequest(
   val targetWidth: Int? = null,
   val targetHeight: Int? = null,
   val tag: String? = null,
+  val priority: DecodePriority = DecodePriority.NORMAL,
+  val progressiveEnabled: Boolean = true,
 ) {
   /**
    * Builder for creating [ImageRequest] instances.
@@ -52,6 +57,8 @@ public data class ImageRequest(
     private var targetWidth: Int? = null
     private var targetHeight: Int? = null
     private var tag: String? = null
+    private var priority: DecodePriority = DecodePriority.NORMAL
+    private var progressiveEnabled: Boolean = true
 
     /** Sets the image source. */
     public fun model(model: Any?): Builder = apply { this.model = model }
@@ -99,6 +106,19 @@ public data class ImageRequest(
       this.tag = tag
     }
 
+    /** Sets the decode priority. Higher priority loads first. */
+    public fun priority(priority: DecodePriority): Builder = apply {
+      this.priority = priority
+    }
+
+    /**
+     * Enables or disables progressive loading.
+     * When enabled (default), intermediate image results are emitted during decode.
+     */
+    public fun progressiveEnabled(enabled: Boolean): Builder = apply {
+      this.progressiveEnabled = enabled
+    }
+
     /** Builds the [ImageRequest]. */
     public fun build(): ImageRequest = ImageRequest(
       model = model,
@@ -109,6 +129,8 @@ public data class ImageRequest(
       targetWidth = targetWidth,
       targetHeight = targetHeight,
       tag = tag,
+      priority = priority,
+      progressiveEnabled = progressiveEnabled,
     )
   }
 

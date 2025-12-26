@@ -23,7 +23,9 @@ import com.skydoves.landscapist.core.cache.MemoryCache
 import com.skydoves.landscapist.core.cache.TwoTierMemoryCache
 import com.skydoves.landscapist.core.decoder.DecodeResult
 import com.skydoves.landscapist.core.decoder.ImageDecoder
+import com.skydoves.landscapist.core.decoder.ProgressiveDecodeResult
 import com.skydoves.landscapist.core.decoder.createPlatformDecoder
+import com.skydoves.landscapist.core.decoder.createProgressiveDecoder
 import com.skydoves.landscapist.core.memory.MemoryPressureLevel
 import com.skydoves.landscapist.core.memory.MemoryPressureListener
 import com.skydoves.landscapist.core.memory.MemoryPressureManager
@@ -35,6 +37,7 @@ import com.skydoves.landscapist.core.network.KtorImageFetcher
 import com.skydoves.landscapist.core.request.Disposable
 import com.skydoves.landscapist.core.request.ImmediateDisposable
 import com.skydoves.landscapist.core.request.RequestManager
+import com.skydoves.landscapist.core.scheduler.DecodeScheduler
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.CoroutineDispatcher
@@ -110,6 +113,11 @@ public class Landscapist private constructor(
   /**
    * Loads an image based on the provided request.
    *
+   * By default, uses progressive loading for better perceived performance:
+   * - Emits intermediate (blurry) results while decoding
+   * - Uses priority-based scheduling so visible images load first
+   * - Reuses bitmaps from the pool to reduce GC pressure
+   *
    * @param request The image request.
    * @return A flow emitting [ImageResult] states.
    */
@@ -128,7 +136,7 @@ public class Landscapist private constructor(
       height = request.targetHeight,
     )
 
-    // 1. Check memory cache
+    // 1. Check memory cache (instant)
     if (request.memoryCachePolicy.readEnabled) {
       memoryCache[cacheKey]?.let { cached ->
         emit(
@@ -146,13 +154,30 @@ public class Landscapist private constructor(
       diskCache.get(cacheKey)?.use { snapshot ->
         val bytes = snapshot.data().buffer().readByteArray()
         val diskPath = snapshot.dataPath.toString()
-        val decodeResult = decoder.decode(
-          data = bytes,
-          mimeType = null,
-          targetWidth = request.targetWidth,
-          targetHeight = request.targetHeight,
-          config = config,
-        )
+
+        // Use progressive decoding for disk cache if enabled
+        if (request.progressiveEnabled) {
+          emitProgressiveDecode(
+            bytes = bytes,
+            mimeType = null,
+            request = request,
+            cacheKey = cacheKey,
+            dataSource = DataSource.DISK,
+            diskPath = diskPath,
+          )
+          return@flow
+        }
+
+        // Standard decode
+        val decodeResult = scheduleDecodeWithPriority(request) {
+          decoder.decode(
+            data = bytes,
+            mimeType = null,
+            targetWidth = request.targetWidth,
+            targetHeight = request.targetHeight,
+            config = config,
+          )
+        }
 
         when (decodeResult) {
           is DecodeResult.Success -> {
@@ -205,14 +230,29 @@ public class Landscapist private constructor(
           }
         }
 
-        // Decode
-        val decodeResult = decoder.decode(
-          data = fetchResult.data,
-          mimeType = fetchResult.mimeType,
-          targetWidth = request.targetWidth,
-          targetHeight = request.targetHeight,
-          config = config,
-        )
+        // Use progressive decoding for network fetch if enabled
+        if (request.progressiveEnabled) {
+          emitProgressiveDecode(
+            bytes = fetchResult.data,
+            mimeType = fetchResult.mimeType,
+            request = request,
+            cacheKey = cacheKey,
+            dataSource = DataSource.NETWORK,
+            diskPath = diskPath,
+          )
+          return@flow
+        }
+
+        // Standard decode with priority scheduling
+        val decodeResult = scheduleDecodeWithPriority(request) {
+          decoder.decode(
+            data = fetchResult.data,
+            mimeType = fetchResult.mimeType,
+            targetWidth = request.targetWidth,
+            targetHeight = request.targetHeight,
+            config = config,
+          )
+        }
 
         when (decodeResult) {
           is DecodeResult.Success -> {
@@ -249,6 +289,88 @@ public class Landscapist private constructor(
       }
     }
   }.flowOn(dispatcher)
+
+  /**
+   * Schedules a decode operation with priority.
+   */
+  private suspend fun <T> scheduleDecodeWithPriority(
+    request: ImageRequest,
+    decoder: suspend () -> T,
+  ): T {
+    val requestId = "${request.model.hashCode()}_${request.targetWidth}_${request.targetHeight}"
+    return DecodeScheduler.global().schedule(
+      id = requestId,
+      priority = request.priority,
+      tag = request.tag,
+      decoder = decoder,
+    ).await()
+  }
+
+  /**
+   * Performs progressive decoding and emits intermediate results.
+   */
+  private suspend fun kotlinx.coroutines.flow.FlowCollector<ImageResult>.emitProgressiveDecode(
+    bytes: ByteArray,
+    mimeType: String?,
+    request: ImageRequest,
+    cacheKey: CacheKey,
+    dataSource: DataSource,
+    diskPath: String?,
+  ) {
+    val progressiveDecoder = createProgressiveDecoder()
+
+    progressiveDecoder.decodeProgressive(
+      data = bytes,
+      mimeType = mimeType,
+      targetWidth = request.targetWidth,
+      targetHeight = request.targetHeight,
+      config = config,
+    ).collect { result ->
+      when (result) {
+        is ProgressiveDecodeResult.Intermediate -> {
+          // Emit intermediate result (blurry preview)
+          emit(
+            ImageResult.Success(
+              data = result.bitmap,
+              dataSource = dataSource,
+              originalWidth = result.width,
+              originalHeight = result.height,
+              rawData = bytes,
+              diskCachePath = diskPath,
+              isIntermediate = true,
+              progress = result.progress,
+            ),
+          )
+        }
+        is ProgressiveDecodeResult.Complete -> {
+          val bitmap = applyTransformations(result.bitmap, request)
+
+          // Update memory cache with final result
+          if (request.memoryCachePolicy.writeEnabled) {
+            memoryCache[cacheKey] = CachedImage(
+              data = bitmap,
+              dataSource = dataSource,
+              sizeBytes = estimateBitmapSize(result.width, result.height),
+            )
+          }
+
+          emit(
+            ImageResult.Success(
+              data = bitmap,
+              dataSource = dataSource,
+              originalWidth = result.width,
+              originalHeight = result.height,
+              rawData = bytes,
+              diskCachePath = diskPath,
+            ),
+          )
+        }
+        is ProgressiveDecodeResult.Error -> {
+          emit(ImageResult.Failure(result.throwable))
+        }
+      }
+    }
+  }
 
   /**
    * Loads an image from a URL string.

@@ -33,6 +33,8 @@ public sealed class ImageResult {
    * @property originalHeight The original height of the image before any transformations.
    * @property rawData The raw image bytes for sub-sampling support, if available.
    * @property diskCachePath The disk cache file path, if the image was loaded from disk.
+   * @property isIntermediate Whether this is an intermediate result during progressive loading.
+   * @property progress The loading progress (0.0 to 1.0) for progressive loading.
    */
   public data class Success(
     val data: Any,
@@ -41,7 +43,13 @@ public sealed class ImageResult {
     val originalHeight: Int = 0,
     val rawData: ByteArray? = null,
     val diskCachePath: String? = null,
+    val isIntermediate: Boolean = false,
+    val progress: Float = 1f,
   ) : ImageResult() {
+
+    /** Returns true if this is the final (non-intermediate) result. */
+    val isFinal: Boolean get() = !isIntermediate
+
     override fun equals(other: Any?): Boolean {
       if (this === other) return true
       if (other == null || this::class != other::class) return false
@@ -57,6 +65,8 @@ public sealed class ImageResult {
         if (!rawData.contentEquals(other.rawData)) return false
       } else if (other.rawData != null) return false
       if (diskCachePath != other.diskCachePath) return false
+      if (isIntermediate != other.isIntermediate) return false
+      if (progress != other.progress) return false
 
       return true
     }
@@ -68,6 +78,8 @@ public sealed class ImageResult {
       result = 31 * result + originalHeight
       result = 31 * result + (rawData?.contentHashCode() ?: 0)
       result = 31 * result + (diskCachePath?.hashCode() ?: 0)
+      result = 31 * result + isIntermediate.hashCode()
+      result = 31 * result + progress.hashCode()
       return result
     }
   }

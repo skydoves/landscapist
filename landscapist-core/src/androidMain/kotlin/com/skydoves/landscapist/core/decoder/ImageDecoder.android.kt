@@ -21,6 +21,8 @@ import android.graphics.drawable.AnimatedImageDrawable
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.skydoves.landscapist.core.LandscapistConfig
+import com.skydoves.landscapist.core.bitmappool.BitmapFormat
+import com.skydoves.landscapist.core.bitmappool.GlobalBitmapPool
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
@@ -159,26 +161,57 @@ internal class AndroidImageDecoder : ImageDecoder {
       Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
       !hasAlpha(mimeType)
 
-    // Second pass: decode with options
+    // Determine bitmap format
+    val bitmapFormat = when {
+      useHardware -> BitmapFormat.HARDWARE
+      config.allowRgb565 && !hasAlpha(mimeType) -> BitmapFormat.RGB_565
+      else -> BitmapFormat.ARGB_8888
+    }
+
+    // Calculate decoded dimensions
+    val decodedWidth = originalWidth / sampleSize
+    val decodedHeight = originalHeight / sampleSize
+
+    // Second pass: decode with options and bitmap pooling
     val decodeOptions = BitmapFactory.Options().apply {
       inSampleSize = sampleSize
-      inPreferredConfig = when {
-        useHardware && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
-          Bitmap.Config.HARDWARE
+      inPreferredConfig = when (bitmapFormat) {
+        BitmapFormat.HARDWARE -> {
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Bitmap.Config.HARDWARE
+          } else {
+            Bitmap.Config.ARGB_8888
+          }
         }
-        config.allowRgb565 && !hasAlpha(mimeType) -> {
-          Bitmap.Config.RGB_565
-        }
-        else -> {
-          Bitmap.Config.ARGB_8888
+        BitmapFormat.RGB_565 -> Bitmap.Config.RGB_565
+        BitmapFormat.ARGB_8888 -> Bitmap.Config.ARGB_8888
+      }
+
+      // Try to reuse a bitmap from the pool (not for hardware bitmaps)
+      if (bitmapFormat != BitmapFormat.HARDWARE &&
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
+      ) {
+        val reusable = GlobalBitmapPool.get().getReusable(
+          width = decodedWidth,
+          height = decodedHeight,
+          format = bitmapFormat,
+        )
+        if (reusable is Bitmap) {
+          inMutable = true
+          inBitmap = reusable
         }
       }
     }
 
-    var bitmap = BitmapFactory.decodeByteArray(data, 0, data.size, decodeOptions)
-      ?: return DecodeResult.Error(
-        IllegalArgumentException("Failed to decode bitmap"),
-      )
+    var bitmap = try {
+      BitmapFactory.decodeByteArray(data, 0, data.size, decodeOptions)
+    } catch (e: IllegalArgumentException) {
+      // inBitmap was not compatible, try again without reuse
+      decodeOptions.inBitmap = null
+      BitmapFactory.decodeByteArray(data, 0, data.size, decodeOptions)
+    } ?: return DecodeResult.Error(
+      IllegalArgumentException("Failed to decode bitmap"),
+    )
 
     // If hardware bitmap failed, try to copy to hardware
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
