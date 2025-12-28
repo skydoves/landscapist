@@ -54,11 +54,16 @@ class ImageLoaderPerformanceTest {
       "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg"
 
     private val TEST_URLS = listOf(
-      "https://user-images.githubusercontent.com/24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087932-5aec7280-553e-11ea-9301-3b12ddaae0a7.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087931-5aec7280-553e-11ea-8749-aec87a7a6c22.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087932-5aec7280-553e-11ea-9301-3b12ddaae0a7.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087931-5aec7280-553e-11ea-8749-aec87a7a6c22.jpg",
     )
   }
 
@@ -84,7 +89,9 @@ class ImageLoaderPerformanceTest {
 
     var result: ImageResult? = null
     val loadTime = measureTimeMillis {
-      result = landscapist.load(request).first { it is ImageResult.Success || it is ImageResult.Failure }
+      result = landscapist.load(request).first {
+        it is ImageResult.Success || it is ImageResult.Failure
+      }
     }
 
     println("Single image load time: ${loadTime}ms")
@@ -140,7 +147,7 @@ class ImageLoaderPerformanceTest {
     val successCount = results.count { it is ImageResult.Success }
     val avgTime = totalTime / TEST_URLS.size
 
-    println("Loaded ${successCount}/${TEST_URLS.size} images in ${totalTime}ms")
+    println("Loaded $successCount/${TEST_URLS.size} images in ${totalTime}ms")
     println("Average time per image: ${avgTime}ms")
 
     assertTrue(successCount == TEST_URLS.size, "All images should load successfully")

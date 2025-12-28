@@ -42,9 +42,12 @@ class QuickPerformanceTest {
 
   companion object {
     private val TEST_IMAGES = listOf(
-      "https://user-images.githubusercontent.com/24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
     )
   }
 
@@ -106,7 +109,7 @@ class QuickPerformanceTest {
           imageModel = { TEST_IMAGES[2] },
           modifier = Modifier.size(200.dp).testTag("landscapist"),
           imageOptions = ImageOptions(),
-          onImageStateChanged = { imageState = it }
+          onImageStateChanged = { imageState = it },
         )
       }
       composeTestRule.waitForIdle()
@@ -138,6 +141,6 @@ class QuickPerformanceTest {
 
   private data class TestResult(
     val library: String,
-    val timeMs: Long
+    val timeMs: Long,
   )
 }

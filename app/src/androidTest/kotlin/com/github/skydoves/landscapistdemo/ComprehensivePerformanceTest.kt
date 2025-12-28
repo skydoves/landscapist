@@ -60,10 +60,14 @@ class ComprehensivePerformanceTest {
   companion object {
     private const val ROUNDS = 5
     private val TEST_IMAGES = listOf(
-      "https://user-images.githubusercontent.com/24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087932-5aec7280-553e-11ea-9301-3b12ddaae0a7.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087932-5aec7280-553e-11ea-9301-3b12ddaae0a7.jpg",
     )
   }
 
@@ -93,28 +97,38 @@ class ComprehensivePerformanceTest {
         avgMemory = results.map { it.memoryKb }.average(),
         minMemory = results.minOf { it.memoryKb },
         maxMemory = results.maxOf { it.memoryKb },
-        successRate = results.count { it.success } * 100.0 / results.size
+        successRate = results.count { it.success } * 100.0 / results.size,
       )
     }
 
     // Print detailed table
-    println(String.format(
-      "%-20s | %-12s | %-12s | %-12s | %-12s | %-12s | %-10s",
-      "Library", "Avg Time", "Min Time", "Max Time", "Avg Memory", "Min Memory", "Success Rate"
-    ))
+    println(
+      String.format(
+        "%-20s | %-12s | %-12s | %-12s | %-12s | %-12s | %-10s",
+        "Library",
+        "Avg Time",
+        "Min Time",
+        "Max Time",
+        "Avg Memory",
+        "Min Memory",
+        "Success Rate",
+      ),
+    )
     println("-".repeat(120))
 
     stats.entries.sortedBy { it.value.avgLoadTime }.forEach { (library, stat) ->
-      println(String.format(
-        "%-20s | %-12s | %-12s | %-12s | %-12s | %-12s | %-10s",
-        library,
-        "${stat.avgLoadTime.toInt()}ms",
-        "${stat.minLoadTime}ms",
-        "${stat.maxLoadTime}ms",
-        "${stat.avgMemory.toInt()}KB",
-        "${stat.minMemory}KB",
-        "${stat.successRate.toInt()}%"
-      ))
+      println(
+        String.format(
+          "%-20s | %-12s | %-12s | %-12s | %-12s | %-12s | %-10s",
+          library,
+          "${stat.avgLoadTime.toInt()}ms",
+          "${stat.minLoadTime}ms",
+          "${stat.maxLoadTime}ms",
+          "${stat.avgMemory.toInt()}KB",
+          "${stat.minMemory}KB",
+          "${stat.successRate.toInt()}%",
+        ),
+      )
     }
 
     println()
@@ -126,13 +140,15 @@ class ComprehensivePerformanceTest {
     allResults.forEach { (library, results) ->
       println("$library:")
       results.forEachIndexed { index, result ->
-        println(String.format(
-          "  Round %d: %dms, %dKB, %s",
-          index + 1,
-          result.loadTimeMs,
-          result.memoryKb,
-          if (result.success) "✓" else "✗"
-        ))
+        println(
+          String.format(
+            "  Round %d: %dms, %dKB, %s",
+            index + 1,
+            result.loadTimeMs,
+            result.memoryKb,
+            if (result.success) "✓" else "✗",
+          ),
+        )
       }
       println()
     }
@@ -150,7 +166,7 @@ class ComprehensivePerformanceTest {
       val diff = if (index > 0) {
         val baseline = fastestByAvg[0].value.avgLoadTime
         val percent = ((stat.avgLoadTime - baseline) / baseline * 100).toInt()
-        " (+${percent}%)"
+        " (+$percent%)"
       } else {
         " (baseline)"
       }
@@ -163,7 +179,7 @@ class ComprehensivePerformanceTest {
       val diff = if (index > 0) {
         val baseline = lowestMemory[0].value.avgMemory
         val percent = ((stat.avgMemory - baseline) / baseline * 100).toInt()
-        " (+${percent}%)"
+        " (+$percent%)"
       } else {
         " (baseline)"
       }
@@ -221,14 +237,16 @@ class ComprehensivePerformanceTest {
   private fun testLibraryRound(
     libraryName: String,
     round: Int,
-    test: (roundIndex: Int) -> RoundResult
+    test: (roundIndex: Int) -> RoundResult,
   ) {
     println("[$libraryName] Round ${round + 1}...")
     val result = test(round)
 
     allResults.getOrPut(libraryName) { mutableListOf() }.add(result)
 
-    println("  ✓ Time: ${result.loadTimeMs}ms, Memory: ${result.memoryKb}KB, Success: ${result.success}")
+    println(
+      "  ✓ Time: ${result.loadTimeMs}ms, Memory: ${result.memoryKb}KB, Success: ${result.success}",
+    )
   }
 
   private fun testGlideImage(imageUrl: String): RoundResult {
@@ -241,14 +259,14 @@ class ComprehensivePerformanceTest {
           GlideImage(
             imageModel = { imageUrl },
             modifier = Modifier
-              .size(300.dp)
+              .size(1200.dp)
               .testTag("GlideImage"),
             imageOptions = ImageOptions(),
           )
         }
 
         waitForIdle()
-        Thread.sleep(3000)  // Wait for network load
+        Thread.sleep(3000) // Wait for network load
         success = true
       }
     }
@@ -258,7 +276,7 @@ class ComprehensivePerformanceTest {
     return RoundResult(
       loadTimeMs = loadTime,
       memoryKb = (endMemory - startMemory).coerceAtLeast(0),
-      success = success
+      success = success,
     )
   }
 
@@ -272,7 +290,7 @@ class ComprehensivePerformanceTest {
           CoilImage(
             imageModel = { imageUrl },
             modifier = Modifier
-              .size(300.dp)
+              .size(1200.dp)
               .testTag("CoilImage"),
             imageOptions = ImageOptions(),
           )
@@ -289,7 +307,7 @@ class ComprehensivePerformanceTest {
     return RoundResult(
       loadTimeMs = loadTime,
       memoryKb = (endMemory - startMemory).coerceAtLeast(0),
-      success = success
+      success = success,
     )
   }
 
@@ -304,12 +322,12 @@ class ComprehensivePerformanceTest {
           LandscapistImage(
             imageModel = { imageUrl },
             modifier = Modifier
-              .size(300.dp)
+              .size(1200.dp)
               .testTag("LandscapistImage"),
             imageOptions = ImageOptions(),
             onImageStateChanged = { state ->
               imageState = state
-            }
+            },
           )
         }
 
@@ -328,7 +346,7 @@ class ComprehensivePerformanceTest {
     return RoundResult(
       loadTimeMs = loadTime,
       memoryKb = (endMemory - startMemory).coerceAtLeast(0),
-      success = success
+      success = success,
     )
   }
 
@@ -342,7 +360,7 @@ class ComprehensivePerformanceTest {
           FrescoImage(
             imageUrl = imageUrl,
             modifier = Modifier
-              .size(300.dp)
+              .size(1200.dp)
               .testTag("FrescoImage"),
             imageOptions = ImageOptions(),
           )
@@ -359,7 +377,7 @@ class ComprehensivePerformanceTest {
     return RoundResult(
       loadTimeMs = loadTime,
       memoryKb = (endMemory - startMemory).coerceAtLeast(0),
-      success = success
+      success = success,
     )
   }
 
@@ -385,7 +403,7 @@ class ComprehensivePerformanceTest {
   private data class RoundResult(
     val loadTimeMs: Long,
     val memoryKb: Long,
-    val success: Boolean
+    val success: Boolean,
   )
 
   private data class LibraryStats(
@@ -395,6 +413,6 @@ class ComprehensivePerformanceTest {
     val avgMemory: Double,
     val minMemory: Long,
     val maxMemory: Long,
-    val successRate: Double
+    val successRate: Double,
   )
 }

@@ -15,7 +15,6 @@
  */
 package com.github.skydoves.landscapistdemo
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -71,11 +70,16 @@ class ImageLibraryPerformanceTest {
       "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg"
 
     private val TEST_IMAGES = listOf(
-      "https://user-images.githubusercontent.com/24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087932-5aec7280-553e-11ea-9301-3b12ddaae0a7.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087931-5aec7280-553e-11ea-8749-aec87a7a6c22.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087932-5aec7280-553e-11ea-9301-3b12ddaae0a7.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087931-5aec7280-553e-11ea-8749-aec87a7a6c22.jpg",
     )
   }
 
@@ -163,7 +167,10 @@ class ImageLibraryPerformanceTest {
       }
     }
 
-    println("GlideImage multiple (${TEST_IMAGES.size}): ${result.totalTimeMs}ms, Loaded: ${result.successCount}/${TEST_IMAGES.size}")
+    println(
+      "GlideImage multiple (${TEST_IMAGES.size}): ${result.totalTimeMs}ms, " +
+        "Loaded: ${result.successCount}/${TEST_IMAGES.size}",
+    )
     assert(result.successCount == TEST_IMAGES.size) {
       "Not all images loaded: ${result.successCount}/${TEST_IMAGES.size}"
     }
@@ -185,7 +192,10 @@ class ImageLibraryPerformanceTest {
       }
     }
 
-    println("CoilImage multiple (${TEST_IMAGES.size}): ${result.totalTimeMs}ms, Loaded: ${result.successCount}/${TEST_IMAGES.size}")
+    println(
+      "CoilImage multiple (${TEST_IMAGES.size}): ${result.totalTimeMs}ms, " +
+        "Loaded: ${result.successCount}/${TEST_IMAGES.size}",
+    )
     assert(result.successCount == TEST_IMAGES.size) {
       "Not all images loaded: ${result.successCount}/${TEST_IMAGES.size}"
     }
@@ -207,7 +217,10 @@ class ImageLibraryPerformanceTest {
       }
     }
 
-    println("LandscapistImage multiple (${TEST_IMAGES.size}): ${result.totalTimeMs}ms, Loaded: ${result.successCount}/${TEST_IMAGES.size}")
+    println(
+      "LandscapistImage multiple (${TEST_IMAGES.size}): ${result.totalTimeMs}ms, " +
+        "Loaded: ${result.successCount}/${TEST_IMAGES.size}",
+    )
     assert(result.successCount == TEST_IMAGES.size) {
       "Not all images loaded: ${result.successCount}/${TEST_IMAGES.size}"
     }
@@ -229,7 +242,10 @@ class ImageLibraryPerformanceTest {
       }
     }
 
-    println("FrescoImage multiple (${TEST_IMAGES.size}): ${result.totalTimeMs}ms, Loaded: ${result.successCount}/${TEST_IMAGES.size}")
+    println(
+      "FrescoImage multiple (${TEST_IMAGES.size}): ${result.totalTimeMs}ms, " +
+        "Loaded: ${result.successCount}/${TEST_IMAGES.size}",
+    )
     assert(result.successCount == TEST_IMAGES.size) {
       "Not all images loaded: ${result.successCount}/${TEST_IMAGES.size}"
     }

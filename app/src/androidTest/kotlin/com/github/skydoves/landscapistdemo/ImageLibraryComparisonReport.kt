@@ -25,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -126,7 +125,9 @@ class ImageLibraryComparisonReport {
     val lowestMemory = testResults.minByOrNull { it.memoryKb }
 
     report.appendLine("Fastest cold load: ${fastestCold?.library} (${fastestCold?.coldLoadMs}ms)")
-    report.appendLine("Fastest cached load: ${fastestCached?.library} (${fastestCached?.cachedLoadMs}ms)")
+    report.appendLine(
+      "Fastest cached load: ${fastestCached?.library} (${fastestCached?.cachedLoadMs}ms)",
+    )
     report.appendLine("Lowest memory usage: ${lowestMemory?.library} (${lowestMemory?.memoryKb}KB)")
     report.appendLine()
 

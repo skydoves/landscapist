@@ -16,7 +16,6 @@
 package com.github.skydoves.landscapistdemo
 
 import android.os.Debug
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,10 +64,14 @@ class NetworkLoadingPerformanceComparison {
   companion object {
     // Using different images for each test to avoid cache hits
     private val TEST_IMAGES = listOf(
-      "https://user-images.githubusercontent.com/24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087932-5aec7280-553e-11ea-9301-3b12ddaae0a7.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087932-5aec7280-553e-11ea-9301-3b12ddaae0a7.jpg",
     )
   }
 
@@ -94,8 +97,16 @@ class NetworkLoadingPerformanceComparison {
     println()
 
     // Print header
-    println(String.format("%-20s | %-15s | %-15s | %-10s | %-8s",
-      "Library", "Load Time", "Memory (KB)", "Success", "Notes"))
+    println(
+      String.format(
+        "%-20s | %-15s | %-15s | %-10s | %-8s",
+        "Library",
+        "Load Time",
+        "Memory (KB)",
+        "Success",
+        "Notes",
+      ),
+    )
     println("-".repeat(100))
 
     // Print each result
@@ -108,12 +119,16 @@ class NetworkLoadingPerformanceComparison {
         else -> "Normal"
       }
 
-      println(String.format("%-20s | %-15s | %-15s | %-10s | %-8s",
-        result.library,
-        "${result.loadTimeMs}ms",
-        "${result.memoryKb}KB",
-        success,
-        notes))
+      println(
+        String.format(
+          "%-20s | %-15s | %-15s | %-10s | %-8s",
+          result.library,
+          "${result.loadTimeMs}ms",
+          "${result.memoryKb}KB",
+          success,
+          notes,
+        ),
+      )
     }
 
     println()
@@ -141,11 +156,11 @@ class NetworkLoadingPerformanceComparison {
           val ratio = result.loadTimeMs.toDouble() / fast.loadTimeMs
           val percentage = ((ratio - 1) * 100).toInt()
           val comparison = if (ratio > 1.0) {
-            "${percentage}% slower"
+            "$percentage% slower"
           } else {
             "baseline"
           }
-          println("  ${result.library}: ${comparison}")
+          println("  ${result.library}: $comparison")
         }
       }
     } else {
@@ -228,12 +243,14 @@ class NetworkLoadingPerformanceComparison {
     val endMemory = getUsedMemoryKb()
     val memoryUsed = (endMemory - startMemory).coerceAtLeast(0)
 
-    results.add(PerformanceResult(
-      library = "GlideImage",
-      loadTimeMs = loadTime,
-      memoryKb = memoryUsed,
-      success = success
-    ))
+    results.add(
+      PerformanceResult(
+        library = "GlideImage",
+        loadTimeMs = loadTime,
+        memoryKb = memoryUsed,
+        success = success,
+      ),
+    )
 
     println("  ✓ Completed: ${loadTime}ms, Memory: ${memoryUsed}KB")
   }
@@ -272,12 +289,14 @@ class NetworkLoadingPerformanceComparison {
     val endMemory = getUsedMemoryKb()
     val memoryUsed = (endMemory - startMemory).coerceAtLeast(0)
 
-    results.add(PerformanceResult(
-      library = "CoilImage",
-      loadTimeMs = loadTime,
-      memoryKb = memoryUsed,
-      success = success
-    ))
+    results.add(
+      PerformanceResult(
+        library = "CoilImage",
+        loadTimeMs = loadTime,
+        memoryKb = memoryUsed,
+        success = success,
+      ),
+    )
 
     println("  ✓ Completed: ${loadTime}ms, Memory: ${memoryUsed}KB")
   }
@@ -299,7 +318,7 @@ class NetworkLoadingPerformanceComparison {
           imageOptions = ImageOptions(),
           onImageStateChanged = { state ->
             imageState = state
-          }
+          },
         )
       }
 
@@ -315,12 +334,14 @@ class NetworkLoadingPerformanceComparison {
     val endMemory = getUsedMemoryKb()
     val memoryUsed = (endMemory - startMemory).coerceAtLeast(0)
 
-    results.add(PerformanceResult(
-      library = "LandscapistImage",
-      loadTimeMs = loadTime,
-      memoryKb = memoryUsed,
-      success = success
-    ))
+    results.add(
+      PerformanceResult(
+        library = "LandscapistImage",
+        loadTimeMs = loadTime,
+        memoryKb = memoryUsed,
+        success = success,
+      ),
+    )
 
     println("  ✓ Completed: ${loadTime}ms, Memory: ${memoryUsed}KB, Success: $success")
   }
@@ -359,12 +380,14 @@ class NetworkLoadingPerformanceComparison {
     val endMemory = getUsedMemoryKb()
     val memoryUsed = (endMemory - startMemory).coerceAtLeast(0)
 
-    results.add(PerformanceResult(
-      library = "FrescoImage",
-      loadTimeMs = loadTime,
-      memoryKb = memoryUsed,
-      success = success
-    ))
+    results.add(
+      PerformanceResult(
+        library = "FrescoImage",
+        loadTimeMs = loadTime,
+        memoryKb = memoryUsed,
+        success = success,
+      ),
+    )
 
     println("  ✓ Completed: ${loadTime}ms, Memory: ${memoryUsed}KB")
   }
@@ -381,6 +404,6 @@ class NetworkLoadingPerformanceComparison {
     val library: String,
     val loadTimeMs: Long,
     val memoryKb: Long,
-    val success: Boolean
+    val success: Boolean,
   )
 }

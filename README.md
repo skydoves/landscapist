@@ -95,14 +95,16 @@ Landscapist Core is **exceptionally lightweight** compared to other image loadin
 | Coil3 | ~312 KB | **+115% larger** | Moderate |
 | Fresco | ~3.2 MB | **+2,107% larger** | Very High |
 
-**Why size matters:**
+**Performance (Android Release Build):**
 
-- **SDK Development**: If you're building an SDK or library, every KB counts. Adding Glide adds 382 KB to your users' APKs, while Landscapist Core adds only 145 KB.
-- **App Size Impact**: For 1 million users, choosing Landscapist Core over Glide saves **382 GB** of bandwidth and storage.
-- **Faster Downloads**: Smaller libraries mean faster download times for your users, especially on slower networks.
-- **Lower Memory Footprint**: A smaller library typically uses less runtime memory, leaving more resources for your app.
+| Library | Avg Load Time | Memory Usage | Supports KMP |
+|---------|---------------|--------------|--------------|
+| **LandscapistImage** | **1,245ms** | **4,520KB** | **✓** |
+| **GlideImage** | 1,312ms (+5%) | 5,124KB (+13%) | ✗ |
+| **CoilImage** | 1,389ms (+12%) | 4,876KB (+8%) | **✓** |
+| **FrescoImage** | 1,467ms (+18%) | 5,342KB (+18%) | ✗ |
 
-Despite its small size, Landscapist Core provides a complete image loading solution with memory/disk caching, network loading, and progressive rendering - everything you need without the bloat.
+> For detailed performance analysis and test methodology, see the [Landscapist Core documentation](https://skydoves.github.io/landscapist/landscapist-core/#performance-comparison).
 
 ### Setup
 
