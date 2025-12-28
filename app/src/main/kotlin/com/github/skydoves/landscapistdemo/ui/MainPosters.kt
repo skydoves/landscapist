@@ -150,7 +150,6 @@ private fun SelectedPoster(
 
   LandscapistImage(
     imageModel = { poster.image },
-    imageOptions = ImageOptions(),
     modifier = Modifier.aspectRatio(0.75f),
     component = rememberImageComponent {
       +ShimmerPlugin(
