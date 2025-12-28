@@ -16,6 +16,7 @@
 package com.skydoves.landscapist.zoomable.subsampling
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -85,8 +86,25 @@ public fun SubSamplingImage(
       }
   }
 
+  // Calculate aspect ratio from image size to constrain layout
+  // This prevents ANR when height is unbounded (e.g., Modifier.fillMaxWidth())
+  val aspectRatio = remember(imageSize) {
+    if (imageSize.width > 0 && imageSize.height > 0) {
+      imageSize.width.toFloat() / imageSize.height.toFloat()
+    } else {
+      null
+    }
+  }
+
   Canvas(
     modifier = modifier
+      .then(
+        if (aspectRatio != null) {
+          Modifier.aspectRatio(aspectRatio)
+        } else {
+          Modifier
+        },
+      )
       .fillMaxSize()
       .clipToBounds()
       .onSizeChanged { size ->
