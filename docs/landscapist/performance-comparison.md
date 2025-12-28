@@ -94,7 +94,8 @@ The following table shows variance across both test sizes (5 rounds each):
 | **FrescoImage** | 3,058ms | 19ms | 3,054ms | 18ms | 0.6% / 0.6% |
 | **CoilImage** | 3,114ms | 18ms | 3,114ms | 8ms | 0.6% / 0.3% |
 
-**Observations:**
+#### Observations
+
 - **LandscapistImage** shows higher variance due to streaming decode being sensitive to network fluctuations
 - **Variance increases with image size** for LandscapistImage (11.7% → 27.8% CV) due to longer streaming decode windows
 - **Competitors** show extremely low variance (<1% CV) - buffer entire image before processing
