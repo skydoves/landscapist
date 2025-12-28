@@ -14,7 +14,7 @@
 
 <p align="center">
 🌻 <a href="https://skydoves.github.io/landscapist" target="_blank"> Landscapist</a> is a highly optimized, pluggable Jetpack Compose and Kotlin Multiplatform image loading solution that fetches and displays network images with <a href="https://github.com/bumptech/glide" target="_blank"> Glide</a>, <a href="https://github.com/coil-kt/coil" target="_blank"> Coil</a>, and <a href="https://github.com/facebook/fresco" target="_blank"> Fresco.</a> This library supports tracing image loading states, composing custom implementations, and some valuable animations, such as crossfades, blur transformation, and circular reveals. You can also configure and attach image-loading behaviors easily and fast with image plugins. <br><br> <a align="center" href="https://skydoves.github.io/landscapist" target="_blank">See official documentation for Landscapist</a>
-</p>[landscapist-core.md](docs/landscapist-core.md)
+</p>
 
 ## Who's using Landscapist?
 👉 [Check out who's using Landscapist](https://skydoves.github.io/landscapist/#whos-using-landscapist).
