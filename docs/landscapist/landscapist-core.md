@@ -2,39 +2,7 @@
 
 **Kotlin Multiplatform from day one.** The `landscapist-core` module is a complete, standalone image loading engine designed for Kotlin Multiplatform. Unlike the Glide, Coil, or Fresco integrations, this module provides a lightweight, self-contained solution with no external image loading library dependencies, working seamlessly across Android, iOS, Desktop, and Web.
 
-## Why Choose Landscapist?
-
-### 1. Minimal Footprint for SDKs and Libraries
-Landscapist Core is **exceptionally lightweight** compared to other image loading libraries, making it the ideal choice for SDK and library developers who need to minimize their dependency footprint. When building SDKs or libraries that require image loading capabilities, the size of your dependencies directly impacts your users' APK size.
-
-**AAR Size Comparison (Android Release Build):**
-
-| Library | AAR Size | vs Landscapist Core | Impact on APK |
-|---------|----------|---------------------|---------------|
-| **landscapist-core** | **~145 KB** | **Baseline (Smallest)** | Minimal |
-| Glide | ~527 KB | **+263% larger** | Significant |
-| Coil3 | ~312 KB | **+115% larger** | Moderate |
-| Fresco | ~3.2 MB | **+2,107% larger** | Very High |
-
-**Why this matters for SDKs:**
-- **User Impact**: Every KB in your SDK adds to your users' APK size. Landscapist Core keeps your SDK lean.
-- **Adoption Rate**: Developers are more likely to adopt lightweight SDKs that don't bloat their apps.
-- **Multiple SDK Scenario**: When apps use multiple SDKs, each using lightweight dependencies prevents exponential growth.
-- **Enterprise Requirements**: Many enterprises have strict APK size budgets. Landscapist Core helps you stay within limits.
-
-**Real-world example**: If your SDK uses Landscapist Core instead of Glide, you save **~382 KB per user**. For 1 million users, that's **382 GB of bandwidth** and storage savings across all devices.
-
-### 2. Cross-Platform from the Start
-Write your image loading code once and deploy it everywhere. `LandscapistImage` works identically across all Compose Multiplatform targets without platform-specific workarounds or conditional code. Share your image loading logic, caching configuration, and UI components across your entire application.
-
-### 3. Full Control Over the Pipeline
-Unlike wrapper libraries that hide implementation details, `LandscapistImage` exposes the entire image loading pipeline. Configure network timeouts, cache policies, image transformations, and loading priorities at both the global and per-request levels. You're not locked into preset behaviors—customize everything to match your app's specific needs.
-
-### 4. Performance Optimized
-Built with performance in mind from day one. `LandscapistImage` automatically downsamples images based on display size, uses efficient memory and disk caching strategies, and supports progressive loading for large images. Memory usage is optimized through weak reference pooling and automatic cache trimming under memory pressure.
-
-### 5. Plugin Ecosystem
-Leverage the full Landscapist plugin ecosystem including shimmer placeholders, crossfade animations, blur transformations, palette extraction, and zoomable images. All plugins work seamlessly with `LandscapistImage` and can be combined in any way you need.
+> **See Also**: Learn more about [Why Choose Landscapist](why-choose-landscapist.md) for detailed benefits and comparisons, and [Performance Comparison](performance-comparison.md) for comprehensive benchmark results.
 
 ## Key Features
 
@@ -49,64 +17,6 @@ Leverage the full Landscapist plugin ecosystem including shimmer placeholders, c
 - **Multiple Image Sources**: Support for network URLs, local files, content URIs, drawable resources, bitmaps, byte arrays, and platform-specific sources
 - **Request Customization**: Per-request configuration of cache policies, headers, priorities, transformations, and size constraints
 - **Memory Efficient**: Automatic image downsampling, LRU caching with weak reference pooling, and memory pressure handling
-
-## Performance Comparison
-
-The table below shows performance metrics for loading a 200KB network image (cold cache, initial load, 300dp size) on Android. Tests run **5 rounds per library** and report averaged results from network request to decoded bitmap ready for display.
-
-| Library | Avg Load Time | Min/Max Range | Avg Memory | Min/Max Range | Supports KMP |
-|---------|---------------|---------------|------------|---------------|--------------|
-| **LandscapistImage** | **1,245ms** | 1,187-1,298ms | **4,520KB** | 4,312-4,689KB | **✓** |
-| **GlideImage** | 1,312ms (+5%) | 1,256-1,378ms | 5,124KB (+13%) | 4,987-5,289KB | ✗ |
-| **CoilImage (Coil3)** | 1,389ms (+12%) | 1,324-1,445ms | 4,876KB (+8%) | 4,721-5,012KB | **✓** |
-| **FrescoImage** | 1,467ms (+18%) | 1,401-1,523ms | 5,342KB (+18%) | 5,198-5,476KB | ✗ |
-
-#### Performance Highlights
-
-- **Fastest Loading**: LandscapistImage is **5% faster** than Glide, **12% faster** than Coil, and **18% faster** than Fresco
-- **Memory Efficiency**: LandscapistImage uses **13% less memory** than Glide and **18% less** than Fresco
-- **Consistent Performance**: Smallest variance across runs (111ms range vs 122-178ms for competitors)
-- **Multiplatform Ready**: Only LandscapistImage and Coil support Kotlin Multiplatform
-- **Platform Limitation**: Glide and Fresco are Android-only
-
-#### Why LandscapistImage is Faster
-
-1. **Optimized Decoding Pipeline**: Direct integration between network fetching (Ktor) and image decoding eliminates intermediate buffering.
-2. **Efficient Downsampling**: Progressive decoding at target size during download, not after.
-3. **Smart Memory Management**: Weak reference pooling and LRU caching reduce GC pressure.
-4. **Minimal Abstraction**: Built-in loader with no wrapper overhead.
-
-> **Test Methodology**: Performance numbers averaged across 5 rounds of instrumented tests on Android 16 emulator. Each test loads a fresh 200KB JPEG from network (GitHub CDN, no cache) at 300dp size. All caches cleared between runs. Measurements from `setContent` to fully decoded bitmap. See [ComprehensivePerformanceTest.kt](https://github.com/skydoves/landscapist/blob/697ad3f64ab6aa8ec068ce13c82912f579f9454d/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/ComprehensivePerformanceTest.kt#L49) for full implementation.
-
-### Large Image Performance (1200.dp)
-
-For larger images (1200.dp), the performance advantage of LandscapistImage becomes even more pronounced. The table below shows the same test methodology with 1200.dp image size:
-
-| Library | Avg Load Time | Min/Max Range | Avg Memory | Min/Max Range | Supports KMP |
-|---------|---------------|---------------|------------|---------------|--------------|
-| **LandscapistImage** | **1,266ms** | 1,144-1,373ms | **< 500KB*** | < 500KB | **✓** |
-| **GlideImage** | 3,048ms (+141%) | 3,039-3,055ms | 19,345KB (+3,769%) | 19,297-19,407KB | ✗ |
-| **FrescoImage** | 3,057ms (+142%) | 3,049-3,063ms | 1,347KB (+169%) | 1,168-1,630KB | ✗ |
-| **CoilImage (Coil3)** | 3,105ms (+145%) | 3,091-3,115ms | 12,631KB (+2,426%) | 12,461-12,981KB | **✓** |
-
-#### Large Image Performance Highlights
-
-- **Dramatically Faster**: LandscapistImage is **59% faster** than the nearest competitor (GlideImage)
-- **Memory Efficiency**: Exceptional memory management with minimal footprint compared to competitors
-- **Scalability**: Performance advantage increases with image size - 16x pixel area but only marginal increase in load time
-- **Consistent Speed**: Small variance (229ms range) indicates reliable, predictable performance
-
-#### Why the Performance Gap Widens
-
-For larger images, LandscapistImage's optimizations become increasingly impactful:
-1. **Progressive Decoding**: Streams and decodes tiles progressively, avoiding full-image buffer allocation.
-2. **Smart Downsampling**: Decodes at exact target dimensions during download, not after.
-3. **Efficient Memory Model**: Processes image data in chunks rather than loading entire file into memory.
-4. **Optimized Pipeline**: Direct Ktor → decoder path eliminates intermediate conversions.
-
-*Memory measurements for `LandscapistImage` consistently showed negligible heap allocation (< 500KB), indicating highly efficient streaming decode with immediate cleanup after compositing. This is **14x-39x less memory** than competitors for the same image size.
-
-> **Test Configuration**: 1200.dp × 1200.dp images (~16x pixel area of 300.dp test). Same 200KB source image, scaled to target size during decode. Tests demonstrate how each library handles larger display sizes from the same network source.
 
 ## Installation
 
@@ -604,6 +514,8 @@ landscapist.load(request).collect { result ->
 
 ## See Also
 
+- [Why Choose Landscapist](why-choose-landscapist.md) - Key benefits and advantages
+- [Performance Comparison](performance-comparison.md) - Comprehensive benchmark results
 - [Landscapist Image](landscapist-image.md) - Compose UI component built on landscapist-core
-- [Image Options](image-options.md) - Configure image display options
-- [Image Component and Plugins](image-component-and-plugin.md) - Plugin system for extending functionality
+- [Image Options](../image-options.md) - Configure image display options
+- [Image Component and Plugins](../image-component-and-plugin.md) - Plugin system for extending functionality

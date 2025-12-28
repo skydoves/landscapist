@@ -1174,10 +1174,12 @@ LandscapistImage(
 
 ## See Also
 
+- [Why Choose Landscapist](why-choose-landscapist.md) - Key benefits and advantages
+- [Performance Comparison](performance-comparison.md) - Comprehensive benchmark results
 - [Landscapist Core](landscapist-core.md) - The underlying image loading engine
-- [Image Options](image-options.md) - Configure image display options
-- [Image Component and Plugins](image-component-and-plugin.md) - Plugin system details
-- [Placeholder](placeholder.md) - Placeholder options
-- [Animation](animation.md) - Animation plugins
-- [Zoomable](zoomable.md) - Zoomable image support
-- [Palette](palette.md) - Color extraction
+- [Image Options](../image-options.md) - Configure image display options
+- [Image Component and Plugins](../image-component-and-plugin.md) - Plugin system details
+- [Placeholder](../placeholder.md) - Placeholder options
+- [Animation](../animation.md) - Animation plugins
+- [Zoomable](../zoomable.md) - Zoomable image support
+- [Palette](../palette.md) - Color extraction

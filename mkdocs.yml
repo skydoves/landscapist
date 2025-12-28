@@ -10,6 +10,11 @@ docs_dir: docs
 # Navigation
 nav:
   - 'Overview': index.md
+  - 'Landscapist':
+    - 'Landscapist Core': landscapist/landscapist-core.md
+    - 'Landscapist Image': landscapist/landscapist-image.md  
+    - 'Why Choose Landscapist': landscapist/why-choose-landscapist.md
+    - 'Performance Comparison': landscapist/performance-comparison.md
   - 'Glide':
     - 'Overview': glide/overview.md
     - 'Custom Options': glide/options.md
