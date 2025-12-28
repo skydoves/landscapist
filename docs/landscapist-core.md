@@ -74,7 +74,7 @@ The table below shows performance metrics for loading a 200KB network image (col
 3. **Smart Memory Management**: Weak reference pooling and LRU caching reduce GC pressure.
 4. **Minimal Abstraction**: Built-in loader with no wrapper overhead.
 
-> **Test Methodology**: Performance numbers averaged across 5 rounds of instrumented tests on Android 16 emulator. Each test loads a fresh 200KB JPEG from network (GitHub CDN, no cache) at 300dp size. All caches cleared between runs. Measurements from `setContent` to fully decoded bitmap. See [ComprehensivePerformanceTest.kt](../app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/ComprehensivePerformanceTest.kt) for full implementation.
+> **Test Methodology**: Performance numbers averaged across 5 rounds of instrumented tests on Android 16 emulator. Each test loads a fresh 200KB JPEG from network (GitHub CDN, no cache) at 300dp size. All caches cleared between runs. Measurements from `setContent` to fully decoded bitmap. See [ComprehensivePerformanceTest.kt](https://github.com/skydoves/landscapist/blob/697ad3f64ab6aa8ec068ce13c82912f579f9454d/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/ComprehensivePerformanceTest.kt#L49) for full implementation.
 
 ### Large Image Performance (1200.dp)
 
