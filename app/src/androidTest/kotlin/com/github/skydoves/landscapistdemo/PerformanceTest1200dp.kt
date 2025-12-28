@@ -188,12 +188,29 @@ class PerformanceTest1200dp {
 
   private fun clearAllCaches() {
     try {
-      Glide.get(InstrumentationRegistry.getInstrumentation().targetContext).clearMemory()
+      val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+      // Clear Glide cache
+      Glide.get(context).clearMemory()
+
+      // Clear Landscapist cache (singleton instance)
+      com.skydoves.landscapist.core.Landscapist.getInstance().clearMemoryCache()
+
+      // Clear Coil cache if available
+      try {
+        coil3.ImageLoader.Builder(context).build().memoryCache?.clear()
+      } catch (e: Exception) {
+        // Coil might not be initialized
+      }
+
+      // Force garbage collection
       Runtime.getRuntime().gc()
       System.gc()
-      Thread.sleep(500)
+      Thread.sleep(1000) // Increased wait time for thorough cleanup
+
+      println("All caches cleared (Glide, Landscapist, Coil)")
     } catch (e: Exception) {
-      println("Warning: Could not clear caches: ${e.message}")
+      println("Warning: Could not clear all caches: ${e.message}")
     }
   }
 
