@@ -49,6 +49,7 @@ dependencies {
   implementation(project(":landscapist-placeholder"))
   implementation(project(":landscapist-transformation"))
   implementation(project(":landscapist-zoomable"))
+  implementation(project(":landscapist-image"))
 
   implementation(project(":glide"))
   implementation(project(":coil"))

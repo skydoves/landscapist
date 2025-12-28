@@ -59,6 +59,7 @@ class MainActivity : ComponentActivity() {
             testTagsAsResourceId = true
           },
         ) {
+          LandscapistImageProfiles()
           CoilImageProfiles()
           Coil3ImageProfiles()
           GlideImageProfiles()
