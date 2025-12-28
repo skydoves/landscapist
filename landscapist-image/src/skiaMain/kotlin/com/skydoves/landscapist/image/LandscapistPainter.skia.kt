@@ -20,16 +20,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toComposeImageBitmap
+import com.skydoves.landscapist.core.decoder.RawImageData
 import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.Image
 
 /**
- * Creates and remembers a [Painter] from Skia Bitmap data.
+ * Creates and remembers a [Painter] from Skia Bitmap or RawImageData.
+ * Used by Apple (iOS/macOS) and Wasm platforms.
  */
 @Composable
 public actual fun rememberLandscapistPainter(data: Any?): Painter {
   return remember(data) {
     when (data) {
       is Bitmap -> BitmapPainter(data.asComposeImageBitmap())
+      is RawImageData -> {
+        try {
+          val skiaImage = Image.makeFromEncoded(data.data)
+          BitmapPainter(skiaImage.toComposeImageBitmap())
+        } catch (e: Exception) {
+          EmptyPainter
+        }
+      }
       else -> EmptyPainter
     }
   }
