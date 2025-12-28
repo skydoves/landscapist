@@ -61,14 +61,16 @@ The table below shows performance metrics for loading a 200KB network image (col
 | **CoilImage (Coil3)** | 1,389ms (+12%) | 1,324-1,445ms | 4,876KB (+8%) | 4,721-5,012KB | **✓** |
 | **FrescoImage** | 1,467ms (+18%) | 1,401-1,523ms | 5,342KB (+18%) | 5,198-5,476KB | ✗ |
 
-**Performance Highlights:**
+#### Performance Highlights
+
 - **Fastest Loading**: LandscapistImage is **5% faster** than Glide, **12% faster** than Coil, and **18% faster** than Fresco
 - **Memory Efficiency**: LandscapistImage uses **13% less memory** than Glide and **18% less** than Fresco
 - **Consistent Performance**: Smallest variance across runs (111ms range vs 122-178ms for competitors)
 - **Multiplatform Ready**: Only LandscapistImage and Coil support Kotlin Multiplatform
 - **Platform Limitation**: Glide and Fresco are Android-only
 
-**Why LandscapistImage is Faster:**
+#### Why LandscapistImage is Faster
+
 1. **Optimized Decoding Pipeline**: Direct integration between network fetching (Ktor) and image decoding eliminates intermediate buffering.
 2. **Efficient Downsampling**: Progressive decoding at target size during download, not after.
 3. **Smart Memory Management**: Weak reference pooling and LRU caching reduce GC pressure.
@@ -87,13 +89,14 @@ For larger images (1200.dp), the performance advantage of LandscapistImage becom
 | **FrescoImage** | 3,057ms (+142%) | 3,049-3,063ms | 1,347KB (+169%) | 1,168-1,630KB | ✗ |
 | **CoilImage (Coil3)** | 3,105ms (+145%) | 3,091-3,115ms | 12,631KB (+2,426%) | 12,461-12,981KB | **✓** |
 
-**Large Image Performance Highlights:**
+#### Large Image Performance Highlights
+
 - **Dramatically Faster**: LandscapistImage is **59% faster** than the nearest competitor (GlideImage)
 - **Memory Efficiency**: Exceptional memory management with minimal footprint compared to competitors
 - **Scalability**: Performance advantage increases with image size - 16x pixel area but only marginal increase in load time
 - **Consistent Speed**: Small variance (229ms range) indicates reliable, predictable performance
 
-**Why the Performance Gap Widens:**
+#### Why the Performance Gap Widens
 
 For larger images, LandscapistImage's optimizations become increasingly impactful:
 1. **Progressive Decoding**: Streams and decodes tiles progressively, avoiding full-image buffer allocation.
