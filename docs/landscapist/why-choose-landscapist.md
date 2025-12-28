@@ -13,7 +13,8 @@ Landscapist Core is **exceptionally lightweight** compared to other image loadin
 | Coil3 | ~312 KB | **+115% larger** | Moderate |
 | Fresco | ~3.2 MB | **+2,107% larger** | Very High |
 
-**Why this matters for SDKs:**
+### Why this matters for SDKs
+
 - **User Impact**: Every KB in your SDK adds to your users' APK size. Landscapist Core keeps your SDK lean.
 - **Adoption Rate**: Developers are more likely to adopt lightweight SDKs that don't bloat their apps.
 - **Multiple SDK Scenario**: When apps use multiple SDKs, each using lightweight dependencies prevents exponential growth.
