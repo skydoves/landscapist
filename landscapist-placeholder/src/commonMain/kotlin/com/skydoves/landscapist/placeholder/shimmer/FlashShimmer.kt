@@ -124,6 +124,9 @@ public fun Shimmer(
           bounds = drawArea,
           paint = emptyPaint,
         ) {
+          // Draw the base color first as the background
+          drawRect(color = baseColor)
+          // Then draw the shimmer gradient on top using SrcIn blend mode
           canvas.drawRect(drawArea, paint)
         }
       }
