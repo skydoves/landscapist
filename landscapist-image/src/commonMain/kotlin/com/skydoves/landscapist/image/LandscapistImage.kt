@@ -32,8 +32,11 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.IntSize
 import com.skydoves.landscapist.ImageLoadState
 import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.InternalLandscapistApi
+import com.skydoves.landscapist.LandscapistImage
 import com.skydoves.landscapist.StableHolder
 import com.skydoves.landscapist.components.ComposeFailureStatePlugins
 import com.skydoves.landscapist.components.ComposeLoadingStatePlugins
@@ -117,10 +120,16 @@ public fun LandscapistImage(
           component.ComposeLoadingStatePlugins(
             modifier = Modifier.constraint(this@LandscapistImageInternal),
             imageOptions = imageOptions,
-            executor = { _ ->
-              loading?.invoke(this@LandscapistImageInternal, LandscapistImageState.Loading)
+            executor = { size ->
+              LandscapistThumbnail(
+                requestSize = size,
+                recomposeKey = StableHolder(request),
+                landscapist = StableHolder(landscapist),
+                imageOptions = imageOptions,
+              )
             },
           )
+          loading?.invoke(this@LandscapistImageInternal, LandscapistImageState.Loading)
         }
 
         is LandscapistImageState.Success -> {
@@ -389,5 +398,41 @@ private fun Modifier.imageSemantics(imageOptions: ImageOptions): Modifier {
     }
   } else {
     this
+  }
+}
+
+/**
+ * A thumbnail composable used by loading state plugins to display a low-resolution
+ * preview while the main image is loading.
+ *
+ * @param requestSize The target size for the thumbnail.
+ * @param recomposeKey The image request to load.
+ * @param landscapist The Landscapist instance to use for loading.
+ * @param imageOptions Image display options.
+ */
+@OptIn(InternalLandscapistApi::class)
+@Composable
+private fun LandscapistThumbnail(
+  requestSize: IntSize,
+  recomposeKey: StableHolder<ImageRequest>,
+  landscapist: StableHolder<Landscapist>,
+  imageOptions: ImageOptions,
+) {
+  LandscapistImageInternal(
+    request = recomposeKey,
+    landscapist = landscapist,
+    modifier = Modifier,
+    component = rememberImageComponent {},
+    imageOptions = imageOptions.copy(requestSize = requestSize),
+  ) { imageResult ->
+    val state = imageResult.toLandscapistImageState()
+    if (state is LandscapistImageState.Success) {
+      val data = state.data ?: return@LandscapistImageInternal
+      val painter = rememberLandscapistPainter(data)
+      imageOptions.LandscapistImage(
+        modifier = Modifier,
+        painter = painter,
+      )
+    }
   }
 }

@@ -2,6 +2,7 @@ public final class com/skydoves/landscapist/image/ComposableSingletons$Landscapi
 	public static final field INSTANCE Lcom/skydoves/landscapist/image/ComposableSingletons$LandscapistImageKt;
 	public fun <init> ()V
 	public final fun getLambda$-1726880433$landscapist_image ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-30246008$landscapist_image ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/skydoves/landscapist/image/ImageBitmapConverter_skiaKt {
