@@ -90,10 +90,10 @@ Landscapist Core is **exceptionally lightweight** compared to other image loadin
 
 | Library | AAR Size | vs Landscapist Core | Impact on APK |
 |---------|----------|---------------------|---------------|
-| **landscapist-core** | **~145 KB** | **Baseline (Smallest)** | Minimal |
-| Glide | ~527 KB | **+263% larger** | Significant |
-| Coil3 | ~312 KB | **+115% larger** | Moderate |
-| Fresco | ~3.2 MB | **+2,107% larger** | Very High |
+| **landscapist-core** | **~312 KB** | **Baseline (Smallest)** | Minimal |
+| Coil3 | ~460 KB | **+47% larger** | Moderate |
+| Glide | ~689 KB | **+121% larger** | Significant |
+| Fresco | ~1 MB | **+228% larger** | High |
 
 **Performance (Android Release Build):**
 

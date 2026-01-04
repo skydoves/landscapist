@@ -8,10 +8,10 @@ Landscapist Core is **exceptionally lightweight** compared to other image loadin
 
 | Library | AAR Size | vs Landscapist Core | Impact on APK |
 |---------|----------|---------------------|---------------|
-| **landscapist-core** | **~145 KB** | **Baseline (Smallest)** | Minimal |
-| Glide | ~527 KB | **+263% larger** | Significant |
-| Coil3 | ~312 KB | **+115% larger** | Moderate |
-| Fresco | ~3.2 MB | **+2,107% larger** | Very High |
+| **landscapist-core** | **~312 KB** | **Baseline (Smallest)** | Minimal |
+| Coil3 | ~460 KB | **+47% larger** | Moderate |
+| Glide | ~689 KB | **+121% larger** | Significant |
+| Fresco | ~1 MB | **+228% larger** | High |
 
 ### Why this matters for SDKs
 
@@ -20,7 +20,7 @@ Landscapist Core is **exceptionally lightweight** compared to other image loadin
 - **Multiple SDK Scenario**: When apps use multiple SDKs, each using lightweight dependencies prevents exponential growth.
 - **Enterprise Requirements**: Many enterprises have strict APK size budgets. Landscapist Core helps you stay within limits.
 
-**Real-world example**: If your SDK uses Landscapist Core instead of Glide, you save **~382 KB per user**. For 1 million users, that's **382 GB of bandwidth** and storage savings across all devices.
+**Real-world example**: If your SDK uses Landscapist Core instead of Glide, you save **~377 KB per user**. For 1 million users, that's **377 GB of bandwidth** and storage savings across all devices.
 
 ## 2. Cross-Platform from the Start
 
