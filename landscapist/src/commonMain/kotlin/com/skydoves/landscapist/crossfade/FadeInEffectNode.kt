@@ -20,6 +20,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.toRect
@@ -114,6 +115,6 @@ private data class FadeInEffectElement(
 
 @Composable
 internal fun Modifier.fadeInWithEffect(key: Any, durationMs: Int): Modifier {
-  val state: State<Any> = mutableStateOf(key)
+  val state: State<Any> = rememberUpdatedState(key)
   return this.then(FadeInEffectElement(state, durationMs))
 }
