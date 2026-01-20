@@ -178,5 +178,5 @@ internal fun rememberImageSourceFile(
   imageModel: Any?,
   dataSource: DataSource?,
 ): State<File?> = produceState(initialValue = null, imageModel, dataSource) {
-  getImageSourceFile(context, imageLoader, imageModel, dataSource)
+  value = getImageSourceFile(context, imageLoader, imageModel, dataSource)
 }
