@@ -53,7 +53,7 @@ private class FadeInEffectNode(
       // snapshotFlow observes changes to our `key` state.
       // collectLatest ensures that if the key changes mid-animation,
       // the old animation is cancelled and the new one starts.
-      snapshotFlow { key }
+      snapshotFlow { key.value }
         .collectLatest {
           alpha.snapTo(0f)
           brightness.snapTo(0.8f)

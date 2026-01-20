@@ -50,7 +50,7 @@ private class FadeOutEffectNode(
 
   override fun onAttach() {
     coroutineScope.launch {
-      snapshotFlow { key }
+      snapshotFlow { key.value }
         .collectLatest {
           // Reset to the starting (visible) state before animating out
           alpha.snapTo(1f)
