@@ -234,7 +234,7 @@ public fun GlideImage(
             dataSource = glideImageState.dataSource,
           )
 
-          ProvideImageSourceFile(file = sourceFile) {
+          ProvideImageSourceFile(file = sourceFile.value) {
             component.ComposeWithComposablePlugins {
               if (success != null) {
                 success.invoke(boxScope, glideImageState, painter)

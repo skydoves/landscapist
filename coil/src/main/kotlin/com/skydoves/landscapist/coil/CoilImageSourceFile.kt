@@ -22,11 +22,8 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.State
+import androidx.compose.runtime.produceState
 import coil.ImageLoader
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -181,12 +178,6 @@ internal fun rememberImageSourceFile(
   imageLoader: ImageLoader,
   imageModel: Any?,
   dataSource: DataSource?,
-): File? {
-  var sourceFile by remember { mutableStateOf<File?>(null) }
-
-  LaunchedEffect(imageModel, dataSource) {
-    sourceFile = getImageSourceFile(context, imageLoader, imageModel, dataSource)
-  }
-
-  return sourceFile
+): State<File?> = produceState(initialValue = null, imageModel, dataSource) {
+  value = getImageSourceFile(context, imageLoader, imageModel, dataSource)
 }

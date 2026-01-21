@@ -19,7 +19,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.toRect
@@ -49,7 +49,7 @@ private class FadeOutEffectNode(
 
   override fun onAttach() {
     coroutineScope.launch {
-      snapshotFlow { key }
+      snapshotFlow { key.value }
         .collectLatest {
           // Reset to the starting (visible) state before animating out
           alpha.snapTo(1f)
@@ -111,6 +111,6 @@ private data class FadeOutEffectElement(
 
 @Composable
 internal fun Modifier.fadeOutWithEffect(key: Any, durationMs: Int): Modifier {
-  val state: State<Any> = mutableStateOf(key)
+  val state: State<Any> = rememberUpdatedState(key)
   return this.then(FadeOutEffectElement(state, durationMs))
 }

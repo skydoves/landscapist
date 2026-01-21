@@ -40,7 +40,7 @@ internal actual fun ProvideCoilSourceFile(
     dataSource = dataSource,
   )
 
-  ProvideImageSourceFile(file = sourceFile) {
+  ProvideImageSourceFile(file = sourceFile.value) {
     content()
   }
 }

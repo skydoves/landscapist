@@ -289,7 +289,7 @@ public fun CoilImage(
             dataSource = coilImageState.dataSource,
           )
 
-          ProvideImageSourceFile(file = sourceFile) {
+          ProvideImageSourceFile(file = sourceFile.value) {
             component.ComposeWithComposablePlugins {
               if (success != null) {
                 success.invoke(boxScope, coilImageState, painter)
