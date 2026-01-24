@@ -74,9 +74,12 @@ class LandscapistVsCoil3PerformanceTest {
       "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg"
 
     private val TEST_IMAGES = listOf(
-      "https://user-images.githubusercontent.com/24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
-      "https://user-images.githubusercontent.com/24237865/75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087934-5b850900-553e-11ea-92d7-b7c7e7e09bb0.jpg",
+      "https://user-images.githubusercontent.com/24237865/" +
+        "75087930-5a53dc00-553e-11ea-8eff-c4e98d76a51e.jpg",
     )
   }
 
@@ -209,7 +212,14 @@ class LandscapistVsCoil3PerformanceTest {
     TEST_IMAGES.indices.forEach { i ->
       val directTime = directCoil3Times.getOrNull(i) ?: 0L
       val landscapistTime = landscapistTimes.getOrNull(i) ?: 0L
-      println(String.format("  Image %d: Direct=%dms, Landscapist=%dms", i + 1, directTime, landscapistTime))
+      println(
+        String.format(
+          "  Image %d: Direct=%dms, Landscapist=%dms",
+          i + 1,
+          directTime,
+          landscapistTime,
+        ),
+      )
     }
     println()
     println("Averages:")
