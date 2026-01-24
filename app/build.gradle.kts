@@ -80,4 +80,7 @@ dependencies {
   androidTestImplementation(libs.androidx.test.junit)
   androidTestImplementation(libs.androidx.compose.ui.test.junit4)
   debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+  // Direct Coil3 for performance comparison tests
+  androidTestImplementation(libs.coil3.compose)
 }
