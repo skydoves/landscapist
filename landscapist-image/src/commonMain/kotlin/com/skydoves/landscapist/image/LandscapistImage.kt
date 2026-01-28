@@ -58,6 +58,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 /**
  * Loads and displays an image using the Landscapist core image loading engine.
@@ -134,7 +136,11 @@ public fun LandscapistImage(
         }
 
         is LandscapistImageState.Success -> {
-          val basePainter = rememberLandscapistPainter(state.data)
+          val basePainter = if (state.data is DrawableResource) {
+            painterResource(state.data)
+          } else {
+            rememberLandscapistPainter(state.data)
+          }
           val imageBitmap = remember(state.data) {
             state.data?.let { convertToImageBitmap(it) }
           }
@@ -352,6 +358,19 @@ private fun executeImageLoading(
   request: ImageRequest,
 ) = flow {
   emit(ImageLoadState.Loading)
+
+  // Handle DrawableResource from KMP Compose Resources directly.
+  // DrawableResource is a local bundled resource that doesn't need network fetching or caching.
+  if (request.model is DrawableResource) {
+    emit(
+      ImageLoadState.Success(
+        data = request.model,
+        dataSource = com.skydoves.landscapist.DataSource.RESOURCE,
+      ),
+    )
+    return@flow
+  }
+
   landscapist.load(request).collect { result ->
     emit(result.toImageLoadState())
   }
