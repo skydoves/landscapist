@@ -15,6 +15,7 @@
  */
 package com.github.skydoves.landscapistdemo
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +53,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Performance comparison test between LandscapistImage and direct Coil3.
@@ -69,6 +72,8 @@ class LandscapistVsCoil3PerformanceTest {
   val composeTestRule = createComposeRule()
 
   companion object {
+    private const val TAG = "PerfComparison"
+
     // Test image URL - 600x600 JPG as mentioned in the issue
     private const val TEST_IMAGE_URL = "https://user-images.githubusercontent.com/" +
       "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg"
@@ -485,6 +490,305 @@ class LandscapistVsCoil3PerformanceTest {
           completed = true
           val info = "${state.originalWidth}x${state.originalHeight}"
           onSuccess(System.currentTimeMillis(), info)
+        }
+      },
+    )
+  }
+
+  // ===== LOCAL DRAWABLE RESOURCE PERFORMANCE TESTS =====
+  // These tests use local drawable resources to eliminate network variability
+  // and provide reliable, reproducible performance measurements.
+
+  /**
+   * Compare single drawable resource load: Direct Coil3 vs LandscapistImage.
+   * Both composables are rendered side by side in a single setContent call.
+   * Uses nanoTime for precision.
+   */
+  @Test
+  fun compareLocalDrawableLoadPerformance() {
+    val coil3TimeNanos = AtomicLong(0L)
+    val landscapistTimeNanos = AtomicLong(0L)
+    val latch = CountDownLatch(2)
+
+    composeTestRule.setContent {
+      Column {
+        DirectCoil3DrawableTest(
+          drawableRes = R.drawable.poster,
+          tag = "coil3-local",
+          onComplete = { nanos ->
+            coil3TimeNanos.set(nanos)
+            latch.countDown()
+          },
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        LandscapistDrawableTest(
+          drawableRes = R.drawable.poster,
+          tag = "landscapist-local",
+          onComplete = { nanos ->
+            landscapistTimeNanos.set(nanos)
+            latch.countDown()
+          },
+        )
+      }
+    }
+
+    val allDone = latch.await(10, TimeUnit.SECONDS)
+
+    val coil3Ms = coil3TimeNanos.get() / 1_000_000.0
+    val landscapistMs = landscapistTimeNanos.get() / 1_000_000.0
+    val overheadMs = landscapistMs - coil3Ms
+
+    Log.d(TAG, "")
+    Log.d(TAG, "=".repeat(70))
+    Log.d(TAG, "LOCAL DRAWABLE: Single Load Performance")
+    Log.d(TAG, "=".repeat(70))
+    Log.d(TAG, String.format("%-25s | %.2fms", "Direct Coil3", coil3Ms))
+    Log.d(TAG, String.format("%-25s | %.2fms", "LandscapistImage", landscapistMs))
+    Log.d(TAG, "-".repeat(50))
+    Log.d(TAG, String.format("Overhead: %.2fms", overheadMs))
+    Log.d(TAG, "=".repeat(70))
+
+    println("\n" + "=".repeat(70))
+    println("LOCAL DRAWABLE: Single Load Performance")
+    println("=".repeat(70))
+    println(String.format("%-25s | %.2fms", "Direct Coil3", coil3Ms))
+    println(String.format("%-25s | %.2fms", "LandscapistImage", landscapistMs))
+    println("-".repeat(50))
+    println(String.format("Overhead: %.2fms", overheadMs))
+    println("=".repeat(70))
+
+    assert(allDone) { "Not all tests completed within timeout" }
+  }
+
+  /**
+   * Multi-round comparison with local drawables for statistical accuracy.
+   * Loads one pair at a time (sequentially) to avoid concurrent load contention.
+   * Uses key(currentRound) to force fresh composable instances each round.
+   */
+  @Test
+  fun compareLocalDrawableMultiRound() {
+    val rounds = 5
+    val coil3NanosList = mutableListOf<Long>()
+    val landscapistNanosList = mutableListOf<Long>()
+    var currentRound by mutableStateOf(0)
+    // Shared atomic values written by callbacks, read by test thread after latch
+    val coilNanos = AtomicLong(0L)
+    val landscapistNanos = AtomicLong(0L)
+    var roundLatch = CountDownLatch(2)
+    val pairDone = java.util.concurrent.atomic.AtomicInteger(0)
+
+    composeTestRule.setContent {
+      key(currentRound) {
+        Column {
+          DirectCoil3DrawableTest(
+            drawableRes = R.drawable.poster,
+            tag = "coil3-round-$currentRound",
+            onComplete = { nanos ->
+              coilNanos.set(nanos)
+              roundLatch.countDown()
+            },
+          )
+
+          Spacer(modifier = Modifier.height(8.dp))
+
+          LandscapistDrawableTest(
+            drawableRes = R.drawable.poster,
+            tag = "landscapist-round-$currentRound",
+            onComplete = { nanos ->
+              landscapistNanos.set(nanos)
+              roundLatch.countDown()
+            },
+          )
+        }
+      }
+    }
+
+    // Wait for initial composition and effects to settle before starting timing loop.
+    composeTestRule.waitForIdle()
+
+    // Round 0 starts automatically from initial composition.
+    // For subsequent rounds, we set currentRound → key(currentRound) forces recreation.
+    for (round in 0 until rounds) {
+      if (round > 0) {
+        coilNanos.set(0L)
+        landscapistNanos.set(0L)
+        roundLatch = CountDownLatch(2)
+        composeTestRule.runOnIdle { currentRound = round }
+        composeTestRule.waitForIdle()
+      }
+
+      val done = roundLatch.await(10, TimeUnit.SECONDS)
+      Log.d(
+        TAG,
+        "Round $round done=$done: Coil3=${coilNanos.get() / 1_000_000.0}ms, " +
+          "Landscapist=${landscapistNanos.get() / 1_000_000.0}ms",
+      )
+      coil3NanosList.add(coilNanos.get())
+      landscapistNanosList.add(landscapistNanos.get())
+    }
+
+    val coil3Ms = coil3NanosList.map { it / 1_000_000.0 }
+    val landscapistMs = landscapistNanosList.map { it / 1_000_000.0 }
+
+    val avgCoil3 = coil3Ms.average()
+    val avgLandscapist = landscapistMs.average()
+    val minCoil3 = coil3Ms.min()
+    val minLandscapist = landscapistMs.min()
+    val maxCoil3 = coil3Ms.max()
+    val maxLandscapist = landscapistMs.max()
+
+    Log.d(TAG, "")
+    Log.d(TAG, "=".repeat(70))
+    Log.d(TAG, "LOCAL DRAWABLE: Multi-Round Performance ($rounds rounds)")
+    Log.d(TAG, "=".repeat(70))
+    for (i in 0 until rounds) {
+      Log.d(
+        TAG,
+        String.format(
+          "  Round %d: Coil3=%.2fms, Landscapist=%.2fms, diff=%.2fms",
+          i + 1,
+          coil3Ms[i],
+          landscapistMs[i],
+          landscapistMs[i] - coil3Ms[i],
+        ),
+      )
+    }
+    Log.d(TAG, String.format("%-15s | %10s | %10s | %10s", "", "Avg", "Min", "Max"))
+    Log.d(TAG, "-".repeat(55))
+    Log.d(
+      TAG,
+      String.format(
+        "%-15s | %8.2fms | %8.2fms | %8.2fms",
+        "Direct Coil3",
+        avgCoil3,
+        minCoil3,
+        maxCoil3,
+      ),
+    )
+    Log.d(
+      TAG,
+      String.format(
+        "%-15s | %8.2fms | %8.2fms | %8.2fms",
+        "Landscapist",
+        avgLandscapist,
+        minLandscapist,
+        maxLandscapist,
+      ),
+    )
+    Log.d(TAG, String.format("Avg Overhead: %.2fms", avgLandscapist - avgCoil3))
+    if (avgCoil3 > 0) Log.d(TAG, String.format("Ratio: %.2fx", avgLandscapist / avgCoil3))
+    Log.d(TAG, "=".repeat(70))
+
+    println("\n" + "=".repeat(70))
+    println("LOCAL DRAWABLE: Multi-Round Performance ($rounds rounds)")
+    println("=".repeat(70))
+    for (i in 0 until rounds) {
+      println(
+        String.format(
+          "  Round %d: Coil3=%.2fms, Landscapist=%.2fms, diff=%.2fms",
+          i + 1,
+          coil3Ms[i],
+          landscapistMs[i],
+          landscapistMs[i] - coil3Ms[i],
+        ),
+      )
+    }
+    println(String.format("%-15s | %10s | %10s | %10s", "", "Avg", "Min", "Max"))
+    println("-".repeat(55))
+    println(
+      String.format(
+        "%-15s | %8.2fms | %8.2fms | %8.2fms",
+        "Direct Coil3",
+        avgCoil3,
+        minCoil3,
+        maxCoil3,
+      ),
+    )
+    println(
+      String.format(
+        "%-15s | %8.2fms | %8.2fms | %8.2fms",
+        "Landscapist",
+        avgLandscapist,
+        minLandscapist,
+        maxLandscapist,
+      ),
+    )
+    println(String.format("Avg Overhead: %.2fms", avgLandscapist - avgCoil3))
+    if (avgCoil3 > 0) println(String.format("Ratio: %.2fx", avgLandscapist / avgCoil3))
+    println("=".repeat(70))
+
+    assert(coil3NanosList[0] > 0) { "Coil3 round 0 did not complete" }
+    assert(landscapistNanosList[0] > 0) { "Landscapist round 0 did not complete" }
+  }
+
+  // ===== Local Drawable Helper Composables =====
+
+  @Composable
+  private fun DirectCoil3DrawableTest(
+    drawableRes: Int,
+    tag: String = "coil3-drawable",
+    size: Int = 200,
+    onComplete: (Long) -> Unit,
+  ) {
+    val context = LocalContext.current
+    val imageLoader = remember { ImageLoader(context) }
+    var startNanos by remember { mutableLongStateOf(0L) }
+    var completed by remember { mutableStateOf(false) }
+
+    val painter = rememberAsyncImagePainter(
+      model = ImageRequest.Builder(context)
+        .data(drawableRes)
+        .memoryCachePolicy(CachePolicy.DISABLED)
+        .diskCachePolicy(CachePolicy.DISABLED)
+        .build(),
+      imageLoader = imageLoader,
+    )
+
+    val state by painter.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+      startNanos = System.nanoTime()
+    }
+
+    LaunchedEffect(state) {
+      if (state is AsyncImagePainter.State.Success && !completed) {
+        completed = true
+        onComplete(System.nanoTime() - startNanos)
+      }
+    }
+
+    Image(
+      painter = painter,
+      contentDescription = null,
+      modifier = Modifier.size(size.dp).testTag(tag),
+      contentScale = ContentScale.Crop,
+    )
+  }
+
+  @Composable
+  private fun LandscapistDrawableTest(
+    drawableRes: Int,
+    tag: String = "landscapist-drawable",
+    size: Int = 200,
+    onComplete: (Long) -> Unit,
+  ) {
+    var startNanos by remember { mutableLongStateOf(0L) }
+    var completed by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+      startNanos = System.nanoTime()
+    }
+
+    LandscapistImage(
+      imageModel = { drawableRes },
+      modifier = Modifier.size(size.dp).testTag(tag),
+      imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+      onImageStateChanged = { state ->
+        if (state is LandscapistImageState.Success && !completed) {
+          completed = true
+          onComplete(System.nanoTime() - startNanos)
         }
       },
     )

@@ -194,6 +194,7 @@ public abstract interface class com/skydoves/landscapist/constraints/Constrainab
 
 public final class com/skydoves/landscapist/constraints/ConstraintsExtensionsKt {
 	public static final fun constraint (Landroidx/compose/ui/Modifier;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;)Landroidx/compose/ui/Modifier;
+	public static final fun constraint-0kLqBqw (Landroidx/compose/ui/Modifier;J)Landroidx/compose/ui/Modifier;
 }
 
 public final class com/skydoves/landscapist/crossfade/CrossfadePlugin : com/skydoves/landscapist/plugins/ImagePlugin$PainterPlugin {
