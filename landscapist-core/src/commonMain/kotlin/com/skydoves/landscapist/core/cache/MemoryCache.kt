@@ -86,9 +86,16 @@ public interface MemoryCache {
  * @property data The image data (platform-specific bitmap type).
  * @property dataSource The source from which the image was originally loaded.
  * @property sizeBytes The size of the image in bytes.
+ * @property originalWidth The original width of the image before any transformations.
+ * @property originalHeight The original height of the image before any transformations.
+ * @property diskCachePath The disk cache file path, if available. Used by sub-sampling plugins
+ *   to create a region decoder from the cached file on subsequent memory cache hits.
  */
 public data class CachedImage(
   val data: Any,
   val dataSource: DataSource,
   val sizeBytes: Long,
+  val originalWidth: Int = 0,
+  val originalHeight: Int = 0,
+  val diskCachePath: String? = null,
 )
