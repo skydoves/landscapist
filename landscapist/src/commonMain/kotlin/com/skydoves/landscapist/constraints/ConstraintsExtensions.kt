@@ -16,9 +16,11 @@
 package com.skydoves.landscapist.constraints
 
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import com.skydoves.landscapist.InternalLandscapistApi
 
@@ -42,6 +44,19 @@ public fun Modifier.constraint(boxConstraints: BoxWithConstraintsScope): Modifie
         Modifier
       },
     )
+}
+
+/**
+ * Overloaded constraint modifier that takes [Constraints] directly (in pixels).
+ * This is used when we capture constraints from Layout measurement.
+ * Uses fillMaxSize to ensure children fill the available space,
+ * mimicking the behavior of BoxWithConstraints with propagateMinConstraints = true.
+ */
+@InternalLandscapistApi
+public fun Modifier.constraint(constraints: Constraints): Modifier {
+  // Use fillMaxSize to ensure children fill the available space
+  // This mimics the behavior of BoxWithConstraints with propagateMinConstraints = true
+  return this.fillMaxSize()
 }
 
 private fun Dp.isFinite(): Boolean = this != Dp.Infinity && this != Dp.Unspecified

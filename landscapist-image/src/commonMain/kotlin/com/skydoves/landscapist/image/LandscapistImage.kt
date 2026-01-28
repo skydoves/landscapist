@@ -15,18 +15,19 @@
  */
 package com.skydoves.landscapist.image
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -45,7 +46,6 @@ import com.skydoves.landscapist.components.ComposeWithComposablePlugins
 import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.imagePlugins
 import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.constraints.constraint
 import com.skydoves.landscapist.core.ImageRequest
 import com.skydoves.landscapist.core.Landscapist
 import com.skydoves.landscapist.core.model.ImageResult
@@ -118,7 +118,7 @@ public fun LandscapistImage(
         is LandscapistImageState.Loading,
         -> {
           component.ComposeLoadingStatePlugins(
-            modifier = Modifier.constraint(this@LandscapistImageInternal),
+            modifier = Modifier,
             imageOptions = imageOptions,
             executor = { size ->
               LandscapistThumbnail(
@@ -129,7 +129,7 @@ public fun LandscapistImage(
               )
             },
           )
-          loading?.invoke(this@LandscapistImageInternal, LandscapistImageState.Loading)
+          loading?.invoke(this, LandscapistImageState.Loading)
         }
 
         is LandscapistImageState.Success -> {
@@ -149,7 +149,7 @@ public fun LandscapistImage(
           }
 
           component.ComposeSuccessStatePlugins(
-            modifier = Modifier.constraint(this@LandscapistImageInternal),
+            modifier = Modifier,
             imageModel = model,
             imageOptions = imageOptions,
             imageBitmap = imageBitmap,
@@ -162,10 +162,10 @@ public fun LandscapistImage(
           ) {
             component.ComposeWithComposablePlugins {
               if (success != null) {
-                success.invoke(this@LandscapistImageInternal, state, painter)
+                success.invoke(this, state, painter)
               } else {
                 DefaultSuccessContent(
-                  modifier = Modifier.constraint(this@LandscapistImageInternal),
+                  modifier = Modifier,
                   painter = painter,
                   imageOptions = imageOptions,
                 )
@@ -176,12 +176,12 @@ public fun LandscapistImage(
 
         is LandscapistImageState.Failure -> {
           component.ComposeFailureStatePlugins(
-            modifier = Modifier.constraint(this@LandscapistImageInternal),
+            modifier = Modifier,
             imageOptions = imageOptions,
             reason = state.reason,
           )
 
-          failure?.invoke(this@LandscapistImageInternal, state)
+          failure?.invoke(this, state)
         }
       }
     }
@@ -190,7 +190,8 @@ public fun LandscapistImage(
 
 /**
  * Internal implementation that uses ImageResult directly to preserve rawData and diskCachePath.
- * Uses BoxWithConstraints to get the available size and loads the image at appropriate resolution.
+ * Uses Modifier.layout to capture incoming parent constraints for downsampling, then starts loading.
+ * This avoids SubcomposeLayout overhead while still providing proper downsampling.
  */
 @Composable
 private fun LandscapistImageInternal(
@@ -199,7 +200,7 @@ private fun LandscapistImageInternal(
   modifier: Modifier,
   component: ImageComponent,
   imageOptions: ImageOptions,
-  content: @Composable BoxWithConstraintsScope.(imageResult: ImageResult) -> Unit,
+  content: @Composable BoxScope.(imageResult: ImageResult) -> Unit,
 ) {
   val loadingKey = imageOptions.loadingOptionsKey
 
@@ -207,33 +208,81 @@ private fun LandscapistImageInternal(
     mutableStateOf<ImageLoadState>(ImageLoadState.None)
   }
 
-  // Apply aspect ratio modifier if specified to reserve space before image loads
-  val aspectRatio = imageOptions.placeholderAspectRatio
-  val containerModifier = remember(modifier, aspectRatio) {
-    if (aspectRatio != null && aspectRatio > 0f) {
-      modifier.aspectRatio(aspectRatio)
+  // Capture incoming parent constraints for downsampling. Initialized to -1 meaning "not yet measured".
+  // Once measured, the value is locked to prevent LaunchedEffect restarts.
+  var incomingMaxWidth by remember { mutableIntStateOf(-1) }
+  var incomingMaxHeight by remember { mutableIntStateOf(-1) }
+  val hasMeasured = incomingMaxWidth >= 0
+
+  // Auto-calculate aspect ratio from loaded image dimensions for sub-sampling support.
+  // Priority: explicit placeholderAspectRatio > auto from loaded image > none
+  val autoAspectRatio = remember(state) {
+    val successData = (state as? ImageLoadState.Success)?.data as? LandscapistSuccessData
+    if (successData != null && successData.originalWidth > 0 && successData.originalHeight > 0) {
+      successData.originalWidth.toFloat() / successData.originalHeight.toFloat()
+    } else {
+      null
+    }
+  }
+  val effectiveAspectRatio = imageOptions.placeholderAspectRatio ?: autoAspectRatio
+
+  // Apply aspect ratio modifier if available to reserve space / ensure bounded height
+  val baseModifier = remember(modifier, effectiveAspectRatio) {
+    if (effectiveAspectRatio != null && effectiveAspectRatio > 0f) {
+      modifier.aspectRatio(effectiveAspectRatio)
     } else {
       modifier
     }
   }
 
-  BoxWithConstraints(
-    modifier = containerModifier.imageSemantics(imageOptions),
-    propagateMinConstraints = true,
-  ) {
-    // Build request with target size from constraints
-    val sizedRequest = remember(request.value, imageOptions, constraints) {
-      buildSizedRequest(request.value, imageOptions, constraints)
+  // Build request with target size from captured layout dimensions.
+  // The remember keys include incomingMaxWidth/incomingMaxHeight so the request is built
+  // once the first measurement happens. After that, size changes won't rebuild.
+  val sizedRequest = remember(request.value, imageOptions, incomingMaxWidth, incomingMaxHeight) {
+    val constraints = if (hasMeasured) {
+      Constraints(
+        maxWidth = if (incomingMaxWidth > 0) incomingMaxWidth else Constraints.Infinity,
+        maxHeight = if (incomingMaxHeight > 0) incomingMaxHeight else Constraints.Infinity,
+      )
+    } else {
+      Constraints() // unbounded fallback (should rarely happen)
     }
+    buildSizedRequest(request.value, imageOptions, constraints)
+  }
 
-    // Load image when request or constraints change
+  // Start loading once we have a sized request and measurement is done (or request has size already).
+  // The key includes sizedRequest so if the model changes, loading restarts with proper size.
+  val canLoad = hasMeasured ||
+    (request.value.targetWidth != null && request.value.targetHeight != null) ||
+    imageOptions.isValidSize
+
+  if (canLoad) {
     LaunchedEffect(sizedRequest, loadingKey) {
       executeImageLoading(landscapist.value, sizedRequest).collect {
         state = it
       }
     }
+  }
 
-    // Convert to ImageResult and render content
+  // Use Box with propagateMinConstraints + Modifier.layout to capture incoming parent constraints.
+  // Unlike onSizeChanged (which reports actual rendered size), Modifier.layout reads the
+  // incoming constraints from the parent, giving us bounded width even when content is empty.
+  // This is critical for sub-sampling/zoomable plugins in unbounded contexts (e.g., scrollable Column).
+  Box(
+    modifier = baseModifier
+      .imageSemantics(imageOptions)
+      .layout { measurable, constraints ->
+        if (incomingMaxWidth < 0) {
+          incomingMaxWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else 0
+          incomingMaxHeight = if (constraints.hasBoundedHeight) constraints.maxHeight else 0
+        }
+        val placeable = measurable.measure(constraints)
+        layout(placeable.width, placeable.height) {
+          placeable.placeRelative(0, 0)
+        }
+      },
+    propagateMinConstraints = true,
+  ) {
     val imageResult = state.toImageResult()
     content(imageResult)
   }
