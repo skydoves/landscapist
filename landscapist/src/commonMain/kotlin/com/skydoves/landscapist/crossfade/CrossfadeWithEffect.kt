@@ -61,7 +61,7 @@ public fun <T> CrossfadeWithEffect(
     }
   }
 
-  Box(modifier) {
+  Box(modifier, propagateMinConstraints = true) {
     if (enabled) {
       currentlyVisibleItems.forEach { state ->
         key(contentKey(state)) {
@@ -80,7 +80,7 @@ public fun <T> CrossfadeWithEffect(
             }
           }
 
-          Box(modifier = animationModifier) {
+          Box(modifier = animationModifier, propagateMinConstraints = true) {
             content(state)
           }
         }

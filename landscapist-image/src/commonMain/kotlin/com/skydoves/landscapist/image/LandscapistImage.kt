@@ -224,7 +224,11 @@ private fun LandscapistImageInternal(
       null
     }
   }
-  val effectiveAspectRatio = imageOptions.placeholderAspectRatio ?: autoAspectRatio
+  // Only apply auto aspect ratio when incoming height is unbounded (e.g., scrollable Column).
+  // In bounded contexts (e.g., .size(50.dp)), the parent already provides proper constraints.
+  val needsAutoAspectRatio = hasMeasured && incomingMaxHeight == 0
+  val effectiveAspectRatio = imageOptions.placeholderAspectRatio
+    ?: if (needsAutoAspectRatio) autoAspectRatio else null
 
   // Apply aspect ratio modifier if available to reserve space / ensure bounded height
   val baseModifier = remember(modifier, effectiveAspectRatio) {
