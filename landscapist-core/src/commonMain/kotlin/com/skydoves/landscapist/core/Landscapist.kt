@@ -144,6 +144,9 @@ public class Landscapist private constructor(
           ImageResult.Success(
             data = cached.data,
             dataSource = DataSource.MEMORY,
+            originalWidth = cached.originalWidth,
+            originalHeight = cached.originalHeight,
+            diskCachePath = cached.diskCachePath,
           ),
         )
         return@flow
@@ -190,6 +193,9 @@ public class Landscapist private constructor(
                 data = bitmap,
                 dataSource = DataSource.DISK,
                 sizeBytes = estimateBitmapSize(decodeResult.width, decodeResult.height),
+                originalWidth = decodeResult.width,
+                originalHeight = decodeResult.height,
+                diskCachePath = diskPath,
               )
             }
 
@@ -266,6 +272,9 @@ public class Landscapist private constructor(
                 data = bitmap,
                 dataSource = DataSource.NETWORK,
                 sizeBytes = estimateBitmapSize(decodeResult.width, decodeResult.height),
+                originalWidth = decodeResult.width,
+                originalHeight = decodeResult.height,
+                diskCachePath = diskPath,
               )
             }
 
@@ -300,6 +309,8 @@ public class Landscapist private constructor(
             data = image,
             dataSource = fetchResult.dataSource,
             sizeBytes = estimateBitmapSize(fetchResult.width, fetchResult.height),
+            originalWidth = fetchResult.width,
+            originalHeight = fetchResult.height,
           )
         }
 
@@ -376,6 +387,9 @@ public class Landscapist private constructor(
               data = bitmap,
               dataSource = dataSource,
               sizeBytes = estimateBitmapSize(result.width, result.height),
+              originalWidth = result.width,
+              originalHeight = result.height,
+              diskCachePath = diskPath,
             )
           }
 
