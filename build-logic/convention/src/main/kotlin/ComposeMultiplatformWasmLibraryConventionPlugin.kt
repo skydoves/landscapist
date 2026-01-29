@@ -28,18 +28,16 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 class ComposeMultiplatformWasmLibraryConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
     with(target) {
-      pluginManager.apply("com.android.library")
       pluginManager.apply("org.jetbrains.kotlin.multiplatform")
+      pluginManager.apply("com.android.library")
       pluginManager.apply("org.jetbrains.compose")
       pluginManager.apply("com.vanniktech.maven.publish")
       pluginManager.apply("binary-compatibility-validator")
       pluginManager.apply("androidx.baselineprofile")
 
-      extensions.configure<LibraryExtension> libraryExtension@{
-        extensions.configure<KotlinMultiplatformExtension> kmpExtension@{
-          configureComposeMultiplatformWasm(this@libraryExtension, this@kmpExtension)
-        }
-      }
+      val libraryExtension = extensions.getByType(LibraryExtension::class.java)
+      val kmpExtension = extensions.getByType(KotlinMultiplatformExtension::class.java)
+      configureComposeMultiplatformWasm(libraryExtension, kmpExtension)
 
       val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
       tasks.withType(JavaCompile::class.java).configureEach {

@@ -18,7 +18,7 @@
 
 package com.skydoves.landscapist
 
-import com.android.build.api.dsl.CommonExtension
+import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * Configure KMP library without Compose dependencies
  */
 internal fun Project.configureKmpLibrary(
-  commonExtension: CommonExtension<*, *, *, *, *, *>,
+  libraryExtension: LibraryExtension,
   kotlinMultiplatformExtension: KotlinMultiplatformExtension,
 ) {
   kotlinMultiplatformExtension.apply {
@@ -86,7 +86,7 @@ internal fun Project.configureKmpLibrary(
     explicitApi()
   }
 
-  commonExtension.apply {
+  libraryExtension.apply {
     packaging {
       resources {
         excludes.add("/META-INF/{AL2.0,LGPL2.1}")

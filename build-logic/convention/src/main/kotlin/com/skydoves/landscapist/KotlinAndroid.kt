@@ -18,7 +18,8 @@
 
 package com.skydoves.landscapist
 
-import com.android.build.api.dsl.CommonExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
@@ -26,38 +27,62 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 /**
- * Configure base Kotlin with Android options
+ * Configure base Kotlin with Android options for library modules
  */
 internal fun Project.configureKotlinAndroid(
-  commonExtension: CommonExtension<*, *, *, *, *, *>,
+  libraryExtension: LibraryExtension,
 ) {
   val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
 
-  commonExtension.apply {
-
+  libraryExtension.apply {
     compileOptions {
       sourceCompatibility = JavaVersion.VERSION_17
       targetCompatibility = JavaVersion.VERSION_17
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
-      compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.findVersion("jvmTarget").get().toString()))
-        freeCompilerArgs.addAll(
-          listOf(
-            "-opt-in=kotlin.RequiresOptIn",
-            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-opt-in=com.skydoves.landscapist.InternalLandscapistApi",
-          )
-        )
-      }
+    lint {
+      abortOnError = false
+    }
+  }
+
+  configureKotlinCompile(libs)
+}
+
+/**
+ * Configure base Kotlin with Android options for application modules
+ */
+internal fun Project.configureKotlinAndroid(
+  appExtension: BaseAppModuleExtension,
+) {
+  val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+
+  appExtension.apply {
+    compileOptions {
+      sourceCompatibility = JavaVersion.VERSION_17
+      targetCompatibility = JavaVersion.VERSION_17
     }
 
     lint {
       abortOnError = false
+    }
+  }
+
+  configureKotlinCompile(libs)
+}
+
+private fun Project.configureKotlinCompile(libs: org.gradle.api.artifacts.VersionCatalog) {
+  tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
+    compilerOptions {
+      jvmTarget.set(JvmTarget.fromTarget(libs.findVersion("jvmTarget").get().toString()))
+      freeCompilerArgs.addAll(
+        listOf(
+          "-opt-in=kotlin.RequiresOptIn",
+          "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+          "-opt-in=com.skydoves.landscapist.InternalLandscapistApi",
+        )
+      )
     }
   }
 }

@@ -18,7 +18,8 @@
 
 package com.skydoves.landscapist
 
-import com.android.build.api.dsl.CommonExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.assign
@@ -28,15 +29,15 @@ import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 
 /**
- * Configure Compose-specific options
+ * Configure Compose-specific options for library modules
  */
 internal fun Project.configureAndroidCompose(
-  commonExtension: CommonExtension<*, *, *, *, *, *>,
+  libraryExtension: LibraryExtension,
 ) {
   pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
   pluginManager.apply("com.github.skydoves.compose.stability.analyzer")
 
-  commonExtension.apply {
+  libraryExtension.apply {
     buildFeatures {
       compose = true
     }
@@ -48,6 +49,34 @@ internal fun Project.configureAndroidCompose(
     }
   }
 
+  configureComposeCompiler()
+}
+
+/**
+ * Configure Compose-specific options for application modules
+ */
+internal fun Project.configureAndroidCompose(
+  appExtension: BaseAppModuleExtension,
+) {
+  pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
+  pluginManager.apply("com.github.skydoves.compose.stability.analyzer")
+
+  appExtension.apply {
+    buildFeatures {
+      compose = true
+    }
+
+    packaging {
+      resources {
+        excludes.add("/META-INF/{AL2.0,LGPL2.1}")
+      }
+    }
+  }
+
+  configureComposeCompiler()
+}
+
+private fun Project.configureComposeCompiler() {
   extensions.configure<ComposeCompilerGradlePluginExtension> {
     reportsDestination = layout.buildDirectory.dir("compose_compiler")
   }
