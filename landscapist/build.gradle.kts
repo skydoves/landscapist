@@ -67,6 +67,7 @@ android {
   compileSdk = Configuration.compileSdk
   defaultConfig {
     minSdk = Configuration.minSdk
+    consumerProguardFiles("consumer-rules.pro")
   }
 }
 
