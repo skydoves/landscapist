@@ -27,16 +27,14 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 class KmpLibraryConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
     with(target) {
-      pluginManager.apply("com.android.library")
       pluginManager.apply("org.jetbrains.kotlin.multiplatform")
+      pluginManager.apply("com.android.library")
       pluginManager.apply("com.vanniktech.maven.publish")
       pluginManager.apply("binary-compatibility-validator")
 
-      extensions.configure<LibraryExtension> libraryExtension@{
-        extensions.configure<KotlinMultiplatformExtension> kmpExtension@{
-          configureKmpLibrary(this@libraryExtension, this@kmpExtension)
-        }
-      }
+      val libraryExtension = extensions.getByType(LibraryExtension::class.java)
+      val kmpExtension = extensions.getByType(KotlinMultiplatformExtension::class.java)
+      configureKmpLibrary(libraryExtension, kmpExtension)
 
       val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
       tasks.withType(JavaCompile::class.java).configureEach {

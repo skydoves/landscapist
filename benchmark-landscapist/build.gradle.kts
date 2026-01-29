@@ -47,8 +47,8 @@ android {
 
   targetProjectPath = ":benchmark-landscapist-app"
 
-  testOptions.managedDevices.devices {
-    maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel6api31").apply {
+  testOptions.managedDevices.localDevices {
+    create("pixel6api31") {
       device = "Pixel 6"
       apiLevel = 31
       systemImageSource = "aosp"

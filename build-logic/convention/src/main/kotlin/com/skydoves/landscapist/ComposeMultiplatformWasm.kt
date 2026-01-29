@@ -18,7 +18,7 @@
 
 package com.skydoves.landscapist
 
-import com.android.build.api.dsl.CommonExtension
+import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * Configure Compose-Multiplatform-specific options
  */
 internal fun Project.configureComposeMultiplatformWasm(
-  commonExtension: CommonExtension<*, *, *, *, *, *>,
+  libraryExtension: LibraryExtension,
   kotlinMultiplatformExtension: KotlinMultiplatformExtension,
 ) {
   pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
@@ -35,7 +35,7 @@ internal fun Project.configureComposeMultiplatformWasm(
     androidTarget { publishLibraryVariants("release") }
     jvm("desktop")
     jvmToolchain(17)
-    
+
     wasmJs {
       browser {
         testTask {
@@ -88,7 +88,7 @@ internal fun Project.configureComposeMultiplatformWasm(
     explicitApi()
   }
 
-  commonExtension.apply {
+  libraryExtension.apply {
     buildFeatures {
       compose = true
     }
