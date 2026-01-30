@@ -511,7 +511,8 @@ class LandscapistVsCoil3PerformanceTest {
       "3000x3000" to "https://picsum.photos/3000/3000",
     )
 
-    val results = mutableMapOf<String, Pair<Double, Double>>() // resolution -> (coil3Ms, landscapistMs)
+    // resolution -> (coil3Ms, landscapistMs)
+    val results = mutableMapOf<String, Pair<Double, Double>>()
     var currentIndex by mutableStateOf(0)
     val coil3TimeNanos = AtomicLong(0L)
     val landscapistTimeNanos = AtomicLong(0L)
@@ -674,7 +675,10 @@ class LandscapistVsCoil3PerformanceTest {
       val landscapistMs = landscapistTimeNanos.get() / 1_000_000.0
 
       allResults[resolution]?.add(Pair(coil3Ms, landscapistMs))
-      Log.d(TAG, "Resolution $resolution Round $round: Coil3=${coil3Ms}ms, Landscapist=${landscapistMs}ms")
+      Log.d(
+        TAG,
+        "Resolution $resolution Round $round: Coil3=${coil3Ms}ms, Landscapist=${landscapistMs}ms",
+      )
 
       Thread.sleep(300)
     }
@@ -690,7 +694,8 @@ class LandscapistVsCoil3PerformanceTest {
       val roundResults = allResults[resolution] ?: continue
       println("**$resolution:**")
       for ((idx, pair) in roundResults.withIndex()) {
-        println("- Round ${idx + 1}: Coil3 = %.2fms, Landscapist = %.2fms".format(pair.first, pair.second))
+        val msg = "- Round ${idx + 1}: Coil3 = %.2fms, Landscapist = %.2fms"
+        println(msg.format(pair.first, pair.second))
       }
       println("")
     }
@@ -798,7 +803,10 @@ class LandscapistVsCoil3PerformanceTest {
       val landscapistMs = landscapistTimeNanos.get() / 1_000_000.0
 
       allResults[resolution]?.add(Pair(coil3Ms, landscapistMs))
-      Log.d(TAG, "Resolution $resolution Round $round: Coil3=${coil3Ms}ms, Landscapist=${landscapistMs}ms")
+      Log.d(
+        TAG,
+        "Resolution $resolution Round $round: Coil3=${coil3Ms}ms, Landscapist=${landscapistMs}ms",
+      )
 
       Thread.sleep(200)
     }
@@ -821,7 +829,13 @@ class LandscapistVsCoil3PerformanceTest {
       println("| Round | Coil3 (ms) | Landscapist (ms) | Difference (ms) |")
       println("|-------|------------|------------------|-----------------|")
       for ((idx, pair) in roundResults.withIndex()) {
-        println("| ${idx + 1} | %.2f | %.2f | %.2f |".format(pair.first, pair.second, pair.second - pair.first))
+        println(
+          "| ${idx + 1} | %.2f | %.2f | %.2f |".format(
+            pair.first,
+            pair.second,
+            pair.second - pair.first,
+          ),
+        )
       }
       println("")
     }
@@ -839,7 +853,15 @@ class LandscapistVsCoil3PerformanceTest {
       val diff = avgLandscapist - avgCoil3
       val ratio = if (avgCoil3 > 0) avgLandscapist / avgCoil3 else 0.0
 
-      println("| %s | %.2f | %.2f | %.2f | %.2fx |".format(resolution, avgCoil3, avgLandscapist, diff, ratio))
+      println(
+        "| %s | %.2f | %.2f | %.2f | %.2fx |".format(
+          resolution,
+          avgCoil3,
+          avgLandscapist,
+          diff,
+          ratio,
+        ),
+      )
     }
     println("")
   }
@@ -860,8 +882,14 @@ class LandscapistVsCoil3PerformanceTest {
 
     // Generate bitmap in-memory
     val bitmap = remember(width, height) {
-      android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888).apply {
-        eraseColor(android.graphics.Color.rgb((0..255).random(), (0..255).random(), (0..255).random()))
+      android.graphics.Bitmap.createBitmap(
+        width,
+        height,
+        android.graphics.Bitmap.Config.ARGB_8888,
+      ).apply {
+        eraseColor(
+          android.graphics.Color.rgb((0..255).random(), (0..255).random(), (0..255).random()),
+        )
       }
     }
 
@@ -907,8 +935,14 @@ class LandscapistVsCoil3PerformanceTest {
 
     // Generate bitmap in-memory
     val bitmap = remember(width, height) {
-      android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888).apply {
-        eraseColor(android.graphics.Color.rgb((0..255).random(), (0..255).random(), (0..255).random()))
+      android.graphics.Bitmap.createBitmap(
+        width,
+        height,
+        android.graphics.Bitmap.Config.ARGB_8888,
+      ).apply {
+        eraseColor(
+          android.graphics.Color.rgb((0..255).random(), (0..255).random(), (0..255).random()),
+        )
       }
     }
 
