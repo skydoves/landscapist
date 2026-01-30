@@ -495,6 +495,512 @@ class LandscapistVsCoil3PerformanceTest {
     )
   }
 
+  // ===== RESOLUTION-BASED PERFORMANCE TESTS =====
+  // These tests compare performance across different image resolutions
+
+  /**
+   * Test: Compare performance across different image resolutions (600x600, 1200x1200, 3000x3000)
+   * Uses picsum.photos for consistent image delivery at exact dimensions.
+   * All resolutions are tested sequentially using key() to force recomposition.
+   */
+  @Test
+  fun comparePerformanceByResolution() {
+    val resolutions = listOf(
+      "600x600" to "https://picsum.photos/600/600",
+      "1200x1200" to "https://picsum.photos/1200/1200",
+      "3000x3000" to "https://picsum.photos/3000/3000",
+    )
+
+    val results = mutableMapOf<String, Pair<Double, Double>>() // resolution -> (coil3Ms, landscapistMs)
+    var currentIndex by mutableStateOf(0)
+    val coil3TimeNanos = AtomicLong(0L)
+    val landscapistTimeNanos = AtomicLong(0L)
+    var latch = CountDownLatch(2)
+
+    composeTestRule.setContent {
+      val (resolution, baseUrl) = resolutions[currentIndex]
+      // Add timestamp to URL to prevent caching between resolutions
+      val url = "$baseUrl?idx=$currentIndex&t=${System.currentTimeMillis()}"
+
+      key(currentIndex) {
+        Column {
+          NetworkCoil3Test(
+            url = url,
+            tag = "coil3-$resolution",
+            disableCache = true,
+            onComplete = { nanos ->
+              coil3TimeNanos.set(nanos)
+              latch.countDown()
+            },
+          )
+
+          Spacer(modifier = Modifier.height(8.dp))
+
+          NetworkLandscapistTest(
+            url = url,
+            tag = "landscapist-$resolution",
+            onComplete = { nanos ->
+              landscapistTimeNanos.set(nanos)
+              latch.countDown()
+            },
+          )
+        }
+      }
+    }
+
+    // Test each resolution
+    for (idx in resolutions.indices) {
+      if (idx > 0) {
+        coil3TimeNanos.set(0L)
+        landscapistTimeNanos.set(0L)
+        latch = CountDownLatch(2)
+        composeTestRule.runOnIdle { currentIndex = idx }
+      }
+
+      val done = latch.await(120, TimeUnit.SECONDS)
+      composeTestRule.waitForIdle()
+
+      val (resolution, _) = resolutions[idx]
+      val coil3Ms = coil3TimeNanos.get() / 1_000_000.0
+      val landscapistMs = landscapistTimeNanos.get() / 1_000_000.0
+
+      results[resolution] = Pair(coil3Ms, landscapistMs)
+      Log.d(TAG, "Resolution $resolution: Coil3=${coil3Ms}ms, Landscapist=${landscapistMs}ms")
+
+      Thread.sleep(500) // Brief pause between resolutions
+    }
+
+    // Print markdown table
+    println("\n")
+    println("## Performance Comparison by Resolution")
+    println("")
+    println("| Resolution | Coil3 (ms) | Landscapist (ms) | Difference (ms) | Ratio |")
+    println("|------------|------------|------------------|-----------------|-------|")
+
+    for ((resolution, _) in resolutions) {
+      val (coil3Ms, landscapistMs) = results[resolution] ?: continue
+      val diff = landscapistMs - coil3Ms
+      val ratio = if (coil3Ms > 0) landscapistMs / coil3Ms else 0.0
+      println(
+        String.format(
+          "| %s | %.2f | %.2f | %.2f | %.2fx |",
+          resolution,
+          coil3Ms,
+          landscapistMs,
+          diff,
+          ratio,
+        ),
+      )
+    }
+    println("")
+
+    // Verify all tests completed
+    assert(results.size == resolutions.size) { "Not all resolution tests completed" }
+  }
+
+  /**
+   * Test: Multi-round performance comparison by resolution for statistical accuracy
+   * Runs 3 rounds per resolution to get more reliable averages.
+   */
+  @Test
+  fun comparePerformanceByResolutionMultiRound() {
+    val resolutions = listOf(
+      "600x600" to "https://picsum.photos/600/600",
+      "1200x1200" to "https://picsum.photos/1200/1200",
+      "3000x3000" to "https://picsum.photos/3000/3000",
+    )
+    val rounds = 3
+    val totalTests = resolutions.size * rounds
+
+    // resolution -> list of (coil3Ms, landscapistMs) for each round
+    val allResults = mutableMapOf<String, MutableList<Pair<Double, Double>>>()
+    resolutions.forEach { (resolution, _) -> allResults[resolution] = mutableListOf() }
+
+    var currentTestIndex by mutableStateOf(0)
+    val coil3TimeNanos = AtomicLong(0L)
+    val landscapistTimeNanos = AtomicLong(0L)
+    var latch = CountDownLatch(2)
+
+    composeTestRule.setContent {
+      val resolutionIndex = currentTestIndex / rounds
+      val round = currentTestIndex % rounds
+      val (resolution, baseUrl) = resolutions[resolutionIndex]
+      // Add unique params to bypass cache
+      val url = "$baseUrl?round=$round&idx=$currentTestIndex&t=${System.currentTimeMillis()}"
+
+      key(currentTestIndex) {
+        Column {
+          NetworkCoil3Test(
+            url = url,
+            tag = "coil3-$resolution-r$round",
+            disableCache = true,
+            onComplete = { nanos ->
+              coil3TimeNanos.set(nanos)
+              latch.countDown()
+            },
+          )
+
+          Spacer(modifier = Modifier.height(8.dp))
+
+          NetworkLandscapistTest(
+            url = url,
+            tag = "landscapist-$resolution-r$round",
+            onComplete = { nanos ->
+              landscapistTimeNanos.set(nanos)
+              latch.countDown()
+            },
+          )
+        }
+      }
+    }
+
+    // Run all tests
+    for (testIdx in 0 until totalTests) {
+      if (testIdx > 0) {
+        coil3TimeNanos.set(0L)
+        landscapistTimeNanos.set(0L)
+        latch = CountDownLatch(2)
+        composeTestRule.runOnIdle { currentTestIndex = testIdx }
+      }
+
+      val done = latch.await(120, TimeUnit.SECONDS)
+      composeTestRule.waitForIdle()
+
+      val resolutionIndex = testIdx / rounds
+      val round = testIdx % rounds
+      val (resolution, _) = resolutions[resolutionIndex]
+
+      val coil3Ms = coil3TimeNanos.get() / 1_000_000.0
+      val landscapistMs = landscapistTimeNanos.get() / 1_000_000.0
+
+      allResults[resolution]?.add(Pair(coil3Ms, landscapistMs))
+      Log.d(TAG, "Resolution $resolution Round $round: Coil3=${coil3Ms}ms, Landscapist=${landscapistMs}ms")
+
+      Thread.sleep(300)
+    }
+
+    // Print detailed results
+    println("\n")
+    println("## Performance Comparison by Resolution (Multi-Round)")
+    println("")
+    println("### Individual Round Results")
+    println("")
+
+    for ((resolution, _) in resolutions) {
+      val roundResults = allResults[resolution] ?: continue
+      println("**$resolution:**")
+      for ((idx, pair) in roundResults.withIndex()) {
+        println("- Round ${idx + 1}: Coil3 = %.2fms, Landscapist = %.2fms".format(pair.first, pair.second))
+      }
+      println("")
+    }
+
+    // Print summary table with averages
+    println("### Summary (Averages)")
+    println("")
+    println("| Resolution | Coil3 Avg (ms) | Landscapist Avg (ms) | Difference (ms) | Ratio |")
+    println("|------------|----------------|----------------------|-----------------|-------|")
+
+    for ((resolution, _) in resolutions) {
+      val roundResults = allResults[resolution] ?: continue
+      val avgCoil3 = roundResults.map { it.first }.average()
+      val avgLandscapist = roundResults.map { it.second }.average()
+      val diff = avgLandscapist - avgCoil3
+      val ratio = if (avgCoil3 > 0) avgLandscapist / avgCoil3 else 0.0
+
+      println(
+        String.format(
+          "| %s | %.2f | %.2f | %.2f | %.2fx |",
+          resolution,
+          avgCoil3,
+          avgLandscapist,
+          diff,
+          ratio,
+        ),
+      )
+    }
+    println("")
+  }
+
+  /**
+   * Test: Compare performance across different image resolutions using in-memory bitmaps.
+   * This eliminates network variability and tests pure rendering performance.
+   */
+  @Test
+  fun comparePerformanceByResolutionInMemory() {
+    val resolutions = listOf(
+      "600x600" to (600 to 600),
+      "1200x1200" to (1200 to 1200),
+      "3000x3000" to (3000 to 3000),
+    )
+    val rounds = 3
+    val totalTests = resolutions.size * rounds
+
+    // resolution -> list of (coil3Ms, landscapistMs) for each round
+    val allResults = mutableMapOf<String, MutableList<Pair<Double, Double>>>()
+    resolutions.forEach { (resolution, _) -> allResults[resolution] = mutableListOf() }
+
+    var currentTestIndex by mutableStateOf(0)
+    val coil3TimeNanos = AtomicLong(0L)
+    val landscapistTimeNanos = AtomicLong(0L)
+    var latch = CountDownLatch(2)
+
+    composeTestRule.setContent {
+      val resolutionIndex = currentTestIndex / rounds
+      val round = currentTestIndex % rounds
+      val (resolution, dimensions) = resolutions[resolutionIndex]
+      val (width, height) = dimensions
+
+      key(currentTestIndex) {
+        Column {
+          BitmapCoil3Test(
+            width = width,
+            height = height,
+            tag = "coil3-$resolution-r$round",
+            onComplete = { nanos ->
+              coil3TimeNanos.set(nanos)
+              latch.countDown()
+            },
+          )
+
+          Spacer(modifier = Modifier.height(8.dp))
+
+          BitmapLandscapistTest(
+            width = width,
+            height = height,
+            tag = "landscapist-$resolution-r$round",
+            onComplete = { nanos ->
+              landscapistTimeNanos.set(nanos)
+              latch.countDown()
+            },
+          )
+        }
+      }
+    }
+
+    // Run all tests
+    for (testIdx in 0 until totalTests) {
+      if (testIdx > 0) {
+        coil3TimeNanos.set(0L)
+        landscapistTimeNanos.set(0L)
+        latch = CountDownLatch(2)
+        composeTestRule.runOnIdle { currentTestIndex = testIdx }
+      }
+
+      val done = latch.await(30, TimeUnit.SECONDS)
+      composeTestRule.waitForIdle()
+
+      val resolutionIndex = testIdx / rounds
+      val round = testIdx % rounds
+      val (resolution, _) = resolutions[resolutionIndex]
+
+      val coil3Ms = coil3TimeNanos.get() / 1_000_000.0
+      val landscapistMs = landscapistTimeNanos.get() / 1_000_000.0
+
+      allResults[resolution]?.add(Pair(coil3Ms, landscapistMs))
+      Log.d(TAG, "Resolution $resolution Round $round: Coil3=${coil3Ms}ms, Landscapist=${landscapistMs}ms")
+
+      Thread.sleep(200)
+    }
+
+    // Print markdown results
+    println("\n")
+    println("## Performance Comparison by Resolution")
+    println("")
+    println("### Test Configuration")
+    println("- **Rounds per resolution**: $rounds")
+    println("- **Image source**: In-memory generated bitmaps")
+    println("")
+    println("### Individual Round Results")
+    println("")
+
+    for ((resolution, _) in resolutions) {
+      val roundResults = allResults[resolution] ?: continue
+      println("**$resolution:**")
+      println("")
+      println("| Round | Coil3 (ms) | Landscapist (ms) | Difference (ms) |")
+      println("|-------|------------|------------------|-----------------|")
+      for ((idx, pair) in roundResults.withIndex()) {
+        println("| ${idx + 1} | %.2f | %.2f | %.2f |".format(pair.first, pair.second, pair.second - pair.first))
+      }
+      println("")
+    }
+
+    // Print summary table
+    println("### Summary (Averages)")
+    println("")
+    println("| Resolution | Coil3 Avg (ms) | Landscapist Avg (ms) | Difference (ms) | Ratio |")
+    println("|------------|----------------|----------------------|-----------------|-------|")
+
+    for ((resolution, _) in resolutions) {
+      val roundResults = allResults[resolution] ?: continue
+      val avgCoil3 = roundResults.map { it.first }.average()
+      val avgLandscapist = roundResults.map { it.second }.average()
+      val diff = avgLandscapist - avgCoil3
+      val ratio = if (avgCoil3 > 0) avgLandscapist / avgCoil3 else 0.0
+
+      println("| %s | %.2f | %.2f | %.2f | %.2fx |".format(resolution, avgCoil3, avgLandscapist, diff, ratio))
+    }
+    println("")
+  }
+
+  // ===== In-Memory Bitmap Helper Composables =====
+
+  @Composable
+  private fun BitmapCoil3Test(
+    width: Int,
+    height: Int,
+    tag: String,
+    onComplete: (Long) -> Unit,
+  ) {
+    val context = LocalContext.current
+    val imageLoader = remember { ImageLoader(context) }
+    var startNanos by remember { mutableLongStateOf(0L) }
+    var completed by remember { mutableStateOf(false) }
+
+    // Generate bitmap in-memory
+    val bitmap = remember(width, height) {
+      android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888).apply {
+        eraseColor(android.graphics.Color.rgb((0..255).random(), (0..255).random(), (0..255).random()))
+      }
+    }
+
+    val painter = rememberAsyncImagePainter(
+      model = ImageRequest.Builder(context)
+        .data(bitmap)
+        .memoryCachePolicy(CachePolicy.DISABLED)
+        .diskCachePolicy(CachePolicy.DISABLED)
+        .build(),
+      imageLoader = imageLoader,
+    )
+
+    val state by painter.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+      startNanos = System.nanoTime()
+    }
+
+    LaunchedEffect(state) {
+      if (state is AsyncImagePainter.State.Success && !completed) {
+        completed = true
+        onComplete(System.nanoTime() - startNanos)
+      }
+    }
+
+    Image(
+      painter = painter,
+      contentDescription = null,
+      modifier = Modifier.size(200.dp).testTag(tag),
+      contentScale = ContentScale.Crop,
+    )
+  }
+
+  @Composable
+  private fun BitmapLandscapistTest(
+    width: Int,
+    height: Int,
+    tag: String,
+    onComplete: (Long) -> Unit,
+  ) {
+    var startNanos by remember { mutableLongStateOf(0L) }
+    var completed by remember { mutableStateOf(false) }
+
+    // Generate bitmap in-memory
+    val bitmap = remember(width, height) {
+      android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888).apply {
+        eraseColor(android.graphics.Color.rgb((0..255).random(), (0..255).random(), (0..255).random()))
+      }
+    }
+
+    LaunchedEffect(Unit) {
+      startNanos = System.nanoTime()
+    }
+
+    LandscapistImage(
+      imageModel = { bitmap },
+      modifier = Modifier.size(200.dp).testTag(tag),
+      imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+      onImageStateChanged = { state ->
+        if (state is LandscapistImageState.Success && !completed) {
+          completed = true
+          onComplete(System.nanoTime() - startNanos)
+        }
+      },
+    )
+  }
+
+  // ===== Network Image Helper Composables =====
+
+  @Composable
+  private fun NetworkCoil3Test(
+    url: String,
+    tag: String,
+    disableCache: Boolean = false,
+    onComplete: (Long) -> Unit,
+  ) {
+    val context = LocalContext.current
+    val imageLoader = remember { ImageLoader(context) }
+    var startNanos by remember { mutableLongStateOf(0L) }
+    var completed by remember { mutableStateOf(false) }
+
+    val cachePolicy = if (disableCache) CachePolicy.DISABLED else CachePolicy.ENABLED
+
+    val painter = rememberAsyncImagePainter(
+      model = ImageRequest.Builder(context)
+        .data(url)
+        .memoryCachePolicy(cachePolicy)
+        .diskCachePolicy(cachePolicy)
+        .build(),
+      imageLoader = imageLoader,
+    )
+
+    val state by painter.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+      startNanos = System.nanoTime()
+    }
+
+    LaunchedEffect(state) {
+      if (state is AsyncImagePainter.State.Success && !completed) {
+        completed = true
+        onComplete(System.nanoTime() - startNanos)
+      }
+    }
+
+    Image(
+      painter = painter,
+      contentDescription = null,
+      modifier = Modifier.size(200.dp).testTag(tag),
+      contentScale = ContentScale.Crop,
+    )
+  }
+
+  @Composable
+  private fun NetworkLandscapistTest(
+    url: String,
+    tag: String,
+    onComplete: (Long) -> Unit,
+  ) {
+    var startNanos by remember { mutableLongStateOf(0L) }
+    var completed by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+      startNanos = System.nanoTime()
+    }
+
+    LandscapistImage(
+      imageModel = { url },
+      modifier = Modifier.size(200.dp).testTag(tag),
+      imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+      onImageStateChanged = { state ->
+        if (state is LandscapistImageState.Success && !completed) {
+          completed = true
+          onComplete(System.nanoTime() - startNanos)
+        }
+      },
+    )
+  }
+
   // ===== LOCAL DRAWABLE RESOURCE PERFORMANCE TESTS =====
   // These tests use local drawable resources to eliminate network variability
   // and provide reliable, reproducible performance measurements.
