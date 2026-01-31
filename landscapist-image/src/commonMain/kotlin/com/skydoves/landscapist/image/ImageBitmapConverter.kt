@@ -25,3 +25,28 @@ import androidx.compose.ui.graphics.ImageBitmap
  * @return The converted [ImageBitmap], or null if conversion failed.
  */
 public expect fun convertToImageBitmap(data: Any): ImageBitmap?
+
+/**
+ * Checks if the given data is a pre-decoded bitmap type that can be rendered directly.
+ * This includes platform-specific Bitmap types and Compose ImageBitmap.
+ *
+ * @param data The data to check.
+ * @return true if the data is a bitmap type, false otherwise.
+ */
+public expect fun isBitmapType(data: Any?): Boolean
+
+/**
+ * Gets the width of a bitmap. Returns 0 if the data is not a bitmap type.
+ *
+ * @param data The bitmap data.
+ * @return The width in pixels, or 0 if not a bitmap.
+ */
+public expect fun getBitmapWidth(data: Any?): Int
+
+/**
+ * Gets the height of a bitmap. Returns 0 if the data is not a bitmap type.
+ *
+ * @param data The bitmap data.
+ * @return The height in pixels, or 0 if not a bitmap.
+ */
+public expect fun getBitmapHeight(data: Any?): Int

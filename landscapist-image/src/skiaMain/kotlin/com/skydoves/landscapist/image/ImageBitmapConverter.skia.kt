@@ -34,6 +34,35 @@ public actual fun convertToImageBitmap(data: Any): ImageBitmap? {
         null
       }
     }
+    is ImageBitmap -> data
     else -> null
+  }
+}
+
+/**
+ * Skia implementation: checks if data is an ImageBitmap.
+ * Note: Skia platforms typically use RawImageData, not pre-decoded bitmaps.
+ */
+public actual fun isBitmapType(data: Any?): Boolean {
+  return data is ImageBitmap
+}
+
+/**
+ * Skia implementation: gets width from ImageBitmap.
+ */
+public actual fun getBitmapWidth(data: Any?): Int {
+  return when (data) {
+    is ImageBitmap -> data.width
+    else -> 0
+  }
+}
+
+/**
+ * Skia implementation: gets height from ImageBitmap.
+ */
+public actual fun getBitmapHeight(data: Any?): Int {
+  return when (data) {
+    is ImageBitmap -> data.height
+    else -> 0
   }
 }

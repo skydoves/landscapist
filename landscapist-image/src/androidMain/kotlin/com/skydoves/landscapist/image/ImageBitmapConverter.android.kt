@@ -25,6 +25,36 @@ import androidx.compose.ui.graphics.asImageBitmap
 public actual fun convertToImageBitmap(data: Any): ImageBitmap? {
   return when (data) {
     is Bitmap -> data.asImageBitmap()
+    is ImageBitmap -> data
     else -> null
+  }
+}
+
+/**
+ * Android implementation: checks if data is a Bitmap or ImageBitmap.
+ */
+public actual fun isBitmapType(data: Any?): Boolean {
+  return data is Bitmap || data is ImageBitmap
+}
+
+/**
+ * Android implementation: gets width from Bitmap or ImageBitmap.
+ */
+public actual fun getBitmapWidth(data: Any?): Int {
+  return when (data) {
+    is Bitmap -> data.width
+    is ImageBitmap -> data.width
+    else -> 0
+  }
+}
+
+/**
+ * Android implementation: gets height from Bitmap or ImageBitmap.
+ */
+public actual fun getBitmapHeight(data: Any?): Int {
+  return when (data) {
+    is Bitmap -> data.height
+    is ImageBitmap -> data.height
+    else -> 0
   }
 }
