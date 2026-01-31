@@ -164,7 +164,6 @@ HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Entry;-><init>(Lcom/bumptech/gl
 HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Entry;-><init>(Lcom/bumptech/glide/disklrucache/DiskLruCache;Ljava/lang/String;Lcom/bumptech/glide/disklrucache/DiskLruCache$1;)V
 HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Entry;->access$1100(Lcom/bumptech/glide/disklrucache/DiskLruCache$Entry;)[J
 HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Entry;->access$1200(Lcom/bumptech/glide/disklrucache/DiskLruCache$Entry;)Ljava/lang/String;
-HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Entry;->access$1300(Lcom/bumptech/glide/disklrucache/DiskLruCache$Entry;)J
 HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Entry;->access$1302(Lcom/bumptech/glide/disklrucache/DiskLruCache$Entry;J)J
 HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Entry;->access$700(Lcom/bumptech/glide/disklrucache/DiskLruCache$Entry;)Z
 HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Entry;->access$702(Lcom/bumptech/glide/disklrucache/DiskLruCache$Entry;Z)Z
@@ -176,9 +175,6 @@ HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Entry;->getDirtyFile(I)Ljava/io
 HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Entry;->getLengths()Ljava/lang/String;
 HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Entry;->setLengths([Ljava/lang/String;)V
 Lcom/bumptech/glide/disklrucache/DiskLruCache$Value;
-HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Value;-><init>(Lcom/bumptech/glide/disklrucache/DiskLruCache;Ljava/lang/String;J[Ljava/io/File;[J)V
-HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Value;-><init>(Lcom/bumptech/glide/disklrucache/DiskLruCache;Ljava/lang/String;J[Ljava/io/File;[JLcom/bumptech/glide/disklrucache/DiskLruCache$1;)V
-HSPLcom/bumptech/glide/disklrucache/DiskLruCache$Value;->getFile(I)Ljava/io/File;
 Lcom/bumptech/glide/disklrucache/StrictLineReader;
 HSPLcom/bumptech/glide/disklrucache/StrictLineReader;-><init>(Ljava/io/InputStream;ILjava/nio/charset/Charset;)V
 HSPLcom/bumptech/glide/disklrucache/StrictLineReader;-><init>(Ljava/io/InputStream;Ljava/nio/charset/Charset;)V
@@ -274,7 +270,6 @@ HSPLcom/bumptech/glide/load/data/HttpUrlFetcher;->cleanup()V
 HSPLcom/bumptech/glide/load/data/HttpUrlFetcher;->getDataSource()Lcom/bumptech/glide/load/DataSource;
 HSPLcom/bumptech/glide/load/data/HttpUrlFetcher;->getHttpStatusCodeOrInvalid(Ljava/net/HttpURLConnection;)I
 HSPLcom/bumptech/glide/load/data/HttpUrlFetcher;->getStreamForSuccessfulRequest(Ljava/net/HttpURLConnection;)Ljava/io/InputStream;
-HSPLcom/bumptech/glide/load/data/HttpUrlFetcher;->isHttpOk(I)Z
 HSPLcom/bumptech/glide/load/data/HttpUrlFetcher;->loadData(Lcom/bumptech/glide/Priority;Lcom/bumptech/glide/load/data/DataFetcher$DataCallback;)V
 HSPLcom/bumptech/glide/load/data/HttpUrlFetcher;->loadDataWithRedirects(Ljava/net/URL;ILjava/net/URL;Ljava/util/Map;)Ljava/io/InputStream;
 Lcom/bumptech/glide/load/data/HttpUrlFetcher$DefaultHttpUrlConnectionFactory;
@@ -321,7 +316,6 @@ Lcom/bumptech/glide/load/engine/CallbackException;
 Lcom/bumptech/glide/load/engine/DataCacheGenerator;
 HSPLcom/bumptech/glide/load/engine/DataCacheGenerator;-><init>(Lcom/bumptech/glide/load/engine/DecodeHelper;Lcom/bumptech/glide/load/engine/DataFetcherGenerator$FetcherReadyCallback;)V
 HSPLcom/bumptech/glide/load/engine/DataCacheGenerator;-><init>(Ljava/util/List;Lcom/bumptech/glide/load/engine/DecodeHelper;Lcom/bumptech/glide/load/engine/DataFetcherGenerator$FetcherReadyCallback;)V
-HSPLcom/bumptech/glide/load/engine/DataCacheGenerator;->hasNextModelLoader()Z
 HSPLcom/bumptech/glide/load/engine/DataCacheGenerator;->onDataReady(Ljava/lang/Object;)V
 HSPLcom/bumptech/glide/load/engine/DataCacheGenerator;->startNext()Z
 Lcom/bumptech/glide/load/engine/DataCacheKey;
@@ -344,7 +338,6 @@ HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getDiskCacheStrategy()Lcom/bum
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getHeight()I
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getLoadData()Ljava/util/List;
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getLoadPath(Ljava/lang/Class;)Lcom/bumptech/glide/load/engine/LoadPath;
-HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getModelLoaders(Ljava/io/File;)Ljava/util/List;
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getOptions()Lcom/bumptech/glide/load/Options;
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getPriority()Lcom/bumptech/glide/Priority;
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getRegisteredResourceClasses()Ljava/util/List;
@@ -354,7 +347,6 @@ HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getSignature()Lcom/bumptech/gl
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getSourceEncoder(Ljava/lang/Object;)Lcom/bumptech/glide/load/Encoder;
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getTransformation(Ljava/lang/Class;)Lcom/bumptech/glide/load/Transformation;
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->getWidth()I
-HSPLcom/bumptech/glide/load/engine/DecodeHelper;->hasLoadPath(Ljava/lang/Class;)Z
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->init(Lcom/bumptech/glide/GlideContext;Ljava/lang/Object;Lcom/bumptech/glide/load/Key;IILcom/bumptech/glide/load/engine/DiskCacheStrategy;Ljava/lang/Class;Ljava/lang/Class;Lcom/bumptech/glide/Priority;Lcom/bumptech/glide/load/Options;Ljava/util/Map;ZZLcom/bumptech/glide/load/engine/DecodeJob$DiskCacheProvider;)V
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->isResourceEncoderAvailable(Lcom/bumptech/glide/load/engine/Resource;)Z
 HSPLcom/bumptech/glide/load/engine/DecodeHelper;->isScaleOnlyOrNoTransform()Z
@@ -1623,19 +1615,18 @@ Lcom/skydoves/landscapist/glide/GlideImage;
 HSPLcom/skydoves/landscapist/glide/GlideImage;->GlideImage(Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/glide/GlideRequestType;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;ZLkotlin/jvm/functions/Function1;Landroidx/compose/ui/graphics/painter/Painter;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
 Lcom/skydoves/landscapist/glide/GlideImageSourceFileKt;
 HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt;->access$downloadToDiskCache(Landroid/content/Context;Ljava/lang/String;)Ljava/io/File;
-HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt;->access$rememberImageSourceFile$lambda$2(Landroidx/compose/runtime/MutableState;Ljava/io/File;)V
 HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt;->downloadToDiskCache(Landroid/content/Context;Ljava/lang/String;)Ljava/io/File;
 HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt;->getImageSourceFile(Landroid/content/Context;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt;->rememberImageSourceFile$lambda$1(Landroidx/compose/runtime/MutableState;)Ljava/io/File;
-HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt;->rememberImageSourceFile$lambda$2(Landroidx/compose/runtime/MutableState;Ljava/io/File;)V
-HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt;->rememberImageSourceFile(Landroid/content/Context;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Landroidx/compose/runtime/Composer;I)Ljava/io/File;
+HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt;->rememberImageSourceFile(Landroid/content/Context;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Landroidx/compose/runtime/Composer;I)Landroidx/compose/runtime/State;
 Lcom/skydoves/landscapist/glide/GlideImageSourceFileKt$getImageSourceFile$2;
 HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt$getImageSourceFile$2;-><init>(Ljava/lang/Object;Landroid/content/Context;Lkotlin/coroutines/Continuation;)V
 HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt$getImageSourceFile$2;->create(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt$getImageSourceFile$2;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/glide/GlideImageSourceFileKt$rememberImageSourceFile$1$1;
-HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt$rememberImageSourceFile$1$1;-><init>(Landroid/content/Context;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Landroidx/compose/runtime/MutableState;Lkotlin/coroutines/Continuation;)V
+HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt$rememberImageSourceFile$1$1;-><init>(Landroid/content/Context;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lkotlin/coroutines/Continuation;)V
 HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt$rememberImageSourceFile$1$1;->create(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt$rememberImageSourceFile$1$1;->invoke(Landroidx/compose/runtime/ProduceStateScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt$rememberImageSourceFile$1$1;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 HSPLcom/skydoves/landscapist/glide/GlideImageSourceFileKt$rememberImageSourceFile$1$1;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/glide/GlideImageState;
 HSPLcom/skydoves/landscapist/glide/GlideImageState;-><clinit>()V
@@ -1650,9 +1641,6 @@ HSPLcom/skydoves/landscapist/glide/GlideImageState$None;-><clinit>()V
 HSPLcom/skydoves/landscapist/glide/GlideImageState$None;-><init>()V
 Lcom/skydoves/landscapist/glide/GlideImageState$Success;
 HSPLcom/skydoves/landscapist/glide/GlideImageState$Success;-><clinit>()V
-HSPLcom/skydoves/landscapist/glide/GlideImageState$Success;-><init>(Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lcom/skydoves/landscapist/glide/GlideRequestType;)V
-HSPLcom/skydoves/landscapist/glide/GlideImageState$Success;->getData()Ljava/lang/Object;
-HSPLcom/skydoves/landscapist/glide/GlideImageState$Success;->getDataSource()Lcom/skydoves/landscapist/DataSource;
 Lcom/skydoves/landscapist/glide/GlideImageStateKt;
 HSPLcom/skydoves/landscapist/glide/GlideImageStateKt;->toGlideImageState(Lcom/skydoves/landscapist/ImageLoadState;Lcom/skydoves/landscapist/glide/GlideRequestType;)Lcom/skydoves/landscapist/glide/GlideImageState;
 Lcom/skydoves/landscapist/glide/GlideImage__GlideImageKt;
@@ -1691,7 +1679,6 @@ HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$$ExternalSyntheticLa
 Lcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$$ExternalSyntheticLambda5;
 HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$$ExternalSyntheticLambda5;-><init>(Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function2;)V
 Lcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$$ExternalSyntheticLambda6;
-HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$$ExternalSyntheticLambda6;-><init>(Lcom/skydoves/landscapist/components/ImageComponent;Lkotlin/jvm/functions/Function5;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;Lcom/skydoves/landscapist/glide/GlideImageState;Landroidx/compose/ui/graphics/painter/Painter;Lcom/skydoves/landscapist/ImageOptions;)V
 HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$$ExternalSyntheticLambda6;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$$ExternalSyntheticLambda7;
 HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$$ExternalSyntheticLambda7;-><init>(Lcom/skydoves/landscapist/ImageLoadState;)V
@@ -1709,7 +1696,6 @@ HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$GlideImage$7$1;->inv
 HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$GlideImage$7$1;->invoke(Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$GlideImage$7$1;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$GlideImage$7$1$1;
-HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$GlideImage$7$1$1;->$r8$lambda$Q5Uc7ACWE2K0dDH51LnJQ9UhxuA()Lkotlin/Unit;
 HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$GlideImage$7$1$1;-><init>(Lcom/skydoves/landscapist/glide/FlowCustomTarget;Lcom/bumptech/glide/RequestManager;Lcom/skydoves/landscapist/glide/GlideRequestType;Lcom/skydoves/landscapist/StableHolder;Lcom/skydoves/landscapist/StableHolder;Lcom/skydoves/landscapist/StableHolder;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/coroutines/Continuation;)V
 HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$GlideImage$7$1$1;->create(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 HSPLcom/skydoves/landscapist/glide/GlideImage__GlideImageKt$GlideImage$7$1$1;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -1739,9 +1725,6 @@ HSPLcom/skydoves/landscapist/glide/LocalGlideProvider;->getGlideRequestBuilder(L
 HSPLcom/skydoves/landscapist/glide/LocalGlideProvider;->getGlideRequestManager(Landroidx/compose/runtime/Composer;I)Lcom/bumptech/glide/RequestManager;
 HSPLcom/skydoves/landscapist/glide/LocalGlideProvider;->getGlideRequestOptions(Landroidx/compose/runtime/Composer;I)Lcom/bumptech/glide/request/RequestOptions;
 Lcom/skydoves/landscapist/glide/LocalGlideProviderKt;
-HSPLcom/skydoves/landscapist/glide/LocalGlideProviderKt;->$r8$lambda$8XhX7ty9yzMTOWIfTPJlEpGcKW8()Lcom/bumptech/glide/RequestManager;
-HSPLcom/skydoves/landscapist/glide/LocalGlideProviderKt;->$r8$lambda$E6bfG5JA85dj7-PF_kMlM_wLQnw()Lcom/bumptech/glide/RequestBuilder;
-HSPLcom/skydoves/landscapist/glide/LocalGlideProviderKt;->$r8$lambda$h-LYwU9TdFYUN7lviA7E8rRBQZs()Lcom/bumptech/glide/request/RequestOptions;
 HSPLcom/skydoves/landscapist/glide/LocalGlideProviderKt;-><clinit>()V
 HSPLcom/skydoves/landscapist/glide/LocalGlideProviderKt;->LocalGlideRequestBuilder$lambda$0()Lcom/bumptech/glide/RequestBuilder;
 HSPLcom/skydoves/landscapist/glide/LocalGlideProviderKt;->LocalGlideRequestManager$lambda$0()Lcom/bumptech/glide/RequestManager;
