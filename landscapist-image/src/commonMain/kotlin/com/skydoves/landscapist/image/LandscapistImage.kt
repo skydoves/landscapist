@@ -121,7 +121,7 @@ public fun LandscapistImage(
         is LandscapistImageState.Loading,
         -> {
           component.ComposeLoadingStatePlugins(
-            modifier = Modifier,
+            modifier = Modifier.fillMaxSize(),
             imageOptions = imageOptions,
             executor = { size ->
               LandscapistThumbnail(
