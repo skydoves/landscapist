@@ -11,7 +11,6 @@ Lcom/skydoves/landscapist/zoomable/ContentTransformation$Companion;
 HSPLcom/skydoves/landscapist/zoomable/ContentTransformation$Companion;-><init>()V
 HSPLcom/skydoves/landscapist/zoomable/ContentTransformation$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 Lcom/skydoves/landscapist/zoomable/LocalImageRegionDecoderKt;
-HSPLcom/skydoves/landscapist/zoomable/LocalImageRegionDecoderKt;->$r8$lambda$wfm8f_hjz1eVQP8tdqkcEeJ_OSs()Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;
 HSPLcom/skydoves/landscapist/zoomable/LocalImageRegionDecoderKt;-><clinit>()V
 HSPLcom/skydoves/landscapist/zoomable/LocalImageRegionDecoderKt;->LocalImageRegionDecoder$lambda$0()Lcom/skydoves/landscapist/zoomable/subsampling/ImageRegionDecoder;
 HSPLcom/skydoves/landscapist/zoomable/LocalImageRegionDecoderKt;->getLocalImageRegionDecoder()Landroidx/compose/runtime/ProvidableCompositionLocal;
@@ -46,7 +45,6 @@ HSPLcom/skydoves/landscapist/zoomable/ZoomablePlugin;->equals(Ljava/lang/Object;
 Lcom/skydoves/landscapist/zoomable/ZoomablePlugin$$ExternalSyntheticLambda0;
 HSPLcom/skydoves/landscapist/zoomable/ZoomablePlugin$$ExternalSyntheticLambda0;-><init>(Lcom/skydoves/landscapist/zoomable/ZoomablePlugin;Lkotlin/jvm/functions/Function2;I)V
 Lcom/skydoves/landscapist/zoomable/ZoomableState;
-HSPLcom/skydoves/landscapist/zoomable/ZoomableState;->$r8$lambda$A2wwK0av1i30RgVpIGWv2cUke40(Lcom/skydoves/landscapist/zoomable/ZoomableState;)Lcom/skydoves/landscapist/zoomable/ContentTransformation;
 HSPLcom/skydoves/landscapist/zoomable/ZoomableState;-><clinit>()V
 HSPLcom/skydoves/landscapist/zoomable/ZoomableState;-><init>(Lcom/skydoves/landscapist/zoomable/ZoomableConfig;)V
 HSPLcom/skydoves/landscapist/zoomable/ZoomableState;->constrainOffset()V
@@ -70,7 +68,6 @@ HSPLcom/skydoves/landscapist/zoomable/ZoomableState$$ExternalSyntheticLambda5;->
 Lcom/skydoves/landscapist/zoomable/ZoomableState_androidKt;
 HSPLcom/skydoves/landscapist/zoomable/ZoomableState_androidKt;->rememberZoomableState(Lcom/skydoves/landscapist/zoomable/ZoomableConfig;Ljava/lang/Object;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/zoomable/ZoomableState;
 Lcom/skydoves/landscapist/zoomable/internal/ZoomGestureDetectorKt;
-HSPLcom/skydoves/landscapist/zoomable/internal/ZoomGestureDetectorKt;->$r8$lambda$D6Afv6_AIh_yVXWNiplar9EVf24(Lcom/skydoves/landscapist/zoomable/ZoomableConfig;Lcom/skydoves/landscapist/zoomable/ZoomableState;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/Modifier;
 HSPLcom/skydoves/landscapist/zoomable/internal/ZoomGestureDetectorKt;->zoomGestures$lambda$0(Lcom/skydoves/landscapist/zoomable/ZoomableConfig;Lcom/skydoves/landscapist/zoomable/ZoomableState;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/Modifier;
 HSPLcom/skydoves/landscapist/zoomable/internal/ZoomGestureDetectorKt;->zoomGestures(Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/zoomable/ZoomableState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;)Landroidx/compose/ui/Modifier;
 Lcom/skydoves/landscapist/zoomable/internal/ZoomGestureDetectorKt$$ExternalSyntheticLambda0;
@@ -82,7 +79,6 @@ Lcom/skydoves/landscapist/zoomable/internal/ZoomGestureDetectorKt$zoomGestures$1
 HSPLcom/skydoves/landscapist/zoomable/internal/ZoomGestureDetectorKt$zoomGestures$1$2$1;-><init>(Lcom/skydoves/landscapist/zoomable/ZoomableState;)V
 Lcom/skydoves/landscapist/zoomable/internal/ZoomableContent_androidKt;
 HSPLcom/skydoves/landscapist/zoomable/internal/ZoomableContent_androidKt;->$r8$lambda$-Ic6tlPRio4VSHiznfrsEuVgmTs(Lcom/skydoves/landscapist/zoomable/ZoomableState;Landroidx/compose/ui/unit/IntSize;)Lkotlin/Unit;
-HSPLcom/skydoves/landscapist/zoomable/internal/ZoomableContent_androidKt;->$r8$lambda$60A_TdiAYHdmlfwzCrq6pWmBQlc(Lcom/skydoves/landscapist/zoomable/ZoomableState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;ZLkotlin/jvm/functions/Function2;ILandroidx/compose/runtime/Composer;I)Lkotlin/Unit;
 HSPLcom/skydoves/landscapist/zoomable/internal/ZoomableContent_androidKt;->$r8$lambda$AOEZQQUz0ISxLfZhrLx0U0U9Qp8(Landroidx/compose/runtime/MutableState;Landroidx/compose/runtime/DisposableEffectScope;)Landroidx/compose/runtime/DisposableEffectResult;
 HSPLcom/skydoves/landscapist/zoomable/internal/ZoomableContent_androidKt;->$r8$lambda$y70QHc5OO0KsklJLEw3e5o1mAls(Lcom/skydoves/landscapist/zoomable/ContentTransformation;Landroidx/compose/ui/graphics/GraphicsLayerScope;)Lkotlin/Unit;
 HSPLcom/skydoves/landscapist/zoomable/internal/ZoomableContent_androidKt;->StandardZoomableContent$lambda$0$0(Lcom/skydoves/landscapist/zoomable/ZoomableState;Landroidx/compose/ui/unit/IntSize;)Lkotlin/Unit;

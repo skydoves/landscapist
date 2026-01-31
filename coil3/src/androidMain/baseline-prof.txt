@@ -1,11 +1,8 @@
 Lcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt;
 HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt;->access$getFromDiskCacheOrDownload(Landroid/content/Context;Lcoil3/ImageLoader;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt;->access$rememberImageSourceFile$lambda$2(Landroidx/compose/runtime/MutableState;Ljava/io/File;)V
 HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt;->getFromDiskCacheOrDownload(Landroid/content/Context;Lcoil3/ImageLoader;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt;->getImageSourceFile(Landroid/content/Context;Lcoil3/ImageLoader;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt;->rememberImageSourceFile$lambda$1(Landroidx/compose/runtime/MutableState;)Ljava/io/File;
-HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt;->rememberImageSourceFile$lambda$2(Landroidx/compose/runtime/MutableState;Ljava/io/File;)V
-HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt;->rememberImageSourceFile(Landroid/content/Context;Lcoil3/ImageLoader;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Landroidx/compose/runtime/Composer;I)Ljava/io/File;
+HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt;->rememberImageSourceFile(Landroid/content/Context;Lcoil3/ImageLoader;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Landroidx/compose/runtime/Composer;I)Landroidx/compose/runtime/State;
 Lcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$getFromDiskCacheOrDownload$1;
 HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$getFromDiskCacheOrDownload$1;-><init>(Lkotlin/coroutines/Continuation;)V
 Lcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$getImageSourceFile$2;
@@ -13,16 +10,16 @@ HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$getImageSourceFile$2;-
 HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$getImageSourceFile$2;->create(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$getImageSourceFile$2;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$rememberImageSourceFile$1$1;
-HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$rememberImageSourceFile$1$1;-><init>(Landroid/content/Context;Lcoil3/ImageLoader;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Landroidx/compose/runtime/MutableState;Lkotlin/coroutines/Continuation;)V
+HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$rememberImageSourceFile$1$1;-><init>(Landroid/content/Context;Lcoil3/ImageLoader;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lkotlin/coroutines/Continuation;)V
 HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$rememberImageSourceFile$1$1;->create(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$rememberImageSourceFile$1$1;->invoke(Landroidx/compose/runtime/ProduceStateScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$rememberImageSourceFile$1$1;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 HSPLcom/skydoves/landscapist/coil3/Coil3ImageSourceFileKt$rememberImageSourceFile$1$1;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/coil3/CoilImageKt;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->$r8$lambda$4s6vmUTlO_eEW_jd4LqBKvFGF0A(Lcoil3/request/ImageRequest;)Lcoil3/request/ImageRequest;
-HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->$r8$lambda$SpLBu0Y2QUl7KwbeG8Edd2-t8t4(Lcom/skydoves/landscapist/components/ImageComponent;Lkotlin/jvm/functions/Function1;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function5;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;Lcom/skydoves/landscapist/ImageLoadState;Landroidx/compose/runtime/Composer;I)Lkotlin/Unit;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->$r8$lambda$lWRBSRxbP7iXB4U9H-WhEPJ-x2M(Lcom/skydoves/landscapist/components/ImageComponent;Lkotlin/jvm/functions/Function5;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;Lcom/skydoves/landscapist/coil3/CoilImageState;Landroidx/compose/ui/graphics/painter/Painter;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/runtime/Composer;I)Lkotlin/Unit;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->$r8$lambda$o1rdWyKrYJ0-ukneQVKf_VCutls(Lkotlin/jvm/functions/Function5;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;Lcom/skydoves/landscapist/coil3/CoilImageState;Landroidx/compose/ui/graphics/painter/Painter;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/runtime/Composer;I)Lkotlin/Unit;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->$r8$lambda$pkG_XZhWcx3pquPfU8csPs0JNIQ(Lcom/skydoves/landscapist/coil3/CoilImageState;Lcom/skydoves/landscapist/components/ImageComponent;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function5;Lcom/skydoves/landscapist/coil3/CoilImageState;Landroidx/compose/runtime/Composer;I)Lkotlin/Unit;
-HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->$r8$lambda$t73XYqEPl2sIlJPHJRg1xfHHeA0(Landroidx/compose/runtime/Composer;I)Lcoil3/ImageLoader;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->$r8$lambda$xZqpc94FlrSwSJEte_zek5NE_i4(Lcom/skydoves/landscapist/coil3/CoilImageState;Lcom/skydoves/landscapist/coil3/CoilImageState;)Ljava/lang/Object;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->$r8$lambda$zEJZsghGThWG4dr6vo7CZwMdu2w(Lcom/skydoves/landscapist/coil3/CoilImageState;)Lkotlin/Unit;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->CoilImage$lambda$0(Landroidx/compose/runtime/Composer;I)Lcoil3/ImageLoader;
@@ -36,7 +33,6 @@ HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->CoilImage$lambda$7(Lcom/skydove
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->CoilImage(Lcom/skydoves/landscapist/StableHolder;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lcom/skydoves/landscapist/StableHolder;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->CoilImage(Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/graphics/painter/Painter;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->CoilImage(Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/components/ImageComponent;Lkotlin/jvm/functions/Function0;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/graphics/painter/Painter;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
-HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->access$toResult(Lcoil3/request/ImageResult;)Lcom/skydoves/landscapist/ImageLoadState;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->rememberRequestWithConstraints(Lcoil3/request/ImageRequest;Lcom/skydoves/landscapist/ImageOptions;Landroidx/compose/runtime/Composer;I)Lcoil3/request/ImageRequest;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->toDataSource(Lcoil3/decode/DataSource;)Lcom/skydoves/landscapist/DataSource;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt;->toResult(Lcoil3/request/ImageResult;)Lcom/skydoves/landscapist/ImageLoadState;
@@ -55,7 +51,6 @@ HSPLcom/skydoves/landscapist/coil3/CoilImageKt$$ExternalSyntheticLambda16;->invo
 Lcom/skydoves/landscapist/coil3/CoilImageKt$$ExternalSyntheticLambda4;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt$$ExternalSyntheticLambda4;-><init>(Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/ImageOptions;)V
 Lcom/skydoves/landscapist/coil3/CoilImageKt$$ExternalSyntheticLambda5;
-HSPLcom/skydoves/landscapist/coil3/CoilImageKt$$ExternalSyntheticLambda5;-><init>(Lcom/skydoves/landscapist/components/ImageComponent;Lkotlin/jvm/functions/Function5;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;Lcom/skydoves/landscapist/coil3/CoilImageState;Landroidx/compose/ui/graphics/painter/Painter;Lcom/skydoves/landscapist/ImageOptions;)V
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt$$ExternalSyntheticLambda5;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/coil3/CoilImageKt$$ExternalSyntheticLambda6;
 HSPLcom/skydoves/landscapist/coil3/CoilImageKt$$ExternalSyntheticLambda6;-><init>(Lkotlin/jvm/functions/Function5;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;Lcom/skydoves/landscapist/coil3/CoilImageState;Landroidx/compose/ui/graphics/painter/Painter;Lcom/skydoves/landscapist/ImageOptions;)V
@@ -101,10 +96,7 @@ HSPLcom/skydoves/landscapist/coil3/CoilImageState$None;->equals(Ljava/lang/Objec
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$None;->hashCode()I
 Lcom/skydoves/landscapist/coil3/CoilImageState$Success;
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$Success;-><clinit>()V
-HSPLcom/skydoves/landscapist/coil3/CoilImageState$Success;-><init>(Lcoil3/Image;Lcom/skydoves/landscapist/DataSource;)V
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$Success;->equals(Ljava/lang/Object;)Z
-HSPLcom/skydoves/landscapist/coil3/CoilImageState$Success;->getDataSource()Lcom/skydoves/landscapist/DataSource;
-HSPLcom/skydoves/landscapist/coil3/CoilImageState$Success;->getImage()Lcoil3/Image;
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$Success;->getImageBitmap(Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/ImageBitmap;
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$Success;->hashCode()I
 Lcom/skydoves/landscapist/coil3/CoilImageStateKt;
@@ -130,7 +122,6 @@ HSPLcom/skydoves/landscapist/coil3/LocalCoilProvider;-><clinit>()V
 HSPLcom/skydoves/landscapist/coil3/LocalCoilProvider;-><init>()V
 HSPLcom/skydoves/landscapist/coil3/LocalCoilProvider;->getCoilImageLoader(Landroidx/compose/runtime/Composer;I)Lcoil3/ImageLoader;
 Lcom/skydoves/landscapist/coil3/LocalCoilProviderKt;
-HSPLcom/skydoves/landscapist/coil3/LocalCoilProviderKt;->$r8$lambda$dsT-3H_sfWv18ZUUJcsPD8YvP9w()Lcoil3/ImageLoader;
 HSPLcom/skydoves/landscapist/coil3/LocalCoilProviderKt;-><clinit>()V
 HSPLcom/skydoves/landscapist/coil3/LocalCoilProviderKt;->LocalCoilImageLoader$lambda$0()Lcoil3/ImageLoader;
 HSPLcom/skydoves/landscapist/coil3/LocalCoilProviderKt;->getLocalCoilImageLoader()Landroidx/compose/runtime/ProvidableCompositionLocal;
@@ -150,8 +141,6 @@ HSPLcom/skydoves/landscapist/coil3/PlatformsKt;->getPlatformImageLoader(Landroid
 HSPLcom/skydoves/landscapist/coil3/PlatformsKt;->rememberImagePainter(Lcoil3/Image;Ljava/util/List;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
 HSPLcom/skydoves/landscapist/coil3/PlatformsKt;->toImageBitmap(Lcoil3/Image;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/ImageBitmap;
 Lcom/skydoves/landscapist/coil3/ProvideCoilSourceFile_androidKt;
-HSPLcom/skydoves/landscapist/coil3/ProvideCoilSourceFile_androidKt;->$r8$lambda$CCC6jmizBSkxSLdrnQWyRzA-OWE(Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)Lkotlin/Unit;
-HSPLcom/skydoves/landscapist/coil3/ProvideCoilSourceFile_androidKt;->$r8$lambda$Pzy8kyG5JFFR10cmAZYcEIZl6R4(Lcoil3/ImageLoader;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lkotlin/jvm/functions/Function2;ILandroidx/compose/runtime/Composer;I)Lkotlin/Unit;
 HSPLcom/skydoves/landscapist/coil3/ProvideCoilSourceFile_androidKt;->ProvideCoilSourceFile$lambda$0(Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)Lkotlin/Unit;
 HSPLcom/skydoves/landscapist/coil3/ProvideCoilSourceFile_androidKt;->ProvideCoilSourceFile$lambda$1(Lcoil3/ImageLoader;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lkotlin/jvm/functions/Function2;ILandroidx/compose/runtime/Composer;I)Lkotlin/Unit;
 HSPLcom/skydoves/landscapist/coil3/ProvideCoilSourceFile_androidKt;->ProvideCoilSourceFile(Lcoil3/ImageLoader;Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)V

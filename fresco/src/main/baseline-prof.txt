@@ -650,7 +650,6 @@ HSPLcom/facebook/drawee/drawable/FadeDrawable;->finishTransitionImmediately()V
 HSPLcom/facebook/drawee/drawable/FadeDrawable;->getCurrentTimeMs()J
 HSPLcom/facebook/drawee/drawable/FadeDrawable;->invalidateSelf()V
 HSPLcom/facebook/drawee/drawable/FadeDrawable;->maybeOnFadeFinished()V
-HSPLcom/facebook/drawee/drawable/FadeDrawable;->maybeOnFadeStarted()V
 HSPLcom/facebook/drawee/drawable/FadeDrawable;->maybeOnImageShownImmediately()V
 HSPLcom/facebook/drawee/drawable/FadeDrawable;->resetInternal()V
 HSPLcom/facebook/drawee/drawable/FadeDrawable;->setTransitionDuration(I)V
@@ -889,7 +888,6 @@ HSPLcom/facebook/imageformat/ImageFormat$Companion;-><init>()V
 HSPLcom/facebook/imageformat/ImageFormat$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 Lcom/facebook/imageformat/ImageFormat$FormatChecker;
 Lcom/facebook/imageformat/ImageFormatChecker;
-HSPLcom/facebook/imageformat/ImageFormatChecker;->$r8$lambda$zJcyccJ6CBjI-jyZLRfI2NNPi50()Lcom/facebook/imageformat/ImageFormatChecker;
 HSPLcom/facebook/imageformat/ImageFormatChecker;-><clinit>()V
 HSPLcom/facebook/imageformat/ImageFormatChecker;-><init>()V
 HSPLcom/facebook/imageformat/ImageFormatChecker;->access$getInstance$delegate$cp()Lkotlin/Lazy;
@@ -968,9 +966,6 @@ HSPLcom/facebook/imagepipeline/cache/BitmapMemoryCacheTrimStrategy$Companion;-><
 Lcom/facebook/imagepipeline/cache/BoundedLinkedHashSet;
 HSPLcom/facebook/imagepipeline/cache/BoundedLinkedHashSet;-><init>(I)V
 Lcom/facebook/imagepipeline/cache/BufferedDiskCache;
-HSPLcom/facebook/imagepipeline/cache/BufferedDiskCache;->$r8$lambda$2jrd-Cez49t2pJvUhy3EednKvKM(Lcom/facebook/imagepipeline/image/EncodedImage;Lcom/facebook/imagepipeline/cache/BufferedDiskCache;Ljava/io/OutputStream;)V
-HSPLcom/facebook/imagepipeline/cache/BufferedDiskCache;->$r8$lambda$Xi8OsSSDnMevR6CCYihna7wDklU(Ljava/lang/Object;Lcom/facebook/imagepipeline/cache/BufferedDiskCache;Lcom/facebook/cache/common/CacheKey;Lcom/facebook/imagepipeline/image/EncodedImage;)V
-HSPLcom/facebook/imagepipeline/cache/BufferedDiskCache;->$r8$lambda$vaIZbByACJ_oaNMhyp8n6lFtsWg(Ljava/lang/Object;Ljava/util/concurrent/atomic/AtomicBoolean;Lcom/facebook/imagepipeline/cache/BufferedDiskCache;Lcom/facebook/cache/common/CacheKey;)Lcom/facebook/imagepipeline/image/EncodedImage;
 HSPLcom/facebook/imagepipeline/cache/BufferedDiskCache;-><clinit>()V
 HSPLcom/facebook/imagepipeline/cache/BufferedDiskCache;-><init>(Lcom/facebook/cache/disk/FileCache;Lcom/facebook/common/memory/PooledByteBufferFactory;Lcom/facebook/common/memory/PooledByteStreams;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Lcom/facebook/imagepipeline/cache/ImageCacheStatsTracker;)V
 HSPLcom/facebook/imagepipeline/cache/BufferedDiskCache;->get(Lcom/facebook/cache/common/CacheKey;Ljava/util/concurrent/atomic/AtomicBoolean;)Lbolts/Task;
@@ -1200,7 +1195,6 @@ HSPLcom/facebook/imagepipeline/core/DefaultExecutorSupplier$Companion;-><init>()
 HSPLcom/facebook/imagepipeline/core/DefaultExecutorSupplier$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 Lcom/facebook/imagepipeline/core/DiskCachesStore;
 Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;
-HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory;->$r8$lambda$uLnHzirHtcbL0JFGi1OuccUhwrA(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;)Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;
 HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory;-><init>(Lcom/facebook/imagepipeline/core/FileCacheFactory;Lcom/facebook/imagepipeline/core/ImagePipelineConfigInterface;)V
 HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory;-><init>(Lcom/facebook/imagepipeline/core/FileCacheFactory;Lcom/facebook/imagepipeline/memory/PoolFactory;Lcom/facebook/imagepipeline/core/ExecutorSupplier;Lcom/facebook/imagepipeline/cache/ImageCacheStatsTracker;ILcom/facebook/cache/disk/DiskCacheConfig;Lcom/facebook/cache/disk/DiskCacheConfig;Ljava/util/Map;)V
 HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory;->access$getDynamicDiskCacheConfigMap$p(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;)Ljava/util/Map;
@@ -1219,12 +1213,6 @@ Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory$$ExternalSyntheticLambda
 HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory$$ExternalSyntheticLambda0;-><init>(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;)V
 HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory$$ExternalSyntheticLambda0;->invoke()Ljava/lang/Object;
 Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;
-HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;->$r8$lambda$3UpBfAjd8OgRWNbeAASFcTR1y3A(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;)Lcom/facebook/cache/disk/FileCache;
-HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;->$r8$lambda$apTyEB63NskwOR7jKmBrcxFUihM(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;)Lcom/facebook/imagepipeline/cache/BufferedDiskCache;
-HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;->$r8$lambda$c7UdFIcNIPqkGst2fqdHmn7kkE8(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;)Lcom/facebook/imagepipeline/cache/BufferedDiskCache;
-HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;->$r8$lambda$mUGPUsc-VUEbCI14AeTC4rp5ujI(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;)Lcom/facebook/cache/disk/FileCache;
-HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;->$r8$lambda$oghhGNYgSf675rBPBYUco4nvl1E(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;)Lcom/facebook/common/internal/ImmutableMap;
-HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;->$r8$lambda$v-kINtWC6VaK74fKoqZBHHqk8Og(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;)Ljava/util/Map;
 HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;-><init>(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;)V
 HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;->dynamicBufferedDiskCaches_delegate$lambda$9(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;)Lcom/facebook/common/internal/ImmutableMap;
 HSPLcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;->dynamicFileCaches_delegate$lambda$7(Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory;Lcom/facebook/imagepipeline/core/DiskCachesStoreFactory$diskCachesStore$2$1;)Ljava/util/Map;
@@ -1466,7 +1454,6 @@ HSPLcom/facebook/imagepipeline/core/NativeCodeSetup;-><clinit>()V
 HSPLcom/facebook/imagepipeline/core/NativeCodeSetup;->getUseNativeCode()Z
 HSPLcom/facebook/imagepipeline/core/NativeCodeSetup;->setUseNativeCode(Z)V
 Lcom/facebook/imagepipeline/core/PriorityThreadFactory;
-HSPLcom/facebook/imagepipeline/core/PriorityThreadFactory;->$r8$lambda$gKxQU1bghuEskyM4mT5eRzkaG54(Lcom/facebook/imagepipeline/core/PriorityThreadFactory;Ljava/lang/Runnable;)V
 HSPLcom/facebook/imagepipeline/core/PriorityThreadFactory;-><init>(ILjava/lang/String;Z)V
 HSPLcom/facebook/imagepipeline/core/PriorityThreadFactory;->newThread$lambda$0(Lcom/facebook/imagepipeline/core/PriorityThreadFactory;Ljava/lang/Runnable;)V
 HSPLcom/facebook/imagepipeline/core/PriorityThreadFactory;->newThread(Ljava/lang/Runnable;)Ljava/lang/Thread;
@@ -1488,8 +1475,6 @@ HSPLcom/facebook/imagepipeline/core/ProducerFactory;->newEncodedMemoryCacheProdu
 HSPLcom/facebook/imagepipeline/core/ProducerFactory;->newNetworkFetchProducer(Lcom/facebook/imagepipeline/producers/NetworkFetcher;)Lcom/facebook/imagepipeline/producers/Producer;
 HSPLcom/facebook/imagepipeline/core/ProducerFactory;->newResizeAndRotateProducer(Lcom/facebook/imagepipeline/producers/Producer;ZLcom/facebook/imagepipeline/transcoder/ImageTranscoderFactory;)Lcom/facebook/imagepipeline/producers/ResizeAndRotateProducer;
 Lcom/facebook/imagepipeline/core/ProducerSequenceFactory;
-HSPLcom/facebook/imagepipeline/core/ProducerSequenceFactory;->$r8$lambda$d9RTSYA_O5-3fmU7ZcvX1snI8PY(Lcom/facebook/imagepipeline/core/ProducerSequenceFactory;)Lcom/facebook/imagepipeline/producers/Producer;
-HSPLcom/facebook/imagepipeline/core/ProducerSequenceFactory;->$r8$lambda$wQKiXDSu4iV3tLQrfzdVC3N9-gE(Lcom/facebook/imagepipeline/core/ProducerSequenceFactory;)Lcom/facebook/imagepipeline/producers/Producer;
 HSPLcom/facebook/imagepipeline/core/ProducerSequenceFactory;-><clinit>()V
 HSPLcom/facebook/imagepipeline/core/ProducerSequenceFactory;-><init>(Landroid/content/ContentResolver;Lcom/facebook/imagepipeline/core/ProducerFactory;Lcom/facebook/imagepipeline/producers/NetworkFetcher;ZZLcom/facebook/imagepipeline/producers/ThreadHandoffProducerQueue;Lcom/facebook/imagepipeline/core/DownsampleMode;ZZZLcom/facebook/imagepipeline/transcoder/ImageTranscoderFactory;ZZZLjava/util/Set;)V
 HSPLcom/facebook/imagepipeline/core/ProducerSequenceFactory;->commonNetworkFetchToEncodedMemorySequence_delegate$lambda$17(Lcom/facebook/imagepipeline/core/ProducerSequenceFactory;)Lcom/facebook/imagepipeline/producers/Producer;
@@ -1985,7 +1970,6 @@ Lcom/facebook/imagepipeline/producers/DecodeProducer$NetworkImagesProgressiveDec
 HSPLcom/facebook/imagepipeline/producers/DecodeProducer$NetworkImagesProgressiveDecoder;-><init>(Lcom/facebook/imagepipeline/producers/DecodeProducer;Lcom/facebook/imagepipeline/producers/Consumer;Lcom/facebook/imagepipeline/producers/ProducerContext;Lcom/facebook/imagepipeline/decoder/ProgressiveJpegParser;Lcom/facebook/imagepipeline/decoder/ProgressiveJpegConfig;ZI)V
 HSPLcom/facebook/imagepipeline/producers/DecodeProducer$NetworkImagesProgressiveDecoder;->updateDecodeJob(Lcom/facebook/imagepipeline/image/EncodedImage;I)Z
 Lcom/facebook/imagepipeline/producers/DecodeProducer$ProgressiveDecoder;
-HSPLcom/facebook/imagepipeline/producers/DecodeProducer$ProgressiveDecoder;->$r8$lambda$Y9NahPUmLEkdMWWMLomB1mNwyIc(Lcom/facebook/imagepipeline/producers/DecodeProducer$ProgressiveDecoder;Lcom/facebook/imagepipeline/producers/DecodeProducer;ILcom/facebook/imagepipeline/image/EncodedImage;I)V
 HSPLcom/facebook/imagepipeline/producers/DecodeProducer$ProgressiveDecoder;-><init>(Lcom/facebook/imagepipeline/producers/DecodeProducer;Lcom/facebook/imagepipeline/producers/Consumer;Lcom/facebook/imagepipeline/producers/ProducerContext;ZI)V
 HSPLcom/facebook/imagepipeline/producers/DecodeProducer$ProgressiveDecoder;->_init_$lambda$2(Lcom/facebook/imagepipeline/producers/DecodeProducer$ProgressiveDecoder;Lcom/facebook/imagepipeline/producers/DecodeProducer;ILcom/facebook/imagepipeline/image/EncodedImage;I)V
 HSPLcom/facebook/imagepipeline/producers/DecodeProducer$ProgressiveDecoder;->doDecode(Lcom/facebook/imagepipeline/image/EncodedImage;II)V
@@ -2288,7 +2272,6 @@ HSPLcom/facebook/imagepipeline/transformation/TransformationUtils;-><clinit>()V
 HSPLcom/facebook/imagepipeline/transformation/TransformationUtils;-><init>()V
 HSPLcom/facebook/imagepipeline/transformation/TransformationUtils;->maybeApplyTransformation(Lcom/facebook/imagepipeline/transformation/BitmapTransformation;Lcom/facebook/common/references/CloseableReference;)Z
 Lcom/facebook/imageutils/BitmapUtil;
-HSPLcom/facebook/imageutils/BitmapUtil;->$r8$lambda$C12wgcHX3ZEo59wqtErsCpqZ7UE()Landroidx/core/util/Pools$SynchronizedPool;
 HSPLcom/facebook/imageutils/BitmapUtil;-><clinit>()V
 HSPLcom/facebook/imageutils/BitmapUtil;-><init>()V
 HSPLcom/facebook/imageutils/BitmapUtil;->DECODE_BUFFERS_delegate$lambda$0()Landroidx/core/util/Pools$SynchronizedPool;
@@ -2366,9 +2349,7 @@ HSPLcom/skydoves/landscapist/fresco/FrescoImageState$None;-><clinit>()V
 HSPLcom/skydoves/landscapist/fresco/FrescoImageState$None;-><init>()V
 Lcom/skydoves/landscapist/fresco/FrescoImageState$Success;
 HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Success;-><clinit>()V
-HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Success;-><init>(Landroidx/compose/ui/graphics/ImageBitmap;Lcom/skydoves/landscapist/DataSource;)V
 HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Success;->equals(Ljava/lang/Object;)Z
-HSPLcom/skydoves/landscapist/fresco/FrescoImageState$Success;->getImageBitmap()Landroidx/compose/ui/graphics/ImageBitmap;
 Lcom/skydoves/landscapist/fresco/FrescoImageStateKt;
 HSPLcom/skydoves/landscapist/fresco/FrescoImageStateKt;->toFrescoImageState(Lcom/skydoves/landscapist/ImageLoadState;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/fresco/FrescoImageState;
 Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt;
@@ -2406,7 +2387,6 @@ HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheti
 Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda7;
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda7;-><init>(Ljava/lang/String;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function2;)V
 Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda8;
-HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda8;-><init>(Lkotlin/jvm/functions/Function5;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;Lcom/skydoves/landscapist/fresco/FrescoImageState;Landroidx/compose/ui/graphics/painter/Painter;Lcom/skydoves/landscapist/ImageOptions;)V
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda8;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 Lcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda9;
 HSPLcom/skydoves/landscapist/fresco/FrescoImage__FrescoImageKt$$ExternalSyntheticLambda9;-><init>(Ljava/lang/String;)V
@@ -2424,7 +2404,6 @@ HSPLcom/skydoves/landscapist/fresco/LocalFrescoProvider;-><clinit>()V
 HSPLcom/skydoves/landscapist/fresco/LocalFrescoProvider;-><init>()V
 HSPLcom/skydoves/landscapist/fresco/LocalFrescoProvider;->getFrescoImageRequest(Ljava/lang/String;Landroidx/compose/runtime/Composer;I)Lcom/facebook/imagepipeline/request/ImageRequestBuilder;
 Lcom/skydoves/landscapist/fresco/LocalFrescoProviderKt;
-HSPLcom/skydoves/landscapist/fresco/LocalFrescoProviderKt;->$r8$lambda$EDxJ3ikGJQ8RFFCpF14feLsfYUg()Lcom/facebook/imagepipeline/request/ImageRequestBuilder;
 HSPLcom/skydoves/landscapist/fresco/LocalFrescoProviderKt;-><clinit>()V
 HSPLcom/skydoves/landscapist/fresco/LocalFrescoProviderKt;->LocalFrescoImageRequest$lambda$0()Lcom/facebook/imagepipeline/request/ImageRequestBuilder;
 HSPLcom/skydoves/landscapist/fresco/LocalFrescoProviderKt;->getLocalFrescoImageRequest()Landroidx/compose/runtime/ProvidableCompositionLocal;
