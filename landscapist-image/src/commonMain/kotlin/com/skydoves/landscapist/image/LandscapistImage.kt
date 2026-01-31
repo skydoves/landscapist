@@ -89,6 +89,20 @@ public fun LandscapistImage(
   failure: @Composable (BoxScope.(LandscapistImageState.Failure) -> Unit)? = null,
 ) {
   val model = imageModel()
+
+  // Fast path: If model is already a Bitmap or ImageBitmap, render directly without loading pipeline
+  if (isBitmapType(model)) {
+    LandscapistImageFastPath(
+      bitmap = model,
+      modifier = modifier,
+      component = component,
+      imageOptions = imageOptions,
+      onImageStateChanged = onImageStateChanged,
+      success = success,
+    )
+    return
+  }
+
   val request = remember(model, requestBuilder) {
     ImageRequest.builder().apply {
       model(model)
@@ -190,6 +204,77 @@ public fun LandscapistImage(
 
           failure?.invoke(this, state)
         }
+      }
+    }
+  }
+}
+
+/**
+ * Fast path for pre-decoded Bitmap/ImageBitmap inputs.
+ * Skips the entire loading pipeline (Flow, coroutines, state transitions) for maximum performance.
+ * This makes Landscapist competitive with direct Coil3 for bitmap pass-through scenarios.
+ */
+@Composable
+private fun LandscapistImageFastPath(
+  bitmap: Any?,
+  modifier: Modifier,
+  component: ImageComponent,
+  imageOptions: ImageOptions,
+  onImageStateChanged: ((LandscapistImageState) -> Unit)?,
+  success: @Composable (BoxScope.(LandscapistImageState.Success, Painter) -> Unit)?,
+) {
+  // Create success state immediately - no loading state needed for pre-decoded bitmaps
+  val successState = remember(bitmap) {
+    LandscapistImageState.Success(
+      data = bitmap,
+      dataSource = com.skydoves.landscapist.core.model.DataSource.MEMORY,
+      originalWidth = getBitmapWidth(bitmap),
+      originalHeight = getBitmapHeight(bitmap),
+      rawData = null,
+      diskCachePath = null,
+    )
+  }
+
+  // Notify state change immediately
+  LaunchedEffect(successState) {
+    onImageStateChanged?.invoke(successState)
+  }
+
+  // Render directly without CrossfadeWithEffect for fast path (bitmap is already available)
+  val painter = rememberLandscapistPainter(bitmap)
+  val imageBitmap = remember(bitmap) {
+    bitmap?.let { convertToImageBitmap(it) }
+  }
+
+  // Apply painter plugins if needed
+  val finalPainter = if (imageBitmap != null) {
+    painter.composePainterPlugins(
+      imagePlugins = component.imagePlugins,
+      imageBitmap = imageBitmap,
+    )
+  } else {
+    painter
+  }
+
+  component.ComposeSuccessStatePlugins(
+    modifier = Modifier,
+    imageModel = bitmap,
+    imageOptions = imageOptions,
+    imageBitmap = imageBitmap,
+  )
+
+  Box(
+    modifier = modifier.imageSemantics(imageOptions),
+  ) {
+    component.ComposeWithComposablePlugins {
+      if (success != null) {
+        success.invoke(this, successState, finalPainter)
+      } else {
+        DefaultSuccessContent(
+          modifier = Modifier.fillMaxSize(),
+          painter = finalPainter,
+          imageOptions = imageOptions,
+        )
       }
     }
   }

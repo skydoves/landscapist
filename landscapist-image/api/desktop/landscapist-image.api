@@ -7,6 +7,9 @@ public final class com/skydoves/landscapist/image/ComposableSingletons$Landscapi
 
 public final class com/skydoves/landscapist/image/ImageBitmapConverter_skiaKt {
 	public static final fun convertToImageBitmap (Ljava/lang/Object;)Landroidx/compose/ui/graphics/ImageBitmap;
+	public static final fun getBitmapHeight (Ljava/lang/Object;)I
+	public static final fun getBitmapWidth (Ljava/lang/Object;)I
+	public static final fun isBitmapType (Ljava/lang/Object;)Z
 }
 
 public final class com/skydoves/landscapist/image/LandscapistImageKt {
