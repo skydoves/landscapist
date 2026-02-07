@@ -17,6 +17,7 @@ package com.skydoves.landscapist.image
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -26,7 +27,7 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
 
 /**
- * Creates and remembers a [Painter] from Skia Bitmap or RawImageData.
+ * Creates and remembers a [Painter] from Skia Bitmap, RawImageData, or ImageBitmap.
  * Used by Apple (iOS/macOS) and Wasm platforms.
  */
 @Composable
@@ -42,6 +43,7 @@ public actual fun rememberLandscapistPainter(data: Any?): Painter {
           EmptyPainter
         }
       }
+      is ImageBitmap -> BitmapPainter(data)
       else -> EmptyPainter
     }
   }
