@@ -19,13 +19,14 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import com.skydoves.landscapist.rememberDrawablePainter
 
 /**
- * Creates and remembers a [Painter] from Android Bitmap or Drawable data.
+ * Creates and remembers a [Painter] from Android Bitmap, Drawable, or ImageBitmap data.
  * Supports animated drawables (GIF, APNG, animated WebP) on API 28+.
  */
 @Composable
@@ -33,6 +34,7 @@ public actual fun rememberLandscapistPainter(data: Any?): Painter {
   return when (data) {
     is Bitmap -> remember(data) { BitmapPainter(data.asImageBitmap()) }
     is Drawable -> rememberDrawablePainter(data)
+    is ImageBitmap -> remember(data) { BitmapPainter(data) }
     else -> EmptyPainter
   }
 }
