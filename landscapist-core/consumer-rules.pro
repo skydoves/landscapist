@@ -19,18 +19,29 @@
 
 # Keep Ktor HTTP client classes (required for network image loading on Desktop/JVM)
 # These are used by the Landscapist core engine and must not be stripped
+-keep class io.ktor.** { *; }
 -keep class io.ktor.client.** { *; }
 -keep class io.ktor.client.engine.** { *; }
 -keep class io.ktor.client.engine.cio.** { *; }
 -keep class io.ktor.util.** { *; }
+-keep class io.ktor.utils.io.** { *; }
 -keepclassmembers class io.ktor.** {
     volatile <fields>;
 }
 
 # Keep ServiceLoader resources (required for Ktor engine discovery)
--keepnames class io.ktor.client.HttpClientEngineContainer
--keepnames class io.ktor.client.engine.cio.CIOEngineContainer
+-keep class io.ktor.client.HttpClientEngineContainer { *; }
+-keep class io.ktor.client.engine.cio.CIOEngineContainer { *; }
+-keep class * implements io.ktor.client.HttpClientEngineContainer { *; }
+-keepnames class io.ktor.** implements java.io.Serializable
 
 # Prevent issues with Okio (used by Ktor)
 -dontwarn okio.**
 -keep class okio.** { *; }
+-keep class okio.Buffer { *; }
+
+# Keep Kotlin coroutines and flow (prevents Flow exception transparency violations)
+-keep class kotlinx.coroutines.** { *; }
+-keepclassmembers class kotlinx.coroutines.** { *; }
+-keep class kotlinx.coroutines.flow.** { *; }
+-keepclassmembers class kotlinx.coroutines.flow.** { *; }
