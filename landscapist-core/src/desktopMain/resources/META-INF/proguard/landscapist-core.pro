@@ -55,9 +55,6 @@
     volatile <fields>;
 }
 
-# Keep ServiceLoader configuration files
--keepresourcexmlelements META-INF/services/**
-
 # ============================================================================
 # Okio (Used by Ktor)
 # ============================================================================
