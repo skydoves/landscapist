@@ -49,18 +49,20 @@ kotlin {
         api(project(":landscapist"))
         api(libs.palette)
 
-        implementation(compose.ui)
-        implementation(compose.runtime)
-        implementation(compose.foundation)
+        implementation(libs.jetbrains.compose.ui)
+        implementation(libs.jetbrains.compose.runtime)
+        implementation(libs.jetbrains.compose.foundation)
       }
     }
   }
 
   targets.configureEach {
     compilations.configureEach {
-      compilerOptions.configure {
-        // https://youtrack.jetbrains.com/issue/KT-61573
-        freeCompilerArgs.add("-Xexpect-actual-classes")
+      compileTaskProvider.configure {
+        compilerOptions {
+          // https://youtrack.jetbrains.com/issue/KT-61573
+          freeCompilerArgs.add("-Xexpect-actual-classes")
+        }
       }
     }
   }

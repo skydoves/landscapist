@@ -47,9 +47,9 @@ kotlin {
     }
     commonMain {
       dependencies {
-        implementation(compose.ui)
-        implementation(compose.runtime)
-        implementation(compose.foundation)
+        implementation(libs.jetbrains.compose.ui)
+        implementation(libs.jetbrains.compose.runtime)
+        implementation(libs.jetbrains.compose.foundation)
         implementation(libs.kotlinx.coroutines.core)
       }
     }
