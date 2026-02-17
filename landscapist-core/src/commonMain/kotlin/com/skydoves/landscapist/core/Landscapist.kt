@@ -15,6 +15,7 @@
  */
 package com.skydoves.landscapist.core
 
+import androidx.compose.runtime.Stable
 import com.skydoves.landscapist.core.cache.CacheKey
 import com.skydoves.landscapist.core.cache.CachedImage
 import com.skydoves.landscapist.core.cache.DiskCache
@@ -66,6 +67,7 @@ import okio.use
  * @property dispatcher The dispatcher for I/O operations.
  * @property requestManager The manager for tracking and cancelling requests.
  */
+@Stable
 public class Landscapist private constructor(
   public val config: LandscapistConfig,
   private val memoryCache: MemoryCache,

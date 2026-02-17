@@ -52,6 +52,9 @@ kotlin {
         // Coroutines
         implementation(libs.kotlinx.coroutines.core)
 
+        // Compose runtime annotation for stability markers (@Stable, @Immutable)
+        implementation(libs.compose.runtime.annotation)
+
         // Ktor for networking
         implementation(libs.ktor.core)
 
