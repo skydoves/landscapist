@@ -19,6 +19,7 @@ import com.skydoves.landscapist.core.ImageRequest
 import com.skydoves.landscapist.core.NetworkConfig
 import com.skydoves.landscapist.core.model.DataSource
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -115,6 +116,9 @@ public class KtorImageFetcher(
         install(HttpTimeout) {
           connectTimeoutMillis = networkConfig.connectTimeout.inWholeMilliseconds
           requestTimeoutMillis = networkConfig.readTimeout.inWholeMilliseconds
+        }
+        install(HttpSend) {
+          maxSendCount = networkConfig.maxRedirects
         }
         followRedirects = networkConfig.followRedirects
       }
