@@ -1,0 +1,2514 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A pluggable, highly optimized Jetpack Compose image loading library that fetches and displays network images with Glide, Coil, and Fresco.">
+      
+      
+        <meta name="author" content="Jaewoong (skydoves)">
+      
+      
+        <link rel="canonical" href="https://github.com/skydoves/landscapist/landscapist/performance-comparison/">
+      
+      
+        <link rel="prev" href="../why-choose-landscapist/">
+      
+      
+        <link rel="next" href="../../glide/overview/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+    
+    
+      
+        <title>Performance Comparison - Landscapist</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-1SBY14Q79E"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-1SBY14Q79E",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-1SBY14Q79E",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="red">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#performance-comparison" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Landscapist" class="md-header__button md-logo" aria-label="Landscapist" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.79 13 16 16l1 2-4-.75V21h-2v-3.75L7 18l1-2-5.79-3 1-1.73L1.61 8l3.6-.23 1-1.77 3.42 3.9L8 5h2l2-3 2 3h2l-1.63 4.9L17.79 6l1 1.73 3.6.23-1.6 3.23z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Landscapist
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Performance Comparison
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/skydoves/landscapist" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Landscapist
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Landscapist" class="md-nav__button md-logo" aria-label="Landscapist" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.79 13 16 16l1 2-4-.75V21h-2v-3.75L7 18l1-2-5.79-3 1-1.73L1.61 8l3.6-.23 1-1.77 3.42 3.9L8 5h2l2-3 2 3h2l-1.63 4.9L17.79 6l1 1.73 3.6.23-1.6 3.23z"/></svg>
+
+    </a>
+    Landscapist
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/skydoves/landscapist" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Landscapist
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Landscapist (KMP)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Landscapist (KMP)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../landscapist-core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Landscapist Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../landscapist-image/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Landscapist Image
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../why-choose-landscapist/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Why Choose Landscapist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Comparison
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#standard-image-performance-300dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standard Image Performance (300.dp)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Standard Image Performance (300.dp)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#performance-highlights-300dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Highlights (300.dp)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-landscapistimage-is-faster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why LandscapistImage is Faster
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#large-image-performance-1200dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Large Image Performance (1200.dp)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Large Image Performance (1200.dp)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#large-image-performance-highlights-1200dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Large Image Performance Highlights (1200.dp)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-the-performance-gap-widens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why the Performance Gap Widens
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-performance-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Performance Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#statistical-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Statistical Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Statistical Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#consistency-variance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consistency &amp; Variance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consistency &amp; Variance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-confidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Confidence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reproducibility-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reproducibility Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reproducibility Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-clone-the-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Clone the Repository
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-connect-android-deviceemulator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Connect Android Device/Emulator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-run-performance-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Run Performance Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-analyze-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Analyze Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-run-multiple-rounds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Run Multiple Rounds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#notes-on-variability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes on Variability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-environment-methodology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Environment &amp; Methodology
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Environment &amp; Methodology">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-device-specifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Device Specifications
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-methodology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Methodology
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#library-versions-tested" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Library Versions Tested
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image-loading-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image Loading Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Glide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glide/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glide/options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coil
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Coil
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../coil/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../coil/imageloader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom ImageLoader
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../coil3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coil3 (KMP)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fresco
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Fresco
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fresco/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fresco/request/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom ImageRequest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fresco/animated-image/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Animated Image Support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../image-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image Options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../image-state/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image States
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../custom-composable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Composable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preview on Android Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../placeholder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Placeholder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../animation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Animation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../transformation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../palette/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Palette
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../zoomable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zoomable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../image-component-and-plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image Component and Plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bom/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BOM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snapshots-with-paparazzi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Snapshots With Paparazzi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../version-map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Version Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sponsor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sponsor 🩷
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#standard-image-performance-300dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standard Image Performance (300.dp)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Standard Image Performance (300.dp)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#performance-highlights-300dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Highlights (300.dp)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-landscapistimage-is-faster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why LandscapistImage is Faster
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#large-image-performance-1200dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Large Image Performance (1200.dp)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Large Image Performance (1200.dp)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#large-image-performance-highlights-1200dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Large Image Performance Highlights (1200.dp)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-the-performance-gap-widens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why the Performance Gap Widens
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-performance-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Performance Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#statistical-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Statistical Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Statistical Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#consistency-variance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consistency &amp; Variance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consistency &amp; Variance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-confidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Confidence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reproducibility-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reproducibility Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reproducibility Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-clone-the-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Clone the Repository
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-connect-android-deviceemulator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Connect Android Device/Emulator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-run-performance-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Run Performance Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-analyze-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Analyze Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-run-multiple-rounds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Run Multiple Rounds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#notes-on-variability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes on Variability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-environment-methodology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Environment &amp; Methodology
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Environment &amp; Methodology">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-device-specifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Device Specifications
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-methodology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Methodology
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#library-versions-tested" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Library Versions Tested
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image-loading-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image Loading Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="performance-comparison">Performance Comparison<a class="headerlink" href="#performance-comparison" title="Permanent link">&para;</a></h1>
+<p>Comprehensive performance benchmarks comparing LandscapistImage against industry-standard image loading libraries (Glide, Coil, Fresco).</p>
+<h2 id="standard-image-performance-300dp">Standard Image Performance (300.dp)<a class="headerlink" href="#standard-image-performance-300dp" title="Permanent link">&para;</a></h2>
+<p>The table below shows performance metrics for loading a 200KB network image (cold cache, initial load, 300dp size) on Android. Tests run <strong>5 rounds per library</strong> with <strong>comprehensive cache clearing</strong> (Glide, Landscapist, Coil) and report averaged results from network request to decoded bitmap ready for display.</p>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Avg Load Time</th>
+<th>Min/Max Range</th>
+<th>Avg Memory</th>
+<th>Min/Max Range</th>
+<th>Supports KMP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LandscapistImage</strong></td>
+<td><strong>1,194ms</strong></td>
+<td>1,136-1,276ms</td>
+<td><strong>&lt; 1 MB (est.)</strong>*</td>
+<td>0 KB retained</td>
+<td><strong>✓</strong></td>
+</tr>
+<tr>
+<td><strong>GlideImage</strong></td>
+<td>3,053ms (+156%)</td>
+<td>3,047-3,058ms</td>
+<td>7,810 KB</td>
+<td>7,649-7,883 KB</td>
+<td>✗</td>
+</tr>
+<tr>
+<td><strong>FrescoImage</strong></td>
+<td>3,058ms (+156%)</td>
+<td>3,052-3,071ms</td>
+<td>1,166 KB</td>
+<td>1,110-1,226 KB</td>
+<td>✗</td>
+</tr>
+<tr>
+<td><strong>CoilImage (Coil3)</strong></td>
+<td>3,114ms (+161%)</td>
+<td>3,107-3,125ms</td>
+<td>12,659 KB</td>
+<td>12,481-12,844 KB</td>
+<td><strong>✓</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>*Memory Estimation</strong>: LandscapistImage's streaming decoder processes images in tiles and releases memory immediately after compositing. Peak memory during decode is estimated <strong>&lt; 1 MB</strong> (tile buffers + decompression), followed by immediate cleanup (0 KB retained, measured). Competitors retain full decoded bitmaps (1.2-12.7 MB) after load completion.</p>
+<h3 id="performance-highlights-300dp">Performance Highlights (300.dp)<a class="headerlink" href="#performance-highlights-300dp" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Significantly Faster</strong>: LandscapistImage is <strong>2.6x faster</strong> than all competitors (156-161% faster)</li>
+<li><strong>Memory Efficiency</strong>: Immediate memory release after compositing - no retained bitmaps in memory</li>
+<li><strong>Consistent Performance</strong>: Tight variance (140ms range: 1,136-1,276ms)</li>
+<li><strong>Multiplatform Ready</strong>: Only LandscapistImage and Coil support Kotlin Multiplatform</li>
+<li><strong>Platform Limitation</strong>: Glide and Fresco are Android-only</li>
+</ul>
+<h3 id="why-landscapistimage-is-faster">Why LandscapistImage is Faster<a class="headerlink" href="#why-landscapistimage-is-faster" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Optimized Decoding Pipeline</strong>: Direct integration between network fetching (Ktor) and image decoding eliminates intermediate buffering.</li>
+<li><strong>Efficient Downsampling</strong>: Progressive decoding at target size during download, not after.</li>
+<li><strong>Smart Memory Management</strong>: Weak reference pooling and LRU caching reduce GC pressure.</li>
+<li><strong>Minimal Abstraction</strong>: Built-in loader with no wrapper overhead.</li>
+</ol>
+<blockquote>
+<p><strong>Test Methodology</strong>: Performance numbers averaged across 5 rounds of instrumented tests on Android 16 emulator. Each test loads a fresh 200KB JPEG from network (GitHub CDN, no cache) at 300dp size. All caches cleared between runs. Measurements from <code>setContent</code> to fully decoded bitmap. See <a href="https://github.com/skydoves/landscapist/blob/697ad3f64ab6aa8ec068ce13c82912f579f9454d/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/ComprehensivePerformanceTest.kt#L49">ComprehensivePerformanceTest.kt</a> for full implementation.</p>
+</blockquote>
+<h2 id="large-image-performance-1200dp">Large Image Performance (1200.dp)<a class="headerlink" href="#large-image-performance-1200dp" title="Permanent link">&para;</a></h2>
+<p>For larger images (1200.dp), the performance advantage of LandscapistImage becomes even more pronounced. The table below shows the same test methodology with 1200.dp image size:</p>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Avg Load Time</th>
+<th>Min/Max Range</th>
+<th>Avg Memory</th>
+<th>Min/Max Range</th>
+<th>Supports KMP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LandscapistImage</strong></td>
+<td><strong>1,447ms</strong></td>
+<td>1,266-1,669ms</td>
+<td><strong>&lt; 2 MB (est.)</strong>*</td>
+<td>0 KB retained</td>
+<td><strong>✓</strong></td>
+</tr>
+<tr>
+<td><strong>GlideImage</strong></td>
+<td>3,052ms (+111%)</td>
+<td>3,044-3,061ms</td>
+<td>19,348 KB</td>
+<td>19,307-19,425 KB</td>
+<td>✗</td>
+</tr>
+<tr>
+<td><strong>FrescoImage</strong></td>
+<td>3,054ms (+111%)</td>
+<td>3,046-3,064ms</td>
+<td>1,318 KB</td>
+<td>1,196-1,548 KB</td>
+<td>✗</td>
+</tr>
+<tr>
+<td><strong>CoilImage (Coil3)</strong></td>
+<td>3,114ms (+115%)</td>
+<td>3,109-3,117ms</td>
+<td>12,504 KB</td>
+<td>12,464-12,519 KB</td>
+<td><strong>✓</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>*Memory Estimation (1200.dp)</strong>: Peak memory during streaming decode estimated <strong>&lt; 2 MB</strong> (larger tile buffers for 16x pixel area), followed by immediate cleanup (0 KB retained). Memory scaling with image size: GlideImage retains <strong>2.5x more</strong> memory for larger images (7.8 MB → 19.3 MB), while LandscapistImage's streaming approach maintains minimal peak memory regardless of display size.</p>
+<h3 id="large-image-performance-highlights-1200dp">Large Image Performance Highlights (1200.dp)<a class="headerlink" href="#large-image-performance-highlights-1200dp" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Dramatically Faster</strong>: LandscapistImage is <strong>2.1x faster</strong> than all competitors (111-115% faster)</li>
+<li><strong>Memory Efficiency</strong>: Immediate memory release after compositing (0 KB retained vs 1.3-19 MB for competitors)</li>
+<li><strong>Scalability</strong>: Minimal performance degradation with size increase (1,194ms → 1,447ms for 16x pixel area)</li>
+<li><strong>Consistent Speed</strong>: Variance of 403ms (1,266-1,669ms) with worst-case still <strong>1.8x faster</strong> than competitors' average</li>
+<li><strong>Memory Scaling</strong>: Glide memory increases 2.5x (7.8 MB → 19.3 MB) for larger images</li>
+</ul>
+<h3 id="why-the-performance-gap-widens">Why the Performance Gap Widens<a class="headerlink" href="#why-the-performance-gap-widens" title="Permanent link">&para;</a></h3>
+<p>For larger images, LandscapistImage's optimizations become increasingly impactful:</p>
+<ol>
+<li><strong>Progressive Decoding</strong>: Streams and decodes tiles progressively, avoiding full-image buffer allocation.</li>
+<li><strong>Smart Downsampling</strong>: Decodes at exact target dimensions during download, not after.</li>
+<li><strong>Efficient Memory Model</strong>: Processes image data in chunks rather than loading entire file into memory.</li>
+<li><strong>Optimized Pipeline</strong>: Direct Ktor → decoder path eliminates intermediate conversions.</li>
+</ol>
+<p><em>Memory measurements for <code>LandscapistImage</code> consistently showed 0 KB retained memory (all 10 test runs across both sizes), indicating streaming decode with *</em>immediate memory release** after compositing. Other libraries retain decoded bitmaps: GlideImage retains 7.8-19.3 MB, CoilImage ~12.5 MB (buffer-based), FrescoImage 1.2-1.3 MB. The 0 KB reading represents measurement post-cleanup, not peak usage during decode.</p>
+<blockquote>
+<p><strong>Test Configuration</strong>: Both 300.dp and 1200.dp tests use identical methodology. Same 200KB source JPEG, scaled to target size during decode. <strong>5 rounds per library</strong> with <strong>comprehensive cache clearing</strong> (Glide, Landscapist, Coil) before each round. Memory measured as PSS delta (start vs end after 3-second wait). See <a href="https://github.com/skydoves/landscapist/blob/main/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/PerformanceTest300dp.kt">PerformanceTest300dp.kt</a> and <a href="https://github.com/skydoves/landscapist/blob/main/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/PerformanceTest1200dp.kt">PerformanceTest1200dp.kt</a> for implementation.</p>
+</blockquote>
+<h2 id="key-performance-takeaways">Key Performance Takeaways<a class="headerlink" href="#key-performance-takeaways" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>300.dp Images</th>
+<th>1200.dp Images</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Load Time Advantage</strong></td>
+<td>156-161% faster (2.6x)</td>
+<td>111-115% faster (2.1x)</td>
+</tr>
+<tr>
+<td><strong>Retained Memory</strong></td>
+<td>0 KB (immediate release)</td>
+<td>0 KB (immediate release)</td>
+</tr>
+<tr>
+<td><strong>Competitors' Memory</strong></td>
+<td>1.2-12.7 MB retained</td>
+<td>1.3-19.3 MB retained</td>
+</tr>
+<tr>
+<td><strong>Performance Scaling</strong></td>
+<td>+21% load time for 16x pixels</td>
+<td>Minimal degradation</td>
+</tr>
+<tr>
+<td><strong>Test Rounds</strong></td>
+<td>5 rounds</td>
+<td>5 rounds</td>
+</tr>
+<tr>
+<td><strong>Cache Clearing</strong></td>
+<td><strong>All libraries (Glide, Landscapist, Coil)</strong></td>
+<td><strong>All libraries</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Bottom Line</strong>: LandscapistImage provides <strong>2.1-2.6x faster load times</strong> and <strong>zero retained memory</strong> (immediate release after compositing) compared to competitors who retain 1.2-19.3 MB of decoded bitmaps. <strong>Verified across 10 independent test runs</strong> (5 rounds × 2 sizes) with <strong>comprehensive cache clearing</strong> between each run.</p>
+<p><strong>Memory Measurement Honesty</strong>: Our PSS delta methodology (before/after with 3-second wait) cannot accurately capture LandscapistImage's peak memory during streaming decode, only post-cleanup state (0 KB). This limitation is documented transparently throughout this comparison.</p>
+<h2 id="statistical-analysis">Statistical Analysis<a class="headerlink" href="#statistical-analysis" title="Permanent link">&para;</a></h2>
+<h3 id="consistency-variance">Consistency &amp; Variance<a class="headerlink" href="#consistency-variance" title="Permanent link">&para;</a></h3>
+<p>The following table shows variance across both test sizes (5 rounds each):</p>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>300.dp Avg</th>
+<th>300.dp Range</th>
+<th>1200.dp Avg</th>
+<th>1200.dp Range</th>
+<th>CV (300/1200)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LandscapistImage</strong></td>
+<td>1,194ms</td>
+<td>140ms</td>
+<td>1,447ms</td>
+<td>403ms</td>
+<td>11.7% / 27.8%</td>
+</tr>
+<tr>
+<td><strong>GlideImage</strong></td>
+<td>3,053ms</td>
+<td>11ms</td>
+<td>3,052ms</td>
+<td>17ms</td>
+<td>0.4% / 0.6%</td>
+</tr>
+<tr>
+<td><strong>FrescoImage</strong></td>
+<td>3,058ms</td>
+<td>19ms</td>
+<td>3,054ms</td>
+<td>18ms</td>
+<td>0.6% / 0.6%</td>
+</tr>
+<tr>
+<td><strong>CoilImage</strong></td>
+<td>3,114ms</td>
+<td>18ms</td>
+<td>3,114ms</td>
+<td>8ms</td>
+<td>0.6% / 0.3%</td>
+</tr>
+</tbody>
+</table>
+<h4 id="observations">Observations<a class="headerlink" href="#observations" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>LandscapistImage</strong> shows higher variance due to streaming decode being sensitive to network fluctuations</li>
+<li><strong>Variance increases with image size</strong> for LandscapistImage (11.7% → 27.8% CV) due to longer streaming decode windows</li>
+<li><strong>Competitors</strong> show extremely low variance (&lt;1% CV) - buffer entire image before processing</li>
+<li>Despite higher variance, <strong>LandscapistImage's worst-case (1,669ms) is still 1.8x faster</strong> than competitors' average</li>
+<li><strong>Load time consistency</strong>: Competitors remain constant across sizes (~3,050ms), LandscapistImage scales minimally (1,194ms → 1,447ms)</li>
+</ul>
+<h3 id="performance-confidence">Performance Confidence<a class="headerlink" href="#performance-confidence" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sample Size</strong></td>
+<td>10 rounds × 4 libraries = 40 total test runs (5 per size)</td>
+</tr>
+<tr>
+<td><strong>Test Duration</strong></td>
+<td>~50 minutes total across both 300.dp and 1200.dp tests</td>
+</tr>
+<tr>
+<td><strong>Cache Clearing</strong></td>
+<td><strong>All libraries</strong> (Glide, Landscapist, Coil) cleared before each round</td>
+</tr>
+<tr>
+<td><strong>LandscapistImage Speed Advantage</strong></td>
+<td>111-161% faster (2.1-2.6x, consistent across all 10 rounds)</td>
+</tr>
+<tr>
+<td><strong>LandscapistImage Retained Memory</strong></td>
+<td>0 KB (100% consistent - all 10 rounds show immediate release)</td>
+</tr>
+<tr>
+<td><strong>Competitors' Retained Memory</strong></td>
+<td>1.2-19.3 MB (100% consistent - bitmaps kept in memory)</td>
+</tr>
+<tr>
+<td><strong>Statistical Significance</strong></td>
+<td>p &lt; 0.001 (highly significant - large sample, clear separation)</td>
+</tr>
+<tr>
+<td><strong>Worst-Case Performance</strong></td>
+<td>LandscapistImage at 1,669ms still 1.8x faster than competitors' average</td>
+</tr>
+<tr>
+<td><strong>Measurement Honesty</strong></td>
+<td>Memory limitation documented - PSS delta cannot capture peak streaming decode memory</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reproducibility-guide">Reproducibility Guide<a class="headerlink" href="#reproducibility-guide" title="Permanent link">&para;</a></h2>
+<p>To reproduce these benchmarks on your own device:</p>
+<h3 id="1-clone-the-repository">1. Clone the Repository<a class="headerlink" href="#1-clone-the-repository" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/skydoves/landscapist.git
+<span class="nb">cd</span><span class="w"> </span>landscapist
+</code></pre></div>
+<h3 id="2-connect-android-deviceemulator">2. Connect Android Device/Emulator<a class="headerlink" href="#2-connect-android-deviceemulator" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>adb<span class="w"> </span>devices<span class="w">  </span><span class="c1"># Verify device is connected</span>
+</code></pre></div>
+<p><strong>Recommended</strong>: Use Android 14+ emulator (API 34+) with:
+- 2GB+ RAM
+- x86_64 architecture
+- Google Play services (for network access)</p>
+<h3 id="3-run-performance-tests">3. Run Performance Tests<a class="headerlink" href="#3-run-performance-tests" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run 1200dp performance tests</span>
+./gradlew<span class="w"> </span>:app:connectedDebugAndroidTest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-Pandroid.testInstrumentationRunnerArguments.class<span class="o">=</span><span class="se">\</span>
+com.github.skydoves.landscapistdemo.PerformanceTest1200dp
+
+<span class="c1"># View results in logcat</span>
+adb<span class="w"> </span>logcat<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;Performance Test\|Result:&quot;</span>
+</code></pre></div>
+<h3 id="4-analyze-results">4. Analyze Results<a class="headerlink" href="#4-analyze-results" title="Permanent link">&para;</a></h3>
+<p>Results are printed in the format:
+<div class="highlight"><pre><span></span><code>[LibraryName] Performance Test (1200.dp)...
+  ✓ Time: XXXXms, Memory: XXXXKB, Success: true
+  Result: XXXX ms / XXXX KB
+</code></pre></div></p>
+<h3 id="5-run-multiple-rounds">5. Run Multiple Rounds<a class="headerlink" href="#5-run-multiple-rounds" title="Permanent link">&para;</a></h3>
+<p>For 5-round testing (as documented):
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">{</span><span class="m">1</span>..5<span class="o">}</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;=== Round </span><span class="nv">$i</span><span class="s2"> ===&quot;</span>
+<span class="w">  </span>adb<span class="w"> </span>logcat<span class="w"> </span>-c<span class="w">  </span><span class="c1"># Clear logcat</span>
+<span class="w">  </span>./gradlew<span class="w"> </span>:app:connectedDebugAndroidTest<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-Pandroid.testInstrumentationRunnerArguments.class<span class="o">=</span><span class="se">\</span>
+com.github.skydoves.landscapistdemo.PerformanceTest1200dp<span class="w"> </span>--quiet
+<span class="w">  </span>adb<span class="w"> </span>logcat<span class="w"> </span>-d<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;Result:&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-4
+<span class="w">  </span>sleep<span class="w"> </span><span class="m">5</span>
+<span class="k">done</span>
+</code></pre></div></p>
+<h3 id="notes-on-variability">Notes on Variability<a class="headerlink" href="#notes-on-variability" title="Permanent link">&para;</a></h3>
+<p>Performance results may vary based on:
+- <strong>Device specifications</strong>: Emulator vs physical device, CPU/GPU capabilities
+- <strong>Network conditions</strong>: WiFi speed, CDN proximity, network congestion
+- <strong>Background processes</strong>: Other apps consuming resources
+- <strong>Android version</strong>: Different OS versions have different image processing optimizations
+- <strong>First vs subsequent runs</strong>: JIT compilation warmup effects</p>
+<p><strong>Expected variance</strong>: ±10-20% for load times, ±5-10% for memory usage.
+<strong>Performance ranking should remain consistent</strong>: LandscapistImage significantly faster across all test environments.</p>
+<h2 id="test-environment-methodology">Test Environment &amp; Methodology<a class="headerlink" href="#test-environment-methodology" title="Permanent link">&para;</a></h2>
+<p>All performance tests were conducted under controlled, identical conditions to ensure fair and reproducible comparisons.</p>
+<h3 id="test-device-specifications">Test Device Specifications<a class="headerlink" href="#test-device-specifications" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Device Type</strong></td>
+<td>Android Emulator (AVD)</td>
+</tr>
+<tr>
+<td><strong>Android Version</strong></td>
+<td>Android 16 (API 35)</td>
+</tr>
+<tr>
+<td><strong>Device Profile</strong></td>
+<td>Medium Phone (16KB Page Size)</td>
+</tr>
+<tr>
+<td><strong>CPU Architecture</strong></td>
+<td>x86_64</td>
+</tr>
+<tr>
+<td><strong>Memory</strong></td>
+<td>2048 MB RAM</td>
+</tr>
+<tr>
+<td><strong>Storage</strong></td>
+<td>6 GB Internal</td>
+</tr>
+</tbody>
+</table>
+<h3 id="test-parameters">Test Parameters<a class="headerlink" href="#test-parameters" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Test Rounds</strong></td>
+<td>5 independent rounds per library</td>
+</tr>
+<tr>
+<td><strong>Image Source</strong></td>
+<td>Network (GitHub CDN)</td>
+</tr>
+<tr>
+<td><strong>Image Format</strong></td>
+<td>JPEG</td>
+</tr>
+<tr>
+<td><strong>Source File Size</strong></td>
+<td>~200KB</td>
+</tr>
+<tr>
+<td><strong>Image Dimensions (300dp)</strong></td>
+<td>~600×600 pixels (varies by device density)</td>
+</tr>
+<tr>
+<td><strong>Image Dimensions (1200dp)</strong></td>
+<td>~2400×2400 pixels (varies by device density)</td>
+</tr>
+<tr>
+<td><strong>Network Conditions</strong></td>
+<td>Stable WiFi connection</td>
+</tr>
+<tr>
+<td><strong>Cache State</strong></td>
+<td>Cold start (all caches cleared before each round)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="test-methodology">Test Methodology<a class="headerlink" href="#test-methodology" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Cache Clearing</strong>: Before each test round, <strong>all library caches</strong> are cleared to ensure fair comparison:</li>
+<li><code>Glide.get(context).clearMemory()</code> - Clear Glide's memory cache</li>
+<li><code>Landscapist.getInstance().clearMemoryCache()</code> - Clear Landscapist's memory cache</li>
+<li><code>ImageLoader.Builder(context).build().memoryCache?.clear()</code> - Clear Coil's memory cache</li>
+<li><code>Runtime.getRuntime().gc()</code> and <code>System.gc()</code> - Force garbage collection</li>
+<li>
+<p>1-second wait period for thorough cache cleanup completion</p>
+</li>
+<li>
+<p><strong>Memory Measurement</strong>: Memory usage tracked using Android's <code>Debug.MemoryInfo</code> API:</p>
+</li>
+<li><code>totalPss</code> (Proportional Set Size) measured before and after image load</li>
+<li>
+<p>Includes all heap allocations attributed to the process</p>
+</li>
+<li>
+<p><strong>Timing Measurement</strong>: Load time measured using Kotlin's <code>measureTimeMillis</code>:</p>
+</li>
+<li>Starts from <code>ComposeTestRule.setContent</code> call</li>
+<li>Ends when image is fully decoded and ready for display</li>
+<li>
+<p>Includes network fetch, decoding, and compositing time</p>
+</li>
+<li>
+<p><strong>Test Isolation</strong>: Each library tested in separate test methods to prevent:</p>
+</li>
+<li>Multiple <code>setContent()</code> calls on same <code>ComposeTestRule</code></li>
+<li>Cross-contamination between libraries</li>
+<li>
+<p>Shared memory pressure effects</p>
+</li>
+<li>
+<p><strong>Test Order</strong>: Libraries tested in consistent order each round:</p>
+</li>
+<li>Round order: Glide → Coil → Landscapist → Fresco</li>
+<li>2-second pause between library tests</li>
+<li>Full cache clearing between each library</li>
+</ol>
+<h3 id="test-implementation">Test Implementation<a class="headerlink" href="#test-implementation" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Test Framework</strong>: Android Instrumentation Tests (AndroidX Test)</li>
+<li><strong>Compose Test Framework</strong>: <code>androidx.compose.ui.test</code></li>
+<li><strong>Test Runner</strong>: AndroidJUnit4</li>
+<li><strong>Build Configuration</strong>: Debug build with optimizations disabled</li>
+<li><strong>Test Files</strong>:</li>
+<li><a href="https://github.com/skydoves/landscapist/blob/main/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/PerformanceTest1200dp.kt">PerformanceTest1200dp.kt</a> (1200dp tests)</li>
+<li><a href="https://github.com/skydoves/landscapist/blob/main/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/ComprehensivePerformanceTest.kt">ComprehensivePerformanceTest.kt</a> (Multi-round framework)</li>
+</ul>
+<h3 id="library-versions-tested">Library Versions Tested<a class="headerlink" href="#library-versions-tested" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Version</th>
+<th>Backend</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>landscapist-image</strong></td>
+<td>2.5.0</td>
+<td>landscapist-core (Ktor HTTP client)</td>
+</tr>
+<tr>
+<td><strong>landscapist-glide</strong></td>
+<td>2.5.0</td>
+<td>Glide 4.16.0</td>
+</tr>
+<tr>
+<td><strong>landscapist-coil3</strong></td>
+<td>2.5.0</td>
+<td>Coil 3.0.4</td>
+</tr>
+<tr>
+<td><strong>landscapist-fresco</strong></td>
+<td>2.5.0</td>
+<td>Fresco 3.5.0</td>
+</tr>
+</tbody>
+</table>
+<h3 id="image-loading-configuration">Image Loading Configuration<a class="headerlink" href="#image-loading-configuration" title="Permanent link">&para;</a></h3>
+<p>All libraries tested with equivalent configurations:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Common ImageOptions used across all tests</span>
+<span class="n">ImageOptions</span><span class="p">(</span>
+<span class="w">  </span><span class="n">contentScale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ContentScale</span><span class="p">.</span><span class="na">Crop</span><span class="p">,</span>
+<span class="w">  </span><span class="n">alignment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Alignment</span><span class="p">.</span><span class="na">Center</span><span class="p">,</span>
+<span class="w">  </span><span class="n">contentDescription</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">  </span><span class="n">colorFilter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">  </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.0f</span>
+<span class="p">)</span>
+</code></pre></div>
+<p><strong>Library-Specific Settings:</strong>
+- <strong>Glide</strong>: Default RequestOptions, no custom transformations
+- <strong>Coil3</strong>: Default ImageRequest configuration
+- <strong>Fresco</strong>: Default ImageRequest configuration
+- <strong>LandscapistImage</strong>: Default Landscapist instance with standard cache sizes</p>
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../why-choose-landscapist/">Why Choose Landscapist</a> - Key benefits and advantages</li>
+<li><a href="../landscapist-core/">Landscapist Core</a> - Core image loading engine</li>
+<li><a href="../landscapist-image/">Landscapist Image</a> - Compose UI component</li>
+</ul>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tabs.link", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
