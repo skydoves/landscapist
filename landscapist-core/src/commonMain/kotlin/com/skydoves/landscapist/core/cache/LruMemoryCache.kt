@@ -81,12 +81,7 @@ public class LruMemoryCache(
 
   override fun trimToSize(size: Long): Unit = synchronized(lock) {
     while (currentSize.value > size && cache.isNotEmpty()) {
-      val iterator = cache.entries.iterator()
-      if (iterator.hasNext()) {
-        val eldest = iterator.next()
-        iterator.remove()
-        currentSize.addAndGet(-eldest.value.sizeBytes)
-      }
+      evictOldest()
     }
   }
 
@@ -97,12 +92,13 @@ public class LruMemoryCache(
 
   private fun evictIfNeeded(requiredSpace: Long) {
     while (currentSize.value + requiredSpace > maxSize && cache.isNotEmpty()) {
-      val iterator = cache.entries.iterator()
-      if (iterator.hasNext()) {
-        val eldest = iterator.next()
-        iterator.remove()
-        currentSize.addAndGet(-eldest.value.sizeBytes)
-      }
+      evictOldest()
     }
+  }
+
+  private fun evictOldest() {
+    val eldestKey = cache.keys.firstOrNull() ?: return
+    val eldestValue = cache.remove(eldestKey) ?: return
+    currentSize.addAndGet(-eldestValue.sizeBytes)
   }
 }

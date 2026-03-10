@@ -145,12 +145,10 @@ public class TwoTierMemoryCache(
    * Cleans up weak references that have been garbage collected.
    */
   public fun cleanupWeakReferences(): Unit = synchronized(lock) {
-    val iterator = weakCache.iterator()
-    while (iterator.hasNext()) {
-      if (iterator.next().value.get() == null) {
-        iterator.remove()
-      }
-    }
+    val keysToRemove = weakCache.entries
+      .filter { it.value.get() == null }
+      .map { it.key }
+    keysToRemove.forEach { weakCache.remove(it) }
   }
 
   private fun evictIfNeeded(requiredSpace: Long) {
@@ -160,16 +158,13 @@ public class TwoTierMemoryCache(
   }
 
   private fun evictOldest() {
-    val iterator = strongCache.entries.iterator()
-    if (iterator.hasNext()) {
-      val eldest = iterator.next()
-      iterator.remove()
-      currentSize.addAndGet(-eldest.value.sizeBytes)
+    val eldestKey = strongCache.keys.firstOrNull() ?: return
+    val eldestValue = strongCache.remove(eldestKey) ?: return
+    currentSize.addAndGet(-eldestValue.sizeBytes)
 
-      // Move to weak cache if enabled
-      if (weakReferencesEnabled) {
-        weakCache[eldest.key] = WeakRef(eldest.value)
-      }
+    // Move to weak cache if enabled
+    if (weakReferencesEnabled) {
+      weakCache[eldestKey] = WeakRef(eldestValue)
     }
   }
 }
