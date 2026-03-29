@@ -50,6 +50,7 @@ internal fun Project.configureAndroidCompose(
   }
 
   configureComposeCompiler()
+  configureStabilityCheckTaskDependencies()
 }
 
 /**
@@ -74,6 +75,15 @@ internal fun Project.configureAndroidCompose(
   }
 
   configureComposeCompiler()
+  configureStabilityCheckTaskDependencies()
+}
+
+private fun Project.configureStabilityCheckTaskDependencies() {
+  tasks.configureEach {
+    if (name.endsWith("StabilityCheck")) {
+      mustRunAfter(tasks.matching { it.name.contains("Kotlin") })
+    }
+  }
 }
 
 private fun Project.configureComposeCompiler() {

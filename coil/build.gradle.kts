@@ -46,7 +46,7 @@ android {
 }
 
 baselineProfile {
-  baselineProfileOutputDir = "."
+
   filter {
     include("com.skydoves.landscapist.coil.**")
     include("coil.**")
