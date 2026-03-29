@@ -70,7 +70,7 @@ internal class AndroidBitmapPool(
     val config = format.toAndroidConfig()
 
     // Hardware bitmaps can't be pooled
-    if (config == Bitmap.Config.HARDWARE) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && config == Bitmap.Config.HARDWARE) {
       _misses.incrementAndGet()
       return Bitmap.createBitmap(width, height, config)
     }
@@ -97,7 +97,7 @@ internal class AndroidBitmapPool(
     val config = format.toAndroidConfig()
 
     // Hardware bitmaps can't be reused
-    if (config == Bitmap.Config.HARDWARE) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && config == Bitmap.Config.HARDWARE) {
       return null
     }
 
@@ -226,8 +226,15 @@ internal class AndroidBitmapPool(
       Bitmap.Config.RGB_565 -> 2
       Bitmap.Config.ARGB_4444 -> 2
       Bitmap.Config.ARGB_8888 -> 4
-      Bitmap.Config.RGBA_F16 -> 8
-      else -> 4
+      else -> {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+          config == Bitmap.Config.RGBA_F16
+        ) {
+          8
+        } else {
+          4
+        }
+      }
     }
     return width * height * bytesPerPixel
   }
