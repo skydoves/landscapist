@@ -25,6 +25,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.dokka.gradle.DokkaExtension
 
 class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
@@ -35,6 +36,14 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
       pluginManager.apply("binary-compatibility-validator")
       pluginManager.apply("org.jetbrains.dokka")
       pluginManager.apply("androidx.baselineprofile")
+
+      extensions.configure<DokkaExtension> {
+        dokkaSourceSets.configureEach {
+          if (name == "release") {
+            suppress.set(true)
+          }
+        }
+      }
 
       extensions.configure<LibraryExtension> {
         configureKotlinAndroid(this)
