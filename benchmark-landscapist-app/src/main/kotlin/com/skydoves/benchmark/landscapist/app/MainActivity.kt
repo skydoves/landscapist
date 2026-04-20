@@ -65,6 +65,8 @@ class MainActivity : ComponentActivity() {
           GlideImageProfiles()
           FrescoImageProfiles()
           FrescoWebSupportProfiles()
+          ImageGalleryProfiles()
+          ImageViewerProfiles()
         }
       }
     }

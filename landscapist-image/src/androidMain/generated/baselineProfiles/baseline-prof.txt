@@ -82,6 +82,12 @@ Lcom/skydoves/landscapist/image/LandscapistImageState;
 HSPLcom/skydoves/landscapist/image/LandscapistImageState;-><clinit>()V
 HSPLcom/skydoves/landscapist/image/LandscapistImageState;-><init>()V
 HSPLcom/skydoves/landscapist/image/LandscapistImageState;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+Lcom/skydoves/landscapist/image/LandscapistImageState$Failure;
+HSPLcom/skydoves/landscapist/image/LandscapistImageState$Failure;-><clinit>()V
+HSPLcom/skydoves/landscapist/image/LandscapistImageState$Failure;-><init>(Ljava/lang/Throwable;)V
+HSPLcom/skydoves/landscapist/image/LandscapistImageState$Failure;->equals(Ljava/lang/Object;)Z
+HSPLcom/skydoves/landscapist/image/LandscapistImageState$Failure;->getReason()Ljava/lang/Throwable;
+HSPLcom/skydoves/landscapist/image/LandscapistImageState$Failure;->hashCode()I
 Lcom/skydoves/landscapist/image/LandscapistImageState$Loading;
 HSPLcom/skydoves/landscapist/image/LandscapistImageState$Loading;-><clinit>()V
 HSPLcom/skydoves/landscapist/image/LandscapistImageState$Loading;-><init>()V

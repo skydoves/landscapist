@@ -1645,8 +1645,6 @@ Lcom/skydoves/landscapist/glide/GlideImageState$Loading;
 HSPLcom/skydoves/landscapist/glide/GlideImageState$Loading;-><clinit>()V
 HSPLcom/skydoves/landscapist/glide/GlideImageState$Loading;-><init>()V
 Lcom/skydoves/landscapist/glide/GlideImageState$None;
-HSPLcom/skydoves/landscapist/glide/GlideImageState$None;-><clinit>()V
-HSPLcom/skydoves/landscapist/glide/GlideImageState$None;-><init>()V
 Lcom/skydoves/landscapist/glide/GlideImageState$Success;
 HSPLcom/skydoves/landscapist/glide/GlideImageState$Success;-><clinit>()V
 HSPLcom/skydoves/landscapist/glide/GlideImageState$Success;-><init>(Ljava/lang/Object;Lcom/skydoves/landscapist/DataSource;Lcom/skydoves/landscapist/glide/GlideRequestType;)V
