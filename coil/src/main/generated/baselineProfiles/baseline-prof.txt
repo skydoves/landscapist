@@ -247,6 +247,7 @@ HSPLcoil/disk/DiskLruCache$Entry;->writeLengths(Lokio/BufferedSink;)V
 Lcoil/disk/DiskLruCache$Snapshot;
 HSPLcoil/disk/DiskLruCache$Snapshot;-><init>(Lcoil/disk/DiskLruCache;Lcoil/disk/DiskLruCache$Entry;)V
 HSPLcoil/disk/DiskLruCache$Snapshot;->close()V
+HSPLcoil/disk/DiskLruCache$Snapshot;->closeAndEdit()Lcoil/disk/DiskLruCache$Editor;
 HSPLcoil/disk/DiskLruCache$Snapshot;->file(I)Lokio/Path;
 Lcoil/disk/DiskLruCache$fileSystem$1;
 HSPLcoil/disk/DiskLruCache$fileSystem$1;-><init>(Lokio/FileSystem;)V
@@ -276,6 +277,8 @@ HSPLcoil/disk/RealDiskCache$RealEditor;->getMetadata()Lokio/Path;
 Lcoil/disk/RealDiskCache$RealSnapshot;
 HSPLcoil/disk/RealDiskCache$RealSnapshot;-><init>(Lcoil/disk/DiskLruCache$Snapshot;)V
 HSPLcoil/disk/RealDiskCache$RealSnapshot;->close()V
+HSPLcoil/disk/RealDiskCache$RealSnapshot;->closeAndOpenEditor()Lcoil/disk/DiskCache$Editor;
+HSPLcoil/disk/RealDiskCache$RealSnapshot;->closeAndOpenEditor()Lcoil/disk/RealDiskCache$RealEditor;
 HSPLcoil/disk/RealDiskCache$RealSnapshot;->getData()Lokio/Path;
 HSPLcoil/disk/RealDiskCache$RealSnapshot;->getMetadata()Lokio/Path;
 Lcoil/fetch/AssetUriFetcher$Factory;
@@ -495,8 +498,11 @@ HSPLcoil/network/CacheStrategy;->getNetworkRequest()Lokhttp3/Request;
 Lcoil/network/CacheStrategy$Companion;
 HSPLcoil/network/CacheStrategy$Companion;-><init>()V
 HSPLcoil/network/CacheStrategy$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+HSPLcoil/network/CacheStrategy$Companion;->combineHeaders(Lokhttp3/Headers;Lokhttp3/Headers;)Lokhttp3/Headers;
 HSPLcoil/network/CacheStrategy$Companion;->isCacheable(Lokhttp3/Request;Lcoil/network/CacheResponse;)Z
 HSPLcoil/network/CacheStrategy$Companion;->isCacheable(Lokhttp3/Request;Lokhttp3/Response;)Z
+HSPLcoil/network/CacheStrategy$Companion;->isContentSpecificHeader(Ljava/lang/String;)Z
+HSPLcoil/network/CacheStrategy$Companion;->isEndToEnd(Ljava/lang/String;)Z
 Lcoil/network/CacheStrategy$Factory;
 HSPLcoil/network/CacheStrategy$Factory;-><init>(Lokhttp3/Request;Lcoil/network/CacheResponse;)V
 HSPLcoil/network/CacheStrategy$Factory;->cacheResponseAge()J
@@ -1919,7 +1925,6 @@ Lcom/skydoves/landscapist/coil/CoilImageState$None;
 HSPLcom/skydoves/landscapist/coil/CoilImageState$None;-><clinit>()V
 HSPLcom/skydoves/landscapist/coil/CoilImageState$None;-><init>()V
 HSPLcom/skydoves/landscapist/coil/CoilImageState$None;->equals(Ljava/lang/Object;)Z
-HSPLcom/skydoves/landscapist/coil/CoilImageState$None;->hashCode()I
 Lcom/skydoves/landscapist/coil/CoilImageState$Success;
 HSPLcom/skydoves/landscapist/coil/CoilImageState$Success;-><clinit>()V
 HSPLcom/skydoves/landscapist/coil/CoilImageState$Success;-><init>(Landroid/graphics/drawable/Drawable;Lcom/skydoves/landscapist/DataSource;)V
@@ -2121,7 +2126,6 @@ Lcom/skydoves/landscapist/coil3/CoilImageState$None;
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$None;-><clinit>()V
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$None;-><init>()V
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$None;->equals(Ljava/lang/Object;)Z
-HSPLcom/skydoves/landscapist/coil3/CoilImageState$None;->hashCode()I
 Lcom/skydoves/landscapist/coil3/CoilImageState$Success;
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$Success;-><clinit>()V
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$Success;-><init>(Lcoil3/Image;Lcom/skydoves/landscapist/DataSource;)V

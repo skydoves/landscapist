@@ -95,7 +95,6 @@ Lcom/skydoves/landscapist/coil3/CoilImageState$None;
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$None;-><clinit>()V
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$None;-><init>()V
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$None;->equals(Ljava/lang/Object;)Z
-HSPLcom/skydoves/landscapist/coil3/CoilImageState$None;->hashCode()I
 Lcom/skydoves/landscapist/coil3/CoilImageState$Success;
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$Success;-><clinit>()V
 HSPLcom/skydoves/landscapist/coil3/CoilImageState$Success;-><init>(Lcoil3/Image;Lcom/skydoves/landscapist/DataSource;)V

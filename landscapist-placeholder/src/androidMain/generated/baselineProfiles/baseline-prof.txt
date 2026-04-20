@@ -5,6 +5,7 @@ HSPLcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin;-><init>(
 Lcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Failure;
 HSPLcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Failure;-><clinit>()V
 HSPLcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Failure;-><init>(Ljava/lang/Object;)V
+HSPLcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Failure;->compose(Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Ljava/lang/Throwable;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
 Lcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Loading;
 HSPLcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Loading;-><clinit>()V
 HSPLcom/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin$Loading;-><init>(Ljava/lang/Object;)V
