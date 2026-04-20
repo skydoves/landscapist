@@ -1,0 +1,62 @@
+public final class com/skydoves/landscapist/gallery/ComposableSingletons$ImageGalleryKt {
+	public static final field INSTANCE Lcom/skydoves/landscapist/gallery/ComposableSingletons$ImageGalleryKt;
+	public fun <init> ()V
+	public final fun getLambda$-2102142093$landscapist_image_gallery_release ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class com/skydoves/landscapist/gallery/ComposableSingletons$ImageViewerKt {
+	public static final field INSTANCE Lcom/skydoves/landscapist/gallery/ComposableSingletons$ImageViewerKt;
+	public fun <init> ()V
+	public final fun getLambda$529889906$landscapist_image_gallery_release ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class com/skydoves/landscapist/gallery/ImageGalleryDefaults {
+	public static final field $stable I
+	public static final field AspectRatio F
+	public static final field INSTANCE Lcom/skydoves/landscapist/gallery/ImageGalleryDefaults;
+	public final fun getColumns ()Landroidx/compose/foundation/lazy/grid/GridCells;
+	public final fun getHorizontalSpacing-D9Ej5fM ()F
+	public final fun getVerticalSpacing-D9Ej5fM ()F
+}
+
+public final class com/skydoves/landscapist/gallery/ImageGalleryKt {
+	public static final fun ImageGallery (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/gallery/ImageGalleryState;Landroidx/compose/foundation/lazy/grid/GridCells;Landroidx/compose/foundation/layout/PaddingValues;Landroidx/compose/foundation/layout/Arrangement$Horizontal;Landroidx/compose/foundation/layout/Arrangement$Vertical;FLcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;ZLjava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;III)V
+}
+
+public final class com/skydoves/landscapist/gallery/ImageGalleryState {
+	public static final field $stable I
+	public final fun getLazyGridState ()Landroidx/compose/foundation/lazy/grid/LazyGridState;
+}
+
+public final class com/skydoves/landscapist/gallery/ImageGalleryStateKt {
+	public static final fun rememberImageGalleryState (Landroidx/compose/foundation/lazy/grid/LazyGridState;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/gallery/ImageGalleryState;
+}
+
+public final class com/skydoves/landscapist/gallery/ImageViewerDefaults {
+	public static final field $stable I
+	public static final field BeyondViewportPageCount I
+	public static final field DismissThreshold F
+	public static final field DismissVelocityThreshold F
+	public static final field INSTANCE Lcom/skydoves/landscapist/gallery/ImageViewerDefaults;
+	public final fun getBackgroundColor-0d7_KjU ()J
+	public final fun getPageSpacing-D9Ej5fM ()F
+}
+
+public final class com/skydoves/landscapist/gallery/ImageViewerKt {
+	public static final fun ImageViewer-uTJlfUs (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/gallery/ImageViewerState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;FILkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;ZFJLcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
+}
+
+public final class com/skydoves/landscapist/gallery/ImageViewerState {
+	public static final field $stable I
+	public final fun animateToPage (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getCurrentPage ()I
+	public final fun getPagerState ()Landroidx/compose/foundation/pager/PagerState;
+	public final fun isDismissing ()Z
+	public final fun isZoomed ()Z
+	public final fun resetZoom (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/skydoves/landscapist/gallery/ImageViewerStateKt {
+	public static final fun rememberImageViewerState (ILkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/gallery/ImageViewerState;
+}
+

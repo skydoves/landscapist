@@ -20,12 +20,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,18 +55,54 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       DisneyComposeTheme {
+        var selectedTab by remember { mutableIntStateOf(0) }
+        val tabs = listOf("Posters", "Gallery")
+
         Scaffold(
           backgroundColor = if (isSystemInDarkTheme()) {
             background
           } else {
             Color.White
           },
-          topBar = { PosterAppBar() },
-        ) {
-          val list = MockUtil.getMockPosters().toMutableList()
-          list.addAll(MockUtil.getMockPosters())
-          list.addAll(MockUtil.getMockPosters())
-          DisneyPosters(posters = list, paddingValues = it, vm = vm)
+          topBar = {
+            Column {
+              PosterAppBar()
+              TabRow(
+                selectedTabIndex = selectedTab,
+                backgroundColor = purple200,
+                contentColor = Color.White,
+              ) {
+                tabs.forEachIndexed { index, title ->
+                  Tab(
+                    selected = selectedTab == index,
+                    onClick = { selectedTab = index },
+                    text = {
+                      Text(
+                        text = title,
+                        fontWeight = if (selectedTab == index) {
+                          FontWeight.Bold
+                        } else {
+                          FontWeight.Normal
+                        },
+                      )
+                    },
+                  )
+                }
+              }
+            }
+          },
+        ) { paddingValues ->
+          when (selectedTab) {
+            0 -> {
+              val list = MockUtil.getMockPosters().toMutableList()
+              list.addAll(MockUtil.getMockPosters())
+              list.addAll(MockUtil.getMockPosters())
+              DisneyPosters(posters = list, paddingValues = paddingValues, vm = vm)
+            }
+            1 -> {
+              GalleryDemoScreen(paddingValues = paddingValues)
+            }
+          }
         }
       }
     }
