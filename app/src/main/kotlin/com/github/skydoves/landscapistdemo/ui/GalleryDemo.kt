@@ -71,8 +71,8 @@ fun GalleryDemoScreen(paddingValues: PaddingValues) {
       "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=600",
       "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=600",
       "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600",
-      "https://images.unsplash.com/photo-1465056836900-8f1e940b3923?w=600",
-      "https://images.unsplash.com/photo-1482784160681-29d0f4dba053?w=600",
+      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600",
+      "https://images.unsplash.com/photo-1504567961542-e24d9439a724?w=600",
     )
   }
 
