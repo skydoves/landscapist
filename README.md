@@ -25,7 +25,7 @@ Landscapist hits **+1,100,000 downloads every month** around the globe!
 
 ## Why Landscapist?
 
-Landscapist is built with a lot of consideration to improve the performance of image loadings in Jetpack Compose. Most composable functions of Landscapist are Restartable and Skippable, which indicates fairly improved recomposition performance according to the Compose compiler metrics. Also, the library performance was improved with [Baseline Profiles](https://android-developers.googleblog.com/2022/01/improving-app-performance-with-baseline.html) and it supports many pluggable features, such as [ImageOptions](https://github.com/skydoves/landscapist#imageoptions), [listening image state changes](https://github.com/skydoves/landscapist#listening-image-state-changes), [custom composables](https://github.com/skydoves/landscapist#custom-composables), [preview on Android Studio](https://github.com/skydoves/landscapist#preview-on-android-studio), [ImageComponent and ImagePlugin](https://github.com/skydoves/landscapist#imagecomponent-and-imageplugin), [placeholder](https://github.com/skydoves/landscapist#placeholder), [animations (circular reveal, crossfade)](https://github.com/skydoves/landscapist#animation), [transformation (blur)](https://github.com/skydoves/landscapist#transformation), [palette](https://github.com/skydoves/landscapist#palette), and [zoomable](https://github.com/skydoves/landscapist#zoomable).
+Landscapist is built with a lot of consideration to improve the performance of image loadings in Jetpack Compose. Most composable functions of Landscapist are Restartable and Skippable, which indicates fairly improved recomposition performance according to the Compose compiler metrics. Also, the library performance was improved with [Baseline Profiles](https://android-developers.googleblog.com/2022/01/improving-app-performance-with-baseline.html) and it supports many pluggable features, such as [ImageOptions](https://github.com/skydoves/landscapist#imageoptions), [listening image state changes](https://github.com/skydoves/landscapist#listening-image-state-changes), [custom composables](https://github.com/skydoves/landscapist#custom-composables), [preview on Android Studio](https://github.com/skydoves/landscapist#preview-on-android-studio), [ImageComponent and ImagePlugin](https://github.com/skydoves/landscapist#imagecomponent-and-imageplugin), [placeholder](https://github.com/skydoves/landscapist#placeholder), [animations (circular reveal, crossfade)](https://github.com/skydoves/landscapist#animation), [transformation (blur)](https://github.com/skydoves/landscapist#transformation), [palette](https://github.com/skydoves/landscapist#palette), [zoomable](https://github.com/skydoves/landscapist#zoomable), and [image gallery](https://github.com/skydoves/landscapist#image-gallery).
 
 <details>
  <summary>See the Compose compiler metrics for Landscapist</summary>
@@ -415,7 +415,7 @@ Next, add the dependency below to your **module**'s `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation("com.github.skydoves:landscapist-glide:2.9.6")
+    implementation("com.github.skydoves:landscapist-glide:2.9.7")
 }
 ```
 
@@ -1265,6 +1265,178 @@ GlideImage( // or CoilImage
 ```
 
  > **Note**: Sub-sampling is supported on Android (Glide, Coil3) and Kotlin Multiplatform (Coil3, targeting Android, iOS/macOS, and Destkop).
+
+## Image Gallery
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
+
+<img src="preview/gallery.gif" align="right" width="32%"/>
+
+The `landscapist-image-gallery` package provides high level, Compose Multiplatform UI components for building photo gallery experiences on top of Landscapist:
+
+- **`ImageGallery`**: a thumbnail grid built on `LazyVerticalGrid` with optional multi select, header and footer slots, and a custom content slot.
+- **`ImageViewer`**: a full screen pager with pinch to zoom, swipe to dismiss, and top bar, bottom bar, and page indicator overlays.
+- **`ImageSharedTransitionConfig`**: drop in shared element transition between gallery thumbnails and viewer pages.
+
+By default, both components render their images using `LandscapistImage`, so they work on Android, iOS, Desktop, and Web without extra setup. You can still swap in Glide, Coil, Fresco, or any custom loader through the `content` slot.
+
+To use the gallery components, add the dependency below:
+
+```kotlin
+dependencies {
+    implementation("com.github.skydoves:landscapist-image-gallery:$version")
+}
+```
+
+For Kotlin Multiplatform:
+
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("com.github.skydoves:landscapist-image-gallery:$version")
+        }
+    }
+}
+```
+
+### ImageGallery
+
+`ImageGallery` displays a list of image models in a `LazyVerticalGrid`. The items can be anything accepted by Landscapist (URL strings, `Uri`, `File`, `ByteArray`, drawable resources, and so on).
+
+```kotlin
+import com.skydoves.landscapist.gallery.ImageGallery
+
+ImageGallery(
+  images = imageUrls,
+  columns = GridCells.Fixed(3),
+  imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+  component = rememberImageComponent {
+    +ShimmerPlugin(
+      shimmer = Shimmer.Resonate(
+        baseColor = Color.DarkGray,
+        highlightColor = Color.LightGray,
+      ),
+    )
+  },
+  onImageClick = { index, imageModel ->
+    // open ImageViewer at `index`
+  },
+)
+```
+
+Because each tile is rendered by `LandscapistImage` under the hood, the full plugin ecosystem (Shimmer, Crossfade, Palette, and so on) is available through `component`. Use the `content` lambda to render tiles with another loader (Glide, Coil, Fresco).
+
+#### Selection mode
+
+Enable multi select by flipping `selectable` and tracking the selected indices yourself. Long pressing any tile enters selection mode, tapping tiles while in selection mode toggles them, and `onImageClick` is **not** fired while a selection is active.
+
+```kotlin
+var selectedIndices by remember { mutableStateOf(emptySet<Int>()) }
+
+ImageGallery(
+  images = imageUrls,
+  selectable = true,
+  selectedIndices = selectedIndices,
+  onSelectionChanged = { selectedIndices = it },
+  selectionOverlay = { _, selected ->
+    if (selected) {
+      Box(
+        modifier = Modifier
+          .fillMaxSize()
+          .background(Color.Black.copy(alpha = 0.3f)),
+        contentAlignment = Alignment.TopEnd,
+      ) {
+        Icon(
+          imageVector = Icons.Default.CheckCircle,
+          contentDescription = null,
+          modifier = Modifier.padding(6.dp).size(24.dp).clip(CircleShape),
+        )
+      }
+    }
+  },
+  header = { TopAppBar(title = { Text("Gallery") }) },
+)
+```
+
+### ImageViewer
+
+`ImageViewer` is a full screen pager for viewing images one at a time. It includes horizontal paging, pinch and double tap zoom via `ZoomablePlugin`, swipe to dismiss, and slots for a top bar, bottom bar, and page indicator.
+
+```kotlin
+import com.skydoves.landscapist.gallery.ImageViewer
+import com.skydoves.landscapist.gallery.rememberImageViewerState
+
+val viewerState = rememberImageViewerState(
+  initialPage = startIndex,
+  pageCount = { imageUrls.size },
+)
+
+ImageViewer(
+  images = imageUrls,
+  state = viewerState,
+  zoomableConfig = ZoomableConfig(
+    minZoom = 1f,
+    maxZoom = 5f,
+    doubleTapZoom = 2f,
+  ),
+  onDismiss = { navController.popBackStack() },
+  topBar = { current, total ->
+    TopAppBar(
+      backgroundColor = Color.Black.copy(alpha = 0.5f),
+      title = { Text("${current + 1} / $total", color = Color.White) },
+    )
+  },
+)
+```
+
+Swipe to dismiss is automatically disabled while the current page is zoomed, so zoom and pan gestures are not interrupted. Use the `content` slot to render pages with another loader while keeping zoom, paging, and dismiss behavior intact.
+
+### Shared element transition
+
+Pass the **same** `ImageSharedTransitionConfig` to both `ImageGallery` and `ImageViewer` to animate a tapped thumbnail into the full screen viewer and back on dismiss.
+
+```kotlin
+SharedTransitionLayout {
+  AnimatedContent(
+    targetState = showViewer,
+    transitionSpec = { fadeIn() togetherWith fadeOut() },
+    label = "gallery-viewer",
+  ) { viewerVisible ->
+    val animatedContentScope = this
+    if (!viewerVisible) {
+      ImageGallery(
+        images = imageUrls,
+        onImageClick = { index, _ ->
+          selectedPage = index
+          showViewer = true
+        },
+        sharedTransition = ImageSharedTransitionConfig(
+          sharedTransitionScope = this@SharedTransitionLayout,
+          animatedContentScope = animatedContentScope,
+        ),
+      )
+    } else {
+      ImageViewer(
+        images = imageUrls,
+        state = rememberImageViewerState(
+          initialPage = selectedPage,
+          pageCount = { imageUrls.size },
+        ),
+        onDismiss = { showViewer = false },
+        sharedTransition = ImageSharedTransitionConfig(
+          sharedTransitionScope = this@SharedTransitionLayout,
+          animatedContentScope = animatedContentScope,
+        ),
+      )
+    }
+  }
+}
+```
+
+The same pattern works with `NavHost`. Use the `AnimatedContentScope` from each `composable { ... }` destination as the `animatedContentScope`. Override `keyProvider` when gallery indices don't match viewer pages, when the same model appears multiple times, or when you need to namespace keys across multiple galleries.
+
+> For the complete API reference (state holders, defaults, Kotlin Multiplatform targets, all overlay slots), see the [Image Gallery documentation](https://skydoves.github.io/landscapist/gallery/).
 
  ## BOM
 
