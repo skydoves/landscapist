@@ -1,13 +1,13 @@
 public final class com/skydoves/landscapist/gallery/ComposableSingletons$ImageGalleryKt {
 	public static final field INSTANCE Lcom/skydoves/landscapist/gallery/ComposableSingletons$ImageGalleryKt;
 	public fun <init> ()V
-	public final fun getLambda$-2102142093$landscapist_image_gallery_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-2002893656$landscapist_image_gallery_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/skydoves/landscapist/gallery/ComposableSingletons$ImageViewerKt {
 	public static final field INSTANCE Lcom/skydoves/landscapist/gallery/ComposableSingletons$ImageViewerKt;
 	public fun <init> ()V
-	public final fun getLambda$529889906$landscapist_image_gallery_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1733709853$landscapist_image_gallery_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/skydoves/landscapist/gallery/ImageGalleryDefaults {
@@ -20,7 +20,7 @@ public final class com/skydoves/landscapist/gallery/ImageGalleryDefaults {
 }
 
 public final class com/skydoves/landscapist/gallery/ImageGalleryKt {
-	public static final fun ImageGallery (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/gallery/ImageGalleryState;Landroidx/compose/foundation/lazy/grid/GridCells;Landroidx/compose/foundation/layout/PaddingValues;Landroidx/compose/foundation/layout/Arrangement$Horizontal;Landroidx/compose/foundation/layout/Arrangement$Vertical;FLcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;ZLjava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ImageGallery (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/gallery/ImageGalleryState;Landroidx/compose/foundation/lazy/grid/GridCells;Landroidx/compose/foundation/layout/PaddingValues;Landroidx/compose/foundation/layout/Arrangement$Horizontal;Landroidx/compose/foundation/layout/Arrangement$Vertical;FLcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;ZLjava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lcom/skydoves/landscapist/gallery/ImageSharedTransitionConfig;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class com/skydoves/landscapist/gallery/ImageGalleryState {
@@ -30,6 +30,21 @@ public final class com/skydoves/landscapist/gallery/ImageGalleryState {
 
 public final class com/skydoves/landscapist/gallery/ImageGalleryStateKt {
 	public static final fun rememberImageGalleryState (Landroidx/compose/foundation/lazy/grid/LazyGridState;Landroidx/compose/runtime/Composer;II)Lcom/skydoves/landscapist/gallery/ImageGalleryState;
+}
+
+public final class com/skydoves/landscapist/gallery/ImageSharedTransitionConfig {
+	public static final field $stable I
+	public static final field Companion Lcom/skydoves/landscapist/gallery/ImageSharedTransitionConfig$Companion;
+	public fun <init> (Landroidx/compose/animation/SharedTransitionScope;Landroidx/compose/animation/AnimatedContentScope;Lkotlin/jvm/functions/Function2;Z)V
+	public synthetic fun <init> (Landroidx/compose/animation/SharedTransitionScope;Landroidx/compose/animation/AnimatedContentScope;Lkotlin/jvm/functions/Function2;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getAnimatedContentScope ()Landroidx/compose/animation/AnimatedContentScope;
+	public final fun getEnabled ()Z
+	public final fun getKeyProvider ()Lkotlin/jvm/functions/Function2;
+	public final fun getSharedTransitionScope ()Landroidx/compose/animation/SharedTransitionScope;
+}
+
+public final class com/skydoves/landscapist/gallery/ImageSharedTransitionConfig$Companion {
+	public final fun getDefaultKeyProvider ()Lkotlin/jvm/functions/Function2;
 }
 
 public final class com/skydoves/landscapist/gallery/ImageViewerDefaults {
@@ -43,7 +58,7 @@ public final class com/skydoves/landscapist/gallery/ImageViewerDefaults {
 }
 
 public final class com/skydoves/landscapist/gallery/ImageViewerKt {
-	public static final fun ImageViewer-uTJlfUs (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/gallery/ImageViewerState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;FILkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;ZFJLcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ImageViewer-MjSGfMw (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/gallery/ImageViewerState;Lcom/skydoves/landscapist/zoomable/ZoomableConfig;FILkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;ZFJLcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lcom/skydoves/landscapist/gallery/ImageSharedTransitionConfig;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class com/skydoves/landscapist/gallery/ImageViewerState {
