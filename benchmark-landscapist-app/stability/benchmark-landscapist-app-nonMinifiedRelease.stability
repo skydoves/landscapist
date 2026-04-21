@@ -35,6 +35,18 @@ public fun com.skydoves.benchmark.landscapist.app.GlideImageProfiles(): kotlin.U
   params:
 
 @Composable
+public fun com.skydoves.benchmark.landscapist.app.ImageGalleryProfiles(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+public fun com.skydoves.benchmark.landscapist.app.ImageViewerProfiles(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
 public fun com.skydoves.benchmark.landscapist.app.LandscapistImageProfiles(): kotlin.Unit
   skippable: true
   restartable: true

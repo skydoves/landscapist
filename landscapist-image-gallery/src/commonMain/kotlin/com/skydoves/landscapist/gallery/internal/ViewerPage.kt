@@ -68,6 +68,7 @@ internal fun ViewerPage(
   imageOptions: ImageOptions,
   onZoomChanged: (isZoomed: Boolean) -> Unit,
   content: (@Composable (imageModel: Any) -> Unit)?,
+  modifier: Modifier = Modifier,
 ) {
   val zoomableState = rememberZoomableState(
     config = zoomableConfig,
@@ -113,7 +114,7 @@ internal fun ViewerPage(
   }
 
   Box(
-    modifier = Modifier.fillMaxSize(),
+    modifier = modifier.fillMaxSize(),
     contentAlignment = Alignment.Center,
   ) {
     if (content != null) {

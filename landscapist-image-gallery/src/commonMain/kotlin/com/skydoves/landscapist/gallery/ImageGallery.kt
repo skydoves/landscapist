@@ -15,6 +15,7 @@
  */
 package com.skydoves.landscapist.gallery
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -86,7 +87,12 @@ import com.skydoves.landscapist.image.LandscapistImage
  *   [LandscapistImage][com.skydoves.landscapist.image.LandscapistImage] rendering is replaced.
  * @param header Optional composable displayed above the grid items.
  * @param footer Optional composable displayed below the grid items.
+ * @param sharedTransition Optional [ImageSharedTransitionConfig] to enable shared element
+ *   transitions between gallery items and [ImageViewer] pages. When `null` (default),
+ *   no shared bounds are applied. Pass the same config (with matching [ImageSharedTransitionConfig.keyProvider])
+ *   to both [ImageGallery] and [ImageViewer] to animate between them.
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 public fun ImageGallery(
   images: List<Any>,
@@ -112,6 +118,7 @@ public fun ImageGallery(
   content: (@Composable (index: Int, imageModel: Any) -> Unit)? = null,
   header: (@Composable () -> Unit)? = null,
   footer: (@Composable () -> Unit)? = null,
+  sharedTransition: ImageSharedTransitionConfig? = null,
 ) {
   val isSelectionActive = selectable && selectedIndices.isNotEmpty()
 
@@ -140,10 +147,16 @@ public fun ImageGallery(
       contentType = { _, _ -> "image" },
     ) { index, imageModel ->
       val isSelected = selectable && selectedIndices.contains(index)
+      val sharedBoundsModifier = rememberSharedBoundsModifier(
+        config = sharedTransition,
+        index = index,
+        imageModel = imageModel,
+      )
 
       Box(
         modifier = Modifier
           .aspectRatio(aspectRatio)
+          .then(sharedBoundsModifier)
           .combinedClickable(
             onClick = {
               if (isSelectionActive) {

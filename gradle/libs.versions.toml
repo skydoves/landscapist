@@ -91,6 +91,7 @@ jetbrains-compose-runtime = { group = "org.jetbrains.compose.runtime", name = "r
 compose-runtime-annotation = { group = "androidx.compose.runtime", name = "runtime-annotation", version = "1.10.6" }
 jetbrains-compose-ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "jetbrains-compose" }
 jetbrains-compose-foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "jetbrains-compose" }
+jetbrains-compose-animation = { group = "org.jetbrains.compose.animation", name = "animation", version.ref = "jetbrains-compose" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

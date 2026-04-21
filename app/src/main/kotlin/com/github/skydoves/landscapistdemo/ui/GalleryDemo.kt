@@ -16,6 +16,12 @@
 package com.github.skydoves.landscapistdemo.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,15 +54,17 @@ import com.github.skydoves.landscapistdemo.theme.purple200
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.gallery.ImageGallery
+import com.skydoves.landscapist.gallery.ImageSharedTransitionConfig
 import com.skydoves.landscapist.gallery.ImageViewer
 import com.skydoves.landscapist.gallery.rememberImageViewerState
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 /**
- * Demo screen showing ImageGallery and ImageViewer in action.
- * Tapping a gallery image opens the full-screen ImageViewer.
+ * Demo screen showing ImageGallery and ImageViewer in action with a shared element
+ * transition between the gallery thumbnail and the full-screen viewer page.
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun GalleryDemoScreen(paddingValues: PaddingValues) {
   val imageUrls = remember {
@@ -89,88 +97,106 @@ fun GalleryDemoScreen(paddingValues: PaddingValues) {
     )
   }
 
-  Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-    ImageGallery(
-      images = imageUrls,
-      columns = GridCells.Fixed(3),
-      contentPadding = PaddingValues(2.dp),
-      horizontalArrangement = Arrangement.spacedBy(2.dp),
-      verticalArrangement = Arrangement.spacedBy(2.dp),
-      component = component,
-      imageOptions = ImageOptions(contentScale = ContentScale.Crop),
-      selectable = true,
-      selectedIndices = selectedIndices,
-      onSelectionChanged = { selectedIndices = it },
-      onImageClick = { index, _ ->
-        selectedPage = index
-        showViewer = true
-      },
-      selectionOverlay = { _, selected ->
-        if (selected) {
-          Box(
-            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)),
-            contentAlignment = Alignment.TopEnd,
-          ) {
-            Icon(
-              imageVector = Icons.Default.CheckCircle,
-              contentDescription = null,
-              tint = purple200,
-              modifier = Modifier
-                .padding(6.dp)
-                .size(24.dp)
-                .clip(CircleShape),
-            )
-          }
-        }
-      },
-      header = {
-        TopAppBar(
-          backgroundColor = purple200,
-          title = {
-            Text(
-              text = if (selectedIndices.isEmpty()) {
-                "Gallery Demo"
-              } else {
-                "${selectedIndices.size} selected"
+  SharedTransitionLayout(
+    modifier = Modifier.fillMaxSize().padding(paddingValues),
+  ) {
+    AnimatedContent(
+      targetState = showViewer,
+      transitionSpec = { fadeIn() togetherWith fadeOut() },
+      label = "gallery-viewer",
+    ) { viewerVisible ->
+      val animatedContentScope = this
+      if (!viewerVisible) {
+        ImageGallery(
+          images = imageUrls,
+          modifier = Modifier.fillMaxSize(),
+          columns = GridCells.Fixed(3),
+          contentPadding = PaddingValues(2.dp),
+          horizontalArrangement = Arrangement.spacedBy(2.dp),
+          verticalArrangement = Arrangement.spacedBy(2.dp),
+          component = component,
+          imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+          selectable = true,
+          selectedIndices = selectedIndices,
+          onSelectionChanged = { selectedIndices = it },
+          onImageClick = { index, _ ->
+            selectedPage = index
+            showViewer = true
+          },
+          selectionOverlay = { _, selected ->
+            if (selected) {
+              Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.TopEnd,
+              ) {
+                Icon(
+                  imageVector = Icons.Default.CheckCircle,
+                  contentDescription = null,
+                  tint = purple200,
+                  modifier = Modifier
+                    .padding(6.dp)
+                    .size(24.dp)
+                    .clip(CircleShape),
+                )
+              }
+            }
+          },
+          header = {
+            TopAppBar(
+              backgroundColor = purple200,
+              title = {
+                Text(
+                  text = if (selectedIndices.isEmpty()) {
+                    "Gallery Demo"
+                  } else {
+                    "${selectedIndices.size} selected"
+                  },
+                  color = Color.White,
+                  fontSize = 18.sp,
+                  fontWeight = FontWeight.Bold,
+                )
               },
-              color = Color.White,
-              fontSize = 18.sp,
-              fontWeight = FontWeight.Bold,
             )
           },
+          sharedTransition = ImageSharedTransitionConfig(
+            sharedTransitionScope = this@SharedTransitionLayout,
+            animatedContentScope = animatedContentScope,
+          ),
         )
-      },
-    )
-  }
+      } else {
+        BackHandler { showViewer = false }
 
-  // Full-screen image viewer overlay
-  if (showViewer) {
-    BackHandler { showViewer = false }
+        val viewerState = rememberImageViewerState(
+          initialPage = selectedPage,
+          pageCount = { imageUrls.size },
+        )
 
-    val viewerState = rememberImageViewerState(
-      initialPage = selectedPage,
-      pageCount = { imageUrls.size },
-    )
-
-    ImageViewer(
-      images = imageUrls,
-      state = viewerState,
-      component = component,
-      imageOptions = ImageOptions(contentScale = ContentScale.Fit),
-      onDismiss = { showViewer = false },
-      onImageTap = { /* could toggle UI overlays */ },
-      topBar = { currentPage, totalPages ->
-        TopAppBar(
-          backgroundColor = Color.Black.copy(alpha = 0.5f),
-          title = {
-            Text(
-              text = "${currentPage + 1} / $totalPages",
-              color = Color.White,
-              fontSize = 16.sp,
+        ImageViewer(
+          images = imageUrls,
+          modifier = Modifier.fillMaxSize(),
+          state = viewerState,
+          component = component,
+          imageOptions = ImageOptions(contentScale = ContentScale.Fit),
+          onDismiss = { showViewer = false },
+          onImageTap = { /* could toggle UI overlays */ },
+          topBar = { currentPage, totalPages ->
+            TopAppBar(
+              backgroundColor = Color.Black.copy(alpha = 0.5f),
+              title = {
+                Text(
+                  text = "${currentPage + 1} / $totalPages",
+                  color = Color.White,
+                  fontSize = 16.sp,
+                )
+              },
             )
           },
+          sharedTransition = ImageSharedTransitionConfig(
+            sharedTransitionScope = this@SharedTransitionLayout,
+            animatedContentScope = animatedContentScope,
+          ),
         )
-      },
-    )
+      }
+    }
   }
 }

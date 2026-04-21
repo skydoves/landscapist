@@ -15,6 +15,7 @@
  */
 package com.skydoves.landscapist.gallery
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -99,7 +100,12 @@ import kotlinx.coroutines.flow.drop
  * @param content Optional custom content per page. When provided, the default
  *   [LandscapistImage][com.skydoves.landscapist.image.LandscapistImage] rendering is replaced
  *   and [component]/[imageOptions] are ignored.
+ * @param sharedTransition Optional [ImageSharedTransitionConfig] to enable shared element
+ *   transitions between [ImageGallery] items and viewer pages. When `null` (default),
+ *   no shared bounds are applied. Pass the same config (with matching
+ *   [ImageSharedTransitionConfig.keyProvider]) to both sides to animate between them.
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 public fun ImageViewer(
   images: List<Any>,
@@ -121,6 +127,7 @@ public fun ImageViewer(
   bottomBar: (@Composable (currentPage: Int, totalPages: Int) -> Unit)? = null,
   indicator: (@Composable (currentPage: Int, totalPages: Int) -> Unit)? = null,
   content: (@Composable (page: Int, imageModel: Any) -> Unit)? = null,
+  sharedTransition: ImageSharedTransitionConfig? = null,
 ) {
   if (images.isEmpty()) return
 
@@ -170,6 +177,15 @@ public fun ImageViewer(
         key = { images.getOrNull(it) ?: it },
       ) { page ->
         val imageModel = images.getOrNull(page) ?: return@HorizontalPager
+        // Only register shared bounds for the currently-settled page. Off-screen pages that
+        // HorizontalPager pre-composes (beyondViewportPageCount) would otherwise match their
+        // sibling gallery items and animate them all at once during the transition.
+        val isSettledPage = page == state.pagerState.settledPage
+        val sharedBoundsModifier = rememberSharedBoundsModifier(
+          config = sharedTransition?.takeIf { isSettledPage },
+          index = page,
+          imageModel = imageModel,
+        )
         ViewerPage(
           imageModel = imageModel,
           isCurrentPage = page == state.pagerState.settledPage,
@@ -183,6 +199,7 @@ public fun ImageViewer(
             }
           },
           content = content?.let { customContent -> { model -> customContent(page, model) } },
+          modifier = sharedBoundsModifier,
         )
       }
     }

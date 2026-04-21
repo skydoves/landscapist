@@ -29,6 +29,13 @@ public fun com.github.skydoves.landscapistdemo.ui.DisneyPosters(posters: kotlin.
     - vm: STABLE (class with no mutable properties)
 
 @Composable
+public fun com.github.skydoves.landscapistdemo.ui.GalleryDemoScreen(paddingValues: androidx.compose.foundation.layout.PaddingValues): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - paddingValues: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun com.github.skydoves.landscapistdemo.ui.PosterAppBar(): kotlin.Unit
   skippable: true
   restartable: true
