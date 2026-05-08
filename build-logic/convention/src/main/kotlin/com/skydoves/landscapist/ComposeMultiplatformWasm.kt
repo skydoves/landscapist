@@ -50,11 +50,9 @@ internal fun Project.configureComposeMultiplatformWasm(
       binaries.library()
     }
 
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
 
-    macosX64()
     macosArm64()
 
     @Suppress("OPT_IN_USAGE")
@@ -69,12 +67,10 @@ internal fun Project.configureComposeMultiplatformWasm(
           group("darwin") {
             group("apple") {
               group("ios") {
-                withIosX64()
                 withIosArm64()
                 withIosSimulatorArm64()
               }
               group("macos") {
-                withMacosX64()
                 withMacosArm64()
               }
             }
