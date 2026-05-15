@@ -400,35 +400,24 @@ private fun buildSizedRequest(
 
   // If imageOptions has valid size, use it
   if (imageOptions.isValidSize) {
-    return ImageRequest.builder().apply {
-      model(originalRequest.model)
-      memoryCachePolicy(originalRequest.memoryCachePolicy)
-      diskCachePolicy(originalRequest.diskCachePolicy)
-      headers(originalRequest.headers)
-      transformations(originalRequest.transformations)
-      tag(originalRequest.tag)
-      size(imageOptions.requestSize.width, imageOptions.requestSize.height)
-    }.build()
+    return originalRequest.copy(
+      targetWidth = imageOptions.requestSize.width,
+      targetHeight = imageOptions.requestSize.height,
+    )
   }
 
   // Calculate target size from constraints
   val targetWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else null
   val targetHeight = if (constraints.hasBoundedHeight) constraints.maxHeight else null
 
-  // If we have at least one bounded dimension, use it for downsampling
+  // If we have at least one bounded dimension, use it for downsampling.
+  // For unbounded dimensions, use Int.MAX_VALUE to signal "no constraint" while still
+  // passing the decoder's > 0 check. The decoder will maintain aspect ratio.
   if (targetWidth != null || targetHeight != null) {
-    return ImageRequest.builder().apply {
-      model(originalRequest.model)
-      memoryCachePolicy(originalRequest.memoryCachePolicy)
-      diskCachePolicy(originalRequest.diskCachePolicy)
-      headers(originalRequest.headers)
-      transformations(originalRequest.transformations)
-      tag(originalRequest.tag)
-      // Use the bounded dimension(s) for sizing
-      // For unbounded dimensions, use Int.MAX_VALUE to signal "no constraint" while still
-      // passing the decoder's > 0 check. The decoder will maintain aspect ratio.
-      size(targetWidth ?: Int.MAX_VALUE, targetHeight ?: Int.MAX_VALUE)
-    }.build()
+    return originalRequest.copy(
+      targetWidth = targetWidth ?: Int.MAX_VALUE,
+      targetHeight = targetHeight ?: Int.MAX_VALUE,
+    )
   }
 
   // No size constraints - load at original size (this should be rare)
