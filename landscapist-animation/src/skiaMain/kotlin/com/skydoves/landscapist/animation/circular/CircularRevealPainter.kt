@@ -25,13 +25,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.graphics.asSkiaBitmap
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.painter.Painter
-import org.jetbrains.skia.Image
-import org.jetbrains.skia.Matrix33
 
 /**
  * CircularRevealPainter is a [Painter] which animates a clipping circle to reveal an image.
@@ -73,20 +70,29 @@ internal actual class CircularRevealPainter actual constructor(
         scale = mDrawableRect.size.width / bitmapWidth.toFloat()
         dy = (mDrawableRect.size.height - bitmapHeight * scale) * 0.5f
       }
-      // resize the matrix to scale by sx and sy.
-      val m1 = Matrix33.makeScale(scale, scale)
-      val m2 = Matrix33.makeTranslate(
+      // calculate radius and clip the canvas to that circle to reveal the image.
+      val calculatedRadius = size.width.coerceAtLeast(size.height) * radius
+      val center = Offset(size.width / 2, size.height / 2)
+      val clipPath = Path().apply {
+        addOval(
+          Rect(
+            left = center.x - calculatedRadius,
+            top = center.y - calculatedRadius,
+            right = center.x + calculatedRadius,
+            bottom = center.y + calculatedRadius,
+          ),
+        )
+      }
+      canvas.save()
+      canvas.clipPath(clipPath)
+      // translate and scale the canvas so the bitmap is drawn centered.
+      canvas.translate(
         (dx + 0.5f) + mDrawableRect.left,
         (dy + 0.5f) + mDrawableRect.top,
       )
-      val shaderMatrix = m1.makeConcat(m2)
-      val shader = Image.makeFromBitmap(imageBitmap.asSkiaBitmap()).makeShader(
-        localMatrix = shaderMatrix,
-      )
-      val brush = ShaderBrush(shader)
-      // calculate radius and draw an image bitmap as a circle.
-      val calculatedRadius = size.width.coerceAtLeast(size.height) * radius
-      drawCircle(brush, calculatedRadius, Offset(size.width / 2, size.height / 2))
+      canvas.scale(scale, scale)
+      canvas.drawImage(imageBitmap, Offset.Zero, paint)
+      canvas.restore()
       // restore canvas.
       canvas.restore()
       // resets the paint and release to the pool.
