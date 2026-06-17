@@ -16,5 +16,5 @@ public fun com.skydoves.landscapist.fresco.websupport.FrescoWebImage(controllerB
     - contentScale: STABLE (marked @Stable or @Immutable)
     - alpha: STABLE (primitive type)
     - colorFilter: STABLE (marked @Stable or @Immutable)
-    - previewPlaceholder: RUNTIME (requires runtime check)
+    - previewPlaceholder: UNKNOWN (interface or non-final class; concrete implementation unknown)
 

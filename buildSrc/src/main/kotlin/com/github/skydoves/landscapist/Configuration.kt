@@ -17,7 +17,7 @@
 package com.github.skydoves.landscapist
 
 object Configuration {
-  const val compileSdk = 36
+  const val compileSdk = 37
   const val targetSdk = 36
   const val minSdk = 21
   const val minSdk24 = 24

@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.21"
+kotlin = "2.4.0"
 dokka = "2.2.0"
 jvmTarget = "17"
 nexusPlugin = "0.36.0"
@@ -28,7 +28,7 @@ ktor = "3.5.0"
 okio = "3.17.0"
 atomicfu = "0.27.0"
 palette = "3.1.0"
-ksp = "2.3.6"
+ksp = "2.3.9"
 spotless = "6.21.0"
 
 [libraries]

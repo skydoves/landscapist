@@ -1,13 +1,13 @@
 public final class com/skydoves/landscapist/gallery/ComposableSingletons$ImageGalleryKt {
 	public static final field INSTANCE Lcom/skydoves/landscapist/gallery/ComposableSingletons$ImageGalleryKt;
 	public fun <init> ()V
-	public final fun getLambda$-2002893656$landscapist_image_gallery_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-2002893656$LandscapistDemo_landscapist_image_gallery_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/skydoves/landscapist/gallery/ComposableSingletons$ImageViewerKt {
 	public static final field INSTANCE Lcom/skydoves/landscapist/gallery/ComposableSingletons$ImageViewerKt;
 	public fun <init> ()V
-	public final fun getLambda$1733709853$landscapist_image_gallery_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1733709853$LandscapistDemo_landscapist_image_gallery_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/skydoves/landscapist/gallery/ImageGalleryDefaults {
