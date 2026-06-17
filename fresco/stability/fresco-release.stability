@@ -15,7 +15,7 @@ public fun com.skydoves.landscapist.fresco.FrescoImage(imageUrl: kotlin.String?,
     - component: STABLE (marked @Stable or @Immutable)
     - imageOptions: STABLE (marked @Stable or @Immutable)
     - onImageStateChanged: STABLE (function type)
-    - previewPlaceholder: RUNTIME (requires runtime check)
+    - previewPlaceholder: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - loading: STABLE (composable function type)
     - success: STABLE (composable function type)
     - failure: STABLE (composable function type)
@@ -53,7 +53,7 @@ internal fun com.skydoves.landscapist.fresco.rememberCloseableRef(ref: com.faceb
   skippable: false
   restartable: true
   params:
-    - ref: RUNTIME (requires runtime check)
+    - ref: UNKNOWN (interface or non-final class; concrete implementation unknown)
 
 @Composable
 public fun com.skydoves.landscapist.fresco.rememberFrescoImageState(initialState: com.skydoves.landscapist.fresco.FrescoImageState, key: kotlin.Any?): androidx.compose.runtime.MutableState<com.skydoves.landscapist.fresco.FrescoImageState>
@@ -61,7 +61,7 @@ public fun com.skydoves.landscapist.fresco.rememberFrescoImageState(initialState
   restartable: true
   params:
     - initialState: STABLE (marked @Stable or @Immutable)
-    - key: UNSTABLE (has mutable properties or unstable members)
+    - key: UNKNOWN (interface or non-final class; concrete implementation unknown)
 
 @Composable
 public fun com.skydoves.landscapist.fresco.toFrescoImageState(): com.skydoves.landscapist.fresco.FrescoImageState
