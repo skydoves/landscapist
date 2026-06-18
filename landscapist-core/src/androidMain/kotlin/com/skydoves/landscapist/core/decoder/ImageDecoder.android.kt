@@ -203,7 +203,10 @@ internal class AndroidImageDecoder : ImageDecoder {
       }
     }
 
-    var bitmap = try {
+    // Request the preferred config (e.g. HARDWARE) directly from BitmapFactory and accept whatever
+    // it returns. Decoding to a software bitmap and then copying it to a hardware bitmap would
+    // double the work; if the direct decode could not honor HARDWARE, the software bitmap is fine.
+    val bitmap = try {
       BitmapFactory.decodeByteArray(data, 0, data.size, decodeOptions)
     } catch (e: IllegalArgumentException) {
       // inBitmap was not compatible, try again without reuse
@@ -212,22 +215,6 @@ internal class AndroidImageDecoder : ImageDecoder {
     } ?: return DecodeResult.Error(
       IllegalArgumentException("Failed to decode bitmap"),
     )
-
-    // If hardware bitmap failed, try to copy to hardware
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
-      bitmap.config != Bitmap.Config.HARDWARE &&
-      useHardware
-    ) {
-      try {
-        val hardwareBitmap = bitmap.copy(Bitmap.Config.HARDWARE, false)
-        if (hardwareBitmap != null) {
-          bitmap.recycle()
-          bitmap = hardwareBitmap
-        }
-      } catch (_: Exception) {
-        // Failed to copy to hardware, keep the original bitmap
-      }
-    }
 
     return DecodeResult.Success(
       bitmap = bitmap,

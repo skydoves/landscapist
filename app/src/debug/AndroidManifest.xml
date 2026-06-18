@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-only overlay: permit cleartext HTTP so the performance benchmark can load from a local
+  image server (e.g. http://127.0.0.1:8099 via `adb reverse`). Never applied to release builds.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <application android:usesCleartextTraffic="true" />
+</manifest>

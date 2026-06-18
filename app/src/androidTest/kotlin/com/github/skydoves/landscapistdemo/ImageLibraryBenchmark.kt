@@ -27,6 +27,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil3.CoilImage
 import com.skydoves.landscapist.coil3.CoilImageState
@@ -222,12 +223,21 @@ class ImageLibraryBenchmark {
     private val RUN_ID = UUID.randomUUID().toString().take(8)
 
     /**
+     * Base URL for the image source, overridable with `-e baseUrl <url>` (e.g. a local server via
+     * `adb reverse` to remove network noise). Defaults to picsum.photos.
+     */
+    private val baseUrl: String by lazy {
+      InstrumentationRegistry.getArguments().getString("baseUrl")?.trimEnd('/')
+        ?: "https://picsum.photos"
+    }
+
+    /**
      * Each measured load uses a distinct, cacheable URL so the timing reflects a cold load.
      * `seed` (plus [RUN_ID]) guarantees a unique image; `size` requests a server-resized image so
-     * the decode cost tracks the display size. Swap this function to benchmark against your own CDN.
+     * the decode cost tracks the display size. Override [baseUrl] to benchmark against your own CDN.
      */
     private fun imageUrl(seed: String, size: Int): String =
-      "https://picsum.photos/seed/${RUN_ID}_$seed/$size/$size"
+      "$baseUrl/seed/${RUN_ID}_$seed/$size/$size"
 
     private val allResults = mutableListOf<Measurement>()
 

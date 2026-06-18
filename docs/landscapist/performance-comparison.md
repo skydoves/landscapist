@@ -46,7 +46,17 @@ We do not publish fixed load-time or memory numbers, because they vary too much 
   -Pandroid.testInstrumentationRunnerArguments.class=com.github.skydoves.landscapistdemo.ImageLibraryBenchmark
 ```
 
-A companion engine-level benchmark, `UnitPerformanceTest.kt`, measures the underlying loaders (Glide `FutureTarget`, Coil `ImageLoader.execute`, Fresco `ImagePipeline`, `Landscapist.load`) without any Compose layer, each blocking on its own real terminal result.
+Two engine-level benchmarks measure the underlying loaders without any Compose layer, each blocking on its own real terminal result. `UnitPerformanceTest.kt` runs against a fixed remote image, and `EngineSpeedBenchmark.kt` runs against a local server (point it at one with `-e baseUrl http://127.0.0.1:PORT` over `adb reverse`) so the timing isolates loader overhead from network noise with nanosecond resolution.
+
+### What to expect (qualitative, not a published figure)
+
+These observations come from our own engine-level runs and will differ on your hardware, so we state them as direction rather than numbers:
+
+- For a single cold fetch and decode, landscapist-core is on par with Coil3. Neither is meaningfully faster than the other at a matched bitmap config.
+- Glide tends to win on repeated decodes of the same size (the scrolling case), because it reuses bitmap buffers through an `inBitmap` pool. That is a trade of memory for speed that Coil deliberately forgoes too, and landscapist-core does not match Glide's pooled decode throughput.
+- Measure with a matched configuration. Hardware bitmaps (the Android default) decode slowly under an emulator's software GPU, which makes any emulator number unrepresentative of a real device, so compare matched configs and prefer a physical device for absolute figures.
+
+The honest positioning: landscapist-core's edge is the smaller footprint and the Kotlin Multiplatform reach, not a faster decoder. On raw loader speed it is a competitive peer to Coil3, not a leader.
 
 ### 2. Macrobenchmark (frame timing and jank)
 

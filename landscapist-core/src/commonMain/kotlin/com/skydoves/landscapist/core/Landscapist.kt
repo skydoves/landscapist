@@ -257,7 +257,7 @@ public class Landscapist private constructor(
                 mimeType = null,
                 targetWidth = request.targetWidth,
                 targetHeight = request.targetHeight,
-                config = config,
+                config = decodeConfigFor(request),
               )
             }
           ) {
@@ -294,15 +294,14 @@ public class Landscapist private constructor(
       // Network fetch.
       return when (val fetchResult = fetcher.fetch(request)) {
         is FetchResult.Success -> {
-          var diskPath: String? = null
-          if (request.diskCachePolicy.writeEnabled && diskCache != null) {
-            diskCache.edit(cacheKey)?.use { editor ->
-              diskCache.fileSystem.sink(editor.dataPath).buffer().use { sink ->
-                sink.write(fetchResult.data)
-              }
-              editor.commit()
-              diskPath = (diskCache.directory / cacheKey.diskKey).toString()
-            }
+          // Write to the disk cache off the critical path so the decode starts immediately. The
+          // disk path is deterministic, so it can be reported before the background write finishes.
+          val diskPath = if (request.diskCachePolicy.writeEnabled && diskCache != null) {
+            val data = fetchResult.data
+            scope.launch { runCatching { writeToDiskCache(cacheKey, data) } }
+            (diskCache.directory / cacheKey.diskKey).toString()
+          } else {
+            null
           }
           decodeAndCacheStandard(
             bytes = fetchResult.data,
@@ -351,7 +350,7 @@ public class Landscapist private constructor(
           mimeType = mimeType,
           targetWidth = request.targetWidth,
           targetHeight = request.targetHeight,
-          config = config,
+          config = decodeConfigFor(request),
         )
       }
     ) {
@@ -502,6 +501,28 @@ public class Landscapist private constructor(
   }
 
   /**
+   * The decode config for [request]. Hardware bitmaps are disabled when the request has
+   * transformations, because a transformation needs CPU pixel access and would fail on a hardware
+   * bitmap (which lives in GPU memory). This mirrors how Coil auto-disables hardware bitmaps for
+   * transformed requests.
+   */
+  private fun decodeConfigFor(request: ImageRequest): LandscapistConfig =
+    if (request.transformations.isEmpty()) {
+      config
+    } else {
+      config.copy(bitmapConfig = config.bitmapConfig.copy(allowHardware = false))
+    }
+
+  /** Writes the encoded image bytes to the disk cache. Safe to run off the critical path. */
+  private suspend fun writeToDiskCache(cacheKey: CacheKey, data: ByteArray) {
+    val cache = diskCache ?: return
+    cache.edit(cacheKey)?.use { editor ->
+      cache.fileSystem.sink(editor.dataPath).buffer().use { sink -> sink.write(data) }
+      editor.commit()
+    }
+  }
+
+  /**
    * Schedules a decode operation with priority.
    */
   private suspend fun <T> scheduleDecodeWithPriority(
@@ -535,7 +556,7 @@ public class Landscapist private constructor(
       mimeType = mimeType,
       targetWidth = request.targetWidth,
       targetHeight = request.targetHeight,
-      config = config,
+      config = decodeConfigFor(request),
     ).collect { result ->
       when (result) {
         is ProgressiveDecodeResult.Intermediate -> {
