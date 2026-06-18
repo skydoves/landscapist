@@ -46,13 +46,15 @@ internal class SkiaProgressiveDecoder : ProgressiveDecoder {
       // For Skia platforms, we wrap the raw data and let the Compose layer handle decoding
       // The progressive effect is achieved through blur animation in the UI layer
       val rawImageData = RawImageData(data = data, mimeType = mimeType)
+      val size = readImageDimensions(data)
 
-      // Emit the raw data as "complete" - the UI layer will handle progressive rendering
+      // Emit the raw data as "complete" - the UI layer handles progressive rendering. The real size
+      // is parsed from the header so the memory cache can evict the entry by its true size.
       emit(
         ProgressiveDecodeResult.Complete(
           bitmap = rawImageData,
-          width = 0, // Will be determined during Compose decoding
-          height = 0,
+          width = size?.width ?: targetWidth ?: 0,
+          height = size?.height ?: targetHeight ?: 0,
         ),
       )
     } catch (e: Exception) {

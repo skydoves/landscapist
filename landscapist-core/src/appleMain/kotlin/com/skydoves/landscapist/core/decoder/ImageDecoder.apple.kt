@@ -38,12 +38,13 @@ internal class AppleImageDecoder : ImageDecoder {
     targetHeight: Int?,
     config: LandscapistConfig,
   ): DecodeResult {
-    // Return raw bytes for Compose/Skia layer to decode
-    // This ensures consistent behavior across all Skia platforms
+    // Return raw bytes for the Compose/Skia layer to decode, but parse the real pixel size from the
+    // header so the memory cache can account for and evict the entry by its true size.
+    val size = readImageDimensions(data)
     return DecodeResult.Success(
       bitmap = RawImageData(data, mimeType),
-      width = 0, // Unknown until decoded in Compose layer
-      height = 0,
+      width = size?.width ?: targetWidth ?: 0,
+      height = size?.height ?: targetHeight ?: 0,
     )
   }
 }

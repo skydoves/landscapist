@@ -163,7 +163,7 @@ public fun LandscapistImage(
           val painter = if (imageBitmap != null) {
             basePainter.composePainterPlugins(
               imagePlugins = component.imagePlugins,
-              imageBitmap = imageBitmap,
+              imageBitmap = { imageBitmap },
             )
           } else {
             basePainter
@@ -250,7 +250,7 @@ private fun LandscapistImageFastPath(
   val finalPainter = if (imageBitmap != null) {
     painter.composePainterPlugins(
       imagePlugins = component.imagePlugins,
-      imageBitmap = imageBitmap,
+      imageBitmap = { imageBitmap },
     )
   } else {
     painter

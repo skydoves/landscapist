@@ -32,6 +32,9 @@ import com.skydoves.landscapist.core.transformation.Transformation
  * @property tag Optional tag for grouping and managing requests.
  * @property priority The decode priority for this request. Higher priority loads first.
  * @property progressiveEnabled Whether to use progressive loading with intermediate results.
+ * Disabled by default: progressive decoding re-decodes the image at several sample sizes, which
+ * costs noticeably more CPU and allocations. Enable it only when you want low-resolution previews
+ * while a large image streams in.
  */
 public data class ImageRequest(
   val model: Any?,
@@ -43,7 +46,7 @@ public data class ImageRequest(
   val targetHeight: Int? = null,
   val tag: String? = null,
   val priority: DecodePriority = DecodePriority.NORMAL,
-  val progressiveEnabled: Boolean = true,
+  val progressiveEnabled: Boolean = false,
 ) {
   /**
    * Builder for creating [ImageRequest] instances.
@@ -58,7 +61,7 @@ public data class ImageRequest(
     private var targetHeight: Int? = null
     private var tag: String? = null
     private var priority: DecodePriority = DecodePriority.NORMAL
-    private var progressiveEnabled: Boolean = true
+    private var progressiveEnabled: Boolean = false
 
     /** Sets the image source. */
     public fun model(model: Any?): Builder = apply { this.model = model }
@@ -113,7 +116,8 @@ public data class ImageRequest(
 
     /**
      * Enables or disables progressive loading.
-     * When enabled (default), intermediate image results are emitted during decode.
+     * Disabled by default. When enabled, intermediate image results are emitted during decode at
+     * the cost of re-decoding the image at several sample sizes.
      */
     public fun progressiveEnabled(enabled: Boolean): Builder = apply {
       this.progressiveEnabled = enabled

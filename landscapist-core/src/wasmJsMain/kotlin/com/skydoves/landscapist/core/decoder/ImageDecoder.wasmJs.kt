@@ -36,12 +36,13 @@ internal class WasmImageDecoder : ImageDecoder {
     targetHeight: Int?,
     config: LandscapistConfig,
   ): DecodeResult {
-    // For Wasm, we return the raw bytes and let the Compose layer handle decoding
-    // since Skia will be available there
+    // Return raw bytes for the Compose/Skia layer to decode, but parse the real pixel size from the
+    // header so the memory cache can account for and evict the entry by its true size.
+    val size = readImageDimensions(data)
     return DecodeResult.Success(
       bitmap = RawImageData(data, mimeType),
-      width = 0, // Unknown until decoded in Compose layer
-      height = 0,
+      width = size?.width ?: targetWidth ?: 0,
+      height = size?.height ?: targetHeight ?: 0,
     )
   }
 }

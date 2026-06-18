@@ -1,45 +1,33 @@
 #!/bin/bash
 
-# Performance comparison test runner
-# This script runs the network loading performance comparison test
-# and displays the results in a readable format.
+# Landscapist image library benchmark runner.
+#
+# Runs the symmetric load-time benchmark (ImageLibraryBenchmark), which measures every library
+# from the model change until its own onImageStateChanged terminal callback. Requires a connected
+# Android device or emulator and a network connection.
+
+set -e
 
 echo "=================================="
-echo "Landscapist Performance Test"
+echo "Landscapist Image Library Benchmark"
 echo "=================================="
-echo ""
-echo "This will compare network loading performance for:"
-echo "  • GlideImage"
-echo "  • CoilImage"
-echo "  • LandscapistImage"
-echo "  • FrescoImage"
-echo ""
-echo "Requirements:"
-echo "  • Connected Android device or emulator"
-echo "  • Stable internet connection"
-echo "  • ~2-3 minutes to complete"
-echo ""
-read -p "Press Enter to start the test..."
-
-echo ""
-echo "Building and installing test APK..."
+echo "Measures cold-network load time for CoilImage (Coil3), GlideImage, FrescoImage, and"
+echo "LandscapistImage, each timed to its own real completion callback."
 echo ""
 
-# Build and run the test
+adb devices | grep -qw device || {
+  echo "No connected device/emulator found. Start one and re-run." >&2
+  exit 1
+}
+
 ./gradlew :app:connectedDebugAndroidTest \
-  -Pandroid.testInstrumentationRunnerArguments.class=com.github.skydoves.landscapistdemo.NetworkLoadingPerformanceComparison \
-  --info 2>&1 | tee performance-test-output.txt
-
-# Extract results from logcat
-echo ""
-echo "Extracting results..."
-adb logcat -d | grep -A 50 "NETWORK LOADING PERFORMANCE COMPARISON TEST" | tail -50
+  -Pandroid.testInstrumentationRunnerArguments.class=com.github.skydoves.landscapistdemo.ImageLibraryBenchmark \
+  --console=plain 2>&1 | tee benchmark-output.txt
 
 echo ""
-echo "=================================="
-echo "Test Complete!"
-echo "=================================="
+echo "Results table (also printed by the test under 'IMAGE LIBRARY BENCHMARK'):"
+adb logcat -d | grep -A 30 "IMAGE LIBRARY BENCHMARK" | tail -30 || true
+
 echo ""
-echo "Full output saved to: performance-test-output.txt"
-echo "You can also view results in Android Studio's Run window"
-echo ""
+echo "Full output saved to: performance/benchmark-output.txt"
+echo "For scrolling jank and memory, run the macrobenchmark in :benchmark-landscapist."

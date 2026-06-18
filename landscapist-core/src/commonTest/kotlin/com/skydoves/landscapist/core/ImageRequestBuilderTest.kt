@@ -38,6 +38,24 @@ class ImageRequestBuilderTest {
     assertNull(request.targetHeight)
     assertNull(request.tag)
     assertEquals(DecodePriority.NORMAL, request.priority)
+    assertFalse(request.progressiveEnabled)
+  }
+
+  @Test
+  fun `progressive loading is disabled by default`() {
+    assertFalse(ImageRequest(model = "https://example.com/image.jpg").progressiveEnabled)
+    assertFalse(
+      ImageRequest.builder().model("https://example.com/image.jpg").build().progressiveEnabled,
+    )
+  }
+
+  @Test
+  fun `builder can enable progressive loading`() {
+    val request = ImageRequest.builder()
+      .model("https://example.com/image.jpg")
+      .progressiveEnabled(true)
+      .build()
+
     assertTrue(request.progressiveEnabled)
   }
 

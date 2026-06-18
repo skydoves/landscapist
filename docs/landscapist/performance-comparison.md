@@ -1,286 +1,96 @@
 # Performance Comparison
 
-Comprehensive performance benchmarks comparing LandscapistImage against industry-standard image loading libraries (Glide, Coil, Fresco).
+This page explains how Landscapist compares to other image loading libraries (Coil3, Glide, Fresco) and, just as important, how to reproduce those comparisons yourself. Image loading performance depends heavily on the device, OS version, and network, so this page favors reproducible methodology and verifiable artifact sizes over fixed marketing numbers.
 
-## Standard Image Performance (300.dp)
+## What this page no longer claims
 
-The table below shows performance metrics for loading a 200KB network image (cold cache, initial load, 300dp size) on Android. Tests run **5 rounds per library** with **comprehensive cache clearing** (Glide, Landscapist, Coil) and report averaged results from network request to decoded bitmap ready for display.
+Earlier versions of this page published fixed "X ms" load times and a "2.6x faster" headline. Those numbers came from a test harness that stopped the timer for Glide, Coil, and Fresco with a fixed `Thread.sleep(...)` while only Landscapist waited for its real completion callback, so the comparison was not measuring the same work for each library. That harness has been removed. The current benchmarks measure every library the same way, and we ask you to run them on your own devices rather than trust a single published figure.
 
-| Library | Avg Load Time | Min/Max Range | Avg Memory | Min/Max Range | Supports KMP |
-|---------|---------------|---------------|------------|---------------|--------------|
-| **LandscapistImage** | **1,194ms** | 1,136-1,276ms | **< 1 MB (est.)*** | 0 KB retained | **✓** |
-| **GlideImage** | 3,053ms (+156%) | 3,047-3,058ms | 7,810 KB | 7,649-7,883 KB | ✗ |
-| **FrescoImage** | 3,058ms (+156%) | 3,052-3,071ms | 1,166 KB | 1,110-1,226 KB | ✗ |
-| **CoilImage (Coil3)** | 3,114ms (+161%) | 3,107-3,125ms | 12,659 KB | 12,481-12,844 KB | **✓** |
+## Binary size (verifiable)
 
-**\*Memory Estimation**: LandscapistImage's streaming decoder processes images in tiles and releases memory immediately after compositing. Peak memory during decode is estimated **< 1 MB** (tile buffers + decompression), followed by immediate cleanup (0 KB retained, measured). Competitors retain full decoded bitmaps (1.2-12.7 MB) after load completion.
+Artifact size is the one comparison that is stable and reproducible, because it does not depend on a device or network. The numbers below are the release AAR size of each library's core engine module, measured from the Gradle cache for the versions this repository depends on.
 
-### Performance Highlights (300.dp)
+| Library | Module measured | Release AAR | vs landscapist-core |
+|---------|-----------------|-------------|---------------------|
+| **landscapist-core** | `landscapist-core` | **313 KiB** | baseline |
+| Coil3 | `coil-core` 3.5.0 | 468 KiB | +50% |
+| Glide | `glide` 5.0.7 | 693 KiB | +121% |
+| Fresco | core pipeline artifacts | ~1.0 MiB | roughly 3.3x |
 
-- **Significantly Faster**: LandscapistImage is **2.6x faster** than all competitors (156-161% faster)
-- **Memory Efficiency**: Immediate memory release after compositing - no retained bitmaps in memory
-- **Consistent Performance**: Tight variance (140ms range: 1,136-1,276ms)
-- **Multiplatform Ready**: Only LandscapistImage and Coil support Kotlin Multiplatform
-- **Platform Limitation**: Glide and Fresco are Android-only
-
-### Why LandscapistImage is Faster
-
-1. **Optimized Decoding Pipeline**: Direct integration between network fetching (Ktor) and image decoding eliminates intermediate buffering.
-2. **Efficient Downsampling**: Progressive decoding at target size during download, not after.
-3. **Smart Memory Management**: Weak reference pooling and LRU caching reduce GC pressure.
-4. **Minimal Abstraction**: Built-in loader with no wrapper overhead.
-
-> **Test Methodology**: Performance numbers averaged across 5 rounds of instrumented tests on Android 16 emulator. Each test loads a fresh 200KB JPEG from network (GitHub CDN, no cache) at 300dp size. All caches cleared between runs. Measurements from `setContent` to fully decoded bitmap. See [ComprehensivePerformanceTest.kt](https://github.com/skydoves/landscapist/blob/697ad3f64ab6aa8ec068ce13c82912f579f9454d/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/ComprehensivePerformanceTest.kt#L49) for full implementation.
-
-## Large Image Performance (1200.dp)
-
-For larger images (1200.dp), the performance advantage of LandscapistImage becomes even more pronounced. The table below shows the same test methodology with 1200.dp image size:
-
-| Library | Avg Load Time | Min/Max Range | Avg Memory | Min/Max Range | Supports KMP |
-|---------|---------------|---------------|------------|---------------|--------------|
-| **LandscapistImage** | **1,447ms** | 1,266-1,669ms | **< 2 MB (est.)*** | 0 KB retained | **✓** |
-| **GlideImage** | 3,052ms (+111%) | 3,044-3,061ms | 19,348 KB | 19,307-19,425 KB | ✗ |
-| **FrescoImage** | 3,054ms (+111%) | 3,046-3,064ms | 1,318 KB | 1,196-1,548 KB | ✗ |
-| **CoilImage (Coil3)** | 3,114ms (+115%) | 3,109-3,117ms | 12,504 KB | 12,464-12,519 KB | **✓** |
-
-**\*Memory Estimation (1200.dp)**: Peak memory during streaming decode estimated **< 2 MB** (larger tile buffers for 16x pixel area), followed by immediate cleanup (0 KB retained). Memory scaling with image size: GlideImage retains **2.5x more** memory for larger images (7.8 MB → 19.3 MB), while LandscapistImage's streaming approach maintains minimal peak memory regardless of display size.
-
-### Large Image Performance Highlights (1200.dp)
-
-- **Dramatically Faster**: LandscapistImage is **2.1x faster** than all competitors (111-115% faster)
-- **Memory Efficiency**: Immediate memory release after compositing (0 KB retained vs 1.3-19 MB for competitors)
-- **Scalability**: Minimal performance degradation with size increase (1,194ms → 1,447ms for 16x pixel area)
-- **Consistent Speed**: Variance of 403ms (1,266-1,669ms) with worst-case still **1.8x faster** than competitors' average
-- **Memory Scaling**: Glide memory increases 2.5x (7.8 MB → 19.3 MB) for larger images
-
-### Why the Performance Gap Widens
-
-For larger images, LandscapistImage's optimizations become increasingly impactful:
-
-1. **Progressive Decoding**: Streams and decodes tiles progressively, avoiding full-image buffer allocation.
-2. **Smart Downsampling**: Decodes at exact target dimensions during download, not after.
-3. **Efficient Memory Model**: Processes image data in chunks rather than loading entire file into memory.
-4. **Optimized Pipeline**: Direct Ktor → decoder path eliminates intermediate conversions.
-
-*Memory measurements for `LandscapistImage` consistently showed 0 KB retained memory (all 10 test runs across both sizes), indicating streaming decode with **immediate memory release** after compositing. Other libraries retain decoded bitmaps: GlideImage retains 7.8-19.3 MB, CoilImage ~12.5 MB (buffer-based), FrescoImage 1.2-1.3 MB. The 0 KB reading represents measurement post-cleanup, not peak usage during decode.
-
-> **Test Configuration**: Both 300.dp and 1200.dp tests use identical methodology. Same 200KB source JPEG, scaled to target size during decode. **5 rounds per library** with **comprehensive cache clearing** (Glide, Landscapist, Coil) before each round. Memory measured as PSS delta (start vs end after 3-second wait). See [PerformanceTest300dp.kt](https://github.com/skydoves/landscapist/blob/main/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/PerformanceTest300dp.kt) and [PerformanceTest1200dp.kt](https://github.com/skydoves/landscapist/blob/main/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/PerformanceTest1200dp.kt) for implementation.
-
-## Key Performance Takeaways
-
-| Metric | 300.dp Images | 1200.dp Images |
-|--------|---------------|----------------|
-| **Load Time Advantage** | 156-161% faster (2.6x) | 111-115% faster (2.1x) |
-| **Retained Memory** | 0 KB (immediate release) | 0 KB (immediate release) |
-| **Competitors' Memory** | 1.2-12.7 MB retained | 1.3-19.3 MB retained |
-| **Performance Scaling** | +21% load time for 16x pixels | Minimal degradation |
-| **Test Rounds** | 5 rounds | 5 rounds |
-| **Cache Clearing** | **All libraries (Glide, Landscapist, Coil)** | **All libraries** |
-
-**Bottom Line**: LandscapistImage provides **2.1-2.6x faster load times** and **zero retained memory** (immediate release after compositing) compared to competitors who retain 1.2-19.3 MB of decoded bitmaps. **Verified across 10 independent test runs** (5 rounds × 2 sizes) with **comprehensive cache clearing** between each run.
-
-**Memory Measurement Honesty**: Our PSS delta methodology (before/after with 3-second wait) cannot accurately capture LandscapistImage's peak memory during streaming decode, only post-cleanup state (0 KB). This limitation is documented transparently throughout this comparison.
-
-## Statistical Analysis
-
-### Consistency & Variance
-
-The following table shows variance across both test sizes (5 rounds each):
-
-| Library | 300.dp Avg | 300.dp Range | 1200.dp Avg | 1200.dp Range | CV (300/1200) |
-|---------|------------|--------------|-------------|---------------|---------------|
-| **LandscapistImage** | 1,194ms | 140ms | 1,447ms | 403ms | 11.7% / 27.8% |
-| **GlideImage** | 3,053ms | 11ms | 3,052ms | 17ms | 0.4% / 0.6% |
-| **FrescoImage** | 3,058ms | 19ms | 3,054ms | 18ms | 0.6% / 0.6% |
-| **CoilImage** | 3,114ms | 18ms | 3,114ms | 8ms | 0.6% / 0.3% |
-
-#### Observations
-
-- **LandscapistImage** shows higher variance due to streaming decode being sensitive to network fluctuations
-- **Variance increases with image size** for LandscapistImage (11.7% → 27.8% CV) due to longer streaming decode windows
-- **Competitors** show extremely low variance (<1% CV) - buffer entire image before processing
-- Despite higher variance, **LandscapistImage's worst-case (1,669ms) is still 1.8x faster** than competitors' average
-- **Load time consistency**: Competitors remain constant across sizes (~3,050ms), LandscapistImage scales minimally (1,194ms → 1,447ms)
-
-### Performance Confidence
-
-| Metric | Value |
-|--------|-------|
-| **Sample Size** | 10 rounds × 4 libraries = 40 total test runs (5 per size) |
-| **Test Duration** | ~50 minutes total across both 300.dp and 1200.dp tests |
-| **Cache Clearing** | **All libraries** (Glide, Landscapist, Coil) cleared before each round |
-| **LandscapistImage Speed Advantage** | 111-161% faster (2.1-2.6x, consistent across all 10 rounds) |
-| **LandscapistImage Retained Memory** | 0 KB (100% consistent - all 10 rounds show immediate release) |
-| **Competitors' Retained Memory** | 1.2-19.3 MB (100% consistent - bitmaps kept in memory) |
-| **Statistical Significance** | p < 0.001 (highly significant - large sample, clear separation) |
-| **Worst-Case Performance** | LandscapistImage at 1,669ms still 1.8x faster than competitors' average |
-| **Measurement Honesty** | Memory limitation documented - PSS delta cannot capture peak streaming decode memory |
-
-## Reproducibility Guide
-
-To reproduce these benchmarks on your own device:
-
-### 1. Clone the Repository
+Reproduce the landscapist-core number (byte size, so it does not vary by filesystem):
 
 ```bash
-git clone https://github.com/skydoves/landscapist.git
-cd landscapist
+./gradlew :landscapist-core:assembleRelease
+ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar   # 320,771 bytes = 313 KiB
 ```
 
-### 2. Connect Android Device/Emulator
+The competitor numbers are the cached release AARs under `~/.gradle/caches/modules-2/files-2.1/`. The Fresco figure sums the required network-pipeline artifacts (`imagepipeline`, `fbcore`, `imagepipeline-base`, `ui-common`, `middleware`, `soloader`), which total about 1.0 MiB; a full Fresco setup with native transcoding and animation pulls in more.
+
+Caveats, so the table is not misread:
+
+- This measures a single module's AAR, not the full transitive footprint. landscapist-core pulls in Ktor, Okio, coroutines, and atomicfu; Coil pulls in coroutines, Okio, and a network module; Fresco is split across many artifacts (the facade `fresco` AAR is only 36 KB, but a working network pipeline needs `fbcore`, `imagepipeline`, `imagepipeline-base`, and more, which is why the realistic figure is over 1 MB).
+- What ends up in your APK depends on R8 / ProGuard shrinking and which features you use.
+
+The honest summary: landscapist-core has the smallest core artifact and the shortest direct dependency list of the four. That is its main selling point, and it is verifiable.
+
+## Load time and memory (run it yourself)
+
+We do not publish fixed load-time or memory numbers, because they vary too much across devices, OS versions, and networks to be meaningful as a single figure. Instead, two benchmarks are included so you can measure on your own hardware.
+
+### 1. Instrumented load-time benchmark
+
+`app/src/androidTest/.../ImageLibraryBenchmark.kt` measures cold-network load time for all four wrappers using one symmetric method: the timer runs from the moment the image model changes until that library's own `onImageStateChanged` callback reports a terminal state (`Success` or `Failure`). No library uses a fixed sleep, and no success flag is hardcoded. Each measured load uses a distinct URL so it is always cold, and a warmup load per library is discarded.
 
 ```bash
-adb devices  # Verify device is connected
-```
-
-**Recommended**: Use Android 14+ emulator (API 34+) with:
-- 2GB+ RAM
-- x86_64 architecture
-- Google Play services (for network access)
-
-### 3. Run Performance Tests
-
-```bash
-# Run 1200dp performance tests
 ./gradlew :app:connectedDebugAndroidTest \
-  -Pandroid.testInstrumentationRunnerArguments.class=\
-com.github.skydoves.landscapistdemo.PerformanceTest1200dp
-
-# View results in logcat
-adb logcat | grep "Performance Test\|Result:"
+  -Pandroid.testInstrumentationRunnerArguments.class=com.github.skydoves.landscapistdemo.ImageLibraryBenchmark
 ```
 
-### 4. Analyze Results
+Two engine-level benchmarks measure the underlying loaders without any Compose layer, each blocking on its own real terminal result. `UnitPerformanceTest.kt` runs against a fixed remote image, and `EngineSpeedBenchmark.kt` runs against a local server (point it at one with `-e baseUrl http://127.0.0.1:PORT` over `adb reverse`) so the timing isolates loader overhead from network noise with nanosecond resolution.
 
-Results are printed in the format:
-```
-[LibraryName] Performance Test (1200.dp)...
-  ✓ Time: XXXXms, Memory: XXXXKB, Success: true
-  Result: XXXX ms / XXXX KB
-```
+### What to expect (qualitative, not a published figure)
 
-### 5. Run Multiple Rounds
+These observations come from our own engine-level runs and will differ on your hardware, so we state them as direction rather than numbers:
 
-For 5-round testing (as documented):
+- For a single cold fetch and decode, landscapist-core is on par with Coil3. Neither is meaningfully faster than the other at a matched bitmap config.
+- Glide tends to win on repeated decodes of the same size (the scrolling case), because it reuses bitmap buffers through an `inBitmap` pool. That is a trade of memory for speed that Coil deliberately forgoes too, and landscapist-core does not match Glide's pooled decode throughput.
+- Measure with a matched configuration. Hardware bitmaps (the Android default) decode slowly under an emulator's software GPU, which makes any emulator number unrepresentative of a real device, so compare matched configs and prefer a physical device for absolute figures.
+
+The honest positioning: landscapist-core's edge is the smaller footprint and the Kotlin Multiplatform reach, not a faster decoder. On raw loader speed it is a competitive peer to Coil3, not a leader.
+
+### 2. Macrobenchmark (frame timing and jank)
+
+`:benchmark-landscapist` is an AndroidX Macrobenchmark that scrolls a `LazyColumn` of many images per library and records `FrameTimingMetric`. This is the correct tool for scrolling-list jank and for memory pressure, which a single-image instrumentation test cannot measure reliably.
+
 ```bash
-for i in {1..5}; do
-  echo "=== Round $i ==="
-  adb logcat -c  # Clear logcat
-  ./gradlew :app:connectedDebugAndroidTest \
-    -Pandroid.testInstrumentationRunnerArguments.class=\
-com.github.skydoves.landscapistdemo.PerformanceTest1200dp --quiet
-  adb logcat -d | grep "Result:" | tail -4
-  sleep 5
-done
+./gradlew :benchmark-landscapist:pixel6api31BenchmarkAndroidTest
+# or, on a connected device:
+./gradlew :benchmark-landscapist:connectedBenchmarkAndroidTest
 ```
 
-### Notes on Variability
+For memory, profile a scrolling run with the Android Studio Memory Profiler. A single decoded-image delta is too noisy to publish as a number.
 
-Performance results may vary based on:
-- **Device specifications**: Emulator vs physical device, CPU/GPU capabilities
-- **Network conditions**: WiFi speed, CDN proximity, network congestion
-- **Background processes**: Other apps consuming resources
-- **Android version**: Different OS versions have different image processing optimizations
-- **First vs subsequent runs**: JIT compilation warmup effects
+## Architecture comparison
 
-**Expected variance**: ±10-20% for load times, ±5-10% for memory usage.
-**Performance ranking should remain consistent**: LandscapistImage significantly faster across all test environments.
+The core engines are in the same family. landscapist-core is a from-scratch Kotlin Multiplatform loader; the table below states what it implements relative to Coil3 honestly, including the gaps.
 
-## Test Environment & Methodology
+| Capability | landscapist-core | Coil3 |
+|-----------|------------------|-------|
+| Memory cache (LRU, byte-bounded) | Yes, plus a weak reference second tier | Yes |
+| Disk cache | Yes (Okio based) | Yes |
+| Downsampling at decode (Android) | Yes (two-pass `inSampleSize`) | Yes |
+| Hardware bitmaps (Android) | Yes (opaque images, API 26+) | Yes |
+| Bitmap pooling / `inBitmap` reuse | Yes (Android) | Dropped (net negative in Coil's testing) |
+| Kotlin Multiplatform (Android / iOS / Desktop / Web) | Yes | Yes |
+| Cancellation on composable dispose | Yes | Yes |
 
-All performance tests were conducted under controlled, identical conditions to ensure fair and reproducible comparisons.
+## When to choose which
 
-### Test Device Specifications
+Choose **landscapist-core / LandscapistImage** when you want a small dependency footprint, first-class Kotlin Multiplatform support across Android, iOS, Desktop, and Web, and direct control over the loading pipeline without a wrapper layer.
 
-| Parameter | Value |
-|-----------|-------|
-| **Device Type** | Android Emulator (AVD) |
-| **Android Version** | Android 16 (API 35) |
-| **Device Profile** | Medium Phone (16KB Page Size) |
-| **CPU Architecture** | x86_64 |
-| **Memory** | 2048 MB RAM |
-| **Storage** | 6 GB Internal |
+Choose **CoilImage (Coil3)** when you are already invested in the Coil ecosystem or rely on its extensions.
 
-### Test Parameters
-
-| Parameter | Value |
-|-----------|-------|
-| **Test Rounds** | 5 independent rounds per library |
-| **Image Source** | Network (GitHub CDN) |
-| **Image Format** | JPEG |
-| **Source File Size** | ~200KB |
-| **Image Dimensions (300dp)** | ~600×600 pixels (varies by device density) |
-| **Image Dimensions (1200dp)** | ~2400×2400 pixels (varies by device density) |
-| **Network Conditions** | Stable WiFi connection |
-| **Cache State** | Cold start (all caches cleared before each round) |
-
-### Test Methodology
-
-1. **Cache Clearing**: Before each test round, **all library caches** are cleared to ensure fair comparison:
-   - `Glide.get(context).clearMemory()` - Clear Glide's memory cache
-   - `Landscapist.getInstance().clearMemoryCache()` - Clear Landscapist's memory cache
-   - `ImageLoader.Builder(context).build().memoryCache?.clear()` - Clear Coil's memory cache
-   - `Runtime.getRuntime().gc()` and `System.gc()` - Force garbage collection
-   - 1-second wait period for thorough cache cleanup completion
-
-2. **Memory Measurement**: Memory usage tracked using Android's `Debug.MemoryInfo` API:
-   - `totalPss` (Proportional Set Size) measured before and after image load
-   - Includes all heap allocations attributed to the process
-
-3. **Timing Measurement**: Load time measured using Kotlin's `measureTimeMillis`:
-   - Starts from `ComposeTestRule.setContent` call
-   - Ends when image is fully decoded and ready for display
-   - Includes network fetch, decoding, and compositing time
-
-4. **Test Isolation**: Each library tested in separate test methods to prevent:
-   - Multiple `setContent()` calls on same `ComposeTestRule`
-   - Cross-contamination between libraries
-   - Shared memory pressure effects
-
-5. **Test Order**: Libraries tested in consistent order each round:
-   - Round order: Glide → Coil → Landscapist → Fresco
-   - 2-second pause between library tests
-   - Full cache clearing between each library
-
-### Test Implementation
-
-- **Test Framework**: Android Instrumentation Tests (AndroidX Test)
-- **Compose Test Framework**: `androidx.compose.ui.test`
-- **Test Runner**: AndroidJUnit4
-- **Build Configuration**: Debug build with optimizations disabled
-- **Test Files**:
-  - [PerformanceTest1200dp.kt](https://github.com/skydoves/landscapist/blob/main/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/PerformanceTest1200dp.kt) (1200dp tests)
-  - [ComprehensivePerformanceTest.kt](https://github.com/skydoves/landscapist/blob/main/app/src/androidTest/kotlin/com/github/skydoves/landscapistdemo/ComprehensivePerformanceTest.kt) (Multi-round framework)
-
-### Library Versions Tested
-
-| Library | Version | Backend |
-|---------|---------|---------|
-| **landscapist-image** | 2.5.0 | landscapist-core (Ktor HTTP client) |
-| **landscapist-glide** | 2.5.0 | Glide 4.16.0 |
-| **landscapist-coil3** | 2.5.0 | Coil 3.0.4 |
-| **landscapist-fresco** | 2.5.0 | Fresco 3.5.0 |
-
-### Image Loading Configuration
-
-All libraries tested with equivalent configurations:
-
-```kotlin
-// Common ImageOptions used across all tests
-ImageOptions(
-  contentScale = ContentScale.Crop,
-  alignment = Alignment.Center,
-  contentDescription = null,
-  colorFilter = null,
-  alpha = 1.0f
-)
-```
-
-**Library-Specific Settings:**
-- **Glide**: Default RequestOptions, no custom transformations
-- **Coil3**: Default ImageRequest configuration
-- **Fresco**: Default ImageRequest configuration
-- **LandscapistImage**: Default Landscapist instance with standard cache sizes
+Choose **GlideImage** or **FrescoImage** for Android-only apps that already use those libraries or need their specific features (Glide's transformations and video thumbnails, Fresco's animated formats and progressive JPEG).
 
 ## See Also
 

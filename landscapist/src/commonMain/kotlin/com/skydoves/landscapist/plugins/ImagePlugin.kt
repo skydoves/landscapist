@@ -99,20 +99,26 @@ public sealed interface ImagePlugin {
 /**
  * Compose a list of [imagePlugins] and [imageBitmap] to the given [Painter].
  *
+ * [imageBitmap] is a lambda so the bitmap is only materialized when at least one
+ * [ImagePlugin.PainterPlugin] is present. Without a painter plugin this returns the receiver
+ * untouched and never invokes [imageBitmap], avoiding a full bitmap copy on every recomposition.
+ *
  * @param imagePlugins A list of [imagePlugins] to be executed on the given [Painter].
- * @param imageBitmap A target [imageBitmap] to be composed of the given [Painter]
+ * @param imageBitmap Produces the target [ImageBitmap] to compose, evaluated lazily.
  */
 @Composable
 @InternalLandscapistApi
 public fun Painter.composePainterPlugins(
   imagePlugins: List<ImagePlugin>,
-  imageBitmap: ImageBitmap,
+  imageBitmap: @Composable () -> ImageBitmap,
 ): Painter {
+  val painterPlugins = imagePlugins.filterIsInstance<ImagePlugin.PainterPlugin>()
+  if (painterPlugins.isEmpty()) return this
+
+  val bitmap = imageBitmap()
   var painter: Painter = this
-  imagePlugins
-    .filterIsInstance<ImagePlugin.PainterPlugin>()
-    .forEach { bitmapImagePlugin ->
-      painter = bitmapImagePlugin.compose(imageBitmap = imageBitmap, painter = painter)
-    }
+  painterPlugins.forEach { bitmapImagePlugin ->
+    painter = bitmapImagePlugin.compose(imageBitmap = bitmap, painter = painter)
+  }
   return painter
 }

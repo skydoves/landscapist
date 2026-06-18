@@ -21,19 +21,33 @@ import androidx.compose.ui.platform.LocalContext
 import com.skydoves.landscapist.core.Landscapist
 import com.skydoves.landscapist.core.builder
 
+// Process-wide default Landscapist for Android. Building one per composition subtree would give each
+// its own memory cache, disk cache, scheduler, and in-flight request map, fragmenting the cache hit
+// rate and the request coalescing. A single shared instance matches the Skia targets, which already
+// fall back to Landscapist.getInstance().
+private val androidDefaultLock = Any()
+
+@Volatile
+private var androidDefaultLandscapist: Landscapist? = null
+
 /**
- * Android implementation that uses LocalContext to create a Landscapist instance
- * with proper disk cache configuration.
+ * Android implementation that resolves the [Landscapist] instance.
+ *
+ * An explicit [LocalLandscapist] provider takes precedence; otherwise a single process-wide
+ * instance (configured with the application context for disk caching) is shared across the app. On
+ * Android the override mechanism is [LocalLandscapist]; `Landscapist.setInstance` does not change
+ * this default.
  */
 @Composable
 public actual fun getLandscapist(): Landscapist {
-  val localInstance = LocalLandscapist.current
-  if (localInstance != null) {
-    return localInstance
-  }
+  LocalLandscapist.current?.let { return it }
 
-  val context = LocalContext.current
-  return remember(context) {
-    Landscapist.builder(context).build()
+  val context = LocalContext.current.applicationContext
+  return remember {
+    androidDefaultLandscapist ?: synchronized(androidDefaultLock) {
+      androidDefaultLandscapist ?: Landscapist.builder(context).build().also {
+        androidDefaultLandscapist = it
+      }
+    }
   }
 }

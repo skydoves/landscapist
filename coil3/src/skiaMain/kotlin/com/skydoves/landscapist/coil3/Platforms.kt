@@ -66,7 +66,7 @@ internal actual fun rememberImagePainter(image: Image, imagePlugins: List<ImageP
     bitmapPainter
   }.composePainterPlugins(
     imagePlugins = imagePlugins,
-    imageBitmap = image.toImageBitmap(),
+    imageBitmap = { image.toImageBitmap() },
   )
 }
 

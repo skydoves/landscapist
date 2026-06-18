@@ -46,6 +46,10 @@ public class DiskLruCache(
 
   private val lock = SynchronizedObject()
   private val entries = linkedMapOf<String, Entry>()
+
+  // Disk keys with an editor currently open, so a second concurrent edit of the same key returns
+  // null instead of sharing the same temp file and clobbering the in-progress write.
+  private val editsInProgress = mutableSetOf<String>()
   private val currentSize = atomic(0L)
   private val initialized = atomic(false)
 
@@ -119,6 +123,13 @@ public class DiskLruCache(
     return withContext(dispatcher) {
       synchronized(lock) {
         val diskKey = key.diskKey
+
+        // Only one editor per key at a time (honors the DiskCache.Editor contract). A concurrent
+        // edit of the same key returns null rather than clobbering the shared temp file.
+        if (!editsInProgress.add(diskKey)) {
+          return@synchronized null
+        }
+
         val tempPath = directory / "$diskKey.tmp"
         val finalPath = directory / diskKey
 
@@ -135,7 +146,7 @@ public class DiskLruCache(
           finalPath = finalPath,
           fileSystem = fileSystem,
           onCommit = { size -> commitEntry(diskKey, size) },
-          onAbort = { /* Nothing to do */ },
+          onAbort = { synchronized(lock) { editsInProgress.remove(diskKey) } },
         )
       }
     }
@@ -143,6 +154,8 @@ public class DiskLruCache(
 
   private fun commitEntry(diskKey: String, size: Long) {
     synchronized(lock) {
+      editsInProgress.remove(diskKey)
+
       // Remove old entry if exists
       entries.remove(diskKey)?.let { old ->
         currentSize.addAndGet(-old.size)

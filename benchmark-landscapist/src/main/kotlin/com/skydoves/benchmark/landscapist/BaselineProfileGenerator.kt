@@ -19,9 +19,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.uiautomator.By
-import androidx.test.uiautomator.BySelector
-import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiObject2
+import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
@@ -39,30 +37,26 @@ class BaselineProfileGenerator {
       maxIterations = 8,
     ) {
       pressHome()
-      // This block defines the app's critical user journey. Here we are interested in
-      // optimizing for app startup. But you can also navigate and scroll
-      // through your most important UI.
       startActivityAndWait()
       device.waitForIdle()
 
-      device.testDiscover() || return@collect
+      // Critical journey: visit each library tab and scroll its image list so the profile
+      // covers the navigation, list, and image-loading code paths for every library.
+      tabs.forEach { tab ->
+        device.findObject(By.text(tab))?.click()
+        device.waitForIdle()
+        device.wait(Until.hasObject(By.res(packageName, "${tab}Image")), 3_000)
+
+        device.findObject(By.scrollable(true))?.let { list ->
+          repeat(2) {
+            list.scroll(Direction.DOWN, 0.8f)
+            device.waitForIdle()
+          }
+        }
+      }
     }
 }
 
-private fun UiDevice.testDiscover(): Boolean {
-  return wait(Until.hasObject(By.res(packageName, "GlideImage")), 1_000) &&
-    wait(Until.hasObject(By.res(packageName, "CoilImage")), 1_000) &&
-    wait(Until.hasObject(By.res(packageName, "FrescoImage")), 1_000) &&
-    wait(Until.hasObject(By.res(packageName, "ImageGallery")), 1_000) &&
-    wait(Until.hasObject(By.res(packageName, "ImageViewer")), 1_000)
-}
-
-private fun UiDevice.waitForObject(selector: BySelector, timeout: Long = 5_000): UiObject2 {
-  if (wait(Until.hasObject(selector), timeout)) {
-    return findObject(selector)
-  }
-
-  error("Object with selector [$selector] not found")
-}
+private val tabs = listOf("Landscapist", "Coil", "Glide", "Fresco")
 
 private const val packageName = "com.skydoves.benchmark.landscapist.app"
