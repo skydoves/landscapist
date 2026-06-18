@@ -15,23 +15,32 @@
  */
 package com.skydoves.benchmark.landscapist.app
 
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.LocalImageComponent
 import com.skydoves.landscapist.image.LandscapistImage
 
 @Composable
-fun LandscapistImageProfiles() {
-  LandscapistImage(
-    modifier = Modifier.size(120.dp),
-    imageModel = {
-      "https://user-images.githubusercontent.com/" +
-        "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg"
-    },
-    component = LocalImageComponent.current,
-    imageOptions = ImageOptions(tag = "CoilImage"),
-  )
+fun LandscapistImageList(urls: List<String>, modifier: Modifier = Modifier) {
+  LazyColumn(modifier = modifier.fillMaxSize()) {
+    items(urls) { url ->
+      LandscapistImage(
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(BenchmarkImages.ITEM_HEIGHT_DP.dp)
+          .testTag("LandscapistImage"),
+        imageModel = { url },
+        component = LocalImageComponent.current,
+        imageOptions = ImageOptions(tag = "LandscapistImage"),
+      )
+    }
+  }
 }

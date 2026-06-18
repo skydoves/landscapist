@@ -20,13 +20,24 @@ package com.skydoves.benchmark.landscapist.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.unit.dp
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.components.LocalImageComponent
 import com.skydoves.landscapist.components.imageComponent
@@ -37,6 +48,13 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 import com.skydoves.landscapist.transformation.blur.BlurTransformationPlugin
 import com.skydoves.landscapist.zoomable.ZoomablePlugin
 
+/**
+ * Benchmark host. Renders one tab per image library; selecting a tab shows a scrolling
+ * [androidx.compose.foundation.lazy.LazyColumn] of distinct images for that library. The
+ * Macrobenchmark driver navigates between tabs (matched by `By.text`) and scrolls the list
+ * (matched by `By.scrollable(true)`), measuring frame timing per library. `testTagsAsResourceId`
+ * surfaces each item's `testTag` as `By.res(packageName, "<Library>Image")`.
+ */
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -53,22 +71,40 @@ class MainActivity : ComponentActivity() {
         +PalettePlugin()
       }
 
+      val urls = remember { BenchmarkImages.urls() }
+      var selectedTab by remember { mutableStateOf(TABS.first()) }
+
       CompositionLocalProvider(LocalImageComponent provides imageComponent) {
         Column(
-          modifier = Modifier.semantics {
-            testTagsAsResourceId = true
-          },
+          modifier = Modifier
+            .fillMaxSize()
+            .semantics { testTagsAsResourceId = true },
         ) {
-          LandscapistImageProfiles()
-          CoilImageProfiles()
-          Coil3ImageProfiles()
-          GlideImageProfiles()
-          FrescoImageProfiles()
-          FrescoWebSupportProfiles()
-          ImageGalleryProfiles()
-          ImageViewerProfiles()
+          Row(modifier = Modifier.fillMaxWidth()) {
+            TABS.forEach { tab ->
+              BasicText(
+                text = tab,
+                modifier = Modifier
+                  .weight(1f)
+                  .clickable { selectedTab = tab }
+                  .padding(vertical = 16.dp),
+              )
+            }
+          }
+
+          val listModifier = Modifier.weight(1f)
+          when (selectedTab) {
+            "Landscapist" -> LandscapistImageList(urls, listModifier)
+            "Coil" -> Coil3ImageList(urls, listModifier)
+            "Glide" -> GlideImageList(urls, listModifier)
+            "Fresco" -> FrescoImageList(urls, listModifier)
+          }
         }
       }
     }
+  }
+
+  companion object {
+    private val TABS = listOf("Landscapist", "Coil", "Glide", "Fresco")
   }
 }

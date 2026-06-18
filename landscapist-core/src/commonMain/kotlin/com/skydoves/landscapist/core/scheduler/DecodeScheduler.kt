@@ -16,26 +16,31 @@
 package com.skydoves.landscapist.core.scheduler
 
 import com.skydoves.landscapist.core.event.currentTimeMillis
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withContext
 
 /**
  * A scheduler for prioritized decode operations.
  *
- * The scheduler maintains a priority queue of decode requests and processes them
- * in order of priority. Higher priority requests are processed first, ensuring
- * that visible images load before off-screen images.
+ * Decode work is admitted through a priority gate that limits concurrency to [parallelism] and,
+ * whenever a slot frees up, hands it to the highest-priority waiter (ties broken oldest-first).
+ * The gate suspends waiters on a [CompletableDeferred] instead of busy-waiting, so queued requests
+ * cost nothing while they wait.
  *
  * Features:
- * - Priority-based execution (IMMEDIATE > HIGH > NORMAL > LOW > BACKGROUND)
+ * - Priority-based admission (IMMEDIATE > HIGH > NORMAL > LOW > BACKGROUND)
  * - Configurable parallelism (number of concurrent decode operations)
  * - Request cancellation by ID or tag
  * - Priority boosting for requests that become visible
@@ -68,12 +73,13 @@ public class DecodeScheduler(
   private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
   private val scope = CoroutineScope(SupervisorJob() + dispatcher)
-  private val semaphore = Semaphore(parallelism)
-  private val mutex = Mutex()
+  private val gate = PriorityGate(parallelism)
 
-  // Active and pending requests
-  private val activeRequests = mutableMapOf<String, Deferred<*>>()
-  private val pendingRequests = mutableMapOf<String, PrioritizedRequest<*>>()
+  // Tracks scheduled requests (waiting or running) for cancellation by id/tag.
+  private val activeLock = SynchronizedObject()
+  private val active = mutableMapOf<String, ScheduledTask>()
+
+  private class ScheduledTask(val deferred: Deferred<*>, val tag: String?)
 
   /**
    * Schedules a decode operation with the specified priority.
@@ -90,42 +96,18 @@ public class DecodeScheduler(
     tag: String? = null,
     decoder: suspend () -> T,
   ): Deferred<T> {
-    val request = PrioritizedRequest(
-      id = id,
-      priority = priority,
-      createdAt = currentTimeMillis(),
-      tag = tag,
-      decoder = decoder,
-    )
-
+    val createdAt = currentTimeMillis()
     val deferred = scope.async {
-      // Add to pending
-      mutex.withLock {
-        pendingRequests[id] = request
-      }
-
-      // Wait for our turn based on priority
-      waitForTurn(request)
-
-      semaphore.withPermit {
-        mutex.withLock {
-          pendingRequests.remove(id)
-        }
-
-        try {
-          decoder()
-        } finally {
-          mutex.withLock {
-            activeRequests.remove(id)
-          }
-        }
+      gate.withPermit(id, priority, createdAt) {
+        decoder()
       }
     }
 
-    // Track active request
-    scope.async {
-      mutex.withLock {
-        activeRequests[id] = deferred
+    synchronized(activeLock) { active[id] = ScheduledTask(deferred, tag) }
+    deferred.invokeOnCompletion {
+      synchronized(activeLock) {
+        // Only remove our own entry; a later schedule() may have reused the same id.
+        if (active[id]?.deferred === deferred) active.remove(id)
       }
     }
 
@@ -133,50 +115,15 @@ public class DecodeScheduler(
   }
 
   /**
-   * Waits until this request should be processed based on priority.
-   */
-  private suspend fun waitForTurn(request: PrioritizedRequest<*>) {
-    // For IMMEDIATE priority, skip the queue
-    if (request.priority == DecodePriority.IMMEDIATE) {
-      return
-    }
-
-    // Wait until this request has highest priority among pending
-    while (true) {
-      val shouldProcess = mutex.withLock {
-        val higherPriorityExists = pendingRequests.values.any { other ->
-          other.id != request.id && other.priority.value > request.priority.value
-        }
-        !higherPriorityExists
-      }
-
-      if (shouldProcess) {
-        break
-      }
-
-      // Yield to allow other coroutines to process
-      kotlinx.coroutines.yield()
-    }
-  }
-
-  /**
-   * Boosts the priority of an existing request.
+   * Boosts the priority of an existing request that is still waiting for a decode slot.
    *
-   * Use this when an off-screen image becomes visible - boost its priority
-   * so it loads before other off-screen images.
+   * Use this when an off-screen image becomes visible so it loads before other waiting images.
    *
    * @param id The request ID to boost.
-   * @param newPriority The new priority (must be higher than current).
+   * @param newPriority The new priority (only applied if higher than the current one).
    */
   public suspend fun boostPriority(id: String, newPriority: DecodePriority) {
-    mutex.withLock {
-      val existing = pendingRequests[id] ?: return
-      if (newPriority.value <= existing.priority.value) return
-
-      // Update with new priority
-      val boosted = existing.copy(priority = newPriority)
-      pendingRequests[id] = boosted
-    }
+    gate.boost(id, newPriority)
   }
 
   /**
@@ -186,16 +133,9 @@ public class DecodeScheduler(
    * @return true if the request was found and cancelled.
    */
   public suspend fun cancel(id: String): Boolean {
-    return mutex.withLock {
-      // Cancel active request
-      val active = activeRequests.remove(id)
-      active?.cancel()
-
-      // Remove from pending
-      val pending = pendingRequests.remove(id)
-
-      active != null || pending != null
-    }
+    val task = synchronized(activeLock) { active.remove(id) }
+    task?.deferred?.cancel()
+    return task != null
   }
 
   /**
@@ -205,51 +145,144 @@ public class DecodeScheduler(
    * @return Number of requests cancelled.
    */
   public suspend fun cancelByTag(tag: String): Int {
-    return mutex.withLock {
-      var count = 0
-
-      // Cancel active requests with this tag
-      val activeToRemove = pendingRequests.entries
-        .filter { it.value.tag == tag }
-        .mapNotNull { activeRequests[it.key] }
-
-      for (deferred in activeToRemove) {
-        deferred.cancel()
-        count++
-      }
-
-      // Remove pending requests with this tag
-      val idsToRemove = pendingRequests.entries
-        .filter { it.value.tag == tag }
-        .map { it.key }
-
-      for (id in idsToRemove) {
-        pendingRequests.remove(id)
-        activeRequests.remove(id)
-      }
-
-      count + idsToRemove.size
+    val toCancel = synchronized(activeLock) {
+      val matching = active.filterValues { it.tag == tag }
+      matching.keys.forEach { active.remove(it) }
+      matching.values.toList()
     }
+    toCancel.forEach { it.deferred.cancel() }
+    return toCancel.size
   }
 
   /**
-   * Cancels all pending requests (active requests continue).
+   * Cancels all requests that are still waiting for a decode slot. Requests that are already
+   * decoding continue to completion.
    */
   public suspend fun clearPending() {
-    mutex.withLock {
-      pendingRequests.clear()
-    }
+    gate.cancelAllWaiting()
   }
 
   /**
-   * Returns the number of pending requests in the queue.
+   * Returns the number of requests waiting for a decode slot.
    */
-  public suspend fun pendingCount(): Int = mutex.withLock { pendingRequests.size }
+  public suspend fun pendingCount(): Int = gate.waitingCount()
 
   /**
-   * Returns the number of currently active decode operations.
+   * Returns the number of currently running decode operations. The value is approximate, since the
+   * scheduled count and the waiting count are read under different locks.
    */
-  public suspend fun activeCount(): Int = mutex.withLock { activeRequests.size }
+  public suspend fun activeCount(): Int {
+    val scheduled = synchronized(activeLock) { active.size }
+    return (scheduled - gate.waitingCount()).coerceAtLeast(0)
+  }
+
+  /**
+   * A concurrency limiter that admits waiters in priority order without busy-waiting.
+   *
+   * A waiter that finds a free permit takes it immediately; otherwise it suspends on a
+   * [CompletableDeferred] until [release] hands it a permit. Releases always go to the highest
+   * priority waiter (oldest first on ties). Permit accounting runs under [NonCancellable] so a
+   * cancelled waiter or decode never leaks a permit.
+   */
+  private class PriorityGate(permits: Int) {
+    private val mutex = Mutex()
+    private var available = permits
+    private val waiters = mutableListOf<Waiter>()
+
+    private class Waiter(
+      val id: String,
+      var priorityValue: Int,
+      val createdAt: Long,
+      val signal: CompletableDeferred<Unit> = CompletableDeferred(),
+    ) {
+      // Set under the mutex when a permit is actually handed to this waiter.
+      var granted: Boolean = false
+    }
+
+    suspend fun <T> withPermit(
+      id: String,
+      priority: DecodePriority,
+      createdAt: Long,
+      block: suspend () -> T,
+    ): T {
+      acquire(id, priority, createdAt)
+      try {
+        return block()
+      } finally {
+        withContext(NonCancellable) { release() }
+      }
+    }
+
+    private suspend fun acquire(id: String, priority: DecodePriority, createdAt: Long) {
+      val waiter = mutex.withLock {
+        if (available > 0) {
+          available--
+          return
+        }
+        Waiter(id, priority.value, createdAt).also { waiters.add(it) }
+      }
+
+      try {
+        waiter.signal.await()
+      } catch (cancellation: CancellationException) {
+        withContext(NonCancellable) {
+          mutex.withLock {
+            // If still queued, just drop it (no permit was held). If it was already removed AND a
+            // permit was granted to it, that permit will go unused, so return it.
+            val stillWaiting = waiters.remove(waiter)
+            if (!stillWaiting && waiter.granted) {
+              available++
+              grantNext()
+            }
+          }
+        }
+        throw cancellation
+      }
+    }
+
+    private suspend fun release() {
+      mutex.withLock {
+        available++
+        grantNext()
+      }
+    }
+
+    /** Must be called while holding [mutex]. */
+    private fun grantNext() {
+      while (available > 0) {
+        val next = waiters.maxWithOrNull(
+          compareBy<Waiter>({ it.priorityValue }, { -it.createdAt }),
+        ) ?: return
+        waiters.remove(next)
+        // Only consume a permit if the waiter actually takes it. A signal that was already
+        // cancelled returns false, so move on to the next waiter without burning a permit.
+        if (next.signal.complete(Unit)) {
+          next.granted = true
+          available--
+          return
+        }
+      }
+    }
+
+    suspend fun boost(id: String, newPriority: DecodePriority) {
+      mutex.withLock {
+        waiters.forEach { waiter ->
+          if (waiter.id == id && newPriority.value > waiter.priorityValue) {
+            waiter.priorityValue = newPriority.value
+          }
+        }
+      }
+    }
+
+    suspend fun cancelAllWaiting() {
+      mutex.withLock {
+        // Cancelling each signal resumes its waiter, whose own cancellation handler removes it.
+        waiters.toList().forEach { it.signal.cancel() }
+      }
+    }
+
+    suspend fun waitingCount(): Int = mutex.withLock { waiters.size }
+  }
 
   public companion object {
     /**
@@ -257,6 +290,8 @@ public class DecodeScheduler(
      * 4 is a good balance for most devices.
      */
     public const val DEFAULT_PARALLELISM: Int = 4
+
+    private val globalLock = SynchronizedObject()
 
     /**
      * Global decode scheduler instance.
@@ -266,19 +301,17 @@ public class DecodeScheduler(
     /**
      * Gets the global decode scheduler, creating it if necessary.
      */
-    public fun global(): DecodeScheduler {
-      globalScheduler?.let { return it }
-
-      val newScheduler = DecodeScheduler()
-      globalScheduler = newScheduler
-      return newScheduler
+    public fun global(): DecodeScheduler = synchronized(globalLock) {
+      globalScheduler ?: DecodeScheduler().also { globalScheduler = it }
     }
 
     /**
      * Initializes the global scheduler with custom settings.
      */
     public fun initialize(parallelism: Int = DEFAULT_PARALLELISM) {
-      globalScheduler = DecodeScheduler(parallelism)
+      synchronized(globalLock) {
+        globalScheduler = DecodeScheduler(parallelism)
+      }
     }
   }
 }

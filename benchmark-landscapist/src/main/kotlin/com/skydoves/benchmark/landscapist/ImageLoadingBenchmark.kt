@@ -124,40 +124,6 @@ class ImageLoadingBenchmark {
     scrollAndLoadImages()
   }
 
-  /**
-   * Benchmarks scrolling performance with multiple images loaded.
-   * Compares all libraries during intensive scrolling.
-   */
-  @Test
-  fun scrollPerformanceComparison() = benchmarkRule.measureRepeated(
-    packageName = PACKAGE_NAME,
-    metrics = listOf(FrameTimingMetric()),
-    iterations = 5,
-    startupMode = StartupMode.WARM,
-    compilationMode = CompilationMode.Partial(),
-  ) {
-    pressHome()
-    startActivityAndWait()
-
-    // Test each library
-    listOf("Glide", "Coil", "Landscapist", "Fresco").forEach { library ->
-      navigateToTab(library)
-
-      // Perform intensive scrolling
-      val scrollable = device.findObject(By.scrollable(true))
-      scrollable?.let {
-        repeat(5) {
-          scrollable.scroll(Direction.DOWN, 1.0f)
-          device.waitForIdle()
-        }
-        repeat(5) {
-          scrollable.scroll(Direction.UP, 1.0f)
-          device.waitForIdle()
-        }
-      }
-    }
-  }
-
   private fun MacrobenchmarkScope.navigateToTab(tabName: String) {
     val tab = device.findObject(By.text(tabName))
     tab?.click()

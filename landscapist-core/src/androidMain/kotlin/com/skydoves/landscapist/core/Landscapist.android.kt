@@ -81,10 +81,31 @@ public class AndroidBuilder(private val context: Context) {
     // Create Android-specific fetcher with all supported model types
     val fetcher = AndroidFetchers.createDefault(config.networkConfig)
 
+    // Size the memory cache relative to the app heap unless the caller set an explicit size. A
+    // caller that sets exactly the 64MB default is treated as "default" and gets the heap-relative
+    // size; to pin 64MB, set a value that differs by a byte or configure the cache directly.
+    val usesDefaultMemoryCacheSize =
+      config.memoryCacheSize == LandscapistConfig.DEFAULT_MEMORY_CACHE_SIZE
+    val effectiveConfig = if (usesDefaultMemoryCacheSize) {
+      config.copy(memoryCacheSize = heapRelativeMemoryCacheSize())
+    } else {
+      config
+    }
+
     return Landscapist.builder()
-      .config(config)
+      .config(effectiveConfig)
       .diskCache(diskCache)
       .fetcher(fetcher)
       .build()
+  }
+
+  /** Memory cache size scaled to the app heap: 25% of max heap, capped at 256MB. */
+  private fun heapRelativeMemoryCacheSize(): Long {
+    val maxHeap = Runtime.getRuntime().maxMemory()
+    return (maxHeap / 4).coerceAtMost(MAX_MEMORY_CACHE_SIZE)
+  }
+
+  private companion object {
+    private const val MAX_MEMORY_CACHE_SIZE: Long = 256L * 1024 * 1024
   }
 }

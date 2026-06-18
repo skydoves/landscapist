@@ -36,4 +36,4 @@ public fun rememberBitmapPainter(
   imageBitmap: ImageBitmap,
 ): Painter = remember(imageBitmap, imagePlugins) {
   BitmapPainter(imageBitmap)
-}.composePainterPlugins(imagePlugins = imagePlugins, imageBitmap = imageBitmap)
+}.composePainterPlugins(imagePlugins = imagePlugins, imageBitmap = { imageBitmap })

@@ -57,5 +57,5 @@ public fun rememberDrawablePainter(
     }
   }.composePainterPlugins(
     imagePlugins = imagePlugins,
-    imageBitmap = drawable.toBitmap().asImageBitmap(),
+    imageBitmap = { drawable.toBitmap().asImageBitmap() },
   )

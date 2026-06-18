@@ -42,11 +42,15 @@ import com.skydoves.landscapist.core.request.RequestManager
 import com.skydoves.landscapist.core.scheduler.DecodeScheduler
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
@@ -80,6 +84,16 @@ public class Landscapist private constructor(
 ) {
 
   private val scope = CoroutineScope(SupervisorJob() + dispatcher)
+
+  // Coalesces concurrent standard loads that share a memory-cache key, so the same image is fetched
+  // and decoded once instead of once per caller. Each entry counts its awaiters so the shared work
+  // is cancelled when the last awaiter leaves (e.g. a list item scrolls off screen).
+  private val inFlightLock = SynchronizedObject()
+  private val inFlightRequests = mutableMapOf<String, InFlightLoad>()
+
+  private class InFlightLoad(val deferred: Deferred<ImageResult>) {
+    var waiters: Int = 0
+  }
 
   init {
     // Register default memory pressure listener
@@ -116,10 +130,11 @@ public class Landscapist private constructor(
   /**
    * Loads an image based on the provided request.
    *
-   * By default, uses progressive loading for better perceived performance:
-   * - Emits intermediate (blurry) results while decoding
-   * - Uses priority-based scheduling so visible images load first
-   * - Reuses bitmaps from the pool to reduce GC pressure
+   * Pipeline: memory cache, then disk cache, then network fetch, then decode. Concurrent requests
+   * for the same image (same memory-cache key) are coalesced into a single fetch and decode.
+   *
+   * Progressive loading ([ImageRequest.progressiveEnabled]) is an opt-in streaming mode that emits
+   * intermediate previews; it is run independently per request and is not coalesced.
    *
    * @param request The image request.
    * @return A flow emitting [ImageResult] states.
@@ -139,7 +154,7 @@ public class Landscapist private constructor(
       height = request.targetHeight,
     )
 
-    // 1. Check memory cache (instant)
+    // 1. Memory cache (instant). Checked per call so a hit never waits on coalescing.
     if (request.memoryCachePolicy.readEnabled) {
       memoryCache[cacheKey]?.let { cached ->
         emit(
@@ -155,14 +170,260 @@ public class Landscapist private constructor(
       }
     }
 
-    // 2. Check disk cache
+    // 2. Progressive loading is an opt-in streaming mode and is not coalesced.
+    if (request.progressiveEnabled) {
+      loadProgressive(request, cacheKey)
+      return@flow
+    }
+
+    // 3. Standard path: coalesce concurrent identical loads into one fetch and decode.
+    emit(dedupedStandardTerminal(cacheKey.memoryKey, request, cacheKey))
+  }.flowOn(dispatcher)
+
+  /**
+   * Returns the terminal result of the standard (non-progressive) pipeline, coalescing concurrent
+   * loads that share [memoryKey] so the image is fetched and decoded only once.
+   *
+   * The shared work survives any single caller's cancellation (so a sibling still completes), but is
+   * cancelled once the last awaiter leaves, matching the usual "cancel the collector to cancel the
+   * load" contract. Coalescing assumes callers that share a [memoryKey] have equivalent request
+   * parameters; the first caller's request drives the shared work.
+   */
+  private suspend fun dedupedStandardTerminal(
+    memoryKey: String,
+    request: ImageRequest,
+    cacheKey: CacheKey,
+  ): ImageResult {
+    val (entry, owner) = synchronized(inFlightLock) {
+      val existing = inFlightRequests[memoryKey]
+      if (existing != null) {
+        existing.waiters++
+        existing to false
+      } else {
+        val created = InFlightLoad(scope.async { computeStandardTerminal(request, cacheKey) })
+        created.waiters = 1
+        inFlightRequests[memoryKey] = created
+        created to true
+      }
+    }
+
+    if (owner) {
+      // Registered outside inFlightLock on purpose: the handler re-enters the lock and atomicfu's
+      // synchronized is not reentrant on native. It removes the entry once the work finishes so a
+      // later load (after a cache eviction) starts fresh.
+      entry.deferred.invokeOnCompletion {
+        synchronized(inFlightLock) {
+          if (inFlightRequests[memoryKey] === entry) inFlightRequests.remove(memoryKey)
+        }
+      }
+    }
+
+    try {
+      return entry.deferred.await()
+    } finally {
+      val abandoned = synchronized(inFlightLock) {
+        entry.waiters--
+        if (entry.waiters == 0 && !entry.deferred.isCompleted) {
+          if (inFlightRequests[memoryKey] === entry) inFlightRequests.remove(memoryKey)
+          entry.deferred
+        } else {
+          null
+        }
+      }
+      // Cancel outside the lock; the completion handler re-enters inFlightLock.
+      abandoned?.cancel()
+    }
+  }
+
+  /**
+   * Runs the standard pipeline (disk cache, then network, then decode) and returns the terminal
+   * [ImageResult]. Never throws for expected failures; cancellation propagates.
+   */
+  private suspend fun computeStandardTerminal(
+    request: ImageRequest,
+    cacheKey: CacheKey,
+  ): ImageResult {
+    try {
+      // Disk cache: a decode error here means the cached bytes are corrupt, so fall through to
+      // the network rather than failing.
+      if (request.diskCachePolicy.readEnabled && diskCache != null) {
+        val diskResult = diskCache.get(cacheKey)?.use { snapshot ->
+          val bytes = snapshot.data().buffer().readByteArray()
+          val diskPath = snapshot.dataPath.toString()
+          when (
+            val decodeResult = scheduleDecodeWithPriority(request) {
+              decoder.decode(
+                data = bytes,
+                mimeType = null,
+                targetWidth = request.targetWidth,
+                targetHeight = request.targetHeight,
+                config = config,
+              )
+            }
+          ) {
+            is DecodeResult.Success -> {
+              val bitmap = applyTransformations(decodeResult.bitmap, request)
+              if (request.memoryCachePolicy.writeEnabled) {
+                memoryCache[cacheKey] = CachedImage(
+                  data = bitmap,
+                  dataSource = DataSource.DISK,
+                  sizeBytes = estimateBitmapSize(decodeResult.width, decodeResult.height),
+                  originalWidth = decodeResult.width,
+                  originalHeight = decodeResult.height,
+                  diskCachePath = diskPath,
+                )
+              }
+              ImageResult.Success(
+                data = bitmap,
+                dataSource = DataSource.DISK,
+                originalWidth = decodeResult.width,
+                originalHeight = decodeResult.height,
+                rawData = bytes,
+                diskCachePath = diskPath,
+              )
+            }
+            is DecodeResult.Error -> {
+              diskCache.remove(cacheKey)
+              null
+            }
+          }
+        }
+        if (diskResult != null) return diskResult
+      }
+
+      // Network fetch.
+      return when (val fetchResult = fetcher.fetch(request)) {
+        is FetchResult.Success -> {
+          var diskPath: String? = null
+          if (request.diskCachePolicy.writeEnabled && diskCache != null) {
+            diskCache.edit(cacheKey)?.use { editor ->
+              diskCache.fileSystem.sink(editor.dataPath).buffer().use { sink ->
+                sink.write(fetchResult.data)
+              }
+              editor.commit()
+              diskPath = (diskCache.directory / cacheKey.diskKey).toString()
+            }
+          }
+          decodeAndCacheStandard(
+            bytes = fetchResult.data,
+            mimeType = fetchResult.mimeType,
+            request = request,
+            cacheKey = cacheKey,
+            dataSource = DataSource.NETWORK,
+            diskPath = diskPath,
+          )
+        }
+
+        is FetchResult.Error -> ImageResult.Failure(fetchResult.throwable)
+
+        is FetchResult.Decoded -> finalizePreDecoded(
+          image = fetchResult.image,
+          dataSource = fetchResult.dataSource,
+          width = fetchResult.width,
+          height = fetchResult.height,
+          request = request,
+          cacheKey = cacheKey,
+        )
+      }
+    } catch (cancellation: CancellationException) {
+      throw cancellation
+    } catch (throwable: Throwable) {
+      return ImageResult.Failure(throwable)
+    }
+  }
+
+  /**
+   * Decodes [bytes] at the request's target size, applies transformations, updates the memory
+   * cache, and returns the terminal [ImageResult].
+   */
+  private suspend fun decodeAndCacheStandard(
+    bytes: ByteArray,
+    mimeType: String?,
+    request: ImageRequest,
+    cacheKey: CacheKey,
+    dataSource: DataSource,
+    diskPath: String?,
+  ): ImageResult {
+    return when (
+      val decodeResult = scheduleDecodeWithPriority(request) {
+        decoder.decode(
+          data = bytes,
+          mimeType = mimeType,
+          targetWidth = request.targetWidth,
+          targetHeight = request.targetHeight,
+          config = config,
+        )
+      }
+    ) {
+      is DecodeResult.Success -> {
+        val bitmap = applyTransformations(decodeResult.bitmap, request)
+        if (request.memoryCachePolicy.writeEnabled) {
+          memoryCache[cacheKey] = CachedImage(
+            data = bitmap,
+            dataSource = dataSource,
+            sizeBytes = estimateBitmapSize(decodeResult.width, decodeResult.height),
+            originalWidth = decodeResult.width,
+            originalHeight = decodeResult.height,
+            diskCachePath = diskPath,
+          )
+        }
+        ImageResult.Success(
+          data = bitmap,
+          dataSource = dataSource,
+          originalWidth = decodeResult.width,
+          originalHeight = decodeResult.height,
+          rawData = bytes,
+          diskCachePath = diskPath,
+        )
+      }
+      is DecodeResult.Error -> ImageResult.Failure(decodeResult.throwable)
+    }
+  }
+
+  /**
+   * Applies transformations to an already-decoded image, updates the memory cache, and returns the
+   * terminal [ImageResult]. Used for fetchers that return a decoded image directly.
+   */
+  private suspend fun finalizePreDecoded(
+    image: Any,
+    dataSource: DataSource,
+    width: Int,
+    height: Int,
+    request: ImageRequest,
+    cacheKey: CacheKey,
+  ): ImageResult {
+    val transformed = applyTransformations(image, request)
+    if (request.memoryCachePolicy.writeEnabled) {
+      memoryCache[cacheKey] = CachedImage(
+        data = transformed,
+        dataSource = dataSource,
+        sizeBytes = estimateBitmapSize(width, height),
+        originalWidth = width,
+        originalHeight = height,
+      )
+    }
+    return ImageResult.Success(
+      data = transformed,
+      dataSource = dataSource,
+      originalWidth = width,
+      originalHeight = height,
+    )
+  }
+
+  /**
+   * Opt-in progressive pipeline. Streams intermediate previews while decoding; animated images and
+   * pre-decoded results fall back to a single standard decode. Not coalesced across requests.
+   */
+  private suspend fun FlowCollector<ImageResult>.loadProgressive(
+    request: ImageRequest,
+    cacheKey: CacheKey,
+  ) {
+    // Disk cache.
     if (request.diskCachePolicy.readEnabled && diskCache != null) {
-      diskCache.get(cacheKey)?.use { snapshot ->
+      val handled = diskCache.get(cacheKey)?.use { snapshot ->
         val bytes = snapshot.data().buffer().readByteArray()
         val diskPath = snapshot.dataPath.toString()
-
-        // Use progressive decoding for disk cache if enabled (skip for animated images)
-        if (request.progressiveEnabled && !AnimatedImageDetector.isAnimated(bytes, null)) {
+        if (!AnimatedImageDetector.isAnimated(bytes, null)) {
           emitProgressiveDecode(
             bytes = bytes,
             mimeType = null,
@@ -171,64 +432,27 @@ public class Landscapist private constructor(
             dataSource = DataSource.DISK,
             diskPath = diskPath,
           )
-          return@flow
-        }
-
-        // Standard decode
-        val decodeResult = scheduleDecodeWithPriority(request) {
-          decoder.decode(
-            data = bytes,
-            mimeType = null,
-            targetWidth = request.targetWidth,
-            targetHeight = request.targetHeight,
-            config = config,
+        } else {
+          emit(
+            decodeAndCacheStandard(
+              bytes = bytes,
+              mimeType = null,
+              request = request,
+              cacheKey = cacheKey,
+              dataSource = DataSource.DISK,
+              diskPath = diskPath,
+            ),
           )
         }
-
-        when (decodeResult) {
-          is DecodeResult.Success -> {
-            val bitmap = applyTransformations(decodeResult.bitmap, request)
-
-            // Update memory cache
-            if (request.memoryCachePolicy.writeEnabled) {
-              memoryCache[cacheKey] = CachedImage(
-                data = bitmap,
-                dataSource = DataSource.DISK,
-                sizeBytes = estimateBitmapSize(decodeResult.width, decodeResult.height),
-                originalWidth = decodeResult.width,
-                originalHeight = decodeResult.height,
-                diskCachePath = diskPath,
-              )
-            }
-
-            emit(
-              ImageResult.Success(
-                data = bitmap,
-                dataSource = DataSource.DISK,
-                originalWidth = decodeResult.width,
-                originalHeight = decodeResult.height,
-                rawData = bytes,
-                diskCachePath = diskPath,
-              ),
-            )
-            return@flow
-          }
-          is DecodeResult.Error -> {
-            // Disk cache corrupted, continue to network
-            diskCache.remove(cacheKey)
-          }
-        }
-      }
+        true
+      } ?: false
+      if (handled) return
     }
 
-    // 3. Fetch from network
-    val fetchResult = fetcher.fetch(request)
-
-    when (fetchResult) {
+    // Network fetch.
+    when (val fetchResult = fetcher.fetch(request)) {
       is FetchResult.Success -> {
         var diskPath: String? = null
-
-        // Save to disk cache first
         if (request.diskCachePolicy.writeEnabled && diskCache != null) {
           diskCache.edit(cacheKey)?.use { editor ->
             diskCache.fileSystem.sink(editor.dataPath).buffer().use { sink ->
@@ -239,9 +463,7 @@ public class Landscapist private constructor(
           }
         }
 
-        // Use progressive decoding for network fetch if enabled (skip for animated images)
-        val isAnimated = AnimatedImageDetector.isAnimated(fetchResult.data, fetchResult.mimeType)
-        if (request.progressiveEnabled && !isAnimated) {
+        if (!AnimatedImageDetector.isAnimated(fetchResult.data, fetchResult.mimeType)) {
           emitProgressiveDecode(
             bytes = fetchResult.data,
             mimeType = fetchResult.mimeType,
@@ -250,83 +472,34 @@ public class Landscapist private constructor(
             dataSource = DataSource.NETWORK,
             diskPath = diskPath,
           )
-          return@flow
-        }
-
-        // Standard decode with priority scheduling
-        val decodeResult = scheduleDecodeWithPriority(request) {
-          decoder.decode(
-            data = fetchResult.data,
-            mimeType = fetchResult.mimeType,
-            targetWidth = request.targetWidth,
-            targetHeight = request.targetHeight,
-            config = config,
+        } else {
+          emit(
+            decodeAndCacheStandard(
+              bytes = fetchResult.data,
+              mimeType = fetchResult.mimeType,
+              request = request,
+              cacheKey = cacheKey,
+              dataSource = DataSource.NETWORK,
+              diskPath = diskPath,
+            ),
           )
         }
-
-        when (decodeResult) {
-          is DecodeResult.Success -> {
-            val bitmap = applyTransformations(decodeResult.bitmap, request)
-
-            // Update memory cache
-            if (request.memoryCachePolicy.writeEnabled) {
-              memoryCache[cacheKey] = CachedImage(
-                data = bitmap,
-                dataSource = DataSource.NETWORK,
-                sizeBytes = estimateBitmapSize(decodeResult.width, decodeResult.height),
-                originalWidth = decodeResult.width,
-                originalHeight = decodeResult.height,
-                diskCachePath = diskPath,
-              )
-            }
-
-            emit(
-              ImageResult.Success(
-                data = bitmap,
-                dataSource = DataSource.NETWORK,
-                originalWidth = decodeResult.width,
-                originalHeight = decodeResult.height,
-                rawData = fetchResult.data,
-                diskCachePath = diskPath,
-              ),
-            )
-          }
-          is DecodeResult.Error -> {
-            emit(ImageResult.Failure(decodeResult.throwable))
-          }
-        }
       }
 
-      is FetchResult.Error -> {
-        emit(ImageResult.Failure(fetchResult.throwable))
-      }
+      is FetchResult.Error -> emit(ImageResult.Failure(fetchResult.throwable))
 
-      is FetchResult.Decoded -> {
-        // Pre-decoded image - skip decode step
-        val image = applyTransformations(fetchResult.image, request)
-
-        // Update memory cache (skip disk cache for pre-decoded types)
-        if (request.memoryCachePolicy.writeEnabled) {
-          memoryCache[cacheKey] = CachedImage(
-            data = image,
-            dataSource = fetchResult.dataSource,
-            sizeBytes = estimateBitmapSize(fetchResult.width, fetchResult.height),
-            originalWidth = fetchResult.width,
-            originalHeight = fetchResult.height,
-          )
-        }
-
-        emit(
-          ImageResult.Success(
-            data = image,
-            dataSource = fetchResult.dataSource,
-            originalWidth = fetchResult.width,
-            originalHeight = fetchResult.height,
-          ),
-        )
-      }
+      is FetchResult.Decoded -> emit(
+        finalizePreDecoded(
+          image = fetchResult.image,
+          dataSource = fetchResult.dataSource,
+          width = fetchResult.width,
+          height = fetchResult.height,
+          request = request,
+          cacheKey = cacheKey,
+        ),
+      )
     }
-  }.flowOn(dispatcher)
+  }
 
   /**
    * Schedules a decode operation with priority.
@@ -347,7 +520,7 @@ public class Landscapist private constructor(
   /**
    * Performs progressive decoding and emits intermediate results.
    */
-  private suspend fun kotlinx.coroutines.flow.FlowCollector<ImageResult>.emitProgressiveDecode(
+  private suspend fun FlowCollector<ImageResult>.emitProgressiveDecode(
     bytes: ByteArray,
     mimeType: String?,
     request: ImageRequest,
@@ -501,7 +674,8 @@ public class Landscapist private constructor(
   ): Any {
     if (request.transformations.isEmpty()) return bitmap
 
-    return withContext(dispatcher) {
+    // Transformations are CPU-bound, so run them on Default rather than the loader's I/O dispatcher.
+    return withContext(Dispatchers.Default) {
       request.transformations.fold(bitmap) { current, transformation ->
         transformation.transform(current)
       }
@@ -544,7 +718,7 @@ public class Landscapist private constructor(
     private var diskCache: DiskCache? = null
     private var fetcher: ImageFetcher? = null
     private var decoder: ImageDecoder? = null
-    private var dispatcher: CoroutineDispatcher = Dispatchers.Default
+    private var dispatcher: CoroutineDispatcher = ioDispatcher
 
     /** Sets the configuration. */
     public fun config(config: LandscapistConfig): Builder = apply {

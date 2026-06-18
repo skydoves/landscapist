@@ -51,7 +51,11 @@ public data class LandscapistConfig(
   val interceptors: List<Interceptor> = emptyList(),
 ) {
   public companion object {
-    /** Default memory cache size: 25% of available memory, max 256MB. */
+    /**
+     * Fallback memory cache size (64MB), used when a heap-relative size is not computed (the common
+     * builder and non-Android platforms). The Android builder sizes the memory cache at 25% of the
+     * app heap, capped at 256MB.
+     */
     public const val DEFAULT_MEMORY_CACHE_SIZE: Long = 64 * 1024 * 1024L // 64MB
 
     /** Default disk cache size: 100MB. */

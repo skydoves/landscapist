@@ -86,25 +86,18 @@ The `landscapist-core` module is a complete, Kotlin Multiplatform image loading 
 
 Landscapist Core is **exceptionally lightweight** compared to other image loading libraries, making it the ideal choice for SDK and library developers who need to minimize their dependency footprint.
 
-**AAR Size Comparison (Android Release Build):**
+**Core engine AAR size (release build), for the versions this repo depends on:**
 
-| Library | AAR Size | vs Landscapist Core | Impact on APK |
-|---------|----------|---------------------|---------------|
-| **landscapist-core** | **~312 KB** | **Baseline (Smallest)** | Minimal |
-| Coil3 | ~460 KB | **+47% larger** | Moderate |
-| Glide | ~689 KB | **+121% larger** | Significant |
-| Fresco | ~1 MB | **+228% larger** | High |
+| Library | Module | Release AAR | vs landscapist-core |
+|---------|--------|-------------|---------------------|
+| **landscapist-core** | `landscapist-core` | **313 KiB** | baseline |
+| Coil3 | `coil-core` 3.5.0 | 468 KiB | +50% |
+| Glide | `glide` 5.0.7 | 693 KiB | +121% |
+| Fresco | core pipeline artifacts | ~1.0 MiB | roughly 3.3x |
 
-**Performance (Android Release Build):**
+Reproduce with `./gradlew :landscapist-core:assembleRelease && ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar` (320,771 bytes = 313 KiB). This is a single module's AAR, not the full transitive footprint.
 
-| Library | Avg Load Time | Memory Usage | Supports KMP |
-|---------|---------------|--------------|--------------|
-| **LandscapistImage** | **1,245ms** | **4,520KB** | **✓** |
-| **GlideImage** | 1,312ms (+5%) | 5,124KB (+13%) | ✗ |
-| **CoilImage** | 1,389ms (+12%) | 4,876KB (+8%) | **✓** |
-| **FrescoImage** | 1,467ms (+18%) | 5,342KB (+18%) | ✗ |
-
-> For detailed performance analysis and test methodology, see the [Landscapist Core documentation](https://skydoves.github.io/landscapist/landscapist-core/#performance-comparison).
+Load-time and memory numbers are not published here because they depend on device, OS, and network. Run the included benchmarks (`ImageLibraryBenchmark` instrumentation test and the `:benchmark-landscapist` macrobenchmark) on your own hardware. See the [performance comparison](https://skydoves.github.io/landscapist/landscapist/performance-comparison/) for methodology.
 
 ### Setup
 
