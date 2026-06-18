@@ -5,50 +5,34 @@
 //   ./gradlew :benchmark-landscapist-app:stabilityDump
 
 @Composable
-public fun com.skydoves.benchmark.landscapist.app.Coil3ImageProfiles(): kotlin.Unit
-  skippable: true
+public fun com.skydoves.benchmark.landscapist.app.Coil3ImageList(urls: kotlin.collections.List<kotlin.String>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
   restartable: true
   params:
+    - urls: RUNTIME (requires runtime check)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun com.skydoves.benchmark.landscapist.app.CoilImageProfiles(): kotlin.Unit
-  skippable: true
+public fun com.skydoves.benchmark.landscapist.app.FrescoImageList(urls: kotlin.collections.List<kotlin.String>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
   restartable: true
   params:
+    - urls: RUNTIME (requires runtime check)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun com.skydoves.benchmark.landscapist.app.FrescoImageProfiles(): kotlin.Unit
-  skippable: true
+public fun com.skydoves.benchmark.landscapist.app.GlideImageList(urls: kotlin.collections.List<kotlin.String>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
   restartable: true
   params:
+    - urls: RUNTIME (requires runtime check)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun com.skydoves.benchmark.landscapist.app.FrescoWebSupportProfiles(): kotlin.Unit
-  skippable: true
+public fun com.skydoves.benchmark.landscapist.app.LandscapistImageList(urls: kotlin.collections.List<kotlin.String>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
   restartable: true
   params:
-
-@Composable
-public fun com.skydoves.benchmark.landscapist.app.GlideImageProfiles(): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-
-@Composable
-public fun com.skydoves.benchmark.landscapist.app.ImageGalleryProfiles(): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-
-@Composable
-public fun com.skydoves.benchmark.landscapist.app.ImageViewerProfiles(): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-
-@Composable
-public fun com.skydoves.benchmark.landscapist.app.LandscapistImageProfiles(): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
+    - urls: RUNTIME (requires runtime check)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
