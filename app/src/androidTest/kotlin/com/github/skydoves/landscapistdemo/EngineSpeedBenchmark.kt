@@ -46,7 +46,8 @@ import kotlin.system.measureNanoTime
  * loader overhead with nanosecond precision.
  *
  * ./gradlew :app:connectedDebugAndroidTest \
- *   -Pandroid.testInstrumentationRunnerArguments.class=com.github.skydoves.landscapistdemo.EngineSpeedBenchmark \
+ *   -Pandroid.testInstrumentationRunnerArguments.class=\
+ *     com.github.skydoves.landscapistdemo.EngineSpeedBenchmark \
  *   -Pandroid.testInstrumentationRunnerArguments.baseUrl=http://127.0.0.1:8099
  */
 @LargeTest
@@ -56,7 +57,8 @@ class EngineSpeedBenchmark {
   private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
   private val baseUrl: String =
-    InstrumentationRegistry.getArguments().getString("baseUrl")?.trimEnd('/') ?: "https://picsum.photos"
+    InstrumentationRegistry.getArguments().getString("baseUrl")?.trimEnd('/')
+      ?: "https://picsum.photos"
 
   private val runId: String = UUID.randomUUID().toString().take(8)
 
@@ -138,7 +140,17 @@ class EngineSpeedBenchmark {
     println("\n" + "=".repeat(72))
     println("ENGINE SPEED BENCHMARK  size=$SIZE  warmup=$WARMUP  measured=$MEASURED  base=$baseUrl")
     println("=".repeat(72))
-    println(String.format(Locale.US, "%-14s | %9s | %9s | %9s | %9s", "Engine", "avg", "median", "min", "p90"))
+    println(
+      String.format(
+        Locale.US,
+        "%-14s | %9s | %9s | %9s | %9s",
+        "Engine",
+        "avg",
+        "median",
+        "min",
+        "p90",
+      ),
+    )
     println("-".repeat(72))
     results.entries
       .map { (engine, ns) -> engine to ns.sorted() }
@@ -153,7 +165,11 @@ class EngineSpeedBenchmark {
           String.format(
             Locale.US,
             "%-14s | %7.2fms | %7.2fms | %7.2fms | %7.2fms",
-            engine, avg, median, min, p90,
+            engine,
+            avg,
+            median,
+            min,
+            p90,
           ),
         )
       }
@@ -176,7 +192,9 @@ class EngineSpeedBenchmark {
 
   private val landscapist565: Landscapist by lazy {
     Landscapist.builder(context)
-      .config(LandscapistConfig(allowRgb565 = true, bitmapConfig = BitmapConfig(allowHardware = false)))
+      .config(
+        LandscapistConfig(allowRgb565 = true, bitmapConfig = BitmapConfig(allowHardware = false)),
+      )
       .build()
   }
 
