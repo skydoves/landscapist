@@ -20,6 +20,9 @@ androidxUiAutomator = "2.4.0"
 composeStabilityAnalyzer = "0.10.0"
 kotlinxSerializationJson = "1.11.0"
 jetbrains-compose = "1.11.1"
+# Native runtime for desktop Compose UI tests. Must match the skiko version that
+# jetbrains-compose pulls transitively (org.jetbrains.skiko:skiko).
+skiko = "0.144.6"
 glide = "5.0.7"
 fresco = "3.7.0"
 coil = "2.7.0"
@@ -91,6 +94,8 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 jetbrains-compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "jetbrains-compose" }
 compose-runtime-annotation = { group = "androidx.compose.runtime", name = "runtime-annotation", version = "1.11.4" }
 jetbrains-compose-ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "jetbrains-compose" }
+jetbrains-compose-ui-test = { group = "org.jetbrains.compose.ui", name = "ui-test", version.ref = "jetbrains-compose" }
+jetbrains-compose-ui-test-junit4 = { group = "org.jetbrains.compose.ui", name = "ui-test-junit4", version.ref = "jetbrains-compose" }
 jetbrains-compose-foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "jetbrains-compose" }
 jetbrains-compose-animation = { group = "org.jetbrains.compose.animation", name = "animation", version.ref = "jetbrains-compose" }
 

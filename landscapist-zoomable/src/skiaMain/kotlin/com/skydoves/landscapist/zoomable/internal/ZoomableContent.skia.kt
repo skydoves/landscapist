@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import com.skydoves.landscapist.LocalImageSourceBytes
@@ -46,6 +47,7 @@ internal actual fun ZoomableContent(
   zoomableState: ZoomableState,
   config: ZoomableConfig,
   enabled: Boolean,
+  onTap: ((Offset) -> Unit)?,
   content: @Composable () -> Unit,
 ) {
   // First try to get decoder from LocalImageRegionDecoder (explicitly provided)
@@ -88,6 +90,7 @@ internal actual fun ZoomableContent(
       zoomableState = zoomableState,
       config = config,
       enabled = enabled,
+      onTap = onTap,
       content = content,
     )
   } else {
@@ -96,6 +99,7 @@ internal actual fun ZoomableContent(
       zoomableState = zoomableState,
       config = config,
       enabled = enabled,
+      onTap = onTap,
       content = content,
     )
   }
@@ -115,6 +119,7 @@ private fun SubSamplingImageWithPlaceholder(
   zoomableState: ZoomableState,
   config: ZoomableConfig,
   enabled: Boolean,
+  onTap: ((Offset) -> Unit)?,
   content: @Composable () -> Unit,
 ) {
   Box(modifier = Modifier.clipToBounds()) {
@@ -133,6 +138,7 @@ private fun SubSamplingImageWithPlaceholder(
       zoomableState = zoomableState,
       config = config,
       enabled = enabled,
+      onTap = onTap,
     )
   }
 }
@@ -145,6 +151,7 @@ internal fun StandardZoomableContent(
   zoomableState: ZoomableState,
   config: ZoomableConfig,
   enabled: Boolean,
+  onTap: ((Offset) -> Unit)? = null,
   content: @Composable () -> Unit,
 ) {
   val transformation = zoomableState.transformation
@@ -160,6 +167,7 @@ internal fun StandardZoomableContent(
           Modifier.zoomGestures(
             state = zoomableState,
             config = config,
+            onTap = onTap,
           )
         } else {
           Modifier

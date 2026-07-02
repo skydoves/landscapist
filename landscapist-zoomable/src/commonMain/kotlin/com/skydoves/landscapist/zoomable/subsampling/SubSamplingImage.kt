@@ -53,6 +53,7 @@ import kotlinx.coroutines.flow.debounce
  * @param enabled Whether zoom gestures are enabled.
  * @param modifier The modifier to apply to the composable.
  * @param contentDescription The content description for accessibility.
+ * @param onTap Optional callback invoked with the tap position on a single tap.
  */
 @Composable
 public fun SubSamplingImage(
@@ -62,6 +63,7 @@ public fun SubSamplingImage(
   enabled: Boolean = true,
   modifier: Modifier = Modifier,
   contentDescription: String? = null,
+  onTap: ((Offset) -> Unit)? = null,
 ) {
   var viewportSize by remember { mutableStateOf(IntSize.Zero) }
   var currentFitScale by remember { mutableFloatStateOf(1f) }
@@ -124,6 +126,7 @@ public fun SubSamplingImage(
           Modifier.zoomGestures(
             state = zoomableState,
             config = config,
+            onTap = onTap,
           )
         } else {
           Modifier
