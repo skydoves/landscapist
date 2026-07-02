@@ -408,7 +408,7 @@ Next, add the dependency below to your **module**'s `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation("com.github.skydoves:landscapist-glide:2.10.0")
+    implementation("com.github.skydoves:landscapist-glide:2.11.0")
 }
 ```
 
