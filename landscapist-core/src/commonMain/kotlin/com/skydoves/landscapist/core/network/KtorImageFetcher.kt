@@ -19,8 +19,10 @@ import com.skydoves.landscapist.core.ImageRequest
 import com.skydoves.landscapist.core.NetworkConfig
 import com.skydoves.landscapist.core.model.DataSource
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.statement.bodyAsBytes
@@ -113,18 +115,42 @@ public class KtorImageFetcher(
      */
     public fun create(networkConfig: NetworkConfig = NetworkConfig()): KtorImageFetcher {
       val httpClient = HttpClient {
-        install(HttpTimeout) {
-          connectTimeoutMillis = networkConfig.connectTimeout.inWholeMilliseconds
-          requestTimeoutMillis = networkConfig.readTimeout.inWholeMilliseconds
-        }
-        install(HttpSend) {
-          maxSendCount = networkConfig.maxRedirects
-        }
-        followRedirects = networkConfig.followRedirects
+        configureForImageLoading(networkConfig)
       }
       return KtorImageFetcher(httpClient, networkConfig)
     }
   }
+}
+
+/**
+ * Applies the shared [HttpClient] configuration used for image loading.
+ *
+ * Kept as a standalone extension so both [KtorImageFetcher.create] and tests configure the client
+ * identically, regardless of the underlying engine.
+ *
+ * @param networkConfig Network configuration settings.
+ */
+internal fun HttpClientConfig<*>.configureForImageLoading(networkConfig: NetworkConfig) {
+  install(HttpTimeout) {
+    connectTimeoutMillis = networkConfig.connectTimeout.inWholeMilliseconds
+    requestTimeoutMillis = networkConfig.readTimeout.inWholeMilliseconds
+  }
+
+  // Persist cookies across redirect hops. Some CDNs set a cookie on the first response and
+  // redirect to a target that requires it; without a cookie store the target keeps redirecting,
+  // producing an endless loop that only ends when the send-count limit is hit. Browsers avoid this
+  // because they retain cookies automatically.
+  // See https://github.com/skydoves/landscapist/issues/859
+  install(HttpCookies)
+
+  install(HttpSend) {
+    // maxSendCount is the total number of times a request may be dispatched (the original request
+    // plus every redirect and retry), not the number of redirects. Allow the original send plus
+    // maxRedirects redirect hops so a request that legitimately redirects never trips the limit.
+    maxSendCount = networkConfig.maxRedirects + 1
+  }
+
+  followRedirects = networkConfig.followRedirects
 }
 
 /**
