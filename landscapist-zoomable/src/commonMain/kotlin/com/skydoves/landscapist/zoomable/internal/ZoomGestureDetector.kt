@@ -37,28 +37,38 @@ import kotlinx.coroutines.launch
  *
  * @param state The [ZoomableState] to update based on gestures.
  * @param config The [ZoomableConfig] for gesture behavior configuration.
+ * @param onTap Optional callback invoked with the tap position on a single tap. Provide this to
+ *   receive tap events, since the tap detector consumes the pointer down and a parent
+ *   `Modifier.clickable` therefore does not fire while tap handling is active.
  */
 internal fun Modifier.zoomGestures(
   state: ZoomableState,
   config: ZoomableConfig,
+  onTap: ((Offset) -> Unit)? = null,
 ): Modifier = composed {
   val scope = rememberCoroutineScope()
 
   this
-    // Handle double-tap to zoom FIRST
+    // Handle double-tap to zoom and single-tap callbacks FIRST.
+    // Install this detector only when it has something to do, so that with both double-tap zoom and
+    // onTap disabled a single tap stays unconsumed and can reach a parent gesture handler.
     .then(
-      if (config.enableDoubleTapZoom) {
-        Modifier.pointerInput(state, config) {
+      if (config.enableDoubleTapZoom || onTap != null) {
+        Modifier.pointerInput(state, config, onTap) {
           detectTapGestures(
-            onTap = { /* Allow single tap to pass through */ },
-            onDoubleTap = { offset ->
-              scope.launch {
-                if (state.isZoomed) {
-                  state.resetZoom()
-                } else {
-                  state.zoomTo(config.doubleTapZoom, offset)
+            onTap = { offset -> onTap?.invoke(offset) },
+            onDoubleTap = if (config.enableDoubleTapZoom) {
+              { offset ->
+                scope.launch {
+                  if (state.isZoomed) {
+                    state.resetZoom()
+                  } else {
+                    state.zoomTo(config.doubleTapZoom, offset)
+                  }
                 }
               }
+            } else {
+              null
             },
           )
         }

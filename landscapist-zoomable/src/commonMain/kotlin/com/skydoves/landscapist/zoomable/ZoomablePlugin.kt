@@ -17,6 +17,7 @@ package com.skydoves.landscapist.zoomable
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.geometry.Offset
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.zoomable.internal.ZoomableContent
 
@@ -38,18 +39,18 @@ import com.skydoves.landscapist.zoomable.internal.ZoomableContent
  *
  * **With custom configuration:**
  * ```kotlin
- * val zoomableState = rememberZoomableState()
+ * // Configuration is supplied through the state.
+ * val zoomableState = rememberZoomableState(
+ *   config = ZoomableConfig(
+ *     maxZoom = 8f,
+ *     doubleTapZoom = 3f,
+ *   ),
+ * )
  *
  * GlideImage(
  *   imageModel = { imageUrl },
  *   component = rememberImageComponent {
- *     +ZoomablePlugin(
- *       state = zoomableState,
- *       config = ZoomableConfig(
- *         maxZoom = 8f,
- *         doubleTapZoom = 3f,
- *       ),
- *     )
+ *     +ZoomablePlugin(state = zoomableState)
  *   },
  * )
  *
@@ -57,6 +58,18 @@ import com.skydoves.landscapist.zoomable.internal.ZoomableContent
  * Button(onClick = { scope.launch { zoomableState.resetZoom() } }) {
  *   Text("Reset")
  * }
+ * ```
+ *
+ * **Handling taps:** because the zoom gesture detector consumes the pointer down, a parent
+ * `Modifier.clickable` will not receive taps while zoom gestures are enabled. Use [onTap] to react
+ * to single taps instead:
+ * ```kotlin
+ * GlideImage(
+ *   imageModel = { imageUrl },
+ *   component = rememberImageComponent {
+ *     +ZoomablePlugin(onTap = { position -> openFullScreen() })
+ *   },
+ * )
  * ```
  *
  * **Reset zoom when image changes:**
@@ -75,12 +88,16 @@ import com.skydoves.landscapist.zoomable.internal.ZoomableContent
  *   If null, a new state will be created internally.
  * @property enabled Whether zoom gestures are enabled.
  * @property onTransformChanged Callback invoked when the transformation changes.
+ * @property onTap Callback invoked with the tap position on a single tap. Use this to handle taps
+ *   on the image, since the zoom gesture detector consumes the pointer down and a parent
+ *   `Modifier.clickable` therefore does not receive the tap while zoom gestures are enabled.
  */
 @Immutable
 public data class ZoomablePlugin(
   public val state: ZoomableState? = null,
   public val enabled: Boolean = true,
   public val onTransformChanged: ((ContentTransformation) -> Unit)? = null,
+  public val onTap: ((Offset) -> Unit)? = null,
 ) : ImagePlugin.ComposablePlugin {
 
   /**
@@ -104,6 +121,7 @@ public data class ZoomablePlugin(
       zoomableState = zoomableState,
       config = zoomableState.config,
       enabled = enabled,
+      onTap = onTap,
       content = content,
     )
   }

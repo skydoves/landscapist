@@ -16,6 +16,7 @@
 package com.skydoves.landscapist.zoomable.internal
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Offset
 import com.skydoves.landscapist.zoomable.ZoomableConfig
 import com.skydoves.landscapist.zoomable.ZoomableState
 
@@ -30,6 +31,7 @@ import com.skydoves.landscapist.zoomable.ZoomableState
  * @param zoomableState The [ZoomableState] managing zoom transformations.
  * @param config The [ZoomableConfig] for zoom behavior.
  * @param enabled Whether zoom gestures are enabled.
+ * @param onTap Optional callback invoked with the tap position on a single tap.
  * @param content The image content to display.
  */
 @Composable
@@ -37,5 +39,6 @@ internal expect fun ZoomableContent(
   zoomableState: ZoomableState,
   config: ZoomableConfig,
   enabled: Boolean,
+  onTap: ((Offset) -> Unit)?,
   content: @Composable () -> Unit,
 )
