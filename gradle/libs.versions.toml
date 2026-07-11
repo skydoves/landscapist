@@ -23,7 +23,7 @@ jetbrains-compose = "1.11.1"
 # Native runtime for desktop Compose UI tests. Must match the skiko version that
 # jetbrains-compose pulls transitively (org.jetbrains.skiko:skiko).
 skiko = "0.144.6"
-glide = "5.0.7"
+glide = "5.0.9"
 fresco = "3.7.0"
 coil = "2.7.0"
 coil3 = "3.5.0"
