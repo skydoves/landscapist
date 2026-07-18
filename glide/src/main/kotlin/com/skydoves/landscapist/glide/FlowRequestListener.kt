@@ -28,7 +28,6 @@ import kotlinx.coroutines.channels.trySendBlocking
  */
 internal class FlowRequestListener(
   private val producerScope: ProducerScope<ImageLoadState>,
-  private val failException: (Throwable?) -> Unit,
 ) : RequestListener<Any> {
 
   override fun onLoadFailed(
@@ -37,9 +36,15 @@ internal class FlowRequestListener(
     target: Target<Any>,
     isFirstResource: Boolean,
   ): Boolean {
-    failException.invoke(e)
-    // return false so that the load failed will handle this.
-    return false
+    producerScope.trySendBlocking(
+      ImageLoadState.Failure(
+        data = null,
+        reason = e,
+      ),
+    )
+    producerScope.channel.close()
+    // return true so target callbacks don't emit into a different active request scope.
+    return true
   }
 
   override fun onResourceReady(
