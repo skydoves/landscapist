@@ -865,7 +865,7 @@ GlideImage(
   previewPlaceholder = painterResource(id = R.drawable.poster)
 )
 ```
-> **Note**: You can also use the the `previewPlaceholder` parameter for **`CoilImage`** and **`FrescoImage`**.
+> **Note**: You can also use the `previewPlaceholder` parameter for **`CoilImage`** and **`FrescoImage`**.
 
 ## ImageComponent and ImagePlugin
 
