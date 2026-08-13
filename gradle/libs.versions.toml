@@ -92,7 +92,7 @@ okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "atomicfu" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 jetbrains-compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "jetbrains-compose" }
-compose-runtime-annotation = { group = "androidx.compose.runtime", name = "runtime-annotation", version = "1.11.4" }
+compose-runtime-annotation = { group = "androidx.compose.runtime", name = "runtime-annotation", version = "1.12.0" }
 jetbrains-compose-ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "jetbrains-compose" }
 jetbrains-compose-ui-test = { group = "org.jetbrains.compose.ui", name = "ui-test", version.ref = "jetbrains-compose" }
 jetbrains-compose-ui-test-junit4 = { group = "org.jetbrains.compose.ui", name = "ui-test-junit4", version.ref = "jetbrains-compose" }
