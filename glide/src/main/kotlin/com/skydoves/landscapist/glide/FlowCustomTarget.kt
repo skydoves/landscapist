@@ -46,8 +46,6 @@ internal class FlowCustomTarget constructor(
 
   private val sizeReadyCallbacks = mutableListOf<SizeReadyCallback>()
 
-  private var failException: Throwable? = null
-
   /** onResourceReady will be handled by [FlowRequestListener]. */
   override fun onResourceReady(resource: Any, transition: Transition<in Any>?) = Unit
 
@@ -55,13 +53,7 @@ internal class FlowCustomTarget constructor(
     producerScope?.trySendBlocking(ImageLoadState.Loading)
   }
 
-  override fun onLoadFailed(errorDrawable: Drawable?) {
-    producerScope?.trySendBlocking(
-      ImageLoadState.Failure(
-        data = errorDrawable,
-        reason = failException,
-      ),
-    )
+  override fun onLoadFailed(ignoredErrorDrawable: Drawable?) {
     producerScope?.channel?.close()
   }
 
@@ -118,10 +110,6 @@ internal class FlowCustomTarget constructor(
 
   fun setProducerScope(producerScope: ProducerScope<ImageLoadState>) {
     this.producerScope = producerScope
-  }
-
-  fun updateFailException(throwable: Throwable?) {
-    failException = throwable
   }
 
   private val Constraints.inferredIntSize: IntSize

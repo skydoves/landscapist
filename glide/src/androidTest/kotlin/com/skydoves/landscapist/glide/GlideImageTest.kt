@@ -18,6 +18,9 @@ package com.skydoves.landscapist.glide
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
@@ -185,6 +188,50 @@ internal class GlideImageTest {
     composeTestRule.runOnIdle {
       assertThat(state.size, `is`(1))
       assertThat(state[0], instanceOf(GlideImageState.Failure::class.java))
+    }
+  }
+
+  @Test
+  fun staleFailure_fromPreviousRequest_doesNotOverrideLatestSuccess() {
+    val terminalStatesForLatestModel = ArrayList<GlideImageState>()
+    val latestModel = android.R.drawable.ic_dialog_info
+    var imageModel by mutableStateOf<Any?>("https://landscapist.invalid/should-fail.jpg")
+
+    composeTestRule.setContent {
+      GlideImage(
+        imageModel = { imageModel },
+        modifier = Modifier
+          .size(128.dp, 128.dp)
+          .testTag(TAG_GLIDE),
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+        onImageStateChanged = { state ->
+          if (
+            imageModel == latestModel &&
+            (state is GlideImageState.Success || state is GlideImageState.Failure)
+          ) {
+            terminalStatesForLatestModel.add(state)
+          }
+        },
+      )
+    }
+
+    composeTestRule.runOnIdle {
+      imageModel = latestModel
+    }
+
+    composeTestRule.waitUntil(10_000) {
+      terminalStatesForLatestModel.isNotEmpty()
+    }
+
+    composeTestRule.runOnIdle {
+      assertThat(
+        terminalStatesForLatestModel.first(),
+        instanceOf(GlideImageState.Success::class.java),
+      )
+      val hasFailureForLatestModel = terminalStatesForLatestModel.any {
+        it is GlideImageState.Failure
+      }
+      assertThat(hasFailureForLatestModel, `is`(false))
     }
   }
 }
