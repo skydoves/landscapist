@@ -19,7 +19,7 @@ androidxProfileinstaller = "1.4.1"
 androidxUiAutomator = "2.4.0"
 composeStabilityAnalyzer = "0.13.0"
 kotlinxSerializationJson = "1.11.0"
-jetbrains-compose = "1.11.1"
+jetbrains-compose = "1.12.0"
 # Native runtime for desktop Compose UI tests. Must match the skiko version that
 # jetbrains-compose pulls transitively (org.jetbrains.skiko:skiko).
 skiko = "0.144.6"
