@@ -60,14 +60,14 @@ private fun com.skydoves.landscapist.coil.CoilThumbnail(requestSize: androidx.co
 
 @Composable
 public fun com.skydoves.landscapist.coil.LocalCoilProvider.getCoilImageLoader(): coil.ImageLoader
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
 
 @Composable
 public fun com.skydoves.landscapist.coil.rememberCoilImageState(initialState: com.skydoves.landscapist.coil.CoilImageState, key: kotlin.Any?): androidx.compose.runtime.MutableState<com.skydoves.landscapist.coil.CoilImageState>
   skippable: false
-  restartable: true
+  restartable: false
   params:
     - initialState: STABLE (marked @Stable or @Immutable)
     - key: UNKNOWN (interface or non-final class; concrete implementation unknown)
@@ -75,7 +75,7 @@ public fun com.skydoves.landscapist.coil.rememberCoilImageState(initialState: co
 @Composable
 internal fun com.skydoves.landscapist.coil.rememberImageSourceFile(context: android.content.Context, imageLoader: coil.ImageLoader, imageModel: kotlin.Any?, dataSource: com.skydoves.landscapist.DataSource?): androidx.compose.runtime.State<java.io.File?>
   skippable: false
-  restartable: true
+  restartable: false
   params:
     - context: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - imageLoader: UNKNOWN (interface or non-final class; concrete implementation unknown)
@@ -85,8 +85,8 @@ internal fun com.skydoves.landscapist.coil.rememberImageSourceFile(context: andr
 @Composable
 internal fun com.skydoves.landscapist.coil.rememberRequestWithConstraints(request: coil.request.ImageRequest, imageOptions: com.skydoves.landscapist.ImageOptions): coil.request.ImageRequest
   skippable: false
-  restartable: true
+  restartable: false
   params:
-    - request: UNSTABLE (has mutable properties or unstable members)
+    - request: UNSTABLE (cross-module type without @Stable/@Immutable)
     - imageOptions: STABLE (marked @Stable or @Immutable)
 
