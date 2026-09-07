@@ -48,12 +48,7 @@ internal actual class CircularRevealPainter actual constructor(
     var dx = 0f
     var dy = 0f
     var scale: Float
-    val paint = Paint()
-
-    paint.asFrameworkPaint().apply {
-      isAntiAlias = true
-      isDither = true
-    }
+    val paint = Paint().apply { isAntiAlias = true }
 
     drawIntoCanvas { canvas ->
       // cache the paint in the internal stack.
@@ -95,8 +90,6 @@ internal actual class CircularRevealPainter actual constructor(
       canvas.restore()
       // restore canvas.
       canvas.restore()
-      // resets the paint and release to the pool.
-      paint.asFrameworkPaint().reset()
     }
   }
 

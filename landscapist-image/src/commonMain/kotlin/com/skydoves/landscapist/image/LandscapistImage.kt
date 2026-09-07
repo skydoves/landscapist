@@ -53,11 +53,9 @@ import com.skydoves.landscapist.core.model.ImageResult
 import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.crossfade.CrossfadeWithEffect
 import com.skydoves.landscapist.plugins.composePainterPlugins
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -296,8 +294,13 @@ private fun LandscapistImageInternal(
 ) {
   val loadingKey = imageOptions.loadingOptionsKey
 
+  // Read the memory cache during composition so an image that is already decoded is drawn in the
+  // very first frame. Waiting for the flow costs a frame of empty content even on a cache hit,
+  // which is what makes images blink when a composable enters, most visibly when a shared element
+  // transition animates the bounds of what is still an empty box.
   var state by remember(request, loadingKey) {
-    mutableStateOf<ImageLoadState>(ImageLoadState.None)
+    val cached = landscapist.value.peekMemoryCache(request.value)
+    mutableStateOf(cached?.toImageLoadState() ?: ImageLoadState.None)
   }
 
   // Capture incoming parent constraints for downsampling. Initialized to -1 meaning "not yet measured".
@@ -354,8 +357,12 @@ private fun LandscapistImageInternal(
 
   if (canLoad) {
     LaunchedEffect(sizedRequest, loadingKey) {
-      executeImageLoading(landscapist.value, sizedRequest).collect {
-        state = it
+      executeImageLoading(landscapist.value, sizedRequest).collect { next ->
+        // Once measurement lands, the request restarts at its real target size. Dropping back to a
+        // loading state would blink away an image the user can already see, so an image on screen
+        // holds until the resized one resolves.
+        if (next is ImageLoadState.Loading && state is ImageLoadState.Success) return@collect
+        state = next
       }
     }
   }
@@ -431,7 +438,8 @@ private fun executeImageLoading(
   landscapist: Landscapist,
   request: ImageRequest,
 ) = flow {
-  emit(ImageLoadState.Loading)
+  // No loading state is emitted up front: Landscapist.load emits one only when the image is not
+  // already in memory, so a cached image never passes through one.
 
   // Handle DrawableResource from KMP Compose Resources directly.
   // DrawableResource is a local bundled resource that doesn't need network fetching or caching.
@@ -450,7 +458,7 @@ private fun executeImageLoading(
   }
 }.catch {
   emit(ImageLoadState.Failure(null, it))
-}.distinctUntilChanged().flowOn(Dispatchers.Default)
+}.distinctUntilChanged()
 
 /**
  * Converts [ImageResult] to [ImageLoadState].

@@ -47,6 +47,7 @@ dependencies {
     api(project(":landscapist-image-gallery"))
     api(project(":landscapist-core"))
     api(project(":landscapist-image"))
+    api(project(":landscapist-svg"))
     api(project(":glide"))
     api(project(":coil"))
     api(project(":coil3"))

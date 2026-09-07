@@ -288,18 +288,34 @@ The memory cache uses an LRU (Least Recently Used) eviction policy:
 
 ```kotlin
 // Access the memory cache
-val memoryCache = landscapist.config.memoryCache
+val memoryCache = landscapist.memoryCache
 
 // Clear the cache
-memoryCache?.clear()
+memoryCache.clear()
 
 // Trim to specific size
-memoryCache?.trimToSize(32 * 1024 * 1024L) // 32MB
+memoryCache.trimToSize(32 * 1024 * 1024L) // 32MB
 
 // Get cache stats
-val size = memoryCache?.size
-val maxSize = memoryCache?.maxSize
+val size = memoryCache.size
+val maxSize = memoryCache.maxSize
 ```
+
+#### Reading the cache without suspending
+
+`load` resolves a memory hit through a flow and a dispatcher hop, which costs a frame or two of
+empty content: long enough to blink, and obvious inside a shared element transition. `peekMemoryCache`
+reads the same cache synchronously, so a composable can draw an already loaded image in its very
+first frame:
+
+```kotlin
+val cached: ImageResult.Success? = landscapist.peekMemoryCache(url)
+```
+
+`LandscapistImage` already does this for you; call it directly only when you drive the loading state
+yourself. The exact target size is matched first, and when nothing is cached for it, any already
+decoded size of the same image is returned, since a composable that has not been measured yet has no
+target size to ask for.
 
 ### Disk Cache
 
@@ -431,18 +447,31 @@ Implement custom image decoders for special formats:
 class WebPDecoder : ImageDecoder {
     override suspend fun decode(
         data: ByteArray,
+        mimeType: String?,
         targetWidth: Int?,
-        targetHeight: Int?
+        targetHeight: Int?,
+        config: LandscapistConfig,
     ): DecodeResult {
         // Custom decoding logic
-        return DecodeResult.Success(imageBitmap)
+        return DecodeResult.Success(bitmap, width, height)
     }
 }
 
-val landscapist = Landscapist.builder(context)
+val landscapist = Landscapist.builder()
     .decoder(WebPDecoder())
     .build()
 ```
+
+The `landscapist-svg` artifact ships `SvgImageDecoder`, which adds SVG on top of any other decoder:
+
+```kotlin
+val landscapist = Landscapist.builder()
+    .decoder(SvgImageDecoder(WebPDecoder()))
+    .build()
+```
+
+It recognizes SVG from its content as well as its MIME type, and rasterizes it at the size the
+request asks for, with AndroidSVG on Android and Skia everywhere else.
 
 ## Image Transformations
 

@@ -40,6 +40,19 @@ public interface MemoryCache {
   public operator fun get(key: CacheKey): CachedImage?
 
   /**
+   * Gets a cached image for the same model and transformations as [key], at any target size.
+   *
+   * A composable knows its image model before it knows the size it will be measured at, so an exact
+   * [get] misses on the first frame even when the image is in memory. This lookup lets the already
+   * decoded variant render immediately while the correctly sized request resolves.
+   *
+   * @param key The cache key. Only its [CacheKey.baseKey] is matched; the target size is ignored.
+   * @return A cached image for any size of this key, or null if nothing is cached. Implementations
+   * that cannot answer this cheaply return null.
+   */
+  public fun getIgnoringSize(key: CacheKey): CachedImage? = null
+
+  /**
    * Stores an image in the cache.
    *
    * @param key The cache key.

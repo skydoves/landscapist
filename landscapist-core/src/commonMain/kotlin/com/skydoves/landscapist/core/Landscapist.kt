@@ -28,6 +28,7 @@ import com.skydoves.landscapist.core.decoder.ImageDecoder
 import com.skydoves.landscapist.core.decoder.ProgressiveDecodeResult
 import com.skydoves.landscapist.core.decoder.createPlatformDecoder
 import com.skydoves.landscapist.core.decoder.createProgressiveDecoder
+import com.skydoves.landscapist.core.decoder.isSvg
 import com.skydoves.landscapist.core.memory.MemoryPressureLevel
 import com.skydoves.landscapist.core.memory.MemoryPressureListener
 import com.skydoves.landscapist.core.memory.MemoryPressureManager
@@ -74,7 +75,7 @@ import okio.use
 @Stable
 public class Landscapist private constructor(
   public val config: LandscapistConfig,
-  private val memoryCache: MemoryCache,
+  public val memoryCache: MemoryCache,
   private val diskCache: DiskCache?,
   private val fetcher: ImageFetcher,
   private val decoder: ImageDecoder,
@@ -145,30 +146,18 @@ public class Landscapist private constructor(
       return@flow
     }
 
-    emit(ImageResult.Loading)
+    val cacheKey = request.cacheKey()
 
-    val cacheKey = CacheKey.create(
-      model = request.model,
-      transformationKeys = request.transformations.map { it.key },
-      width = request.targetWidth,
-      height = request.targetHeight,
-    )
-
-    // 1. Memory cache (instant). Checked per call so a hit never waits on coalescing.
+    // 1. Memory cache (instant). Checked per call so a hit never waits on coalescing, and checked
+    // before any loading state is emitted so an image already in memory never blinks through one.
     if (request.memoryCachePolicy.readEnabled) {
       memoryCache[cacheKey]?.let { cached ->
-        emit(
-          ImageResult.Success(
-            data = cached.data,
-            dataSource = DataSource.MEMORY,
-            originalWidth = cached.originalWidth,
-            originalHeight = cached.originalHeight,
-            diskCachePath = cached.diskCachePath,
-          ),
-        )
+        emit(cached.toSuccess())
         return@flow
       }
     }
+
+    emit(ImageResult.Loading)
 
     // 2. Progressive loading is an opt-in streaming mode and is not coalesced.
     if (request.progressiveEnabled) {
@@ -179,6 +168,52 @@ public class Landscapist private constructor(
     // 3. Standard path: coalesce concurrent identical loads into one fetch and decode.
     emit(dedupedStandardTerminal(cacheKey.memoryKey, request, cacheKey))
   }.flowOn(dispatcher)
+
+  /**
+   * Reads [request] out of the memory cache without suspending, or returns null when it is not
+   * there.
+   *
+   * [load] resolves a memory hit through a flow and a dispatcher hop, which costs a frame or two of
+   * empty content: long enough to blink, and long enough to be obvious inside a shared element
+   * transition. Composables call this during composition instead, so a cached image is on screen in
+   * the very first frame.
+   *
+   * The exact target size is matched first. When there is no entry for it, any already decoded size
+   * of the same image and transformations is returned, since a caller that has not been measured
+   * yet has no target size to ask for. The correctly sized image replaces it once [load] resolves.
+   *
+   * @param request The image request to look up.
+   * @return The cached result, or null when nothing is cached or reads are disabled for [request].
+   */
+  public fun peekMemoryCache(request: ImageRequest): ImageResult.Success? {
+    if (request.model == null || !request.memoryCachePolicy.readEnabled) return null
+    val cacheKey = request.cacheKey()
+    val cached = memoryCache[cacheKey] ?: memoryCache.getIgnoringSize(cacheKey) ?: return null
+    return cached.toSuccess()
+  }
+
+  /**
+   * Reads [url] out of the memory cache without suspending, or returns null when it is not there.
+   *
+   * @see peekMemoryCache
+   */
+  public fun peekMemoryCache(url: String): ImageResult.Success? =
+    peekMemoryCache(ImageRequest(model = url))
+
+  private fun ImageRequest.cacheKey(): CacheKey = CacheKey.create(
+    model = model,
+    transformationKeys = transformations.map { it.key },
+    width = targetWidth,
+    height = targetHeight,
+  )
+
+  private fun CachedImage.toSuccess(): ImageResult.Success = ImageResult.Success(
+    data = data,
+    dataSource = DataSource.MEMORY,
+    originalWidth = originalWidth,
+    originalHeight = originalHeight,
+    diskCachePath = diskCachePath,
+  )
 
   /**
    * Returns the terminal result of the standard (non-progressive) pipeline, coalescing concurrent
@@ -422,7 +457,7 @@ public class Landscapist private constructor(
       val handled = diskCache.get(cacheKey)?.use { snapshot ->
         val bytes = snapshot.data().buffer().readByteArray()
         val diskPath = snapshot.dataPath.toString()
-        if (!AnimatedImageDetector.isAnimated(bytes, null)) {
+        if (supportsProgressiveDecode(bytes, null)) {
           emitProgressiveDecode(
             bytes = bytes,
             mimeType = null,
@@ -462,7 +497,7 @@ public class Landscapist private constructor(
           }
         }
 
-        if (!AnimatedImageDetector.isAnimated(fetchResult.data, fetchResult.mimeType)) {
+        if (supportsProgressiveDecode(fetchResult.data, fetchResult.mimeType)) {
           emitProgressiveDecode(
             bytes = fetchResult.data,
             mimeType = fetchResult.mimeType,
@@ -703,6 +738,16 @@ public class Landscapist private constructor(
     }
   }
 
+  /**
+   * Whether [bytes] can be streamed as a series of progressively sharper previews.
+   *
+   * Progressive decoding re-decodes the same raster bytes at several sample sizes. An animated
+   * image has frames rather than one image to sample, and SVG is markup with no pixels at all, so
+   * both take the standard single decode instead.
+   */
+  private fun supportsProgressiveDecode(bytes: ByteArray, mimeType: String?): Boolean =
+    !AnimatedImageDetector.isAnimated(bytes, mimeType) && !isSvg(bytes, mimeType)
+
   private fun estimateBitmapSize(width: Int, height: Int): Long {
     // Assume 4 bytes per pixel (ARGB_8888)
     return width.toLong() * height.toLong() * 4L
@@ -761,7 +806,12 @@ public class Landscapist private constructor(
       this.fetcher = fetcher
     }
 
-    /** Sets a custom image decoder. */
+    /**
+     * Sets a custom image decoder, replacing the default one entirely.
+     *
+     * The `landscapist-svg` artifact ships `SvgImageDecoder`, which adds SVG on top of any other
+     * decoder: `decoder(SvgImageDecoder())`.
+     */
     public fun decoder(decoder: ImageDecoder): Builder = apply {
       this.decoder = decoder
     }

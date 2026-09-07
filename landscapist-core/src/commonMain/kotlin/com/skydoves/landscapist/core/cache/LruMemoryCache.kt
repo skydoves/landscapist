@@ -32,6 +32,7 @@ public class LruMemoryCache(
 
   private val lock = SynchronizedObject()
   private val cache = linkedMapOf<String, CachedImage>()
+  private val variantIndex = SizeVariantIndex()
   private val currentSize = atomic(0L)
 
   override val maxSize: Long
@@ -51,6 +52,14 @@ public class LruMemoryCache(
     }
   }
 
+  override fun getIgnoringSize(key: CacheKey): CachedImage? = synchronized(lock) {
+    val memoryKey = variantIndex.variantsOf(key.baseKey).firstOrNull { cache.containsKey(it) }
+      ?: return@synchronized null
+    // Re-insert to update access order: an entry reached this way is about to be drawn, so it
+    // should not keep ageing toward eviction.
+    cache.remove(memoryKey)?.also { image -> cache[memoryKey] = image }
+  }
+
   override fun set(key: CacheKey, image: CachedImage): Unit = synchronized(lock) {
     val memoryKey = key.memoryKey
 
@@ -64,11 +73,13 @@ public class LruMemoryCache(
 
     // Add new entry
     cache[memoryKey] = image
+    variantIndex.add(key)
     currentSize.addAndGet(image.sizeBytes)
   }
 
   override fun remove(key: CacheKey): Boolean = synchronized(lock) {
     cache.remove(key.memoryKey)?.let { removed ->
+      variantIndex.remove(key.memoryKey)
       currentSize.addAndGet(-removed.sizeBytes)
       true
     } ?: false
@@ -76,6 +87,7 @@ public class LruMemoryCache(
 
   override fun clear(): Unit = synchronized(lock) {
     cache.clear()
+    variantIndex.clear()
     currentSize.value = 0
   }
 
@@ -99,6 +111,7 @@ public class LruMemoryCache(
   private fun evictOldest() {
     val eldestKey = cache.keys.firstOrNull() ?: return
     val eldestValue = cache.remove(eldestKey) ?: return
+    variantIndex.remove(eldestKey)
     currentSize.addAndGet(-eldestValue.sizeBytes)
   }
 }

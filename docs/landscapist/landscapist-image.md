@@ -477,6 +477,37 @@ LandscapistImage(imageModel = { "/path/to/image.jpg" })
 // Check landscapist-core documentation for details
 ```
 
+### SVG
+
+Add the `landscapist-svg` artifact and install its decoder once:
+
+```kotlin
+dependencies {
+  implementation("com.github.skydoves:landscapist-svg:$version")
+}
+```
+
+```kotlin
+Landscapist.setInstance(
+  Landscapist.builder()
+    .decoder(SvgImageDecoder())
+    .build(),
+)
+```
+
+After that an SVG URL loads like any other image:
+
+```kotlin
+LandscapistImage(imageModel = { "https://example.com/logo.svg" })
+```
+
+The SVG is rasterized at the size the composable was measured at, so it is as sharp as the layout it
+lands in, and a larger placement re-renders rather than upscaling. It is recognized from its content
+as well as its MIME type, so servers that send it as `text/plain` or with no content type still work.
+
+Rendering uses AndroidSVG on Android, which has no SVG support of its own, and Skia everywhere else.
+`SvgImageDecoder()` wraps the default platform decoder; pass your own to keep it: `SvgImageDecoder(MyDecoder())`.
+
 ## Sizing Behavior
 
 ### Explicit Size

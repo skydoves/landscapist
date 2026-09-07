@@ -1,0 +1,7 @@
+public final class com/skydoves/landscapist/svg/SvgImageDecoder : com/skydoves/landscapist/core/decoder/ImageDecoder {
+	public fun <init> ()V
+	public fun <init> (Lcom/skydoves/landscapist/core/decoder/ImageDecoder;)V
+	public synthetic fun <init> (Lcom/skydoves/landscapist/core/decoder/ImageDecoder;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun decode ([BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Lcom/skydoves/landscapist/core/LandscapistConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+

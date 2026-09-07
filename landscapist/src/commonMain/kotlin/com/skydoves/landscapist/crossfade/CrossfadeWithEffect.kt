@@ -18,9 +18,12 @@ package com.skydoves.landscapist.crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.skydoves.landscapist.InternalLandscapistApi
 import kotlinx.coroutines.delay
@@ -53,10 +56,22 @@ public fun <T> CrossfadeWithEffect(
   contentKey: (T) -> Any? = { it },
   content: @Composable (T) -> Unit,
 ) {
-  val currentlyVisibleItems = remember { mutableStateListOf<T>() }
+  // Seeded with the state this composable entered composition with, for two reasons. Waiting for
+  // the effect below to add it leaves the first frame empty, and content that was already resolved
+  // when the composable appeared (an image read straight from the memory cache, say) has nothing to
+  // fade in from. Only content that arrives later animates.
+  val currentlyVisibleItems = remember { mutableStateListOf(targetState) }
+  val initialContentKey = remember { contentKey(targetState) }
+  // Once something else has been the target, the initial state has stopped being the one that was
+  // already on screen, so coming back to it animates like any other arrival.
+  var initialContentReplaced by remember { mutableStateOf(false) }
 
   LaunchedEffect(targetState) {
-    if (!currentlyVisibleItems.any { contentKey(it) == contentKey(targetState) }) {
+    val key = contentKey(targetState)
+    if (key != initialContentKey) {
+      initialContentReplaced = true
+    }
+    if (!currentlyVisibleItems.any { contentKey(it) == key }) {
       currentlyVisibleItems.add(targetState)
     }
   }
@@ -65,12 +80,13 @@ public fun <T> CrossfadeWithEffect(
     if (enabled) {
       currentlyVisibleItems.forEach { state ->
         key(contentKey(state)) {
-          val isTarget = contentKey(state) == contentKey(targetState)
+          val stateKey = contentKey(state)
+          val isTarget = stateKey == contentKey(targetState)
 
-          val animationModifier = if (isTarget) {
-            Modifier.fadeInWithEffect(key = contentKey(state) ?: Unit, durationMs = durationMs)
-          } else {
-            Modifier.fadeOutWithEffect(key = Unit, durationMs = durationMs)
+          val animationModifier = when {
+            !isTarget -> Modifier.fadeOutWithEffect(key = Unit, durationMs = durationMs)
+            !initialContentReplaced && stateKey == initialContentKey -> Modifier
+            else -> Modifier.fadeInWithEffect(key = stateKey ?: Unit, durationMs = durationMs)
           }
 
           if (!isTarget) {

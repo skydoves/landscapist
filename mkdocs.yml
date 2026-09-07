@@ -13,6 +13,7 @@ nav:
   - 'Landscapist (KMP)':
     - 'Landscapist Core': landscapist/landscapist-core.md
     - 'Landscapist Image': landscapist/landscapist-image.md  
+    - 'Landscapist SVG': landscapist/landscapist-svg.md
     - 'Why Choose Landscapist': landscapist/why-choose-landscapist.md
     - 'Performance Comparison': landscapist/performance-comparison.md
   - 'Glide':
