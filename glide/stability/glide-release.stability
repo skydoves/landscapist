@@ -50,26 +50,26 @@ private fun com.skydoves.landscapist.glide.GlideThumbnail(requestSize: androidx.
 
 @Composable
 public fun com.skydoves.landscapist.glide.LocalGlideProvider.getGlideRequestBuilder(): com.bumptech.glide.RequestBuilder<*>
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
 
 @Composable
 public fun com.skydoves.landscapist.glide.LocalGlideProvider.getGlideRequestManager(): com.bumptech.glide.RequestManager
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
 
 @Composable
 public fun com.skydoves.landscapist.glide.LocalGlideProvider.getGlideRequestOptions(): com.bumptech.glide.request.RequestOptions
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
 
 @Composable
 public fun com.skydoves.landscapist.glide.rememberGlideImageState(initialState: com.skydoves.landscapist.glide.GlideImageState, key: kotlin.Any?): androidx.compose.runtime.MutableState<com.skydoves.landscapist.glide.GlideImageState>
   skippable: false
-  restartable: true
+  restartable: false
   params:
     - initialState: STABLE (marked @Stable or @Immutable)
     - key: UNKNOWN (interface or non-final class; concrete implementation unknown)
@@ -77,7 +77,7 @@ public fun com.skydoves.landscapist.glide.rememberGlideImageState(initialState: 
 @Composable
 internal fun com.skydoves.landscapist.glide.rememberImageSourceFile(context: android.content.Context, imageModel: kotlin.Any?, dataSource: com.skydoves.landscapist.DataSource?): androidx.compose.runtime.State<java.io.File?>
   skippable: false
-  restartable: true
+  restartable: false
   params:
     - context: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - imageModel: UNKNOWN (interface or non-final class; concrete implementation unknown)
@@ -86,7 +86,7 @@ internal fun com.skydoves.landscapist.glide.rememberImageSourceFile(context: and
 @Composable
 internal fun com.skydoves.landscapist.glide.rememberTarget(target: com.skydoves.landscapist.glide.FlowCustomTarget, imageOptions: com.skydoves.landscapist.ImageOptions, clearTarget: kotlin.Boolean): com.skydoves.landscapist.glide.FlowCustomTarget
   skippable: false
-  restartable: true
+  restartable: false
   params:
     - target: UNSTABLE (has mutable properties or unstable members)
     - imageOptions: STABLE (marked @Stable or @Immutable)
