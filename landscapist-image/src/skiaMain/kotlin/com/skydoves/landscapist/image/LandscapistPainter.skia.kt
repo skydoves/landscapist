@@ -28,7 +28,7 @@ import org.jetbrains.skia.Image
 
 /**
  * Creates and remembers a [Painter] from Skia Bitmap, RawImageData, or ImageBitmap.
- * Used by Apple (iOS/macOS) and Wasm platforms.
+ * Desktop decodes to its own image type, which [platformImageBitmapOrNull] handles.
  */
 @Composable
 public actual fun rememberLandscapistPainter(data: Any?): Painter {
@@ -44,7 +44,7 @@ public actual fun rememberLandscapistPainter(data: Any?): Painter {
         }
       }
       is ImageBitmap -> BitmapPainter(data)
-      else -> EmptyPainter
+      else -> platformImageBitmapOrNull(data)?.let { BitmapPainter(it) } ?: EmptyPainter
     }
   }
 }

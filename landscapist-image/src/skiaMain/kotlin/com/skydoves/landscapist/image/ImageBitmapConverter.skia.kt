@@ -22,7 +22,7 @@ import org.jetbrains.skia.Image
 
 /**
  * Skia implementation that converts [RawImageData] to [ImageBitmap].
- * Used by Apple (iOS/macOS) and Wasm platforms.
+ * Desktop decodes to its own image type, which [platformImageBitmapOrNull] handles.
  */
 public actual fun convertToImageBitmap(data: Any): ImageBitmap? {
   return when (data) {
@@ -35,16 +35,15 @@ public actual fun convertToImageBitmap(data: Any): ImageBitmap? {
       }
     }
     is ImageBitmap -> data
-    else -> null
+    else -> platformImageBitmapOrNull(data)
   }
 }
 
 /**
- * Skia implementation: checks if data is an ImageBitmap.
- * Note: Skia platforms typically use RawImageData, not pre-decoded bitmaps.
+ * Skia implementation: checks if data is an ImageBitmap, or the target's own decoded image type.
  */
 public actual fun isBitmapType(data: Any?): Boolean {
-  return data is ImageBitmap
+  return data is ImageBitmap || platformImageSizeOrNull(data) != null
 }
 
 /**
@@ -53,7 +52,7 @@ public actual fun isBitmapType(data: Any?): Boolean {
 public actual fun getBitmapWidth(data: Any?): Int {
   return when (data) {
     is ImageBitmap -> data.width
-    else -> 0
+    else -> platformImageSizeOrNull(data)?.width ?: 0
   }
 }
 
@@ -63,6 +62,6 @@ public actual fun getBitmapWidth(data: Any?): Int {
 public actual fun getBitmapHeight(data: Any?): Int {
   return when (data) {
     is ImageBitmap -> data.height
-    else -> 0
+    else -> platformImageSizeOrNull(data)?.height ?: 0
   }
 }
