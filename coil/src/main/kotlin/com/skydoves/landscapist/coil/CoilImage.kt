@@ -62,7 +62,6 @@ import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.crossfade.CrossfadeWithEffect
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.rememberDrawablePainter
-import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.channelFlow
 import okhttp3.HttpUrl
 import java.io.File
@@ -357,7 +356,7 @@ private fun CoilImage(
     executeImageRequest = {
       channelFlow {
         val newBuilder = request.newBuilder(context).target(
-          onStart = { trySendBlocking(ImageLoadState.Loading) },
+          onStart = { trySend(ImageLoadState.Loading) },
         ).build()
 
         val result = imageLoader.value.execute(newBuilder).toResult()

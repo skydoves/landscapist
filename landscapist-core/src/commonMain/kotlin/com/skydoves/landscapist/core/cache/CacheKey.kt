@@ -51,17 +51,25 @@ public data class CacheKey(
   }
 
   /**
+   * The key identifying the image without its target size.
+   *
+   * Every [memoryKey] for the same image and transformations shares this prefix, so it groups the
+   * differently sized variants of one image. Used to find any already decoded variant before the
+   * target size is known.
+   */
+  public val baseKey: String by lazy {
+    buildString {
+      append(url)
+      transformationKeys.forEach { append("_$it") }
+    }
+  }
+
+  /**
    * The key used for memory cache storage.
    * Uses the full URL with size and transformation info for faster lookups.
    */
   public val memoryKey: String by lazy {
-    buildString {
-      append(url)
-      transformationKeys.forEach { append("_$it") }
-      if (width != null && height != null) {
-        append("_${width}x$height")
-      }
-    }
+    if (width != null && height != null) "${baseKey}_${width}x$height" else baseKey
   }
 
   public companion object {

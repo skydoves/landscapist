@@ -26,13 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
 import com.skydoves.landscapist.constraints.Constrainable
-import com.skydoves.landscapist.platforms.platformCoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 
 /**
  * A common image loading model for fetching an image asynchronously and
@@ -63,8 +61,13 @@ public fun <T : Any> ImageLoad(
   }
 
   LaunchedEffect(key1 = recomposeKey, key2 = loadingKey) {
-    executeImageLoading(executeImageRequest).collect {
-      state = it
+    executeImageLoading(executeImageRequest).collect { next ->
+      // A backend that restarts a request emits its loading state again. Blanking an image the
+      // user can already see is what makes images blink on tab switches and shared element
+      // transitions, so a resolved image holds until the restart resolves. ImageLoadState.None is
+      // not filtered: it means the backend released the bitmap, so it must stop being drawn.
+      if (next is ImageLoadState.Loading && state is ImageLoadState.Success) return@collect
+      state = next
     }
   }
 
@@ -91,17 +94,21 @@ public fun <T : Any> ImageLoad(
   }
 }
 
+/**
+ * Runs the backend's request flow.
+ *
+ * No loading state is emitted up front, and no dispatcher is imposed. Every backend signals its own
+ * loading state and does its fetching and decoding on its own threads, so hopping to a background
+ * dispatcher and back only delayed each emission by a frame, which showed as a blink whenever the
+ * image was already cached.
+ */
 private fun executeImageLoading(
   executeImageRequest: suspend () -> Flow<ImageLoadState>,
 ) = flow {
-  // emit loading state
-  emit(ImageLoadState.Loading)
-  // execute image loading
   emitAll(executeImageRequest())
-}.catch {
-  // emit a failure loading state
-  emit(ImageLoadState.Failure(null, null))
-}.distinctUntilChanged().flowOn(platformCoroutineDispatcher)
+}.catch { throwable ->
+  emit(ImageLoadState.Failure(null, throwable))
+}.distinctUntilChanged()
 
 @InternalLandscapistApi
 public val ZeroConstraints: Constraints = Constraints.fixed(0, 0)

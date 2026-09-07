@@ -101,5 +101,10 @@ public data class RawImageData(
   }
 }
 
-/** Pixel dimensions of an encoded image, parsed by [readImageDimensions]. */
-internal data class ImageSize(val width: Int, val height: Int)
+/**
+ * Pixel dimensions parsed out of an encoded image, without decoding it.
+ *
+ * @property width The width in pixels.
+ * @property height The height in pixels.
+ */
+public data class ImageSize(public val width: Int, public val height: Int)

@@ -21,7 +21,6 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.skydoves.landscapist.ImageLoadState
 import kotlinx.coroutines.channels.ProducerScope
-import kotlinx.coroutines.channels.trySendBlocking
 
 /**
  * FlowRequestListener is a [RequestListener] for receiving Glide image results from network and handle states.
@@ -49,7 +48,7 @@ internal class FlowRequestListener(
     dataSource: DataSource,
     isFirstResource: Boolean,
   ): Boolean {
-    producerScope.trySendBlocking(
+    producerScope.trySend(
       ImageLoadState.Success(
         data = resource,
         dataSource = dataSource.toDataSource(),

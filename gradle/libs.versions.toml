@@ -20,9 +20,11 @@ androidxUiAutomator = "2.4.0"
 composeStabilityAnalyzer = "0.13.0"
 kotlinxSerializationJson = "1.11.0"
 jetbrains-compose = "1.12.0"
-# Native runtime for desktop Compose UI tests. Must match the skiko version that
-# jetbrains-compose pulls transitively (org.jetbrains.skiko:skiko).
+# Skia bindings, used directly for SVG rasterizing and for the desktop test runtime. This is a
+# floor: jetbrains-compose contributes a stricter constraint, so resolution lands on its version.
 skiko = "0.144.6"
+# SVG rasterizer for Android, which has no built-in SVG support. Skia targets use skiko instead.
+androidsvg = "1.4"
 glide = "5.0.9"
 fresco = "3.7.0"
 coil = "2.7.0"
@@ -89,6 +91,8 @@ ktor-engine-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-engine-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
+androidsvg = { group = "com.caverock", name = "androidsvg-aar", version.ref = "androidsvg" }
+skiko = { group = "org.jetbrains.skiko", name = "skiko", version.ref = "skiko" }
 atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "atomicfu" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 jetbrains-compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "jetbrains-compose" }
