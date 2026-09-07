@@ -62,6 +62,7 @@ Landscapist now provides two foundational modules designed for Kotlin Multiplatf
 
 - **`landscapist-core`**: A standalone, Kotlin Multiplatform image loading engine with built-in memory/disk caching, progressive loading, and network fetching via Ktor. Works on Android, iOS, Desktop, and Web without any UI dependencies.
 - **`landscapist-image`**: A Compose Multiplatform image component built on top of `landscapist-core` with full plugin support. Seamlessly works across all Compose Multiplatform targets.
+- **`landscapist-svg`**: SVG decoding for `landscapist-core`, rasterized with AndroidSVG on Android and Skia everywhere else. See the [Landscapist SVG documentation](https://skydoves.github.io/landscapist/landscapist/landscapist-svg/).
 
 These modules are perfect if you want a lightweight, customizable image loader without depending on Glide, Coil, or Fresco, with first-class support for all Kotlin Multiplatform and Compose Multiplatform targets.
 
@@ -408,7 +409,7 @@ Next, add the dependency below to your **module**'s `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation("com.github.skydoves:landscapist-glide:2.11.0")
+    implementation("com.github.skydoves:landscapist-glide:2.12.0")
 }
 ```
 
