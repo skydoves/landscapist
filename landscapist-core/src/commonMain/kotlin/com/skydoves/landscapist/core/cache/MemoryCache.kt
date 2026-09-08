@@ -53,6 +53,27 @@ public interface MemoryCache {
   public fun getIgnoringSize(key: CacheKey): CachedImage? = null
 
   /**
+   * Gets the image cached for [key], or an already decoded variant of the same image and
+   * transformations that [isAcceptable] approves.
+   *
+   * A lookup marks what it returns as recently used, which for some caches also promotes it out of
+   * a weak tier and evicts other entries to make room. So a variant that [isAcceptable] turns down
+   * must not be marked: a miss would otherwise leave the cache worse off than it found it,
+   * resurrecting an entry nobody wanted and evicting live ones to do it.
+   *
+   * @param key The cache key. The exact size is preferred; other sizes are offered to
+   * [isAcceptable] from the most recently cached to the least.
+   * @param isAcceptable Whether the variant cached under the given key can serve this request.
+   * The key carries the target size that variant was decoded for.
+   * @return The exact entry, the first accepted variant, or null. Implementations that cannot look
+   * up variants fall back to an exact [get].
+   */
+  public fun getMatching(
+    key: CacheKey,
+    isAcceptable: (CacheKey, CachedImage) -> Boolean,
+  ): CachedImage? = get(key)
+
+  /**
    * Stores an image in the cache.
    *
    * @param key The cache key.

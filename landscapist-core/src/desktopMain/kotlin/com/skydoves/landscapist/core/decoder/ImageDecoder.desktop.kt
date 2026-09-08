@@ -18,6 +18,7 @@ package com.skydoves.landscapist.core.decoder
 import com.skydoves.landscapist.core.LandscapistConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import javax.imageio.ImageIO
@@ -40,38 +41,66 @@ internal class DesktopImageDecoder : ImageDecoder {
     config: LandscapistConfig,
   ): DecodeResult = withContext(Dispatchers.IO) {
     try {
-      val inputStream = ByteArrayInputStream(data)
-      val image = ImageIO.read(inputStream)
-        ?: return@withContext DecodeResult.Error(
-          IllegalArgumentException("Failed to decode image"),
-        )
-
-      val originalWidth = image.width
-      val originalHeight = image.height
-
-      // Calculate target dimensions
-      val (finalWidth, finalHeight) = calculateTargetSize(
-        originalWidth = originalWidth,
-        originalHeight = originalHeight,
-        targetWidth = targetWidth,
-        targetHeight = targetHeight,
-        maxSize = config.maxBitmapSize,
-      )
-
-      // Scale if necessary
-      val finalImage = if (finalWidth != originalWidth || finalHeight != originalHeight) {
-        scaleImage(image, finalWidth, finalHeight)
-      } else {
-        image
-      }
-
-      DecodeResult.Success(
-        bitmap = finalImage,
-        width = finalImage.width,
-        height = finalImage.height,
-      )
+      decodeSubsampled(data, targetWidth, targetHeight, config)
     } catch (e: Exception) {
       DecodeResult.Error(e)
+    }
+  }
+
+  /**
+   * Reads the header, decodes at the nearest power of two above the requested size, then scales the
+   * remainder.
+   *
+   * Decoding the whole image and shrinking it afterwards means a 4000x3000 photo materialises 48 MB
+   * of pixels to produce a thumbnail. ImageIO can skip pixels while it reads, so the full size
+   * raster never exists.
+   */
+  private fun decodeSubsampled(
+    data: ByteArray,
+    targetWidth: Int?,
+    targetHeight: Int?,
+    config: LandscapistConfig,
+  ): DecodeResult {
+    ImageIO.createImageInputStream(ByteArrayInputStream(data)).use { stream ->
+      val readers = ImageIO.getImageReaders(stream)
+      if (!readers.hasNext()) {
+        return DecodeResult.Error(IllegalArgumentException("Failed to decode image"))
+      }
+      val reader = readers.next()
+      try {
+        reader.setInput(stream, true, true)
+        val originalWidth = reader.getWidth(0)
+        val originalHeight = reader.getHeight(0)
+
+        val (finalWidth, finalHeight) = calculateTargetSize(
+          originalWidth = originalWidth,
+          originalHeight = originalHeight,
+          targetWidth = targetWidth,
+          targetHeight = targetHeight,
+          maxSize = config.maxBitmapSize,
+        )
+
+        val param = reader.defaultReadParam
+        val sampleSize = sampleSizeFor(originalWidth, originalHeight, finalWidth, finalHeight)
+        if (sampleSize > 1) {
+          param.setSourceSubsampling(sampleSize, sampleSize, 0, 0)
+        }
+
+        val decoded = reader.read(0, param)
+        val image = if (decoded.width != finalWidth || decoded.height != finalHeight) {
+          scaleImage(decoded, finalWidth, finalHeight)
+        } else {
+          decoded
+        }
+
+        return DecodeResult.Success(
+          bitmap = image,
+          width = image.width,
+          height = image.height,
+        )
+      } finally {
+        reader.dispose()
+      }
     }
   }
 
@@ -93,9 +122,36 @@ internal class DesktopImageDecoder : ImageDecoder {
     val heightRatio = maxH.toFloat() / originalHeight
     val ratio = minOf(widthRatio, heightRatio)
 
-    return (originalWidth * ratio).toInt() to (originalHeight * ratio).toInt()
+    return (originalWidth * ratio).toInt().coerceAtLeast(1) to
+      (originalHeight * ratio).toInt().coerceAtLeast(1)
   }
 
+  /**
+   * The largest power of two the reader can skip by while still producing at least [finalWidth] by
+   * [finalHeight] pixels, so the remaining scale is never an upscale.
+   */
+  private fun sampleSizeFor(
+    originalWidth: Int,
+    originalHeight: Int,
+    finalWidth: Int,
+    finalHeight: Int,
+  ): Int {
+    if (finalWidth <= 0 || finalHeight <= 0) return 1
+    var sampleSize = 1
+    while (
+      originalWidth / (sampleSize * 2) >= finalWidth &&
+      originalHeight / (sampleSize * 2) >= finalHeight
+    ) {
+      sampleSize *= 2
+    }
+    return sampleSize
+  }
+
+  /**
+   * Bilinear rather than [java.awt.Image.SCALE_SMOOTH], which runs an area averaging pipeline that
+   * is roughly an order of magnitude slower. Subsampling has already brought the image to within a
+   * factor of two, so a single bilinear pass loses nothing visible.
+   */
   private fun scaleImage(
     image: BufferedImage,
     targetWidth: Int,
@@ -103,12 +159,12 @@ internal class DesktopImageDecoder : ImageDecoder {
   ): BufferedImage {
     val scaledImage = BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB)
     val graphics = scaledImage.createGraphics()
-    graphics.drawImage(
-      image.getScaledInstance(targetWidth, targetHeight, java.awt.Image.SCALE_SMOOTH),
-      0,
-      0,
-      null,
+    graphics.setRenderingHint(
+      RenderingHints.KEY_INTERPOLATION,
+      RenderingHints.VALUE_INTERPOLATION_BILINEAR,
     )
+    graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+    graphics.drawImage(image, 0, 0, targetWidth, targetHeight, null)
     graphics.dispose()
     return scaledImage
   }

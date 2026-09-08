@@ -92,6 +92,39 @@ public class TwoTierMemoryCache(
     image
   }
 
+  override fun getMatching(
+    key: CacheKey,
+    isAcceptable: (CacheKey, CachedImage) -> Boolean,
+  ): CachedImage? = synchronized(lock) {
+    val exact = key.memoryKey
+    (strongCache[exact] ?: weakCache[exact]?.get())?.let { image ->
+      touch(exact, image)
+      return@synchronized image
+    }
+    // touch() promotes out of the weak tier and evicts other live entries to make room for what it
+    // promotes, so it is only ever applied to the variant that is actually returned. Offering every
+    // variant rather than the newest one also stops a thumbnail from hiding the full sized entry.
+    var collected: MutableList<String>? = null
+    var found: CachedImage? = null
+    for (variant in variantIndex.variantsOf(key.baseKey)) {
+      val memoryKey = variant.memoryKey
+      val image = strongCache[memoryKey] ?: weakCache[memoryKey]?.get()
+      if (image == null) {
+        (collected ?: mutableListOf<String>().also { collected = it }).add(memoryKey)
+        continue
+      }
+      if (!isAcceptable(variant, image)) continue
+      touch(memoryKey, image)
+      found = image
+      break
+    }
+    collected?.forEach { memoryKey ->
+      weakCache.remove(memoryKey)
+      variantIndex.remove(memoryKey)
+    }
+    found
+  }
+
   /**
    * The most recently cached key under [baseKey] that still holds an image.
    *
@@ -101,7 +134,8 @@ public class TwoTierMemoryCache(
   private fun liveVariantOf(baseKey: String): String? {
     var live: String? = null
     var collected: MutableList<String>? = null
-    for (memoryKey in variantIndex.variantsOf(baseKey)) {
+    for (variant in variantIndex.variantsOf(baseKey)) {
+      val memoryKey = variant.memoryKey
       if (strongCache.containsKey(memoryKey) || weakCache[memoryKey]?.get() != null) {
         live = memoryKey
         break

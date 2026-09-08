@@ -160,7 +160,7 @@ public class Landscapist private constructor(
     // 1. Memory cache (instant). Checked per call so a hit never waits on coalescing, and checked
     // before any loading state is emitted so an image already in memory never blinks through one.
     if (request.memoryCachePolicy.readEnabled) {
-      memoryCache[cacheKey]?.let { cached ->
+      readMemoryCache(request, cacheKey)?.let { cached ->
         emit(cached.toSuccess())
         return
       }
@@ -197,8 +197,77 @@ public class Landscapist private constructor(
   public fun peekMemoryCache(request: ImageRequest): ImageResult.Success? {
     if (request.model == null || !request.memoryCachePolicy.readEnabled) return null
     val cacheKey = request.cacheKey()
+    // The peek runs before layout, so there is usually no target size to satisfy and any decoded
+    // variant will do. The correctly sized one replaces it as soon as the real load resolves.
     val cached = memoryCache[cacheKey] ?: memoryCache.getIgnoringSize(cacheKey) ?: return null
     return cached.toSuccess()
+  }
+
+  /**
+   * Reads [request] out of the memory cache, reusing a differently sized variant when it is large
+   * enough to serve this one.
+   *
+   * A layout rarely measures to exactly the same pixel twice. A grid whose columns do not divide
+   * evenly asks for 359, 360 and 361 wide, and keying strictly on the target size makes those three
+   * separate entries and three separate decodes of one image. Accepting an entry that is already at
+   * least as large costs nothing in quality, since it is only ever scaled down to draw.
+   */
+  private fun readMemoryCache(request: ImageRequest, cacheKey: CacheKey): CachedImage? =
+    memoryCache.getMatching(cacheKey) { cachedKey, cached ->
+      cached.coversRequestedSize(cachedKey, request)
+    }
+
+  /**
+   * Whether decoding [request] again could produce anything this entry does not already hold.
+   *
+   * The comparison is between the box this entry was decoded for and the box being asked for now,
+   * not between pixel counts. How a decoder turns a box into an image is its own business: most fit
+   * the image inside it and keep its shape, so a 4000x3000 photo asked for at 360x360 comes back as
+   * 360x270, while an SVG renderer fills the box exactly and would come back 360x360. Reasoning
+   * from the pixels an entry happens to have means picking one of those and being wrong about the
+   * other. A box no larger than the one already decoded for cannot yield more, whichever it is.
+   *
+   * An entry far larger than the request is refused even so. Drawing a 1080 pixel bitmap into a 360
+   * pixel slot costs memory bandwidth on every frame, and a painter plugin that works on the source
+   * pixels, a blur for instance, pays for all of them.
+   */
+  private fun CachedImage.coversRequestedSize(
+    cachedKey: CacheKey,
+    request: ImageRequest,
+  ): Boolean {
+    val targetWidth = request.targetWidth.asPixelBound()
+    val targetHeight = request.targetHeight.asPixelBound()
+    // With no bound on either axis there is nothing to check against, and the cached variant could
+    // be a thumbnail from a plugin. Only an exact key match is reused then.
+    if (targetWidth == null && targetHeight == null) return false
+    if (originalWidth <= 0 || originalHeight <= 0) return false
+    // A transformation is free to resize what it is handed, and the size recorded for an entry is
+    // the size the decoder produced, not the size the transformation left behind. There is nothing
+    // dependable to compare, so only an exact key match is reused.
+    if (request.transformations.isNotEmpty()) return false
+    // A pixel of tolerance on each axis absorbs layouts that measure to fractional sizes.
+    if (!axisCovered(targetWidth, cachedKey.width.asPixelBound())) return false
+    if (!axisCovered(targetHeight, cachedKey.height.asPixelBound())) return false
+    return !isWastefullyLargerThan(targetWidth, targetHeight)
+  }
+
+  /**
+   * Whether an entry decoded for [decodedFor] on one axis can serve a request for [requested].
+   *
+   * Null means the axis was left open, which is the largest a request can be: an entry decoded that
+   * way covers any bound, and a request made that way is covered by nothing narrower.
+   */
+  private fun axisCovered(requested: Int?, decodedFor: Int?): Boolean = when {
+    decodedFor == null -> true
+    requested == null -> false
+    else -> requested <= decodedFor + 1
+  }
+
+  /** Whether this entry holds more than twice the pixels per axis that the request can draw. */
+  private fun CachedImage.isWastefullyLargerThan(targetWidth: Int?, targetHeight: Int?): Boolean {
+    val widthLimit = targetWidth?.let { it.toLong() * 2 } ?: Long.MAX_VALUE
+    val heightLimit = targetHeight?.let { it.toLong() * 2 } ?: Long.MAX_VALUE
+    return originalWidth > widthLimit && originalHeight > heightLimit
   }
 
   /**
@@ -208,6 +277,9 @@ public class Landscapist private constructor(
    */
   public fun peekMemoryCache(url: String): ImageResult.Success? =
     peekMemoryCache(ImageRequest(model = url))
+
+  /** A target dimension in pixels, or null when the layout left that axis unbounded. */
+  private fun Int?.asPixelBound(): Int? = this?.takeIf { it > 0 && it != Int.MAX_VALUE }
 
   private fun ImageRequest.cacheKey(): CacheKey = CacheKey.create(
     model = model,
@@ -300,7 +372,7 @@ public class Landscapist private constructor(
           val bytes = snapshot.data().buffer().readByteArray()
           val diskPath = snapshot.dataPath.toString()
           when (
-            val decodeResult = scheduleDecodeWithPriority(request) {
+            val decodeResult = scheduleDecodeWithPriority(cacheKey, request) {
               decoder.decode(
                 data = bytes,
                 mimeType = null,
@@ -393,7 +465,7 @@ public class Landscapist private constructor(
     diskPath: String?,
   ): ImageResult {
     return when (
-      val decodeResult = scheduleDecodeWithPriority(request) {
+      val decodeResult = scheduleDecodeWithPriority(cacheKey, request) {
         decoder.decode(
           data = bytes,
           mimeType = mimeType,
@@ -574,18 +646,23 @@ public class Landscapist private constructor(
   /**
    * Schedules a decode operation with priority.
    */
+  /**
+   * Runs [decoder] through the shared decode gate.
+   *
+   * The id is the memory key, which is already built and is genuinely unique. Deriving it from
+   * `model.hashCode()` meant two different URLs at the same target size shared an id, and the
+   * scheduler's active map would drop one of them.
+   */
   private suspend fun <T> scheduleDecodeWithPriority(
+    cacheKey: CacheKey,
     request: ImageRequest,
     decoder: suspend () -> T,
-  ): T {
-    val requestId = "${request.model.hashCode()}_${request.targetWidth}_${request.targetHeight}"
-    return DecodeScheduler.global().schedule(
-      id = requestId,
-      priority = request.priority,
-      tag = request.tag,
-      decoder = decoder,
-    ).await()
-  }
+  ): T = DecodeScheduler.global().schedule(
+    id = cacheKey.memoryKey,
+    priority = request.priority,
+    tag = request.tag,
+    decoder = decoder,
+  ).await()
 
   /**
    * Performs progressive decoding and emits intermediate results.
@@ -806,6 +883,13 @@ public class Landscapist private constructor(
     }
 
     /** Sets a custom memory cache. */
+    /**
+     * Sets the memory cache.
+     *
+     * A cache that does not override [MemoryCache.getMatching] still works, but loses the reuse of
+     * an already decoded variant at a different size, so a layout that measures to 359, 360 and 361
+     * decodes the same image three times.
+     */
     public fun memoryCache(cache: MemoryCache): Builder = apply {
       this.memoryCache = cache
     }
