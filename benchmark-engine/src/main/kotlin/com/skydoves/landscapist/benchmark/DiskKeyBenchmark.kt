@@ -111,11 +111,11 @@ internal fun diskKeyComparison() {
       "${onDisk.formatBytes()} for a ${bytes.size.toLong().formatBytes()} image",
   )
   println(
-    "    landscapist's disk key is sha256(url) plus a hash of the size, so the bytes stored for " +
-      "360 cannot answer 359. Coil's disk key is the url: `NetworkFetcher` uses " +
-      "`options.diskCacheKey ?: url`, and no size reaches it. The Coil column here is read from " +
-      "its source rather than measured, because this harness replaces the fetcher its disk cache " +
-      "lives in.",
+    "    Both key the disk cache on the url alone, so one download answers every size. It used " +
+      "to fold the size and the transformations in, which stored a copy of the same file per " +
+      "size and went back to the network for each of them. The Coil column is read from its " +
+      "source rather than measured, because this harness replaces the fetcher its disk cache " +
+      "lives in: `NetworkFetcher` uses `options.diskCacheKey ?: url`, and no size reaches it.",
   )
   println()
 

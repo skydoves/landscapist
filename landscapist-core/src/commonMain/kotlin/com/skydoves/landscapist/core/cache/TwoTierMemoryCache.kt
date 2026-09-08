@@ -43,6 +43,10 @@ public class TwoTierMemoryCache(
   private val variantIndex = SizeVariantIndex()
   private val currentSize = atomic(0L)
 
+  // The size the weak tier has to reach before the dead references in it are swept out. See
+  // [sweepWeakReferences].
+  private var weakSweepThreshold = MIN_WEAK_SWEEP
+
   override val maxSize: Long
     get() = _maxSize
 
@@ -97,7 +101,13 @@ public class TwoTierMemoryCache(
     isAcceptable: (CacheKey, CachedImage) -> Boolean,
   ): CachedImage? = synchronized(lock) {
     val exact = key.memoryKey
-    (strongCache[exact] ?: weakCache[exact]?.get())?.let { image ->
+    // Taken out and put back rather than read and then touched: the entry is going to be moved to
+    // the most recent position either way, and this is the path every hit takes.
+    strongCache.remove(exact)?.let { image ->
+      strongCache[exact] = image
+      return@synchronized image
+    }
+    weakCache[exact]?.get()?.let { image ->
       touch(exact, image)
       return@synchronized image
     }
@@ -227,14 +237,32 @@ public class TwoTierMemoryCache(
   /**
    * Cleans up weak references that have been garbage collected.
    */
-  public fun cleanupWeakReferences(): Unit = synchronized(lock) {
-    val keysToRemove = weakCache.entries
-      .filter { it.value.get() == null }
-      .map { it.key }
-    keysToRemove.forEach {
-      weakCache.remove(it)
-      variantIndex.remove(it)
+  public fun cleanupWeakReferences(): Unit = synchronized(lock) { sweepWeakReferences() }
+
+  /**
+   * Drops the weak entries whose image the collector has already taken.
+   *
+   * Nothing else does this. An entry demoted to the weak tier keeps its key there for good, so a
+   * screen that scrolls past a thousand images leaves a thousand dead references behind, and every
+   * young collection has to walk all of them: the cost of demoting one entry grows with every
+   * image the process has ever loaded.
+   *
+   * Sweeping once the tier has doubled since the last sweep is amortised constant per demotion, and
+   * leaves the tier no more than twice the size of what is genuinely still reachable. The floor
+   * keeps small caches from sweeping at all.
+   *
+   * Must be called while holding [lock].
+   */
+  private fun sweepWeakReferences() {
+    val entries = weakCache.entries.iterator()
+    while (entries.hasNext()) {
+      val entry = entries.next()
+      if (entry.value.get() == null) {
+        entries.remove()
+        variantIndex.remove(entry.key)
+      }
     }
+    weakSweepThreshold = maxOf(MIN_WEAK_SWEEP, weakCache.size * 2)
   }
 
   private fun evictIfNeeded(requiredSpace: Long) {
@@ -252,8 +280,12 @@ public class TwoTierMemoryCache(
     // index; without the weak layer it is gone for good and the index must forget it.
     if (weakReferencesEnabled) {
       weakCache[eldestKey] = WeakRef(eldestValue)
+      if (weakCache.size >= weakSweepThreshold) sweepWeakReferences()
     } else {
       variantIndex.remove(eldestKey)
     }
   }
 }
+
+/** The weak tier is left alone below this, so a small cache never pays for a sweep. */
+private const val MIN_WEAK_SWEEP = 64

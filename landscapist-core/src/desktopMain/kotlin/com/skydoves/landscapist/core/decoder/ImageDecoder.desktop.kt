@@ -29,7 +29,11 @@ import javax.imageio.ImageIO
 public actual fun createPlatformDecoder(): ImageDecoder = DesktopImageDecoder()
 
 /**
- * Desktop implementation of [ImageDecoder] using Java ImageIO.
+ * Desktop implementation of [ImageDecoder].
+ *
+ * Skia does the reading whenever skiko is on the classpath, which it is for every Compose
+ * Multiplatform application, because ImageIO's JPEG reader cannot scale while it decodes. ImageIO
+ * remains the fallback, and produces the same [BufferedImage] the rest of the desktop code expects.
  */
 internal class DesktopImageDecoder : ImageDecoder {
 
@@ -41,7 +45,12 @@ internal class DesktopImageDecoder : ImageDecoder {
     config: LandscapistConfig,
   ): DecodeResult = withContext(Dispatchers.IO) {
     try {
-      decodeSubsampled(data, targetWidth, targetHeight, config)
+      val throughSkia = if (skiaAvailable) {
+        SkiaJvmDecoder.decode(data, targetWidth, targetHeight, config.maxBitmapSize)
+      } else {
+        null
+      }
+      throughSkia ?: decodeSubsampled(data, targetWidth, targetHeight, config)
     } catch (e: Exception) {
       DecodeResult.Error(e)
     }
@@ -53,7 +62,8 @@ internal class DesktopImageDecoder : ImageDecoder {
    *
    * Decoding the whole image and shrinking it afterwards means a 4000x3000 photo materialises 48 MB
    * of pixels to produce a thumbnail. ImageIO can skip pixels while it reads, so the full size
-   * raster never exists.
+   * raster never exists. It cannot skip the work of decoding them, which is why Skia is preferred
+   * when it is there.
    */
   private fun decodeSubsampled(
     data: ByteArray,
@@ -72,7 +82,7 @@ internal class DesktopImageDecoder : ImageDecoder {
         val originalWidth = reader.getWidth(0)
         val originalHeight = reader.getHeight(0)
 
-        val (finalWidth, finalHeight) = calculateTargetSize(
+        val (finalWidth, finalHeight) = fitInside(
           originalWidth = originalWidth,
           originalHeight = originalHeight,
           targetWidth = targetWidth,
@@ -102,28 +112,6 @@ internal class DesktopImageDecoder : ImageDecoder {
         reader.dispose()
       }
     }
-  }
-
-  private fun calculateTargetSize(
-    originalWidth: Int,
-    originalHeight: Int,
-    targetWidth: Int?,
-    targetHeight: Int?,
-    maxSize: Int,
-  ): Pair<Int, Int> {
-    val maxW = minOf(targetWidth ?: originalWidth, maxSize)
-    val maxH = minOf(targetHeight ?: originalHeight, maxSize)
-
-    if (originalWidth <= maxW && originalHeight <= maxH) {
-      return originalWidth to originalHeight
-    }
-
-    val widthRatio = maxW.toFloat() / originalWidth
-    val heightRatio = maxH.toFloat() / originalHeight
-    val ratio = minOf(widthRatio, heightRatio)
-
-    return (originalWidth * ratio).toInt().coerceAtLeast(1) to
-      (originalHeight * ratio).toInt().coerceAtLeast(1)
   }
 
   /**
@@ -168,4 +156,49 @@ internal class DesktopImageDecoder : ImageDecoder {
     graphics.dispose()
     return scaledImage
   }
+}
+
+/**
+ * Whether the Skia reader can be used at all, decided once for the process.
+ *
+ * The probe has to live out here rather than inside [SkiaJvmDecoder]. Without skiko on the
+ * classpath, merely naming that object throws `NoClassDefFoundError` while it is being loaded,
+ * before any check inside it could run, and that is an `Error` rather than an `Exception`, so it
+ * would sail straight past the decoder's own catch and fail every desktop decode. `runCatching`
+ * takes any `Throwable`, and the first mention of the object is inside it.
+ *
+ * Internal rather than private so a test can load this file's class with skiko kept off the
+ * classpath and check that the answer is `false` instead of a thrown `Error`.
+ */
+internal val skiaAvailable: Boolean by lazy {
+  runCatching { SkiaJvmDecoder.isUsable() }.getOrDefault(false)
+}
+
+/**
+ * The size an image of [originalWidth] by [originalHeight] takes when it is fitted inside the
+ * requested box, keeping its shape and never growing.
+ *
+ * Shared by both desktop decode paths so that the Skia reader and the ImageIO fallback agree on the
+ * size for the same request, whichever one runs.
+ */
+internal fun fitInside(
+  originalWidth: Int,
+  originalHeight: Int,
+  targetWidth: Int?,
+  targetHeight: Int?,
+  maxSize: Int,
+): Pair<Int, Int> {
+  val maxW = minOf(targetWidth ?: originalWidth, maxSize)
+  val maxH = minOf(targetHeight ?: originalHeight, maxSize)
+
+  if (originalWidth <= maxW && originalHeight <= maxH) {
+    return originalWidth to originalHeight
+  }
+
+  val widthRatio = maxW.toFloat() / originalWidth
+  val heightRatio = maxH.toFloat() / originalHeight
+  val ratio = minOf(widthRatio, heightRatio)
+
+  return (originalWidth * ratio).toInt().coerceAtLeast(1) to
+    (originalHeight * ratio).toInt().coerceAtLeast(1)
 }

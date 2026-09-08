@@ -39,7 +39,14 @@ public data class CacheKey(
    * from the same ones, so folding either in stored a copy of the same file per size and went back
    * to the network for each of them.
    */
-  public val diskKey: String by lazy { url.encodeUtf8().sha256().hex() }
+  // Held in a field rather than behind `by lazy`, which allocates a delegate for every key. A key
+  // is built for every cache lookup and most never reach the disk, so that delegate was a per
+  // lookup allocation to memoise something usually never asked for. The value derives only from
+  // immutable state, so a race can only recompute the same string.
+  private var cachedDiskKey: String? = null
+
+  public val diskKey: String
+    get() = cachedDiskKey ?: url.encodeUtf8().sha256().hex().also { cachedDiskKey = it }
 
   /**
    * The key identifying the image without its target size.
