@@ -66,10 +66,12 @@ jobs:
               assemble -x :benchmark-landscapist:pixel6api31Setup -x :benchmark-landscapist:pixel6api31NonMinifiedReleaseAndroidTest -x :benchmark-landscapist:collectNonMinifiedReleaseBaselineProfile \
               -x prepareReleaseArtProfile
 
+      # desktopTest covers landscapist-core, landscapist-image, the crossfade and the SVG decoder,
+      # none of which have an Android unit test. Without it those run nowhere.
       - name: Run unit tests
         run: |
           ./gradlew --scan --stacktrace \
-              testDebugUnitTest
+              testDebugUnitTest desktopTest
 
   stability_check:
     name: Compose Stability Check
