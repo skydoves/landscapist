@@ -55,8 +55,12 @@ public data class ImageRequest(
     private var model: Any? = null
     private var memoryCachePolicy: CachePolicy = CachePolicy.ENABLED
     private var diskCachePolicy: CachePolicy = CachePolicy.ENABLED
-    private var headers: MutableMap<String, String> = mutableMapOf()
-    private var transformations: MutableList<Transformation> = mutableListOf()
+
+    // Left null until something is actually added. Most requests are a URL and a size, and
+    // allocating an empty map and an empty list per request, then copying both in build(), is four
+    // objects for nothing.
+    private var headers: MutableMap<String, String>? = null
+    private var transformations: MutableList<Transformation>? = null
     private var targetWidth: Int? = null
     private var targetHeight: Int? = null
     private var tag: String? = null
@@ -78,24 +82,24 @@ public data class ImageRequest(
 
     /** Adds an HTTP header. */
     public fun addHeader(name: String, value: String): Builder = apply {
-      this.headers[name] = value
+      (this.headers ?: mutableMapOf<String, String>().also { this.headers = it })[name] = value
     }
 
     /** Sets all HTTP headers. */
     public fun headers(headers: Map<String, String>): Builder = apply {
-      this.headers.clear()
-      this.headers.putAll(headers)
+      this.headers = if (headers.isEmpty()) null else LinkedHashMap(headers)
     }
 
     /** Adds a transformation. */
     public fun addTransformation(transformation: Transformation): Builder = apply {
-      this.transformations.add(transformation)
+      (this.transformations ?: mutableListOf<Transformation>().also { this.transformations = it })
+        .add(transformation)
     }
 
     /** Sets all transformations. */
     public fun transformations(transformations: List<Transformation>): Builder = apply {
-      this.transformations.clear()
-      this.transformations.addAll(transformations)
+      this.transformations =
+        if (transformations.isEmpty()) null else transformations.toMutableList()
     }
 
     /** Sets the target size. */
@@ -128,8 +132,8 @@ public data class ImageRequest(
       model = model,
       memoryCachePolicy = memoryCachePolicy,
       diskCachePolicy = diskCachePolicy,
-      headers = headers.toMap(),
-      transformations = transformations.toList(),
+      headers = headers?.toMap().orEmpty(),
+      transformations = transformations?.toList().orEmpty(),
       targetWidth = targetWidth,
       targetHeight = targetHeight,
       tag = tag,

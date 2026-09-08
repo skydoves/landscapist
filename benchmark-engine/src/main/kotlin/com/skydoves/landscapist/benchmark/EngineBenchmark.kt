@@ -50,6 +50,8 @@ fun main() {
   allocations()
   coalescing()
   nearIdenticalSizes()
+  decodeComparison()
+  composeComparison()
 
   println("=".repeat(96))
   println("Percentiles over the reported iteration count. Lower is better.")

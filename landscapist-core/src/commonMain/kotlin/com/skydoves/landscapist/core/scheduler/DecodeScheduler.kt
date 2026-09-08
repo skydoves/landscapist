@@ -30,6 +30,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlin.concurrent.Volatile
 
 /**
  * A scheduler for prioritized decode operations.
@@ -296,12 +297,17 @@ public class DecodeScheduler(
     /**
      * Global decode scheduler instance.
      */
+    @Volatile
     private var globalScheduler: DecodeScheduler? = null
 
     /**
      * Gets the global decode scheduler, creating it if necessary.
+     *
+     * Read without the lock once it exists: this is called for every decode, and taking a monitor
+     * to re-read a field that stopped changing after the first image made every decoding thread
+     * queue behind the same one.
      */
-    public fun global(): DecodeScheduler = synchronized(globalLock) {
+    public fun global(): DecodeScheduler = globalScheduler ?: synchronized(globalLock) {
       globalScheduler ?: DecodeScheduler().also { globalScheduler = it }
     }
 

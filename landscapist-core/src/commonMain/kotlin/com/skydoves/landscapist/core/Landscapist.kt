@@ -160,7 +160,7 @@ public class Landscapist private constructor(
     // 1. Memory cache (instant). Checked per call so a hit never waits on coalescing, and checked
     // before any loading state is emitted so an image already in memory never blinks through one.
     if (request.memoryCachePolicy.readEnabled) {
-      memoryCache[cacheKey]?.let { cached ->
+      readMemoryCache(request, cacheKey)?.let { cached ->
         emit(cached.toSuccess())
         return
       }
@@ -197,8 +197,39 @@ public class Landscapist private constructor(
   public fun peekMemoryCache(request: ImageRequest): ImageResult.Success? {
     if (request.model == null || !request.memoryCachePolicy.readEnabled) return null
     val cacheKey = request.cacheKey()
+    // The peek runs before layout, so there is usually no target size to satisfy and any decoded
+    // variant will do. The correctly sized one replaces it as soon as the real load resolves.
     val cached = memoryCache[cacheKey] ?: memoryCache.getIgnoringSize(cacheKey) ?: return null
     return cached.toSuccess()
+  }
+
+  /**
+   * Reads [request] out of the memory cache, reusing a differently sized variant when it is large
+   * enough to serve this one.
+   *
+   * A layout rarely measures to exactly the same pixel twice. A grid whose columns do not divide
+   * evenly asks for 359, 360 and 361 wide, and keying strictly on the target size makes those three
+   * separate entries and three separate decodes of one image. Accepting an entry that is already at
+   * least as large costs nothing in quality, since it is only ever scaled down to draw.
+   */
+  private fun readMemoryCache(request: ImageRequest, cacheKey: CacheKey): CachedImage? {
+    memoryCache[cacheKey]?.let { return it }
+    val candidate = memoryCache.getIgnoringSize(cacheKey) ?: return null
+    return candidate.takeIf { it.coversRequestedSize(request) }
+  }
+
+  /**
+   * Whether this entry's decoded pixels are at least as many as [request] asked for.
+   *
+   * A pixel of tolerance on each axis absorbs layouts that measure to fractional sizes. An entry
+   * smaller than the request is refused, because scaling it up would be visibly worse than decoding
+   * again.
+   */
+  private fun CachedImage.coversRequestedSize(request: ImageRequest): Boolean {
+    val targetWidth = request.targetWidth.asPixelBound() ?: return true
+    val targetHeight = request.targetHeight.asPixelBound() ?: return true
+    if (originalWidth <= 0 || originalHeight <= 0) return false
+    return originalWidth + 1 >= targetWidth && originalHeight + 1 >= targetHeight
   }
 
   /**
@@ -208,6 +239,9 @@ public class Landscapist private constructor(
    */
   public fun peekMemoryCache(url: String): ImageResult.Success? =
     peekMemoryCache(ImageRequest(model = url))
+
+  /** A target dimension in pixels, or null when the layout left that axis unbounded. */
+  private fun Int?.asPixelBound(): Int? = this?.takeIf { it > 0 && it != Int.MAX_VALUE }
 
   private fun ImageRequest.cacheKey(): CacheKey = CacheKey.create(
     model = model,
@@ -300,7 +334,7 @@ public class Landscapist private constructor(
           val bytes = snapshot.data().buffer().readByteArray()
           val diskPath = snapshot.dataPath.toString()
           when (
-            val decodeResult = scheduleDecodeWithPriority(request) {
+            val decodeResult = scheduleDecodeWithPriority(cacheKey, request) {
               decoder.decode(
                 data = bytes,
                 mimeType = null,
@@ -393,7 +427,7 @@ public class Landscapist private constructor(
     diskPath: String?,
   ): ImageResult {
     return when (
-      val decodeResult = scheduleDecodeWithPriority(request) {
+      val decodeResult = scheduleDecodeWithPriority(cacheKey, request) {
         decoder.decode(
           data = bytes,
           mimeType = mimeType,
@@ -574,18 +608,23 @@ public class Landscapist private constructor(
   /**
    * Schedules a decode operation with priority.
    */
+  /**
+   * Runs [decoder] through the shared decode gate.
+   *
+   * The id is the memory key, which is already built and is genuinely unique. Deriving it from
+   * `model.hashCode()` meant two different URLs at the same target size shared an id, and the
+   * scheduler's active map would drop one of them.
+   */
   private suspend fun <T> scheduleDecodeWithPriority(
+    cacheKey: CacheKey,
     request: ImageRequest,
     decoder: suspend () -> T,
-  ): T {
-    val requestId = "${request.model.hashCode()}_${request.targetWidth}_${request.targetHeight}"
-    return DecodeScheduler.global().schedule(
-      id = requestId,
-      priority = request.priority,
-      tag = request.tag,
-      decoder = decoder,
-    ).await()
-  }
+  ): T = DecodeScheduler.global().schedule(
+    id = cacheKey.memoryKey,
+    priority = request.priority,
+    tag = request.tag,
+    decoder = decoder,
+  ).await()
 
   /**
    * Performs progressive decoding and emits intermediate results.

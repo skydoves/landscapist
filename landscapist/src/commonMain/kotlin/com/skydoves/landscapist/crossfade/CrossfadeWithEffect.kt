@@ -56,6 +56,17 @@ public fun <T> CrossfadeWithEffect(
   contentKey: (T) -> Any? = { it },
   content: @Composable (T) -> Unit,
 ) {
+  // Nothing is tracked when the animation is off, which is the default: no crossfade plugin means
+  // no fade out to keep alive, and a snapshot state list per image is not free.
+  if (!enabled) {
+    Box(modifier = modifier, propagateMinConstraints = true) {
+      key(contentKey(targetState)) {
+        content(targetState)
+      }
+    }
+    return
+  }
+
   // Seeded with the state this composable entered composition with, for two reasons. Waiting for
   // the effect below to add it leaves the first frame empty, and content that was already resolved
   // when the composable appeared (an image read straight from the memory cache, say) has nothing to
@@ -77,41 +88,27 @@ public fun <T> CrossfadeWithEffect(
   }
 
   Box(modifier = modifier, propagateMinConstraints = true) {
-    if (enabled) {
-      currentlyVisibleItems.forEach { state ->
-        key(contentKey(state)) {
-          val stateKey = contentKey(state)
-          val isTarget = stateKey == contentKey(targetState)
+    currentlyVisibleItems.forEach { state ->
+      key(contentKey(state)) {
+        val stateKey = contentKey(state)
+        val isTarget = stateKey == contentKey(targetState)
 
-          val animationModifier = when {
-            !isTarget -> Modifier.fadeOutWithEffect(key = Unit, durationMs = durationMs)
-            !initialContentReplaced && stateKey == initialContentKey -> Modifier
-            else -> Modifier.fadeInWithEffect(key = stateKey ?: Unit, durationMs = durationMs)
-          }
+        val animationModifier = when {
+          !isTarget -> Modifier.fadeOutWithEffect(key = Unit, durationMs = durationMs)
+          !initialContentReplaced && stateKey == initialContentKey -> Modifier
+          else -> Modifier.fadeInWithEffect(key = stateKey ?: Unit, durationMs = durationMs)
+        }
 
-          if (!isTarget) {
-            LaunchedEffect(Unit) {
-              delay(durationMs.toLong())
-              currentlyVisibleItems.remove(state)
-            }
-          }
-
-          Box(modifier = animationModifier, propagateMinConstraints = true) {
-            content(state)
+        if (!isTarget) {
+          LaunchedEffect(Unit) {
+            delay(durationMs.toLong())
+            currentlyVisibleItems.remove(state)
           }
         }
-      }
-    } else {
-      if (currentlyVisibleItems.size > 1 || currentlyVisibleItems.firstOrNull() != targetState) {
-        currentlyVisibleItems.retainAll { contentKey(it) == contentKey(targetState) }
-        if (currentlyVisibleItems.isEmpty()) {
-          currentlyVisibleItems.add(targetState)
-        }
-      }
 
-      // Render the content directly without any animation modifiers.
-      key(contentKey(targetState)) {
-        content(targetState)
+        Box(modifier = animationModifier, propagateMinConstraints = true) {
+          content(state)
+        }
       }
     }
   }
