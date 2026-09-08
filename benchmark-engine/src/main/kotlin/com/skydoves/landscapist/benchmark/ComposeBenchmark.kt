@@ -120,13 +120,15 @@ internal fun composeComparison() {
   // A cache hit and a fetch are not the same measurement, and a variant quietly doing the
   // second one would look expensive for a reason with nothing to do with its Compose layer.
   // Both sides are warm before any of this runs, so the honest number here is zero on both.
-  landscapistCounter.reset()
-  coilCounter.reset()
+  warmed.forEach { it.reset() }
   for ((_, content) in variants) renderOnce { content(ITEM_SIZE) }
-  println(
-    "  fetches during one pass over every variant: landscapist " +
-      "${landscapistCounter.count.get()}, coil ${coilCounter.count.get()} (both should be zero)",
-  )
+  val fetched = warmed.map { it.count.get() }
+  println("  fetches during one pass over every variant: ${fetched.joinToString()} (all zero)")
+  // Every loader, not only the two plain ones. The crossfade variants load through their own, so
+  // leaving it out let the one row this benchmark actually loses report a fetch as a cache hit.
+  check(fetched.all { it == 0 }) {
+    "a variant fetched during the measured pass, so it is not a warm cache measurement: $fetched"
+  }
   println()
 
   // Interleaved, so drift over the run lands on every variant rather than on whichever went first,
