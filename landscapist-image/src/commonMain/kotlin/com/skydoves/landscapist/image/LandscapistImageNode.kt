@@ -54,24 +54,19 @@ import kotlin.math.roundToInt
 /**
  * Loads and draws an image on the node it modifies.
  *
- * This is the whole image, in one layout node: it reads the constraints it is measured with to pick
- * the size to decode at, runs the load, holds the painter and draws it. Nothing about the load
- * lives in composition, so an image resolving invalidates the draw of this one node rather than
- * recomposing anything, and the size it decodes at is read during measurement rather than written
- * back into composition as state.
+ * The whole image in one layout node: it reads the constraints it is measured with to pick the
+ * size to decode at, runs the load, holds the painter and draws it. Nothing lives in composition,
+ * so an image resolving invalidates this node's draw rather than recomposing.
  *
- * It only applies when there is genuinely nothing to compose inside the image: no caller slot, no
- * plugin, no crossfade. Everything else goes through [LandscapistImage]'s composed path, which this
- * does not replace.
+ * Only when there is nothing to compose inside the image: no caller slot, no plugin, no crossfade.
+ * Everything else goes through [LandscapistImage]'s composed path.
  *
  * @param landscapist The loader to run the request against.
  * @param request The request to load, before a target size is known.
  * @param imageOptions How the image is drawn, and the size to ask for when the caller fixed one.
  * @param onState Called with each state the image reaches, in order.
- * @param unpaintable Set when the loaded data needs a composed painter, which this node has no way
- * to build. The caller reads it and falls back to the composed path. A state rather than a callback
- * because a state is what the caller has to hold anyway, and a callback would be a second object
- * per image to say the same thing.
+ * @param unpaintable Set when the loaded data needs a composed painter, which this node cannot
+ * build. The caller reads it and falls back to the composed path.
  */
 internal fun Modifier.landscapistImageNode(
   landscapist: Landscapist,
@@ -129,20 +124,10 @@ internal class LandscapistImageNode(
 ) : Modifier.Node(), LayoutModifierNode, DrawModifierNode {
 
   /**
-   * The image, once there is one.
+   * What the node draws.
    *
-   * A plain field rather than snapshot state. The only reader is this node, so it can invalidate
-   * its own measurement and drawing directly, and a snapshot read from inside measure and draw
-   * costs the observer a subscription per node per pass for a value that changes once.
-   */
-  /**
-   * What the node draws, held as snapshot state rather than a plain field.
-   *
-   * The load finishes on whatever dispatcher the loader ends on, and telling the node to lay out
-   * and draw again from there reaches into the owner: on Android that is `View.requestLayout`,
-   * which throws `CalledFromWrongThreadException` off the main thread and fails the image with an
-   * error about view hierarchies. Snapshot state is safe to write from any thread by design, and
-   * measure and draw both read this, so Compose invalidates them itself, on the thread it chooses.
+   * Snapshot state, because the load can finish on any dispatcher and invalidating the node
+   * directly from there touches the owner, which off the main thread throws on Android.
    */
   private var painter: Painter? by mutableStateOf(null)
 
@@ -150,22 +135,14 @@ internal class LandscapistImageNode(
   private var state: LandscapistImageState? = null
   private var started = false
 
-  /**
-   * The load in flight, so a reload can stop it.
-   *
-   * Without this, rebinding a list item to another image left the first load running: it came back
-   * later, published, and put the previous image over the one the item now shows. The node's own
-   * scope only cancels on detach, and a rebind is not a detach.
-   */
+  /** The load in flight, so a rebind can stop it. The node's scope only cancels on detach. */
   private var loadJob: Job? = null
 
   /**
    * Whether [request] still belongs to a previous binding.
    *
-   * A lazy list reuses a node for the next row: it resets the node and attaches it again before the
-   * new composition hands it the new request. Reading the cache in that window looks up the
-   * previous row's URL and publishes the previous row's image, which the viewer sees for a frame in
-   * the wrong place and which callers see as a success for a model they no longer asked for.
+   * A lazy list resets a reused node and attaches it again before the new composition reaches it,
+   * so reading the cache in that window would publish the previous row's image.
    */
   private var awaitingRequest = false
 
@@ -182,14 +159,7 @@ internal class LandscapistImageNode(
     awaitingRequest = true
   }
 
-  /**
-   * Stops the load in flight, if there is one still running.
-   *
-   * Only if it is still running: `cancel` builds a `CancellationException` before it looks at the
-   * job, so calling it on a load that already finished costs an exception per image for nothing.
-   * That is most of them, since every image on a warm cache has finished by the time its screen
-   * goes away, and it measured at 220 bytes an image on the first frame of a screenful.
-   */
+  /** Only if it is still running: `cancel` builds a `CancellationException` either way. */
   private fun cancelLoad() {
     val running = loadJob
     loadJob = null
@@ -228,20 +198,13 @@ internal class LandscapistImageNode(
       cancelLoad()
       started = false
       state = null
-      // Through showPainter, so the image on screen is taken down in the same pass that puts the new
-      // one up rather than being left there until the load comes back.
+      // Takes the old image down in the same pass, rather than leaving it until the load returns.
       showPainter(null)
       peek()
     }
   }
 
-  /**
-   * The synchronous memory cache read.
-   *
-   * An image already in memory is drawn in the very first frame this way. Waiting for the load to
-   * come back costs a frame of empty content even on a hit, which is what makes an image blink when
-   * it enters, most visibly inside a shared element transition.
-   */
+  /** The synchronous cache read, so an image already in memory is drawn in the first frame. */
   private fun peek() {
     val cached = landscapist.peekMemoryCache(request)
     // An image with nothing cached has nothing to show yet, and callers have always been told so
@@ -270,29 +233,15 @@ internal class LandscapistImageNode(
     val sized = buildSizedRequest(request, imageOptions, constraints)
     cancelLoad()
     loadJob = coroutineScope.launch {
-      // The dispatcher this node's scope runs on, which is the composition's, which is the UI
-      // thread. Captured because the collector below does not stay on it: the loader emits from
-      // whatever dispatcher it finished on, and a flow's collector runs wherever the emission
-      // happens. Publishing from there calls invalidateDraw on the layout node, which reaches
-      // straight into the owner and must be on the UI thread. On Android that throws
-      // CalledFromWrongThreadException and the image fails with an error about views.
-      //
-      // The composable this replaced never had the problem: it wrote Compose state, which is
-      // snapshot state and safe from any thread, and let Compose schedule the recomposition.
+      // The UI dispatcher, captured because the collector does not stay on it: a flow's collector
+      // runs wherever the emission happens, and publishing hands state to the caller.
       val ui = coroutineContext[ContinuationInterceptor] ?: EmptyCoroutineContext
 
-      // Collected directly rather than through flow {}, catch {} and distinctUntilChanged(). Each
-      // of those is another flow, another collector and another continuation per image, and none of
-      // them is needed here: the conversion happens in the collector, publish already drops a state
-      // equal to the one on screen, and a try around the collection is what catch would compile to.
-      //
-      // No loading state is emitted up front either: Landscapist.load emits one only when the image
-      // is not already in memory, so a cached image never passes through one.
+      // Collected directly rather than through flow {}, catch {} and distinctUntilChanged(), which
+      // would each add a flow and a continuation per image for something already done here.
       try {
         landscapist.load(sized).collect { result ->
           val next = result.toLandscapistImageState()
-          // A no-op when the emission already arrived on the UI thread, which a memory cache hit
-          // does, so the common path pays nothing for this.
           withContext(ui) { publish(next) }
         }
       } catch (cancellation: CancellationException) {
@@ -305,16 +254,13 @@ internal class LandscapistImageNode(
 
   private fun publish(next: LandscapistImageState) {
     if (next == state) return
-    // Once measurement lands, the request restarts at its real target size. Dropping back to a
-    // loading state would blink away an image the user can already see, so an image on screen holds
-    // until the resized one resolves.
+    // An image on screen holds until the resized request resolves, rather than blinking away.
     if (next is LandscapistImageState.Loading && state is LandscapistImageState.Success) return
     if (next is LandscapistImageState.Success) {
       val painted = landscapistPainterOrNull(next.data)
       val handOver = unpaintable
       if (painted == null && handOver != null) {
-        // An animated drawable draws by reading state and has a lifecycle to dispatch, neither of
-        // which this node can give it. The composed path can, and this is what sends it there.
+        // An animated drawable needs a composed painter, which only the composed path can give it.
         handOver.value = true
         return
       }

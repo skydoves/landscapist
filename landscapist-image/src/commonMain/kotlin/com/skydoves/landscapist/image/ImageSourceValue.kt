@@ -20,11 +20,10 @@ import androidx.compose.runtime.ProvidedValue
 /**
  * The image source a platform can offer for sub-sampling, ready to be provided.
  *
- * The same thing [ProvideImageSource] provides, without being a composable to do it: this returns
- * the value and lets the caller hand it to one `CompositionLocalProvider`, where the composable
- * form is two more composition groups around every image on screen for no other purpose.
+ * The value [ProvideImageSource] provides, without a composable to do it, so the caller can hand
+ * it to one `CompositionLocalProvider` instead of nesting two more groups per image.
  *
- * On Android that is the disk cache file, on the Skia targets the raw bytes.
+ * On Android the disk cache file, on the Skia targets the raw bytes.
  */
 internal expect fun imageSourceProvidedValue(
   diskCachePath: String?,

@@ -37,17 +37,12 @@ import javax.imageio.ImageIO
 /**
  * Decodes through Skia, when skiko is on the classpath.
  *
- * ImageIO's JPEG reader is libjpeg 6b with no SIMD, and its `setSourceSubsampling` never reaches
- * libjpeg's own scaling: asking for one pixel in eight still runs the full inverse DCT and then
- * discards 63 pixels out of 64. Measured on a 4000x3000 JPEG, going from no subsampling to one in
- * sixteen moves the read from 117 ms to 108 ms, which is the pixel copy and nothing else.
+ * ImageIO's `setSourceSubsampling` never reaches libjpeg's own scaling, so asking for one pixel in
+ * eight still runs the full inverse DCT. Skia's codec scales during it, so an eighth costs an
+ * eighth.
  *
- * Skia decodes the same bytes through libjpeg-turbo, and its codec really does scale during the
- * inverse DCT, so asking for an eighth costs an eighth. The same photo lands at 40 ms.
- *
- * Skiko is a `compileOnly` dependency here. Every Compose Multiplatform application already
- * resolves it, so in practice this path is always the one that runs; a plain JVM consumer that has
- * no skiko on its classpath falls back to ImageIO and behaves exactly as before.
+ * Skiko is `compileOnly`. Every Compose Multiplatform application resolves it; a plain JVM consumer
+ * without it falls back to ImageIO.
  */
 internal object SkiaJvmDecoder {
 
@@ -56,10 +51,8 @@ internal object SkiaJvmDecoder {
   /**
    * Whether skiko's native library really loads.
    *
-   * The API jar can be on the classpath without the platform runtime that carries the native
-   * binary, and that only fails when a Skia type is first touched, so this forces the load rather
-   * than checking for a class. Called from behind `runCatching`, since a skiko that is missing
-   * altogether takes this whole object down with it as it loads.
+   * The API jar can be present without the native runtime, which only fails when a Skia type is
+   * touched, so this forces the load. Call it from behind `runCatching`.
    */
   fun isUsable(): Boolean = runCatching {
     Data.makeEmpty().close()
@@ -104,14 +97,9 @@ internal object SkiaJvmDecoder {
           maxSize = maxSize,
         )
 
-        // Only a JPEG can be decoded straight into a smaller raster here, because that is
-        // libjpeg's eighths scaling and nothing else offers it. Anything else would decode at full
-        // size and shrink afterwards, which is what ImageIO already does and does with
-        // subsampling, so it is handed back rather than decoded worse.
-        //
-        // Only when ImageIO can actually read the format, though. Handing back a WebP would make
-        // the same image decode at one size and fail at another, and make two cache entries for it
-        // disagree about whether it exists.
+        // Only a JPEG scales while decoding, so anything else is handed back for ImageIO to
+        // subsample instead. Only when ImageIO can read it, or the same image would decode at one
+        // size and fail at another.
         val shrinking = finalWidth < originalWidth || finalHeight < originalHeight
         if (shrinking &&
           codec.encodedImageFormat != EncodedImageFormat.JPEG &&
@@ -151,9 +139,8 @@ internal object SkiaJvmDecoder {
    * Reads the codec at the smallest size it supports that still covers [finalWidth] by
    * [finalHeight], falling back to the full size when it supports nothing smaller.
    *
-   * libjpeg scales by eighths, which is the only scaling Skia's JPEG codec accepts, so the
-   * candidate is the smallest eighth that is still large enough. Every other codec refuses, and
-   * refuses cheaply: the check runs before any pixel is decoded.
+   * libjpeg scales by eighths, so the candidate is the smallest eighth still large enough. Every
+   * other codec refuses before any pixel is decoded.
    */
   private fun readScaled(
     codec: Codec,
@@ -175,8 +162,7 @@ internal object SkiaJvmDecoder {
     return try {
       full.also { codec.readPixels(it) }
     } catch (throwable: Throwable) {
-      // Truncated bytes are ordinary: a cut off download, a torn disk cache entry. The pixels are
-      // off heap, so leaving them to a cleaner hides them from every heap measurement there is.
+      // Truncated bytes are ordinary, and the pixels are off heap, so they are freed here.
       full.close()
       throw throwable
     }

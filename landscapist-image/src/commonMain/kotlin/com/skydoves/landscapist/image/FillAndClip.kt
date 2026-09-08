@@ -32,26 +32,20 @@ import androidx.compose.ui.unit.Constraints
 /**
  * Takes the whole of the space offered and keeps the drawing inside it.
  *
- * The two belong together, because both exist to serve the [Modifier.paint] that follows: paint
- * sizes a node to the painter's own size unless it is handed fixed constraints, and it draws
- * wherever the content scale takes it, which for a crop is past the edges. Compose spells this pair
- * as `fillMaxSize().clipToBounds()`, which is two more nodes for every image on screen, and the
- * clip among them allocates a graphics layer. One node does both, and clipping while drawing needs
- * no layer at all.
+ * Both serve the [Modifier.paint] that follows, which sizes to the painter unless given fixed
+ * constraints and draws past the edges when the content scale crops. Compose spells this as
+ * `fillMaxSize().clipToBounds()`, which is two more nodes per image and a graphics layer for the
+ * clip. Clipping while drawing needs no layer.
  *
- * It has to come before the paint in the chain: earlier means outside for measurement, so the fill
- * decides what the paint is measured against, and earlier means first for drawing, so the clip is
- * still in effect when [ContentDrawScope.drawContent] reaches the paint.
+ * It has to come before the paint in the chain, so the fill decides what the paint is measured
+ * against and the clip is still in effect when [ContentDrawScope.drawContent] reaches it.
  *
  * @param ownLayer Whether this image needs a graphics layer of its own. A plain bitmap painter is
- * static and does not, which is the common case and the one worth saving a layer on.
+ * static and does not.
  */
 internal fun Modifier.fillAndClip(ownLayer: Boolean): Modifier = if (ownLayer) {
-  // A painter that animates does it by reading state while it draws, and a draw time read is only
-  // observed for a node that owns a graphics layer. Without one the read is attributed to the
-  // nearest ancestor that has a layer, so one image's animation redraws everything around it: in a
-  // list, the whole list. Measured at twelve ancestor redraws over twelve frames against two for a
-  // still image.
+  // A draw time state read is only observed for a node that owns a layer. Without one it is
+  // attributed to the nearest ancestor that has one, so an animating image redraws the whole list.
   this.fillMaxSize().clipToBounds()
 } else {
   this.then(FillAndClipElement)
@@ -70,9 +64,8 @@ private object FillAndClipElement : ModifierNodeElement<FillAndClipNode>() {
 private class FillAndClipNode : Modifier.Node(), LayoutModifierNode, DrawModifierNode {
 
   /**
-   * Fixes each axis that has a bound to that bound and leaves an unbounded one alone, which is what
-   * `fillMaxSize` does. An axis the parent left unbounded is not an offer of space to take, so the
-   * paint that follows still gets to size that axis from the image.
+   * Fixes each bounded axis to its bound and leaves an unbounded one alone, so the paint that
+   * follows still sizes that axis from the image.
    */
   override fun MeasureScope.measure(
     measurable: Measurable,

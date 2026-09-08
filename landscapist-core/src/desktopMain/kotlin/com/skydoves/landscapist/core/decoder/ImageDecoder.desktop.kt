@@ -31,9 +31,8 @@ public actual fun createPlatformDecoder(): ImageDecoder = DesktopImageDecoder()
 /**
  * Desktop implementation of [ImageDecoder].
  *
- * Skia does the reading whenever skiko is on the classpath, which it is for every Compose
- * Multiplatform application, because ImageIO's JPEG reader cannot scale while it decodes. ImageIO
- * remains the fallback, and produces the same [BufferedImage] the rest of the desktop code expects.
+ * Skia reads whenever skiko is on the classpath, because ImageIO's JPEG reader cannot scale while
+ * it decodes. ImageIO remains the fallback and produces the same [BufferedImage].
  */
 internal class DesktopImageDecoder : ImageDecoder {
 
@@ -60,10 +59,8 @@ internal class DesktopImageDecoder : ImageDecoder {
    * Reads the header, decodes at the nearest power of two above the requested size, then scales the
    * remainder.
    *
-   * Decoding the whole image and shrinking it afterwards means a 4000x3000 photo materialises 48 MB
-   * of pixels to produce a thumbnail. ImageIO can skip pixels while it reads, so the full size
-   * raster never exists. It cannot skip the work of decoding them, which is why Skia is preferred
-   * when it is there.
+   * ImageIO can skip pixels while it reads, so the full size raster never exists. It cannot skip
+   * the work of decoding them, which is why Skia is preferred when it is there.
    */
   private fun decodeSubsampled(
     data: ByteArray,
@@ -136,9 +133,8 @@ internal class DesktopImageDecoder : ImageDecoder {
   }
 
   /**
-   * Bilinear rather than [java.awt.Image.SCALE_SMOOTH], which runs an area averaging pipeline that
-   * is roughly an order of magnitude slower. Subsampling has already brought the image to within a
-   * factor of two, so a single bilinear pass loses nothing visible.
+   * Bilinear rather than [java.awt.Image.SCALE_SMOOTH], which is far slower. Subsampling has
+   * already brought the image within a factor of two, so one pass loses nothing visible.
    */
   private fun scaleImage(
     image: BufferedImage,
@@ -161,14 +157,11 @@ internal class DesktopImageDecoder : ImageDecoder {
 /**
  * Whether the Skia reader can be used at all, decided once for the process.
  *
- * The probe has to live out here rather than inside [SkiaJvmDecoder]. Without skiko on the
- * classpath, merely naming that object throws `NoClassDefFoundError` while it is being loaded,
- * before any check inside it could run, and that is an `Error` rather than an `Exception`, so it
- * would sail straight past the decoder's own catch and fail every desktop decode. `runCatching`
- * takes any `Throwable`, and the first mention of the object is inside it.
+ * Out here rather than inside [SkiaJvmDecoder]: without skiko, naming that object throws
+ * `NoClassDefFoundError` as it loads, which is an `Error` and would pass the decoder's own catch.
+ * `runCatching` takes any `Throwable`, and the first mention of the object is inside it.
  *
- * Internal rather than private so a test can load this file's class with skiko kept off the
- * classpath and check that the answer is `false` instead of a thrown `Error`.
+ * Internal rather than private so a test can load this class with skiko off the classpath.
  */
 internal val skiaAvailable: Boolean by lazy {
   runCatching { SkiaJvmDecoder.isUsable() }.getOrDefault(false)
@@ -178,8 +171,7 @@ internal val skiaAvailable: Boolean by lazy {
  * The size an image of [originalWidth] by [originalHeight] takes when it is fitted inside the
  * requested box, keeping its shape and never growing.
  *
- * Shared by both desktop decode paths so that the Skia reader and the ImageIO fallback agree on the
- * size for the same request, whichever one runs.
+ * Shared by both desktop paths, so the Skia reader and the ImageIO fallback agree on the size.
  */
 internal fun fitInside(
   originalWidth: Int,

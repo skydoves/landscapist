@@ -42,9 +42,8 @@ public interface MemoryCache {
   /**
    * Gets a cached image for the same model and transformations as [key], at any target size.
    *
-   * A composable knows its image model before it knows the size it will be measured at, so an exact
-   * [get] misses on the first frame even when the image is in memory. This lookup lets the already
-   * decoded variant render immediately while the correctly sized request resolves.
+   * A composable knows its model before its measured size, so an exact [get] misses on the first
+   * frame even when the image is in memory.
    *
    * @param key The cache key. Only its [CacheKey.baseKey] is matched; the target size is ignored.
    * @return A cached image for any size of this key, or null if nothing is cached. Implementations
@@ -56,10 +55,8 @@ public interface MemoryCache {
    * Gets the image cached for [key], or an already decoded variant of the same image and
    * transformations that [isAcceptable] approves.
    *
-   * A lookup marks what it returns as recently used, which for some caches also promotes it out of
-   * a weak tier and evicts other entries to make room. So a variant that [isAcceptable] turns down
-   * must not be marked: a miss would otherwise leave the cache worse off than it found it,
-   * resurrecting an entry nobody wanted and evicting live ones to do it.
+   * A lookup marks what it returns as recently used, which can promote it out of a weak tier and
+   * evict others, so a variant [isAcceptable] turns down must not be marked.
    *
    * @param key The cache key. The exact size is preferred; other sizes are offered to
    * [isAcceptable] from the most recently cached to the least.

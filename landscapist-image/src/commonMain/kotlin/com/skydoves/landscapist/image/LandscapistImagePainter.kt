@@ -40,20 +40,15 @@ import kotlin.math.roundToInt
  * Loads [model] and hands back a [androidx.compose.ui.graphics.painter.Painter] for the caller to
  * draw wherever it likes.
  *
- * This is the same trade `Image` makes: the caller owns the layout node, so an image costs one node
- * rather than a container plus whatever is composed inside it. That is the reason to reach for it
- * over [LandscapistImage], and everything it gives up is the reason not to. A painter has no
- * loading or failure slot, runs no image plugin, and cannot crossfade, because each of those needs
- * something composed around the image and this composes nothing at all. Use [LandscapistImage] when
- * any of them matter.
+ * The caller owns the layout node, so an image costs one node rather than a container plus its
+ * contents. In exchange there is no loading or failure slot, no plugin and no crossfade, since each
+ * of those needs something composed around the image. Use [LandscapistImage] when any matter.
  *
- * The painter keeps its identity across recompositions and across state changes, so an item drawing
- * it is not rebuilt when the image resolves. An image already in the memory cache is drawn on the
- * very first frame; anything else appears when it arrives.
+ * The painter keeps its identity across recompositions, and an image already in the memory cache is
+ * drawn on the first frame.
  *
- * The size to decode at comes from the first draw, which is all a painter ever learns about its
- * bounds, and is then held, so an image whose bounds animate is not decoded again every frame. Set
- * a size through [requestBuilder] when the first draw is not the size the image ends up at.
+ * The size to decode at comes from the first draw and is then held. Set a size through
+ * [requestBuilder] when the first draw is not the size the image ends up at.
  *
  * @param model The image model to load (URL, Uri, file path, byte array, and so on).
  * @param landscapist The Landscapist instance to load with. Defaults to the composition local.
@@ -73,16 +68,13 @@ public fun rememberLandscapistImagePainter(
       requestBuilder?.invoke(this)
     }.build()
   }
-  // The memory cache is read here rather than waited for, so an image that is already decoded is
-  // drawn in the frame this painter first appears in instead of the one after it.
+  // Read rather than waited for, so a decoded image is drawn in this painter's first frame.
   val painter = remember(request, landscapist) { LandscapistImagePainter(landscapist, request) }
   painter.onImageStateChanged = onImageStateChanged
   LaunchedEffect(painter) { painter.load() }
 
-  // The image is turned into something drawable here rather than inside the painter, because that
-  // is where a resource can be resolved and where an animated drawable gets to keep what it
-  // remembers. The painter it is handed to keeps its own identity, so the caller's layout is not
-  // rebuilt when this changes.
+  // Made drawable here rather than inside the painter: this is where a resource can be resolved
+  // and where an animated drawable keeps what it remembers.
   val data = painter.data
   painter.delegate = if (data is DrawableResource) {
     painterResource(data)
@@ -115,8 +107,8 @@ private class LandscapistImagePainter(
   /**
    * The size this painter was last asked to draw at.
    *
-   * Not a snapshot state: it is written while drawing, and a snapshot write there would invalidate
-   * the frame being drawn. The load reads it once and then stops caring, so a flow is enough.
+   * Not snapshot state: it is written while drawing, where a snapshot write would invalidate the
+   * frame being drawn.
    */
   private val drawSize = MutableStateFlow(IntSize.Zero)
 
@@ -134,8 +126,7 @@ private class LandscapistImagePainter(
 
   /** Loads at the size this painter is drawn at, then follows the loader until it is cancelled. */
   suspend fun load() {
-    // Checked before the size is waited for: a bundled resource is drawn at whatever size it is
-    // given, so making it wait for the first draw left that draw with nothing to show.
+    // Before the size wait: a resource is drawn at whatever size it is given.
     if (request.model is DrawableResource) {
       // A bundled resource is neither fetched nor cached, and painterResource draws it directly.
       data = request.model

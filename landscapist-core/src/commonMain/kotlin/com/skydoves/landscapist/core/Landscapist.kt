@@ -155,12 +155,9 @@ public class Landscapist private constructor(
   /**
    * The standard load, as a flow of its own rather than one the `flow { }` builder wraps.
    *
-   * The builder's job is to hand every collector a `SafeCollector`, which fails a flow that emits
-   * from a coroutine context other than the one collecting it. This one cannot do that: every
-   * emission below happens in the collector's own context, and the one path that does change
-   * context, progressive, goes through `flowOn` and gets a channel of its own. Measured on a single
-   * value the builder costs 583 ns against 125 ns for this, which is most of what a memory cache
-   * hit costs at all.
+   * The builder exists to hand every collector a `SafeCollector`, which is not needed here: every
+   * emission happens in the collector's own context, and progressive goes through `flowOn`. On a
+   * memory cache hit the builder is most of what the load costs.
    */
   private inner class LoadFlow(private val request: ImageRequest) : Flow<ImageResult> {
     override suspend fun collect(collector: FlowCollector<ImageResult>): Unit =
@@ -238,16 +235,12 @@ public class Landscapist private constructor(
   /**
    * Whether decoding [request] again could produce anything this entry does not already hold.
    *
-   * The comparison is between the box this entry was decoded for and the box being asked for now,
-   * not between pixel counts. How a decoder turns a box into an image is its own business: most fit
-   * the image inside it and keep its shape, so a 4000x3000 photo asked for at 360x360 comes back as
-   * 360x270, while an SVG renderer fills the box exactly and would come back 360x360. Reasoning
-   * from the pixels an entry happens to have means picking one of those and being wrong about the
-   * other. A box no larger than the one already decoded for cannot yield more, whichever it is.
+   * Boxes are compared, not pixel counts: a decoder that fits an image inside the box and one that
+   * fills it produce different pixels for the same request, and a box no larger than the one
+   * already decoded for cannot yield more either way.
    *
-   * An entry far larger than the request is refused even so. Drawing a 1080 pixel bitmap into a 360
-   * pixel slot costs memory bandwidth on every frame, and a painter plugin that works on the source
-   * pixels, a blur for instance, pays for all of them.
+   * An entry far larger than the request is refused even so, since drawing it costs bandwidth on
+   * every frame and a painter plugin pays for every source pixel.
    */
   private fun CachedImage.coversRequestedSize(
     cachedKey: CacheKey,
@@ -255,13 +248,10 @@ public class Landscapist private constructor(
   ): Boolean {
     val targetWidth = request.targetWidth.asPixelBound()
     val targetHeight = request.targetHeight.asPixelBound()
-    // With no bound on either axis there is nothing to check against, and the cached variant could
-    // be a thumbnail from a plugin. Only an exact key match is reused then.
+    // Nothing to check against, and the variant could be a thumbnail. Only an exact match is used.
     if (targetWidth == null && targetHeight == null) return false
     if (originalWidth <= 0 || originalHeight <= 0) return false
-    // A transformation is free to resize what it is handed, and the size recorded for an entry is
-    // the size the decoder produced, not the size the transformation left behind. There is nothing
-    // dependable to compare, so only an exact key match is reused.
+    // The recorded size is what the decoder produced, not what the transformation left behind.
     if (request.transformations.isNotEmpty()) return false
     // A pixel of tolerance on each axis absorbs layouts that measure to fractional sizes.
     if (!axisCovered(targetWidth, cachedKey.width.asPixelBound())) return false
@@ -272,8 +262,8 @@ public class Landscapist private constructor(
   /**
    * Whether an entry decoded for [decodedFor] on one axis can serve a request for [requested].
    *
-   * Null means the axis was left open, which is the largest a request can be: an entry decoded that
-   * way covers any bound, and a request made that way is covered by nothing narrower.
+   * Null is an open axis, the largest a request can be: it covers any bound and is covered by
+   * nothing narrower.
    */
   private fun axisCovered(requested: Int?, decodedFor: Int?): Boolean = when {
     decodedFor == null -> true
@@ -284,10 +274,8 @@ public class Landscapist private constructor(
   /**
    * Whether this entry holds more than twice what the request can draw, on either axis.
    *
-   * Either, not both: an entry can be the right height and eight times the width, which is a wide
-   * image cached for a wide slot and now wanted in a narrow one. Asking for both to be oversized
-   * before re-decoding kept that entry, and the memory it costs, for a slot that draws a fraction
-   * of it.
+   * Either, not both: a panorama cached for a wide slot is the right height and eight times the
+   * width when a narrow slot asks for it.
    */
   private fun CachedImage.isWastefullyLargerThan(targetWidth: Int?, targetHeight: Int?): Boolean {
     val widthLimit = targetWidth?.let { it.toLong() * 2 } ?: Long.MAX_VALUE
@@ -321,12 +309,9 @@ public class Landscapist private constructor(
   /**
    * The model, scoped by any headers the request carries.
    *
-   * Two requests for the same URL with different headers are not the same image. An Authorization
-   * or a Cookie header makes it a different viewer's image, and content negotiation makes it
-   * different bytes. Without this they share a cache entry, and on disk they share a file that
-   * outlives the process, so one caller's image is handed to another.
-   *
-   * A request with no headers, which is nearly all of them, keys exactly as it did before.
+   * An Authorization or Cookie header makes it a different viewer's image, and content negotiation
+   * makes it different bytes, so they must not share a cache entry or a file on disk. A request
+   * with no headers keys exactly as it did before.
    */
   private fun ImageRequest.identityScopedModel(): Any? {
     if (headers.isEmpty()) return model

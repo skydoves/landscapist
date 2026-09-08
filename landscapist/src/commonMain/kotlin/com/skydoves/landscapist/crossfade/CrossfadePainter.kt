@@ -42,14 +42,12 @@ import kotlinx.coroutines.launch
  * Fades [painter] in, in the drawing rather than in the composition.
  *
  * The same effect as the crossfade modifiers: opacity over half the duration, brightness over three
- * quarters of it, saturation over all of it. Doing it here rather than by stacking composables is
- * what lets an image with a crossfade keep the cheap path, where the container draws the image
- * itself and nothing is composed inside it.
+ * quarters of it, saturation over all of it. Doing it in the drawing is what lets a crossfaded image
+ * keep the path where the container draws it and nothing is composed inside.
  *
- * An image that replaces one already on screen dissolves over it: the outgoing painter is drawn at
- * full strength underneath, so the composite never dips through transparent. Loading and failure
- * content is not a painter and cannot be drawn this way, so an image that has any still goes
- * through [CrossfadeWithEffect], which can stack two composables instead.
+ * An image replacing one on screen dissolves over it, so the composite never dips through
+ * transparent. Loading and failure content is not a painter, so an image with any still goes
+ * through [CrossfadeWithEffect].
  */
 internal class CrossfadePainter(
   private val painter: Painter,
@@ -59,10 +57,8 @@ internal class CrossfadePainter(
   /**
    * What is being replaced, dropped the moment the fade no longer needs it.
    *
-   * Held as a var rather than taken in the constructor because this painter outlives the animation:
-   * it stays as the image's painter until the next one arrives, and a val would keep the previous
-   * bitmap reachable for that whole time. On a list that swaps a large image in place that is a
-   * second full size bitmap held for as long as the first one is shown.
+   * A var rather than a constructor val: this painter outlives the animation, and a val would keep
+   * the previous bitmap reachable for as long as this one is on screen.
    */
   private var outgoing: Painter? = outgoing
 
@@ -83,10 +79,8 @@ internal class CrossfadePainter(
       with(painter) { draw(size) }
       return
     }
-    // What is being replaced, at full strength underneath. Fading the arriving image in over
-    // nothing makes the image dip through transparent on its way in, which is what stacking two
-    // composables in CrossfadeWithEffect avoided. There is nothing to draw here on a first load,
-    // where nothing was on screen to begin with.
+    // Underneath at full strength, so the composite never dips through transparent. Null on a
+    // first load, where nothing was on screen to begin with.
     outgoing?.let { drawOutgoing(it) }
     colorMatrix.apply {
       updateBrightness(brightnessValue)
@@ -102,12 +96,10 @@ internal class CrossfadePainter(
   }
 
   /**
-   * The outgoing painter, filling the box the incoming one is being drawn into.
+   * The outgoing painter, covering the box the incoming one is drawn into.
    *
-   * Its own size is not the size handed here: the layout was measured against the arriving image,
-   * so drawing the outgoing one straight into that box stretches it whenever the two images are
-   * shaped differently. Covering the box and clipping keeps it undistorted, which is what the
-   * composable it replaced did by drawing both through the same content scale.
+   * The layout was measured against the arriving image, so drawing the outgoing one straight into
+   * that box would stretch it whenever the two are shaped differently.
    */
   private fun DrawScope.drawOutgoing(outgoing: Painter) {
     val intrinsic = outgoing.intrinsicSize
@@ -138,9 +130,8 @@ internal class CrossfadePainter(
 /**
  * Fades this painter in over [durationMs], restarting whenever the painter itself changes.
  *
- * The first painter seen is not faded: it is what the composable was already showing, and an image
- * read straight from the memory cache is on screen from the first frame. Every painter after it
- * replaces something the viewer can see, so it dissolves over it.
+ * The first painter seen is not faded: an image read from the memory cache is already on screen.
+ * Every painter after it replaces something the viewer can see, so it dissolves over it.
  *
  * @param durationMs How long the fade takes from start to finish. Zero returns this painter as it
  * is.

@@ -43,8 +43,7 @@ public class TwoTierMemoryCache(
   private val variantIndex = SizeVariantIndex()
   private val currentSize = atomic(0L)
 
-  // The size the weak tier has to reach before the dead references in it are swept out. See
-  // [sweepWeakReferences].
+  // The size the weak tier reaches before dead references are swept. See [sweepWeakReferences].
   private var weakSweepThreshold = MIN_WEAK_SWEEP
 
   override val maxSize: Long
@@ -90,8 +89,7 @@ public class TwoTierMemoryCache(
     val image = strongCache[memoryKey]
       ?: weakCache[memoryKey]?.get()
       ?: return@synchronized null
-    // An entry reached this way is about to be drawn, so give it what get() gives it: a refreshed
-    // position in the strong cache, and a promotion out of the weak tier.
+    // About to be drawn, so give it what get() gives it: a refreshed position and a promotion.
     touch(memoryKey, image)
     image
   }
@@ -101,8 +99,7 @@ public class TwoTierMemoryCache(
     isAcceptable: (CacheKey, CachedImage) -> Boolean,
   ): CachedImage? = synchronized(lock) {
     val exact = key.memoryKey
-    // Taken out and put back rather than read and then touched: the entry is going to be moved to
-    // the most recent position either way, and this is the path every hit takes.
+    // Taken out and put back rather than read then touched: this is the path every hit takes.
     strongCache.remove(exact)?.let { image ->
       strongCache[exact] = image
       return@synchronized image
@@ -111,9 +108,8 @@ public class TwoTierMemoryCache(
       touch(exact, image)
       return@synchronized image
     }
-    // touch() promotes out of the weak tier and evicts other live entries to make room for what it
-    // promotes, so it is only ever applied to the variant that is actually returned. Offering every
-    // variant rather than the newest one also stops a thumbnail from hiding the full sized entry.
+    // touch() evicts live entries to make room, so it is applied only to the variant returned.
+    // Every variant is offered, not just the newest, so a thumbnail cannot hide the full entry.
     var collected: MutableList<String>? = null
     var found: CachedImage? = null
     for (variant in variantIndex.variantsOf(key.baseKey)) {
@@ -138,8 +134,8 @@ public class TwoTierMemoryCache(
   /**
    * The most recently cached key under [baseKey] that still holds an image.
    *
-   * Keys whose weak referent has been collected are dropped on the way. Nothing else prunes them:
-   * eviction to the weak tier deliberately keeps the key, and [get] only ever sees one key.
+   * Collected keys are dropped on the way, since nothing else prunes them: eviction keeps the key
+   * and [get] only ever sees one.
    */
   private fun liveVariantOf(baseKey: String): String? {
     var live: String? = null
