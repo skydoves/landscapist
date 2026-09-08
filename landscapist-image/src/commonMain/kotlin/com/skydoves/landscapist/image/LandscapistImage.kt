@@ -116,7 +116,7 @@ public fun LandscapistImage(
     }.build()
   }
 
-  // These four scans read the plugin list on every composition rather than remembering it. An
+  // The scans below read the plugin list on every composition rather than remembering it. An
   // ImagePluginComponent is mutable and has no equality, so a component remembered by identity
   // would freeze a plugin set the caller can still add to, and the plugin would never run. The
   // scans allocate nothing, which is what made remembering them look worthwhile.
@@ -479,7 +479,7 @@ private fun LandscapistImageInternal(
  * Builds an ImageRequest with appropriate target size based on constraints.
  * Uses constraints to downsample large images and prevent memory issues.
  */
-private fun buildSizedRequest(
+internal fun buildSizedRequest(
   originalRequest: ImageRequest,
   imageOptions: ImageOptions,
   constraints: Constraints,

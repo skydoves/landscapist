@@ -22,6 +22,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -259,6 +262,68 @@ class LandscapistImageLayoutTest {
     }
 
     assertNotNull(painter, "the crossfade path dropped the content")
+  }
+
+  @Test
+  fun `a changed model loads the new image`() {
+    // The container node runs the load itself, so it is the node that has to notice the request it
+    // was rebuilt with and start again. Nothing recomposes underneath it to do that for it.
+    val loader = Landscapist.builder()
+      .fetcher(
+        object : ImageFetcher {
+          override fun canHandle(model: Any?): Boolean = true
+          override suspend fun fetch(request: ImageRequest): FetchResult {
+            val digit = request.model.toString().substringAfterLast('-')[0].digitToInt()
+            return FetchResult.Success(byteArrayOf(digit.toByte()), mimeType = "image/png")
+          }
+        },
+      )
+      .decoder(
+        object : ImageDecoder {
+          override suspend fun decode(
+            data: ByteArray,
+            mimeType: String?,
+            targetWidth: Int?,
+            targetHeight: Int?,
+            config: LandscapistConfig,
+          ): DecodeResult {
+            val side = data[0].toInt() * 10
+            return DecodeResult.Success(ImageBitmap(side, side), side, side)
+          }
+        },
+      )
+      .build()
+    val first = "https://example.com/photo-1.png"
+    val second = "https://example.com/photo-2.png"
+    runBlocking {
+      for (model in listOf(first, second)) {
+        loader.load(
+          ImageRequest.builder().model(model).diskCachePolicy(CachePolicy.DISABLED).build(),
+        ).first { it is ImageResult.Success }
+      }
+    }
+
+    val widths = mutableListOf<Int>()
+    runComposeUiTest {
+      var model by mutableStateOf(first)
+      setContent {
+        LandscapistImage(
+          imageModel = { model },
+          landscapist = loader,
+          modifier = Modifier.size(120.dp),
+          requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+          onImageStateChanged = {
+            if (it is LandscapistImageState.Success) widths += it.originalWidth
+          },
+        )
+      }
+      waitForIdle()
+      model = second
+      waitForIdle()
+    }
+
+    assertTrue(widths.contains(10), "the first model never loaded, saw $widths")
+    assertTrue(widths.contains(20), "the second model never loaded, saw $widths")
   }
 
   @Test

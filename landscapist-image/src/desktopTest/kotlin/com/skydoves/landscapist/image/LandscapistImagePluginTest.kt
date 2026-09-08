@@ -429,9 +429,17 @@ class LandscapistImagePluginTest {
     // The container path clips while drawing rather than through a graphics layer, and a painter
     // that animates by reading state as it draws has that read attributed to the nearest node
     // owning one. If that is an ancestor, every frame of one image's reveal redraws everything
-    // around it, which in a list is the whole list. The still image is the control: whatever the
-    // scene redraws on its own shows up in both.
-    val still = ancestorDraws(frames = 12, component = component())
+    // around it, which in a list is the whole list.
+    //
+    // The control has to be on the same path, so it carries a painter plugin that hands the painter
+    // straight back. An image with no plugins at all is drawn by a single node that owns its load,
+    // which redraws its ancestor less than either of these and would make the comparison mean
+    // nothing.
+    val stillPlugin = object : ImagePlugin.PainterPlugin {
+      @Composable
+      override fun compose(imageBitmap: ImageBitmap, painter: Painter): Painter = painter
+    }
+    val still = ancestorDraws(frames = 12, component = component(stillPlugin))
     val revealing = ancestorDraws(frames = 12, component = component(CircularRevealPlugin(200)))
 
     assertTrue(

@@ -23,14 +23,21 @@ import com.skydoves.landscapist.plugins.ImagePlugin
 @DslMarker
 internal annotation class LandscapistImagePluginComponentDSL
 
-/** A factory extension for creating a new instance of [ImagePluginComponent] and running
- * [ImagePluginComponent.compose] with the [block] receiver. */
+/**
+ * A factory extension for creating a new instance of [ImagePluginComponent] and running [block] on
+ * it.
+ *
+ * The block is run on the component this builds rather than through [ImagePluginComponent.compose],
+ * which copied an empty plugin list into a second component and threw the first away. Every image
+ * that takes the default component builds one of these on every composition, so that was two
+ * components and two lists per image per frame to end up with the same thing.
+ */
 @Stable
 @Composable
 @LandscapistImagePluginComponentDSL
 public inline fun imageComponent(
   block: @Composable ImagePluginComponent.() -> Unit,
-): ImagePluginComponent = ImagePluginComponent(mutableListOf()).compose { block() }
+): ImagePluginComponent = ImagePluginComponent(mutableListOf()).apply { block() }
 
 /**
  * A pluggable image component that extends [ImageComponent] and includes a collection of [ImagePlugin].

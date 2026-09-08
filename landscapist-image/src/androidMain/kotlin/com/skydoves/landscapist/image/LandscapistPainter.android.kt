@@ -38,3 +38,15 @@ public actual fun rememberLandscapistPainter(data: Any?): Painter {
     else -> EmptyPainter
   }
 }
+
+/**
+ * A [Drawable] is left to [rememberDrawablePainter]: an animated one draws by reading state that
+ * only a composed painter can hold, and it has start and stop to dispatch.
+ */
+internal actual fun landscapistPainterOrNull(data: Any?): Painter? = when (data) {
+  is Bitmap -> BitmapPainter(data.asImageBitmap())
+  is ImageBitmap -> BitmapPainter(data)
+  else -> null
+}
+
+internal actual val ComposedPainterEverNeeded: Boolean = true
