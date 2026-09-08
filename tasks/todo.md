@@ -93,17 +93,15 @@ platform decoder.
       images failed with CalledFromWrongThreadException on Android. Snapshot state now.
       Costs 660 bytes an image on the first frame, which is Compose observing the reads.
 - [x] FIXED: `rememberImageComponent` froze its plugin set at the first composition
-- [ ] The Android decoder halves only while both axes still cover the target, so a landscape
-      image in a square slot is not downsampled at all: 1200x801 decoded for a 550px box, seen
-      in the playground. Correct for a content scale that crops, 2.2x of the pixels needed for
-      one that fits. The decoder is never told which. Pre-existing, and the claim that an image
-      is decoded at the size it is drawn at needs that caveat.
-- [ ] Hardware bitmaps and pixel reading plugins. The Android decoder picks Bitmap.Config.HARDWARE
-      on API 26+ for any mime type without alpha, which is every JPEG, and a hardware bitmap has no
-      CPU readable pixels. Hardware is turned off for requests with transformations but not for a
-      plugin that reads pixels, such as the palette. The demo's palette does work over JPEG on this
-      emulator, so either the palette port copies first or something else intervenes. Worth pinning
-      with a test either way, and worth turning hardware off for a palette plugin if it does not.
+- [x] NOT A BUG: hardware bitmaps and pixel reading plugins. A JPEG does decode to
+      Bitmap.Config.HARDWARE here, confirmed by probe, and both plugins that read pixels cope:
+      the blur copies to ARGB_8888 itself, and kmpalette handles it. Pinned by a palette test
+      and a blur test that both go through a JPEG.
+- [ ] The decoder halves only while both axes still cover the target, which is right for a content
+      scale that crops and decodes up to twice the pixels needed for one that fits. Fixing it means
+      telling the decoder which, and `ImageRequest` is a public data class, so a field for it
+      changes the constructor and `copy` signatures. That is a binary break, so it needs a release
+      that takes one. Measured: 1200x801 decoded for a 550px box.
 - [ ] `GlobalBitmapPool` is dead. Both call sites, `ImageDecoder.android.kt:194` and
       `RegionDecoder.android.kt:104`, only ask for a reusable bitmap; nothing anywhere calls
       `put`, so the pool is always empty and `inBitmap` reuse never happens. Either wire it up

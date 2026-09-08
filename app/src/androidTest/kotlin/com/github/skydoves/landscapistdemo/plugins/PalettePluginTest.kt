@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.github.skydoves.landscapistdemo.harness.ImageFixtures
 import com.github.skydoves.landscapistdemo.harness.LocalImageServer
 import com.kmpalette.palette.graphics.Palette
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -49,6 +50,7 @@ class PalettePluginTest {
     server = LocalImageServer()
     server.serve("/blue.png", solidPng(BlueFixture), PngContentType)
     server.serve("/red.png", solidPng(RedFixture), PngContentType)
+    server.serve("/blue.jpg", ImageFixtures.solid(PluginRequestPx, PluginRequestPx, BLUE_ARGB))
     composeTestRule.mainClock.autoAdvance = false
   }
 
@@ -65,6 +67,29 @@ class PalettePluginTest {
       OnBackdrop {
         LandscapistImage(
           imageModel = { server.url("/blue.png") },
+          landscapist = loader,
+          component = rememberImageComponent {
+            +PalettePlugin { generated -> palette.set(generated) }
+          },
+          modifier = visualImageModifier(),
+          requestBuilder = PluginRequestBuilder,
+        )
+      }
+    }
+
+    assertTheDominantColourIs(BlueFixture)
+  }
+
+  @Test
+  fun theDominantColourIsFoundInAJpegToo() {
+    // A JPEG has no alpha, which is what the decoder keys the hardware bitmap decision off, and a
+    // hardware bitmap has no pixels the palette could read.
+    val loader = visualPluginLoader()
+
+    composeTestRule.setContent {
+      OnBackdrop {
+        LandscapistImage(
+          imageModel = { server.url("/blue.jpg") },
           landscapist = loader,
           component = rememberImageComponent {
             +PalettePlugin { generated -> palette.set(generated) }
@@ -126,5 +151,10 @@ class PalettePluginTest {
         "${pixels.samples().size} pixels were not the image, the first was ${wrong.firstOrNull()}",
       wrong.isEmpty(),
     )
+  }
+
+  private companion object {
+    /** The same blue as [BlueFixture], as the ARGB int the fixtures take. */
+    const val BLUE_ARGB: Int = 0xFF0000FF.toInt()
   }
 }
