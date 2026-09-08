@@ -386,11 +386,6 @@ private fun LandscapistImageInternal(
     mutableStateOf(cached?.toImageLoadState() ?: ImageLoadState.None)
   }
 
-  // Whether this composable appeared with an image already in memory. Held for its whole life, not
-  // per request: the first image it shows is the one that was already on screen, and every image
-  // after that replaces something the viewer can see and so is faded in.
-  val enteredWithImage = remember { state is ImageLoadState.Success }
-
   // The parent constraints the image is decoded against, packed into one state because the two axes
   // are written together, exactly once, and two states would be two objects and two snapshot
   // records per image for a value that never changes again. Once measured the value is locked, so a
@@ -478,15 +473,19 @@ private fun LandscapistImageInternal(
   }
   // When nothing needs to be composed inside, the image is drawn by this node instead of a child.
   // That is one layout node per image rather than two, and it is the shape Image itself uses.
-  val painter = if (paintOnContainer && landscapistState is LandscapistImageState.Success) {
+  val loaded = if (paintOnContainer && landscapistState is LandscapistImageState.Success) {
     rememberSuccessPainter(
       landscapistState,
       component,
       pluginImageBitmap(landscapistState, needsImageBitmap),
-    ).rememberCrossfadePainter(containerFadeMs, skipFirst = enteredWithImage)
+    )
   } else {
     null
   }
+  // Called whether there is a painter or not, so what it remembers survives the image leaving its
+  // success state: it is what knows which painter this composable first showed, and which one each
+  // new image is replacing.
+  val painter = rememberCrossfadePainter(loaded, containerFadeMs)
   // Rebuilding the chain every composition allocates two modifier elements per image.
   val paintModifier = remember(painter, imageOptions) {
     if (painter != null) imageOptions.paintModifier(painter) else Modifier

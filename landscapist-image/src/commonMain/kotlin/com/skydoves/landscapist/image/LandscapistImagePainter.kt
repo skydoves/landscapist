@@ -32,6 +32,7 @@ import com.skydoves.landscapist.core.model.ImageResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
@@ -149,8 +150,23 @@ private class LandscapistImagePainter(
     } else {
       // A painter has no constraints to read, so the first draw is what tells it how big the image
       // has to be. Held from then on, so bounds that animate do not decode again every frame.
-      val size = drawSize.first { it.width > 0 && it.height > 0 }
-      request.copy(targetWidth = size.width, targetHeight = size.height)
+      //
+      // Only for as long as a draw could still arrive, though. A painter with no image yet has no
+      // intrinsic size, so a caller who bounds neither axis measures it to nothing, it is never
+      // drawn at a size, and waiting here forever would leave it permanently blank with no error
+      // and no state. Past the wait it loads at the image's own size, which is what Coil falls
+      // back to for the same reason.
+      val size = withTimeoutOrNull(SIZE_WAIT_MS) {
+        drawSize.first { it.width > 0 && it.height > 0 }
+      }
+      if (size == null) {
+        request
+      } else {
+        request.copy(
+          targetWidth = size.width,
+          targetHeight = size.height,
+        )
+      }
     }
     landscapist.load(sized)
       .catch { onImageStateChanged?.invoke(LandscapistImageState.Failure(reason = it)) }
@@ -162,3 +178,11 @@ private class LandscapistImagePainter(
       }
   }
 }
+
+/**
+ * How long the painter waits for a draw to tell it what size to decode at.
+ *
+ * Long enough that any painter which is going to be drawn has been, short enough that one which
+ * never will be does not stay blank. A few frames.
+ */
+private const val SIZE_WAIT_MS = 200L

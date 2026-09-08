@@ -43,12 +43,14 @@ import kotlinx.coroutines.launch
  * what lets an image with a crossfade keep the cheap path, where the container draws the image
  * itself and nothing is composed inside it.
  *
- * There is nothing to fade out from: this is used only when what came before drew nothing, which is
- * an image with no loading content of its own. Anything that does have something on screen to leave
- * still goes through [CrossfadeWithEffect], which can stack the two.
+ * An image that replaces one already on screen dissolves over it: the outgoing painter is drawn at
+ * full strength underneath, so the composite never dips through transparent. Loading and failure
+ * content is not a painter and cannot be drawn this way, so an image that has any still goes
+ * through [CrossfadeWithEffect], which can stack two composables instead.
  */
 internal class CrossfadePainter(
   private val painter: Painter,
+  private val outgoing: Painter?,
 ) : Painter() {
 
   var alpha: Float by mutableFloatStateOf(0f)
@@ -67,6 +69,11 @@ internal class CrossfadePainter(
       with(painter) { draw(size) }
       return
     }
+    // What is being replaced, at full strength underneath. Fading the arriving image in over
+    // nothing makes the image dip through transparent on its way in, which is what stacking two
+    // composables in CrossfadeWithEffect avoided. There is nothing to draw here on a first load,
+    // where nothing was on screen to begin with.
+    outgoing?.let { with(it) { draw(size) } }
     colorMatrix.apply {
       updateBrightness(brightnessValue)
       updateSaturation(saturationValue)
@@ -99,11 +106,22 @@ internal class CrossfadePainter(
  */
 @Composable
 @InternalLandscapistApi
-public fun Painter.rememberCrossfadePainter(durationMs: Int, skipFirst: Boolean = false): Painter {
-  if (durationMs <= 0) return this
-  val first = remember { this }
-  if (skipFirst && first === this) return this
-  val fading = remember(this) { CrossfadePainter(this) }
+public fun rememberCrossfadePainter(painter: Painter?, durationMs: Int): Painter? {
+  if (durationMs <= 0) return painter
+  // Remembered whether there is a painter yet or not, so these survive the image leaving its
+  // success state and coming back. Held in a holder rather than as state: they are read and written
+  // only inside remember, which runs once per painter.
+  val seen = remember { PainterHistory() }
+  val first = remember { painter }
+  if (painter == null || painter === first) {
+    // The painter this composable first had is what the viewer is already looking at, and fading it
+    // in from nothing is the blink a crossfade exists to prevent.
+    if (painter != null) seen.previous = painter
+    return painter
+  }
+  val fading = remember(painter) {
+    CrossfadePainter(painter, seen.previous).also { seen.previous = painter }
+  }
   LaunchedEffect(fading) {
     val alpha = Animatable(0f)
     val brightness = Animatable(0.8f)
@@ -121,4 +139,9 @@ public fun Painter.rememberCrossfadePainter(durationMs: Int, skipFirst: Boolean 
     }
   }
   return fading
+}
+
+/** The painter this image showed last, so the next one has something to dissolve over. */
+private class PainterHistory {
+  var previous: Painter? = null
 }

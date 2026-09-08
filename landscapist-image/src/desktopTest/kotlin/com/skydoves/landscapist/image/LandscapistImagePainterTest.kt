@@ -16,7 +16,11 @@
 package com.skydoves.landscapist.image
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
@@ -246,6 +250,53 @@ class LandscapistImagePainterTest {
     assertTrue(
       states.any { it is LandscapistImageState.Success },
       "the state callback never reported a success",
+    )
+  }
+
+  @Test
+  fun `a painter the caller never bounds still loads`() {
+    // A painter with no image yet has no intrinsic size, so a caller who bounds neither axis
+    // measures it to nothing and it is never drawn at a size. Waiting for that draw forever left
+    // it permanently blank, with no error and no state to explain it.
+    // Cold: a warm cache is answered by the synchronous peek, which needs no size and would hide
+    // this entirely.
+    val loader = Landscapist.builder().noDiskCache().fetcher(StubFetcher()).decoder(StubDecoder())
+      .build()
+    val states = mutableListOf<LandscapistImageState>()
+    val scene = ImageComposeScene(
+      width = 40,
+      height = 40,
+      density = Density(1f),
+      coroutineContext = Dispatchers.Unconfined,
+      content = {
+        // Width from the parent, height from the image. With no image there is no intrinsic
+        // height, so this measures to zero high and is never drawn at a size.
+        Column(Modifier.verticalScroll(rememberScrollState())) {
+          Image(
+            painter = rememberLandscapistImagePainter(
+              model = url,
+              landscapist = loader,
+              onImageStateChanged = { states += it },
+            ),
+            contentDescription = null,
+            modifier = Modifier.fillMaxWidth(),
+          )
+        }
+      },
+    )
+    try {
+      val deadline = System.nanoTime() + 5_000_000_000L
+      while (System.nanoTime() < deadline && states.none { it is LandscapistImageState.Success }) {
+        scene.render(0L).close()
+        Thread.sleep(25)
+      }
+    } finally {
+      scene.close()
+    }
+
+    assertTrue(
+      states.any { it is LandscapistImageState.Success },
+      "the painter never loaded, it saw $states",
     )
   }
 }

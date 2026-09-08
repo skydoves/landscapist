@@ -517,13 +517,13 @@ class LandscapistImagePluginTest {
     }
 
     assertEquals(0xFF, before ushr 24, "the image already on screen was not opaque")
-    // Somewhere in the middle it is part drawn, which is the fade. Only asserting "not full" would
-    // pass just as happily on a frame that drew nothing at all.
+    // Opaque throughout. The arriving image dissolves over the one it replaces, which is drawn
+    // underneath: fading it in over nothing instead makes the image dip through transparent on its
+    // way in, which is the one thing the composable crossfade never did.
     assertTrue(
-      alphas.any { it in 1..0xFE },
-      "no frame was part way through the fade, the alphas were $alphas",
+      alphas.all { it == 0xFF },
+      "the image went transparent while the new one faded in, the alphas were $alphas",
     )
-    assertEquals(0xFF, alphas.last(), "the fade never finished, the alphas were $alphas")
   }
 
   /** The centre pixel of [image] as ARGB, closing it on the way out. */

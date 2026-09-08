@@ -195,7 +195,7 @@ public final class com/skydoves/landscapist/constraints/ConstraintsExtensionsKt 
 }
 
 public final class com/skydoves/landscapist/crossfade/CrossfadePainterKt {
-	public static final fun rememberCrossfadePainter (Landroidx/compose/ui/graphics/painter/Painter;IZLandroidx/compose/runtime/Composer;II)Landroidx/compose/ui/graphics/painter/Painter;
+	public static final fun rememberCrossfadePainter (Landroidx/compose/ui/graphics/painter/Painter;ILandroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
 }
 
 public final class com/skydoves/landscapist/crossfade/CrossfadePlugin : com/skydoves/landscapist/plugins/ImagePlugin$PainterPlugin {
