@@ -22,6 +22,10 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -51,6 +55,7 @@ import com.skydoves.landscapist.core.model.CachePolicy
 import com.skydoves.landscapist.core.model.ImageResult
 import com.skydoves.landscapist.core.network.FetchResult
 import com.skydoves.landscapist.core.network.ImageFetcher
+import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.zoomable.ZoomablePlugin
@@ -433,5 +438,82 @@ class LandscapistImagePluginTest {
       revealing <= still,
       "the reveal cost $revealing ancestor redraws where a still image cost $still",
     )
+  }
+
+  /** Warms [urls] into one loader, so each is drawable in the frame it first appears in. */
+  private fun warmLoader(urls: List<String>): Landscapist {
+    val loader = Landscapist.builder().fetcher(StubFetcher()).decoder(StubDecoder()).build()
+    runBlocking {
+      for (url in urls) {
+        loader.load(
+          ImageRequest.builder().model(url).diskCachePolicy(CachePolicy.DISABLED).build(),
+        ).first { it is ImageResult.Success }
+      }
+    }
+    return loader
+  }
+
+  @Test
+  fun `a crossfade does not fade in an image that was already in memory`() {
+    // The container draws the crossfade itself now, which is what makes an image with one cost
+    // about what an image without one costs. It must not cost the blink back: an image read from
+    // the memory cache is already what the viewer is looking at.
+    val loader = warmLoader()
+
+    val pixels = render(content = image(loader, component(CrossfadePlugin(duration = 300))))
+
+    assertEquals(1.0, pixels.coverage(), "the first frame faded in from nothing")
+  }
+
+  @Test
+  fun `a crossfade fades in an image that replaces one already on screen`() {
+    val second = "https://example.com/second.png"
+    val loader = warmLoader(listOf(url, second))
+    var model by mutableStateOf(url)
+    val scene = ImageComposeScene(
+      width = sceneSize,
+      height = sceneSize,
+      density = Density(1f),
+      coroutineContext = Dispatchers.Unconfined,
+      content = {
+        LandscapistImage(
+          imageModel = { model },
+          landscapist = loader,
+          component = component(CrossfadePlugin(duration = 300)),
+          modifier = Modifier.size(sceneSize.dp),
+          requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+        )
+      },
+    )
+    val (before, during) = try {
+      scene.render(0L).close()
+      val first = readCentre(scene.render(1L))
+      model = second
+      Snapshot.sendApplyNotifications()
+      first to readCentre(scene.render(2L))
+    } finally {
+      scene.close()
+    }
+
+    assertEquals(0xFF, before ushr 24, "the image already on screen was not opaque")
+    assertTrue(
+      during ushr 24 < 0xFF,
+      "the replacing image appeared at full strength instead of fading in",
+    )
+  }
+
+  /** The centre pixel of [image] as ARGB, closing it on the way out. */
+  private fun readCentre(image: org.jetbrains.skia.Image): Int = try {
+    val bitmap = org.jetbrains.skia.Bitmap()
+    bitmap.allocN32Pixels(image.width, image.height)
+    check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
+    val bytes = bitmap.readPixels() ?: error("no pixels")
+    val offset = ((sceneSize / 2) * sceneSize + sceneSize / 2) * 4
+    (bytes[offset + 3].toInt() and 0xFF shl 24) or
+      (bytes[offset + 2].toInt() and 0xFF shl 16) or
+      (bytes[offset + 1].toInt() and 0xFF shl 8) or
+      (bytes[offset].toInt() and 0xFF)
+  } finally {
+    image.close()
   }
 }

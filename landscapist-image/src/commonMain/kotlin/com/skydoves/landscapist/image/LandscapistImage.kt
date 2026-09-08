@@ -55,6 +55,7 @@ import com.skydoves.landscapist.core.Landscapist
 import com.skydoves.landscapist.core.model.ImageResult
 import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.crossfade.CrossfadeWithEffect
+import com.skydoves.landscapist.crossfade.rememberCrossfadePainter
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.plugins.composePainterPlugins
 import kotlinx.coroutines.flow.catch
@@ -132,9 +133,18 @@ public fun LandscapistImage(
   // source itself, which an earlier attempt did, rebuilt that subtree the moment a disk path
   // appeared and reset whatever a plugin had remembered.
   val providesImageSource = success != null || plugins.anyIs<ImagePlugin.ComposablePlugin>()
+  // A crossfade can be drawn by the container too, as long as nothing was on screen for it to fade
+  // out from. That is an image with no loading or failure content of its own, which is what a list
+  // usually is. Anything that does have content to leave still stacks the two states in
+  // CrossfadeWithEffect, which is the only place two composables can be drawn at once.
+  val fadesWhilePainting = crossfadePlugin != null &&
+    loading == null &&
+    failure == null &&
+    !plugins.anyIs<ImagePlugin.LoadingStatePlugin>() &&
+    !plugins.anyIs<ImagePlugin.FailureStatePlugin>()
   // The container can draw the image itself only when nothing else claims the inside of it.
   val canPaintOnContainer = success == null &&
-    crossfadePlugin == null &&
+    (crossfadePlugin == null || fadesWhilePainting) &&
     !plugins.anyIs<ImagePlugin.ComposablePlugin>() &&
     !plugins.anyIs<ImagePlugin.SuccessStatePlugin>()
   val requestHolder = remember(request) { StableHolder(request) }
@@ -151,13 +161,15 @@ public fun LandscapistImage(
     // observes, and no crossfade to stack frames for. Anything else needs a real child.
     paintOnContainer = canPaintOnContainer,
     needsImageBitmap = needsImageBitmap,
+    containerFadeMs = if (fadesWhilePainting) crossfadePlugin?.duration ?: 0 else 0,
   ) { landscapistState ->
     // Wrap with CrossfadeWithEffect when CrossfadePlugin is present
     CrossfadeWithEffect(
       targetState = landscapistState,
       durationMs = crossfadePlugin?.duration ?: 0,
       contentKey = { it.crossfadeKey() },
-      enabled = crossfadePlugin != null,
+      // Off when the container is doing the fading, so an image is not faded in twice.
+      enabled = crossfadePlugin != null && !fadesWhilePainting,
     ) { state ->
       when (state) {
         is LandscapistImageState.None,
@@ -306,6 +318,7 @@ private fun LandscapistImageInternal(
   onState: (LandscapistImageState) -> Unit,
   paintOnContainer: Boolean,
   needsImageBitmap: Boolean,
+  containerFadeMs: Int,
   content: @Composable BoxScope.(state: LandscapistImageState) -> Unit,
 ) {
   val loadingKey = imageOptions.loadingOptionsKey
@@ -318,6 +331,11 @@ private fun LandscapistImageInternal(
     val cached = landscapist.value.peekMemoryCache(request.value)
     mutableStateOf(cached?.toImageLoadState() ?: ImageLoadState.None)
   }
+
+  // Whether this composable appeared with an image already in memory. Held for its whole life, not
+  // per request: the first image it shows is the one that was already on screen, and every image
+  // after that replaces something the viewer can see and so is faded in.
+  val enteredWithImage = remember { state is ImageLoadState.Success }
 
   // The parent constraints the image is decoded against, packed into one state because the two axes
   // are written together, exactly once, and two states would be two objects and two snapshot
@@ -397,7 +415,7 @@ private fun LandscapistImageInternal(
       landscapistState,
       component,
       pluginImageBitmap(landscapistState, needsImageBitmap),
-    )
+    ).rememberCrossfadePainter(containerFadeMs, skipFirst = enteredWithImage)
   } else {
     null
   }
@@ -779,6 +797,7 @@ private fun LandscapistThumbnail(
     onState = {},
     paintOnContainer = false,
     needsImageBitmap = false,
+    containerFadeMs = 0,
   ) { state ->
     if (state is LandscapistImageState.Success) {
       val data = state.data ?: return@LandscapistImageInternal
