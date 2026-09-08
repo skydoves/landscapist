@@ -206,15 +206,21 @@ public fun LandscapistImage(
     // observes, and no crossfade to stack frames for. Anything else needs a real child.
     paintOnContainer = canPaintOnContainer,
     needsImageBitmap = needsImageBitmap,
-    containerFadeMs = if (fadesWhilePainting) crossfadePlugin?.duration ?: 0 else 0,
+    containerFadeMs = if (fadesWhilePainting && canPaintOnContainer) {
+      crossfadePlugin?.duration ?: 0
+    } else {
+      0
+    },
   ) { landscapistState ->
     // Wrap with CrossfadeWithEffect when CrossfadePlugin is present
     CrossfadeWithEffect(
       targetState = landscapistState,
       durationMs = crossfadePlugin?.duration ?: 0,
       contentKey = { it.crossfadeKey() },
-      // Off when the container is doing the fading, so an image is not faded in twice.
-      enabled = crossfadePlugin != null && !fadesWhilePainting,
+      // Off only when the container is actually doing the fading. Turning it off for every image
+      // that could fade in a painter dropped the crossfade entirely for the ones that then could
+      // not paint on the container: a caller success slot, a zoomable plugin, a palette plugin.
+      enabled = crossfadePlugin != null && !(fadesWhilePainting && canPaintOnContainer),
     ) { state ->
       when (state) {
         is LandscapistImageState.None,
@@ -731,28 +737,6 @@ private fun ImageResult.toImageLoadState(): ImageLoadState = when (this) {
   is ImageResult.Failure -> ImageLoadState.Failure(
     data = null,
     reason = throwable,
-  )
-}
-
-/**
- * Converts [ImageLoadState] back to [ImageResult].
- */
-private fun ImageLoadState.toImageResult(): ImageResult = when (this) {
-  is ImageLoadState.None -> ImageResult.Loading
-  is ImageLoadState.Loading -> ImageResult.Loading
-  is ImageLoadState.Success -> {
-    val successData = data as? LandscapistSuccessData
-    ImageResult.Success(
-      data = successData?.bitmap ?: data ?: Unit,
-      dataSource = dataSource.toCoreDataSource(),
-      originalWidth = successData?.originalWidth ?: 0,
-      originalHeight = successData?.originalHeight ?: 0,
-      rawData = successData?.rawData,
-      diskCachePath = successData?.diskCachePath,
-    )
-  }
-  is ImageLoadState.Failure -> ImageResult.Failure(
-    throwable = reason,
   )
 }
 

@@ -454,11 +454,41 @@ class LandscapistImagePluginTest {
     )
   }
 
-  /** Warms [urls] into one loader, so each is drawable in the frame it first appears in. */
+  /**
+   * Warms [urls] into one loader, so each is drawable in the frame it first appears in.
+   *
+   * Each url decodes to its own colour, in the order given. A crossfade between two images of the
+   * same colour is indistinguishable from no crossfade at all, so the colour is what says the fade
+   * ran rather than the new image simply appearing.
+   */
   private fun warmLoader(urls: List<String>): Landscapist {
+    val colours = urls.withIndex().associate { (index, url) -> url to distinctColours[index] }
     val loader = Landscapist.builder().noDiskCache().fetcher(
-      StubFetcher(),
-    ).decoder(StubDecoder()).build()
+      object : ImageFetcher {
+        override fun canHandle(model: Any?): Boolean = true
+        override suspend fun fetch(request: ImageRequest): FetchResult = FetchResult.Success(
+          data = byteArrayOf(urls.indexOf(request.model as String).toByte()),
+          mimeType = "image/png",
+        )
+      },
+    ).decoder(
+      object : ImageDecoder {
+        override suspend fun decode(
+          data: ByteArray,
+          mimeType: String?,
+          targetWidth: Int?,
+          targetHeight: Int?,
+          config: LandscapistConfig,
+        ): DecodeResult {
+          val colour = distinctColours[data[0].toInt()]
+          val bitmap = ImageBitmap(imageSize, imageSize)
+          val bounds = Rect(Offset.Zero, Size(imageSize.toFloat(), imageSize.toFloat()))
+          Canvas(bitmap).drawRect(bounds, Paint().apply { color = colour })
+          return DecodeResult.Success(bitmap, imageSize, imageSize)
+        }
+      },
+    ).build()
+    check(colours.size == urls.size)
     runBlocking {
       for (url in urls) {
         loader.load(
@@ -484,6 +514,9 @@ class LandscapistImagePluginTest {
     assertEquals(0xFF, faintest, "the first frame was faded rather than drawn")
   }
 
+  /** Colours handed out to the models of a multi image test, in order. */
+  private val distinctColours = listOf(Color.Red, Color.Blue, Color.Green)
+
   @Test
   fun `a crossfade fades in an image that replaces one already on screen`() {
     val second = "https://example.com/second.png"
@@ -504,17 +537,20 @@ class LandscapistImagePluginTest {
         )
       },
     )
-    val (before, alphas) = try {
+    val (before, colours) = try {
       scene.render(0L).close()
       val first = readCentre(scene.render(1L))
       model = second
       Snapshot.sendApplyNotifications()
       // Frames across the fade. The animation runs on the scene's clock, so it only advances when
       // a frame is drawn, and the first frame after the switch is the one that starts it at zero.
-      first to (1..12).map { frame -> readCentre(scene.render(frame * 25L * 1_000_000)) ushr 24 }
+      // Past the 300ms duration, so the last frame is the settled one rather than the last frame
+      // of the animation, which is a shade short of it.
+      first to (1..16).map { frame -> readCentre(scene.render(frame * 40L * 1_000_000)) }
     } finally {
       scene.close()
     }
+    val alphas = colours.map { it ushr 24 }
 
     assertEquals(0xFF, before ushr 24, "the image already on screen was not opaque")
     // Opaque throughout. The arriving image dissolves over the one it replaces, which is drawn
@@ -524,7 +560,64 @@ class LandscapistImagePluginTest {
       alphas.all { it == 0xFF },
       "the image went transparent while the new one faded in, the alphas were $alphas",
     )
+    // Opacity alone cannot tell a dissolve from no crossfade at all, since an image that simply
+    // appears is opaque on every frame too. A frame that is neither of the two colours is what only
+    // a dissolve produces.
+    assertTrue(
+      colours.any { it != pureRed && it != pureBlue },
+      "no frame was part way between the two images, the colours were " +
+        colours.joinToString { it.toUInt().toString(16) },
+    )
+    assertEquals(pureBlue, colours.last(), "the replacing image never arrived")
   }
+
+  @Test
+  fun `a crossfade still fades when the caller takes the painter with a success slot`() {
+    // A success slot means the container cannot draw the image itself, so the painter cannot be the
+    // thing that fades and the composable crossfade has to run instead. Deciding that from "could
+    // this image have faded a painter" rather than "is it going to" turned both off and left this
+    // combination with no crossfade at all.
+    val second = "https://example.com/second.png"
+    val loader = warmLoader(listOf(url, second))
+    var model by mutableStateOf(url)
+    val scene = ImageComposeScene(
+      width = sceneSize,
+      height = sceneSize,
+      density = Density(1f),
+      coroutineContext = Dispatchers.Unconfined,
+      content = {
+        LandscapistImage(
+          imageModel = { model },
+          landscapist = loader,
+          component = component(CrossfadePlugin(duration = 300)),
+          modifier = Modifier.size(sceneSize.dp),
+          requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+          success = { _, painter ->
+            Image(painter = painter, contentDescription = null, modifier = Modifier.fillMaxSize())
+          },
+        )
+      },
+    )
+    val colours = try {
+      scene.render(0L).close()
+      scene.render(1L).close()
+      model = second
+      Snapshot.sendApplyNotifications()
+      (1..16).map { frame -> readCentre(scene.render(frame * 40L * 1_000_000)) }
+    } finally {
+      scene.close()
+    }
+
+    assertTrue(
+      colours.any { it != pureRed && it != pureBlue },
+      "the image with a success slot did not fade, the colours were " +
+        colours.joinToString { it.toUInt().toString(16) },
+    )
+    assertEquals(pureBlue, colours.last(), "the replacing image never arrived")
+  }
+
+  private val pureRed = 0xFFFF0000.toInt()
+  private val pureBlue = 0xFF0000FF.toInt()
 
   /** The centre pixel of [image] as ARGB, closing it on the way out. */
   private fun readCentre(image: org.jetbrains.skia.Image): Int = try {

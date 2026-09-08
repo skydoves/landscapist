@@ -91,7 +91,6 @@ kotlin {
         implementation(project(":landscapist-animation"))
         implementation(project(":landscapist-placeholder"))
         implementation(project(":landscapist-zoomable"))
-        implementation(project(":landscapist-palette"))
         // Skiko native runtime for the host OS, required to render off-screen during the
         // desktop runComposeUiTest runs. The classifier is resolved from the running host so the
         // tests also run on CI (e.g. linux-x64).

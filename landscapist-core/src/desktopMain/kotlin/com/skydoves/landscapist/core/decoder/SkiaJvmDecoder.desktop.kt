@@ -215,8 +215,12 @@ internal object SkiaJvmDecoder {
    * every dimension that is not a multiple of eight, which is most photographs, and the decode then
    * falls back to a full size read: slower than the subsampling this replaced, and holding the
    * whole raster that subsampling never materialised.
+   *
+   * Internal rather than private so the test that proves Skia accepts these sizes asks for them the
+   * way the decoder does, instead of carrying its own copy of the rounding that would go on passing
+   * after the rounding here was changed.
    */
-  private fun scaledUp(dimension: Int, eighths: Int): Int = (dimension * eighths + 7) / 8
+  internal fun scaledUp(dimension: Int, eighths: Int): Int = (dimension * eighths + 7) / 8
 
   private fun allocate(width: Int, height: Int): Bitmap = Bitmap().apply {
     // Premultiplied, because a Skia canvas will only draw into premultiplied pixels. The readback

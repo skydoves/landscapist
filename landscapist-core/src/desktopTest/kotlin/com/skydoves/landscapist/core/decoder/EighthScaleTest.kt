@@ -60,8 +60,10 @@ class EighthScaleTest {
     try {
       val codec = Codec.makeFromData(data)
       try {
-        val width = (codec.width * eighths + 7) / 8
-        val height = (codec.height * eighths + 7) / 8
+        // The decoder's own rounding, not a second copy of it here. A copy would keep agreeing
+        // with Skia after the decoder stopped, which is the failure this test exists to catch.
+        val width = SkiaJvmDecoder.scaledUp(codec.width, eighths)
+        val height = SkiaJvmDecoder.scaledUp(codec.height, eighths)
         val bitmap = Bitmap()
         try {
           bitmap.allocPixels(

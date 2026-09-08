@@ -299,4 +299,54 @@ class LandscapistImagePainterTest {
       "the painter never loaded, it saw $states",
     )
   }
+
+  @Test
+  fun `the wait for a size is counted in frames, not on a clock`() {
+    // The fallback for a painter that is never drawn is the image's own size, which for a photo is
+    // millions of pixels nobody asked for. A wall clock reaches that fallback for a first frame
+    // that is merely slow, which is exactly when a screen full of images can least afford it.
+    // Frames tell the two apart: no frames means nothing has been drawn yet, not that nothing will.
+    val loader = newLoader()
+    requested.clear()
+    val scene = ImageComposeScene(
+      width = sceneSize,
+      height = sceneSize,
+      density = Density(1f),
+      coroutineContext = Dispatchers.Unconfined,
+      content = {
+        Column(Modifier.verticalScroll(rememberScrollState())) {
+          Image(
+            painter = rememberLandscapistImagePainter(
+              model = url,
+              landscapist = loader,
+              requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+            ),
+            contentDescription = null,
+            modifier = Modifier.fillMaxWidth(),
+          )
+        }
+      },
+    )
+    val duringTheStall = try {
+      scene.render(0L).close()
+      // Far longer than any timeout would have been, with no frame in it.
+      Thread.sleep(500)
+      val stalled = requested.toList()
+      val deadline = System.nanoTime() + 5_000_000_000L
+      var frame = 1
+      while (System.nanoTime() < deadline && requested.isEmpty()) {
+        scene.render(frame++ * 16_000_000L)
+        Thread.sleep(4)
+      }
+      stalled
+    } finally {
+      scene.close()
+    }
+
+    assertTrue(
+      duringTheStall.isEmpty(),
+      "the image was fetched while no frames were being drawn, it asked for $duringTheStall",
+    )
+    assertTrue(requested.isNotEmpty(), "the image was never fetched once frames resumed")
+  }
 }

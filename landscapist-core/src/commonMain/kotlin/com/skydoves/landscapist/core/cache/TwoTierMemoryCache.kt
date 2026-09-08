@@ -208,6 +208,10 @@ public class TwoTierMemoryCache(
     weakCache.clear()
     variantIndex.clear()
     currentSize.value = 0
+    // The threshold is only ever raised as the tier grows, so a cache that filled once and was then
+    // cleared would keep sweeping at the size it used to be and hold thousands of cleared
+    // references before it looked at them again.
+    weakSweepThreshold = MIN_WEAK_SWEEP
   }
 
   override fun trimToSize(size: Long): Unit = synchronized(lock) {

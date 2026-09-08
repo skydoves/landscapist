@@ -147,6 +147,18 @@ class SizeToleranceTest {
   }
 
   @Test
+  fun `an entry oversized on one axis alone is decoded again`() {
+    // A panorama: 4000x500 in a 1080 wide slot is 1080x135. Asked for in a 360 wide slot it is
+    // eight times the pixels needed across and exactly the height needed down, so a rule that
+    // wants both axes oversized keeps it, and the slot draws a 583 KB bitmap where 65 KB would do.
+    val loader = Loader(sourceWidth = 4000, sourceHeight = 500)
+    assertEquals("decoded_1080x135", loader.load(1080, 1080))
+
+    assertEquals("decoded_360x45", loader.load(360, 360))
+    assertEquals(2, loader.decoder.decodes, "the oversized panorama was reused")
+  }
+
+  @Test
   fun `an entry decoded for a box that fills it is not reused for a taller box`() {
     // What an SVG renderer does: it fills the box rather than fitting inside it, so the pixels an
     // entry happens to have say nothing about what a taller box would render. Comparing the boxes

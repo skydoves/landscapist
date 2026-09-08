@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
@@ -31,8 +32,6 @@ import com.skydoves.landscapist.core.model.DataSource
 import com.skydoves.landscapist.core.model.ImageResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
@@ -151,15 +150,24 @@ private class LandscapistImagePainter(
       // A painter has no constraints to read, so the first draw is what tells it how big the image
       // has to be. Held from then on, so bounds that animate do not decode again every frame.
       //
-      // Only for as long as a draw could still arrive, though. A painter with no image yet has no
-      // intrinsic size, so a caller who bounds neither axis measures it to nothing, it is never
-      // drawn at a size, and waiting here forever would leave it permanently blank with no error
-      // and no state. Past the wait it loads at the image's own size, which is what Coil falls
-      // back to for the same reason.
-      val size = withTimeoutOrNull(SIZE_WAIT_MS) {
-        drawSize.first { it.width > 0 && it.height > 0 }
+      // A painter with no image yet has no intrinsic size, so a caller who bounds neither axis
+      // measures it to nothing, it is never drawn, and waiting here for a size would leave it
+      // permanently blank with no error and no state to explain it. Past the wait it loads at the
+      // image's own size, which is what Coil falls back to for the same reason.
+      //
+      // Counted in frames rather than milliseconds. A wall clock cannot tell that layout apart from
+      // a first frame that is simply slow to arrive, and a cold start slow enough to trip the clock
+      // would decode every image on the screen at its full size at the worst possible moment. A
+      // painter that is being drawn at all is drawn on the frame after the one that composed it, so
+      // a few frames with no draw means there is no draw coming.
+      var size = drawSize.value
+      var frames = 0
+      while (size == IntSize.Zero && frames < FRAMES_BEFORE_UNSIZED) {
+        withFrameNanos { }
+        size = drawSize.value
+        frames++
       }
-      if (size == null) {
+      if (size == IntSize.Zero) {
         request
       } else {
         request.copy(
@@ -180,9 +188,9 @@ private class LandscapistImagePainter(
 }
 
 /**
- * How long the painter waits for a draw to tell it what size to decode at.
+ * How many frames a painter waits for a draw before it gives up on being told a size.
  *
- * Long enough that any painter which is going to be drawn has been, short enough that one which
- * never will be does not stay blank. A few frames.
+ * Two would do for the drawing itself. Three leaves room for a frame lost to composition before the
+ * layout that would have drawn it.
  */
-private const val SIZE_WAIT_MS = 200L
+private const val FRAMES_BEFORE_UNSIZED = 3

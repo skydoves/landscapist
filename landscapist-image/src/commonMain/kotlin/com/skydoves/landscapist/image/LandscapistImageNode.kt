@@ -146,8 +146,18 @@ internal class LandscapistImageNode(
    */
   private var loadJob: Job? = null
 
+  /**
+   * Whether [request] still belongs to a previous binding.
+   *
+   * A lazy list reuses a node for the next row: it resets the node and attaches it again before the
+   * new composition hands it the new request. Reading the cache in that window looks up the
+   * previous row's URL and publishes the previous row's image, which the viewer sees for a frame in
+   * the wrong place and which callers see as a success for a model they no longer asked for.
+   */
+  private var awaitingRequest = false
+
   override fun onAttach() {
-    peek()
+    if (!awaitingRequest) peek()
   }
 
   override fun onDetach() {
@@ -156,10 +166,26 @@ internal class LandscapistImageNode(
 
   override fun onReset() {
     clear()
+    awaitingRequest = true
+  }
+
+  /**
+   * Stops the load in flight, if there is one still running.
+   *
+   * Only if it is still running: `cancel` builds a `CancellationException` before it looks at the
+   * job, so calling it on a load that already finished costs an exception per image for nothing.
+   * That is most of them, since every image on a warm cache has finished by the time its screen
+   * goes away, and it measured at 220 bytes an image on the first frame of a screenful.
+   */
+  private fun cancelLoad() {
+    val running = loadJob
+    loadJob = null
+    if (running != null && running.isActive) running.cancel()
   }
 
   /** Drops what was loaded, without asking a node that is on its way out to lay out again. */
   private fun clear() {
+    cancelLoad()
     started = false
     painter = null
     state = null
@@ -172,7 +198,12 @@ internal class LandscapistImageNode(
     onState: ((LandscapistImageState) -> Unit)?,
     unpaintable: MutableState<Boolean>?,
   ) {
-    val reload = this.landscapist != landscapist ||
+    // A node that was reset is holding nothing, so it reloads even when it is handed back the
+    // request it already had.
+    val rebound = awaitingRequest
+    awaitingRequest = false
+    val reload = rebound ||
+      this.landscapist != landscapist ||
       this.request != request ||
       this.imageOptions.loadingOptionsKey != imageOptions.loadingOptionsKey
     this.landscapist = landscapist
@@ -181,8 +212,7 @@ internal class LandscapistImageNode(
     this.onState = onState
     this.unpaintable = unpaintable
     if (reload) {
-      loadJob?.cancel()
-      loadJob = null
+      cancelLoad()
       started = false
       state = null
       // Through setPainter, so the image on screen is taken down in the same pass that puts the new
@@ -225,7 +255,7 @@ internal class LandscapistImageNode(
 
   private fun startLoad(constraints: Constraints) {
     val sized = buildSizedRequest(request, imageOptions, constraints)
-    loadJob?.cancel()
+    cancelLoad()
     loadJob = coroutineScope.launch {
       // Collected directly rather than through flow {}, catch {} and distinctUntilChanged(). Each
       // of those is another flow, another collector and another continuation per image, and none of

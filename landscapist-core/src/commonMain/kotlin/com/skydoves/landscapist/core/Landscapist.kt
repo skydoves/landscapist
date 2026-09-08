@@ -281,11 +281,18 @@ public class Landscapist private constructor(
     else -> requested <= decodedFor + 1
   }
 
-  /** Whether this entry holds more than twice the pixels per axis that the request can draw. */
+  /**
+   * Whether this entry holds more than twice what the request can draw, on either axis.
+   *
+   * Either, not both: an entry can be the right height and eight times the width, which is a wide
+   * image cached for a wide slot and now wanted in a narrow one. Asking for both to be oversized
+   * before re-decoding kept that entry, and the memory it costs, for a slot that draws a fraction
+   * of it.
+   */
   private fun CachedImage.isWastefullyLargerThan(targetWidth: Int?, targetHeight: Int?): Boolean {
     val widthLimit = targetWidth?.let { it.toLong() * 2 } ?: Long.MAX_VALUE
     val heightLimit = targetHeight?.let { it.toLong() * 2 } ?: Long.MAX_VALUE
-    return originalWidth > widthLimit && originalHeight > heightLimit
+    return originalWidth > widthLimit || originalHeight > heightLimit
   }
 
   /**
@@ -912,7 +919,6 @@ public class Landscapist private constructor(
       this.config = config
     }
 
-    /** Sets a custom memory cache. */
     /**
      * Sets the memory cache.
      *

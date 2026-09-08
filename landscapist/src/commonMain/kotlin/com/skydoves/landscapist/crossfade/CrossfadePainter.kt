@@ -24,12 +24,15 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.withSaveLayer
 import com.skydoves.landscapist.InternalLandscapistApi
@@ -50,8 +53,18 @@ import kotlinx.coroutines.launch
  */
 internal class CrossfadePainter(
   private val painter: Painter,
-  private val outgoing: Painter?,
+  outgoing: Painter?,
 ) : Painter() {
+
+  /**
+   * What is being replaced, dropped the moment the fade no longer needs it.
+   *
+   * Held as a var rather than taken in the constructor because this painter outlives the animation:
+   * it stays as the image's painter until the next one arrives, and a val would keep the previous
+   * bitmap reachable for that whole time. On a list that swaps a large image in place that is a
+   * second full size bitmap held for as long as the first one is shown.
+   */
+  private var outgoing: Painter? = outgoing
 
   var alpha: Float by mutableFloatStateOf(0f)
   var brightness: Float by mutableFloatStateOf(INITIAL_BRIGHTNESS)
@@ -66,6 +79,7 @@ internal class CrossfadePainter(
     val brightnessValue = brightness
     val saturationValue = saturation
     if (alphaValue >= 1f && brightnessValue >= 1f && saturationValue >= 1f) {
+      outgoing = null
       with(painter) { draw(size) }
       return
     }
@@ -73,7 +87,7 @@ internal class CrossfadePainter(
     // nothing makes the image dip through transparent on its way in, which is what stacking two
     // composables in CrossfadeWithEffect avoided. There is nothing to draw here on a first load,
     // where nothing was on screen to begin with.
-    outgoing?.let { with(it) { draw(size) } }
+    outgoing?.let { drawOutgoing(it) }
     colorMatrix.apply {
       updateBrightness(brightnessValue)
       updateSaturation(saturationValue)
@@ -83,6 +97,33 @@ internal class CrossfadePainter(
     drawIntoCanvas { canvas ->
       canvas.withSaveLayer(size.toRect(), paint) {
         with(painter) { draw(size) }
+      }
+    }
+  }
+
+  /**
+   * The outgoing painter, filling the box the incoming one is being drawn into.
+   *
+   * Its own size is not the size handed here: the layout was measured against the arriving image,
+   * so drawing the outgoing one straight into that box stretches it whenever the two images are
+   * shaped differently. Covering the box and clipping keeps it undistorted, which is what the
+   * composable it replaced did by drawing both through the same content scale.
+   */
+  private fun DrawScope.drawOutgoing(outgoing: Painter) {
+    val intrinsic = outgoing.intrinsicSize
+    if (intrinsic.isUnspecified || intrinsic.width <= 0f || intrinsic.height <= 0f) {
+      with(outgoing) { draw(size) }
+      return
+    }
+    val scale = maxOf(size.width / intrinsic.width, size.height / intrinsic.height)
+    val covered = Size(intrinsic.width * scale, intrinsic.height * scale)
+    if (covered == size) {
+      with(outgoing) { draw(size) }
+      return
+    }
+    clipRect {
+      translate((size.width - covered.width) / 2f, (size.height - covered.height) / 2f) {
+        with(outgoing) { draw(covered) }
       }
     }
   }
@@ -97,12 +138,12 @@ internal class CrossfadePainter(
 /**
  * Fades this painter in over [durationMs], restarting whenever the painter itself changes.
  *
+ * The first painter seen is not faded: it is what the composable was already showing, and an image
+ * read straight from the memory cache is on screen from the first frame. Every painter after it
+ * replaces something the viewer can see, so it dissolves over it.
+ *
  * @param durationMs How long the fade takes from start to finish. Zero returns this painter as it
  * is.
- * @param skipFirst Whether the first painter seen here is already on screen and must not be faded.
- * That is an image read straight from the memory cache: fading it in from nothing is the blink a
- * crossfade exists to prevent. Every painter after the first replaces something the viewer can see,
- * so it fades whatever this is set to.
  */
 @Composable
 @InternalLandscapistApi
@@ -113,10 +154,17 @@ public fun rememberCrossfadePainter(painter: Painter?, durationMs: Int): Painter
   // only inside remember, which runs once per painter.
   val seen = remember { PainterHistory() }
   val first = remember { painter }
-  if (painter == null || painter === first) {
+  if (painter == null) {
+    // The image left its success state, so whatever it was showing has already gone. Keeping it as
+    // the thing to dissolve over would bring it back underneath the next one, which reads as the
+    // replaced image flashing in again after the gap.
+    seen.previous = null
+    return null
+  }
+  if (painter === first) {
     // The painter this composable first had is what the viewer is already looking at, and fading it
     // in from nothing is the blink a crossfade exists to prevent.
-    if (painter != null) seen.previous = painter
+    seen.previous = painter
     return painter
   }
   val fading = remember(painter) {

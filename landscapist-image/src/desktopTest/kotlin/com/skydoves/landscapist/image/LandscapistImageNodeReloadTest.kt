@@ -16,6 +16,7 @@
 package com.skydoves.landscapist.image
 
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -29,19 +30,23 @@ import com.skydoves.landscapist.core.LandscapistConfig
 import com.skydoves.landscapist.core.decoder.DecodeResult
 import com.skydoves.landscapist.core.decoder.ImageDecoder
 import com.skydoves.landscapist.core.model.CachePolicy
+import com.skydoves.landscapist.core.model.ImageResult
 import com.skydoves.landscapist.core.network.FetchResult
 import com.skydoves.landscapist.core.network.ImageFetcher
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * A list item rebound to another image must not be overwritten by the load it left behind.
+ * What happens to the node when a list rebinds the row it is in.
  *
  * The node runs its own load and its scope only ends when the node detaches, which a rebind is not.
  * A first request left in flight comes back later, publishes, and puts the image the item used to
- * show over the one it shows now.
+ * show over the one it shows now. A lazy list goes further and reuses the node itself, which resets
+ * it and attaches it again before the new composition has handed it the new model.
  */
 @OptIn(ExperimentalTestApi::class)
 class LandscapistImageNodeReloadTest {
@@ -112,6 +117,60 @@ class LandscapistImageNodeReloadTest {
       "image-2",
       seen.last(),
       "the load left behind by the rebind published over the image that replaced it: $seen",
+    )
+  }
+
+  @Test
+  fun `a reused node does not publish the image of the row it used to be in`() {
+    // What a lazy list does when a row scrolls off and its node is given to the row scrolling on:
+    // the node is reset and attached again, and only then does the new composition reach it. A
+    // cache read in that window looks up the previous row's model, so the previous row's image is
+    // published into the new row and callers are told it succeeded for a model they never asked
+    // for.
+    val loader = Landscapist.builder()
+      .noDiskCache()
+      .fetcher(GatedFetcher(CompletableDeferred(Unit)))
+      .decoder(SizedDecoder)
+      .build()
+    // Both already in memory, so the reused node can read either of them synchronously.
+    runBlocking {
+      for (model in listOf(slow, quick)) {
+        loader.load(
+          ImageRequest.builder().model(model).diskCachePolicy(CachePolicy.DISABLED).build(),
+        ).first { it is ImageResult.Success }
+      }
+    }
+    val seen = mutableListOf<String>()
+
+    runComposeUiTest {
+      var model by mutableStateOf(slow)
+      setContent {
+        // The node is reused rather than disposed and rebuilt, which is what a lazy list does and
+        // what a plain state change does not.
+        ReusableContent(model) {
+          LandscapistImage(
+            imageModel = { model },
+            landscapist = loader,
+            modifier = Modifier.size(20.dp),
+            requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+            onImageStateChanged = { state ->
+              if (state is LandscapistImageState.Success) seen += state.data.toString()
+            },
+          )
+        }
+      }
+      waitForIdle()
+      seen.clear()
+      model = quick
+      waitForIdle()
+      waitUntil(timeoutMillis = 5_000) { seen.isNotEmpty() }
+    }
+
+    assertTrue(seen.isNotEmpty(), "the reused node never loaded anything")
+    assertEquals(
+      listOf("image-2"),
+      seen.distinct(),
+      "the reused node published the previous row's image: $seen",
     )
   }
 }

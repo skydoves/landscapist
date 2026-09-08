@@ -82,4 +82,39 @@ class WeakTierSweepTest {
     // Reads the list after the assertion, so the collector cannot make this pass by clearing early.
     assertEquals(200, held.size)
   }
+
+  @Test
+  fun `a cleared cache goes back to sweeping at its floor`() {
+    val cache = TwoTierMemoryCache(200, weakReferencesEnabled = true)
+    // Held on purpose, so no sweep can remove anything and the tier grows to its full size. The
+    // point at which it next sweeps is set from that size, which is what has to be undone by the
+    // clear below.
+    val held = (0 until 600).map { CachedImage(ByteArray(64), DataSource.MEMORY, 100, 8, 8) }
+    held.forEachIndexed { index, image -> cache[key(index)] = image }
+    assertTrue(cache.weakCacheCount > 400, "the tier never grew, it holds ${cache.weakCacheCount}")
+
+    cache.clear()
+    assertEquals(0, cache.weakCacheCount, "the clear left entries behind")
+
+    // Now entries nothing keeps. A tier that sweeps at its floor prunes them as it goes; one that
+    // kept the point it reached before the clear waits for hundreds of dead references first.
+    repeat(20) { batch ->
+      repeat(20) { index ->
+        cache[key(10_000 + batch * 20 + index)] =
+          CachedImage(ByteArray(64), DataSource.MEMORY, 100, 8, 8)
+      }
+      System.gc()
+      Thread.sleep(10)
+    }
+    // One more write, so the check that decides to sweep runs after the last collection.
+    cache[key(99_999)] = CachedImage(ByteArray(64), DataSource.MEMORY, 100, 8, 8)
+
+    assertTrue(
+      cache.weakCacheCount < 200,
+      "the tier held ${cache.weakCacheCount} dead references after the clear, so it was still " +
+        "waiting for the size it reached before it",
+    )
+    // Read after the assertion, so the collector cannot clear these early and make it pass.
+    assertEquals(600, held.size)
+  }
 }
