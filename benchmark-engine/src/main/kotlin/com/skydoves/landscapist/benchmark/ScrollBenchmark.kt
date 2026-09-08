@@ -156,6 +156,12 @@ internal fun scrollComparison() {
  * This is the only row where an eviction policy is visible. Both caches are sized to hold about a
  * tenth of the images, so the way back up finds most of what it needs already gone, and every miss
  * is a decode a user would have paid for.
+ *
+ * A collection is forced at the turn, and that is what makes the row mean anything. Both libraries
+ * keep evicted entries behind weak references, so without it the number says whether the collector
+ * happened to run during the fling rather than what either cache does. It moved between 240 and 440
+ * on the same code for that reason alone, and read as a policy difference that is not there: with
+ * the collection forced, both sides re-decode the same 456 images.
  */
 private fun thrashComparison() {
   val cacheBytes = LIST_ITEMS.toLong() * bytesPerItem() / 10
@@ -180,17 +186,26 @@ private fun thrashComparison() {
   ) { "$it" }
   val coilCache = coil.memoryCache!!
   landscapistCache.cleanupWeakReferences()
-  // Both libraries keep evicted entries alive behind weak references and neither counts them in
-  // `size`, so both are counted here the same way: keys held in either tier, and the bytes those
-  // keys represent. Coil's `keys` is already the union of its two tiers.
+  // Entries that still hold an image, not keys. Both libraries keep evicted entries behind weak
+  // references, and a key whose referent has been collected outlives the image on both sides:
+  // landscapist's until the tier is swept, Coil's for as long as the key is in `keys`. Counting
+  // keys therefore counted images that are gone, and did it for one side only, since the sweep
+  // above has already dropped landscapist's. Each key is asked for its image instead.
   val landscapistKeys = (landscapistCache.strongCacheCount + landscapistCache.weakCacheCount)
     .toLong()
-  val coilKeys = coilCache.keys.size.toLong()
+  val coilKeys = coilCache.keys.count { coilCache[it] != null }.toLong()
   compare("entries still held, both tiers", landscapistKeys, coilKeys) { "$it" }
   compare("bytes the cache admits to", landscapistCache.size, coilCache.size) { it.formatBytes() }
   compare("bytes still reachable", landscapistKeys * bytesPerItem(), coilKeys * bytesPerItem()) {
     it.formatBytes()
   }
+  println(
+    "    The decode counts are equal because the collection above is forced on both. The rows " +
+      "under it are not equal, and this harness does not establish why: Coil's evicted entries " +
+      "still hold their image after a collection and landscapist's do not, so Coil answers the " +
+      "next request for one without decoding and keeps ten times the bytes to do it. Which of " +
+      "those a user wants depends on whether their device is short of memory or of time.",
+  )
   println()
 }
 
@@ -201,6 +216,11 @@ private fun scrollThereAndBack(label: String, content: @Composable (LazyListStat
     scene.render(0L).close()
     val frames = (LIST_ITEMS * ITEM_HEIGHT - VIEWPORT_HEIGHT) / FLING_STEP.toInt() + 1
     repeat(frames) { advance(scene, state, FLING_STEP, it) }
+    // Before the way back, so both libraries face the same question: what does the cache still
+    // hold, rather than what has the collector not got round to yet.
+    System.gc()
+    Thread.sleep(GC_SETTLE_MS)
+    System.gc()
     val bottom = state.firstVisibleItemIndex
     repeat(frames) { advance(scene, state, -FLING_STEP, frames + it) }
     val top = state.firstVisibleItemIndex
@@ -224,6 +244,9 @@ private const val ITEM_HEIGHT = 180
 private const val SCROLL_STEP = 16f
 private const val FLING_STEP = 120f
 private const val SCROLL_FRAMES = 400
+
+/** Long enough for the reference processor to clear what the collection above made unreachable. */
+private const val GC_SETTLE_MS = 50L
 
 /** Scrolls one list without measuring, so the classes it needs are loaded and compiled. */
 private fun warmScroll(content: @Composable (LazyListState) -> Unit, frames: Int) {
