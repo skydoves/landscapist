@@ -22,15 +22,13 @@ This replaces that with verification that runs the real path on a real device.
 
 ## Phase 1: on device regression sweep
 
-- [~] Sizing and layout. Bounded, unbounded, fillMaxWidth, every ContentScale, and the decode
-      size. `Modifier.aspectRatio` is covered nowhere, on device or on desktop.
-- [~] Network. 404, 500, a body cut before its header, a redirect chain, a malformed cookie, and
-      a slow response passing through Loading. No timeout test.
+- [x] Sizing and layout, including `Modifier.aspectRatio` and the size the decode is made at
+- [x] Network: 404, 500, a cut body, a redirect chain, a malformed cookie, a slow response
+      passing through Loading, and a response that never arrives failing at the read timeout
 - [x] Caching: memory hit, disk hit, size variant reuse, an entry oversized on one axis, dedup
 - [x] Node path and composed path both draw
-- [~] Model change, LazyColumn reuse and the painter API are covered on desktop only. The
-      threading bug this branch shipped was invisible on desktop, so device coverage is what
-      counts here and these three do not have it.
+- [x] Model change, node reuse, an abandoned load, a recycled LazyColumn and the painter API,
+      all on the device now
 - [x] Crossfade on both paths
 
 ## Phase 2: plugin UI tests, one per plugin
@@ -94,11 +92,7 @@ platform decoder.
 - [x] FIXED: the node asked the layout to run again from the loader's thread, so a screen of
       images failed with CalledFromWrongThreadException on Android. Snapshot state now.
       Costs 660 bytes an image on the first frame, which is Compose observing the reads.
-- [ ] SEPARATE BUG, pre-existing on main: `rememberImageComponent` is `remember { component }`
-      with no keys, so a plugin set that depends on state is frozen at its first value and a
-      toggle never reaches the image. `imageComponent(block)` also rebuilds the component and
-      its list every composition and throws all but the first away, which is about 395 bytes an
-      image per composition. Belongs in its own pull request off main.
+- [x] FIXED: `rememberImageComponent` froze its plugin set at the first composition
 - [ ] The Android decoder halves only while both axes still cover the target, so a landscape
       image in a square slot is not downsampled at all: 1200x801 decoded for a 550px box, seen
       in the playground. Correct for a content scale that crops, 2.2x of the pixels needed for

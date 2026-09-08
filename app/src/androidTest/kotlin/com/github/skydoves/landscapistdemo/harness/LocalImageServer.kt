@@ -90,6 +90,12 @@ class LocalImageServer : AutoCloseable {
   }
 
   private fun answer(client: Socket) {
+    // A client that timed out or was cancelled is gone before the response is written, and the
+    // broken pipe that follows is the test working, not the server failing.
+    runCatching { respond(client) }
+  }
+
+  private fun respond(client: Socket) {
     client.use {
       val input = BufferedInputStream(client.getInputStream())
       val requestLine = readLine(input) ?: return
