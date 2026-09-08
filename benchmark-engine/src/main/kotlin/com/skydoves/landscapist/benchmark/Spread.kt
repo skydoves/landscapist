@@ -18,12 +18,8 @@ package com.skydoves.landscapist.benchmark
 import java.util.Locale
 
 /**
- * The headline numbers, recorded as data as well as printed as prose.
- *
- * One process gives one number and no idea how much to trust it. Everything here depends on where
- * the JIT settled, which thread the allocator handed a fresh buffer to, and what else the machine
- * was doing, and none of that repeats. [runSpread] runs the whole thing again in fresh JVMs and
- * prints what actually moved, so a two percent difference can be told apart from a real one.
+ * The headline numbers, recorded as data as well as printed, so [runSpread] can rerun the whole
+ * benchmark in fresh JVMs and show how much of a difference is only the machine.
  */
 internal object Metrics {
 
@@ -45,12 +41,7 @@ internal object Metrics {
   }
 }
 
-/**
- * Runs this benchmark again in [runs] fresh JVMs and reports the spread of every recorded metric.
- *
- * A child gets the same classpath and the same JVM, and is told to collect rather than narrate, so
- * what comes back is one line per metric per run and nothing else to parse.
- */
+/** Runs this benchmark again in [runs] fresh JVMs and reports the spread of every metric. */
 internal fun runSpread(runs: Int) {
   val java = "${System.getProperty("java.home")}/bin/java"
   val classpath = System.getProperty("java.class.path")
@@ -90,9 +81,7 @@ internal fun runSpread(runs: Int) {
   for ((key, values) in results) {
     val sorted = values.sorted()
     val median = sorted[sorted.size / 2]
-    // The formatted columns round, so two runs that differ by a percent print the same string. The
-    // spread is the column to read: it is what the machine contributed, and a difference between
-    // two libraries that is smaller than it is not a difference.
+    // The spread is what the machine contributed: a gap smaller than it is not a difference.
     val spread = if (median == 0.0) 0.0 else (sorted.last() - sorted.first()) / median
     println(
       String.format(

@@ -25,35 +25,23 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 /**
- * A device free head to head between the landscapist-core engine and the real Coil engine.
- *
- * Run with `./gradlew :benchmark-engine:run`.
- *
- * Both loaders are handed the same already decoded image by their fetcher, so what is timed is the
- * loader itself: key building, cache lookup, the coroutine machinery, and coalescing. Decode is
- * deliberately excluded, because on the JVM Coil decodes through Skia and landscapist-core through
- * ImageIO, and an end to end number would be comparing decoders instead.
- *
- * These are single process JVM numbers on one machine. They are useful for comparing the two
- * engines against each other, not as absolute figures for any device.
+ * A device free head to head between the landscapist-core engine and the real Coil engine, run
+ * with `./gradlew :benchmark-engine:run`. Both fetchers hand back an already decoded image, so
+ * what is timed is the loader and not the platform's decoder. Single process JVM numbers.
  */
 fun main() {
-  // A child forked to have its resident set watched from outside while it decodes exactly once.
-  // Checked first, because a child inherits this process's environment: a run started with -Pjfr
-  // sets LANDSCAPIST_PROFILE, and the child would have profiled a Compose list instead of decoding.
+  // A child forked to have its resident set watched while it decodes once. Checked before the
+  // profile branch, because a child inherits this process's environment.
   System.getenv("LANDSCAPIST_DECODE_PATH")?.let {
     runDecodeChild(it, System.getenv("LANDSCAPIST_DECODE_PHOTO"))
     return
   }
-  // A profiling mode that renders one list over and over, so an allocation profiler sees nothing
-  // but the Compose path. Not part of the reported numbers.
+  // Renders one list repeatedly under a profiler. Not part of the reported numbers.
   System.getenv("LANDSCAPIST_PROFILE")?.let {
     profileComposeOnly(it)
     return
   }
-  // A child of a spread run narrates nothing and reports its recorded metrics instead. The rows it
-  // skips are the ones dominated by sleeping or by decoding a twelve megapixel JPEG, and neither of
-  // those is where the disputed numbers are.
+  // A child of a spread run reports its recorded metrics instead of narrating.
   if (Metrics.collecting) {
     memoryCacheHit(quiet = true)
     allocations(quiet = true)
@@ -104,10 +92,7 @@ fun main() {
 
 private fun coilVersion(): String = "3.6.2"
 
-/**
- * Every load misses the cache, so this is the cost of driving one request end to end through the
- * engine with the fetch itself made free.
- */
+/** Every load misses the cache: one request end to end with the fetch itself made free. */
 private fun coldLoad() {
   val landscapistCounter = FetchCounter()
   val coilCounter = FetchCounter()
@@ -134,9 +119,7 @@ private fun coldLoad() {
   report("cold load (unique model)", landscapistSamples, coilSamples)
 }
 
-/**
- * The same model over and over, which is what a scrolling list mostly does once it has warmed up.
- */
+/** The same model over and over, which is what a warmed up scrolling list mostly does. */
 private fun memoryCacheHit(quiet: Boolean = false) {
   val landscapist = newLandscapist(FetchCounter())
   val coil = newCoil(FetchCounter())
@@ -233,20 +216,13 @@ private fun allocations(quiet: Boolean = false) {
 }
 
 /**
- * The same image asked for at sizes that differ by a pixel or two, which is what a grid produces
- * when its columns do not divide evenly. Counts how many times each engine went back to the fetcher
- * rather than reusing the bitmap it already had.
+ * The same image asked for at sizes that differ by a pixel or two, counting how many times each
+ * engine went back to the fetcher rather than reusing the bitmap it had.
  */
 private fun nearIdenticalSizes() {
-  // More than one sequence, because only some of them flatter either side. A grid that jitters by a
-  // pixel reuses what it has; a sequence that keeps growing genuinely needs more pixels every time,
-  // and neither library can serve it from what it has. A sequence that shrinks is where they part:
-  // Coil reuses the large entry however far down it has to scale, and landscapist refuses anything
-  // more than twice the size it is drawing into, so it decodes again and Coil does not.
-  //
-  // These counts moved when the stub stopped claiming `isSampled = false`. That flag makes Coil's
-  // isCacheValueValidForSize return true before it compares any sizes at all, so Coil used to
-  // report one fetch for every sequence here regardless of what was asked for.
+  // More than one sequence, because only some of them flatter either side. A shrinking sequence
+  // is where they part: Coil reuses the large entry however far it scales down, landscapist
+  // refuses anything more than twice the size it is drawing into.
   val sequences = listOf(
     "a grid jittering by a pixel" to listOf(360, 359, 361, 360, 358, 360),
     "the same grid, ascending" to listOf(358, 359, 360, 361, 362, 363),
@@ -275,8 +251,8 @@ private fun nearIdenticalSizes() {
 }
 
 /**
- * Many callers asking for the same image at once, which is what a list does when several items show
- * the same avatar. Counts how many times each engine actually reached the fetcher.
+ * Many callers asking for the same image at once, counting how many times each engine actually
+ * reached the fetcher.
  */
 private fun coalescing() {
   val concurrency = 32

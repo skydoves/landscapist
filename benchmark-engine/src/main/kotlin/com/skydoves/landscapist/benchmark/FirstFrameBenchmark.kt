@@ -42,16 +42,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 /**
- * How many frames a user waits before the image is actually on screen.
- *
- * This is the claim landscapist makes that nothing else here checks: it reads its memory cache
- * during composition, so an image already decoded is in the very first frame, while Coil documents
- * its painter state as Empty for the first composition and resolves afterwards. A claim about the
- * first frame cannot be tested by a benchmark that only reports what a first frame costs.
- *
- * Three cases, because the answer is different in each and only one of them is flattering:
- * a warm cache, a cold cache with the instant fetcher every other row here uses, and a cold cache
- * with a fetcher slow enough that no loader can finish inside one frame.
+ * How many frames a user waits before the image is on screen: landscapist reads its memory cache
+ * during composition, while Coil documents its painter as Empty for the first one. Three cases,
+ * because only one of them is flattering: warm, cold and instant, and cold and slow.
  */
 internal fun firstFrameComparison() {
   println("frames before the image is fully on screen (0 means the very first frame)")
@@ -110,7 +103,7 @@ private fun warmCase() {
 }
 
 private fun coldCase(label: String, latencyMs: Long) {
-  // A loader per trial, so nothing is ever warm. Sharing one would warm it on the first trial.
+  // A loader per trial, so nothing is ever warm.
   reportFrames(
     label,
     List(TRIALS) { "https://example.com/cold-frame-$it.jpg" },
@@ -145,11 +138,8 @@ private fun coldCase(label: String, latencyMs: Long) {
 }
 
 /**
- * The same question with a fade in, where a fully drawn image is by definition several frames away.
- *
- * Both sides are warm, so this is the animation and nothing else. It is the honest counterweight to
- * the first frame claim: landscapist's own crossfade plugin gives up the advantage its synchronous
- * cache read buys, and so does Coil's.
+ * The same question with a fade in, where a fully drawn image is by definition several frames
+ * away. Both sides are warm, so this is the animation and nothing else.
  */
 private fun crossfadeCase() {
   val landscapist = newLandscapist(FetchCounter())
@@ -197,11 +187,8 @@ private fun reportFrames(label: String, models: List<String>, variants: List<Fra
 }
 
 /**
- * Renders frame by frame in real time until the tile is the image, and reports which frame.
- *
- * Real time, not a virtual clock, because a fetcher that suspends and an animation that
- * interpolates both resolve against the wall clock. The frame the loop is on is passed to the
- * renderer so an animation sees a plausible frame time rather than the same one every render.
+ * Renders frame by frame in real time until the tile is the image, and reports which frame. Real
+ * time, because a suspending fetcher and an animation both resolve against the wall clock.
  */
 private fun framesToImage(content: @Composable () -> Unit): Int {
   val scene = benchmarkScene(TILE, TILE, content)
@@ -218,11 +205,8 @@ private fun framesToImage(content: @Composable () -> Unit): Int {
 }
 
 /**
- * The two paths a benchmark that only ever succeeds never touches.
- *
- * A list on a slow connection spends its time in the loading state, and a list with a dead URL in
- * it spends the rest in the failure state. Both are frames a user sees, and both are frames these
- * libraries recompose and redraw.
+ * The loading and failure paths a benchmark that only ever succeeds never touches. Both are
+ * frames a user sees, and both recompose and redraw.
  */
 private fun loadingAndFailure() {
   val slowLandscapist = newLandscapist(FetchCounter(), latencyMs = 5_000)
@@ -253,10 +237,8 @@ private fun loadingAndFailure() {
 }
 
 /**
- * A placeholder, which is what both libraries put on screen while the image is still coming.
- *
- * Coil takes a painter on `AsyncImage`; landscapist takes a plugin. The plugin is a composable of
- * its own, so this is the row where the plugin architecture is paid for rather than assumed free.
+ * A placeholder, which both libraries put on screen while the image is coming. Coil takes a
+ * painter; landscapist takes a plugin, which is a composable of its own.
  */
 private fun placeholderCase() {
   val landscapist = newLandscapist(FetchCounter(), latencyMs = 5_000)
@@ -276,8 +258,7 @@ private fun placeholderCase() {
       "  ${cases[index].first.padEnd(22)}${samples[index].median().above(floor).formatBytes()}",
     )
   }
-  // Both are meant to be showing something. A placeholder that never drew would allocate less for
-  // doing nothing, and would read as the cheaper one.
+  // Both are meant to be showing something: one that never drew would read as the cheaper one.
   for ((name, content) in cases.drop(1)) {
     val scene = benchmarkScene(TILE_SIZE, TILE_SIZE * TILE_COUNT, content)
     try {
@@ -339,14 +320,9 @@ private fun CoilTile(imageLoader: ImageLoader, model: String) {
 }
 
 /**
- * Coil's fast painter, written both ways.
- *
- * `AsyncImage` attaches a `ConstraintsSizeResolver`, so it asks for the layout size and finds what
- * is in memory. `rememberAsyncImagePainter(model)` does not: `AsyncImagePainter.updateRequest`
- * falls back to `SizeResolver.ORIGINAL` when no size resolver was set, so the obvious spelling asks
- * for the full sized image, cannot use the entry `AsyncImage` cached at the layout size, and goes
- * back out to the network for it. That is the API Coil's own documentation points a performance
- * minded caller at, so both spellings are here.
+ * Coil's fast painter, written both ways. `AsyncImage` attaches a `ConstraintsSizeResolver` and
+ * finds what is in memory; the unsized painter falls back to `SizeResolver.ORIGINAL`, so it asks
+ * for the full sized image and cannot use what was cached at the layout size.
  */
 @Composable
 private fun CoilPainterTile(imageLoader: ImageLoader, model: String, sized: Boolean) {

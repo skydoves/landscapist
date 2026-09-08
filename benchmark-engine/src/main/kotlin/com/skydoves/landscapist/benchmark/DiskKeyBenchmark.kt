@@ -34,22 +34,9 @@ import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
 /**
- * What the disk cache does when the same image is asked for at more than one size.
- *
- * The memory rows above measure decoded bitmaps. This one measures the encoded bytes, which is the
- * expensive resource, because a disk miss is not a decode, it is a download. `CacheKey.diskKey`
- * folds the target size into the key, and `writeToDiskCache` writes the bytes that came off the
- * network under that key, so the same downloaded file is stored once per size and a request at a
- * size nothing has been stored for goes back out to the network even though the bytes are already
- * on the disk under another name.
- *
- * Coil's disk key is the URL. `NetworkFetcher` uses `options.diskCacheKey ?: url.toString()` and
- * nothing about the requested size reaches it, so a Coil app downloads once and decodes from the
- * cached file at whatever size it needs next.
- *
- * Only landscapist's half is measured here. Coil's disk cache lives inside its network fetcher, and
- * this benchmark replaces that fetcher, so there is no honest way to exercise it without standing
- * up a server. The Coil side is read off its source and is stated as that, not measured.
+ * What the disk cache does when the same image is asked for at more than one size, measured in
+ * encoded bytes: a disk miss is a download, not a decode. Only landscapist's half is measured;
+ * Coil's disk cache lives inside the network fetcher this harness replaces.
  */
 internal fun diskKeyComparison() {
   val sizes = listOf(360, 359, 361, 720)
@@ -71,8 +58,7 @@ internal fun diskKeyComparison() {
 
   runBlocking {
     for (size in sizes) {
-      // Cleared between sizes, which is what a process restart or any memory pressure does. Without
-      // it the memory cache answers and the disk cache is never asked anything.
+      // Cleared between sizes, or the memory cache answers and the disk cache is never asked.
       landscapist.clearMemoryCache()
       val request = ImageRequest.builder()
         .model(model)
@@ -82,8 +68,7 @@ internal fun diskKeyComparison() {
       val result = landscapist.load(request).first { it is ImageResult.Success }
       check(result is ImageResult.Success)
       if (result.dataSource == DataSource.NETWORK) {
-        // The write is launched off the critical path, so wait for the entry to appear rather than
-        // sleeping and hoping. A fixed sleep is a race, and losing it counts a download twice.
+        // The write is launched off the critical path, so wait rather than sleep and race it.
         awaitEntry(directory, CacheKey.create(model, width = size, height = size).diskKey)
       }
     }
@@ -149,7 +134,7 @@ private fun smallJpeg(): ByteArray {
   }
 }
 
-/** Waits for [key] to appear in [directory], or gives up after a second and lets the count stand. */
+/** Waits for [key] to appear in [directory], giving up after a second. */
 private fun awaitEntry(directory: java.nio.file.Path, key: String) {
   val deadline = System.nanoTime() + 1_000_000_000L
   while (System.nanoTime() < deadline) {

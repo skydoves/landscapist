@@ -67,10 +67,8 @@ internal fun HintText(text: String) {
 }
 
 /**
- * A horizontally scrolling row of buttons, one of which is selected.
- *
- * Scrolling rather than wrapping, so the row stays one line tall on a phone and the whole set of
- * options is reachable without a flow layout.
+ * A horizontally scrolling row of buttons, one of which is selected. Scrolling rather than
+ * wrapping, so it stays one line tall on a phone.
  */
 @Composable
 internal fun <T> ChoiceRow(

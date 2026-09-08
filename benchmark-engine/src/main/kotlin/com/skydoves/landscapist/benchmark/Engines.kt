@@ -50,20 +50,8 @@ import org.jetbrains.skia.Bitmap as SkiaBitmap
 import org.jetbrains.skia.Canvas as SkiaCanvas
 
 /**
- * The two engines, wired so they do the same work.
- *
- * Both are given a fetcher that hands back an already decoded image, which takes each library's own
- * decoder out of the picture. That matters because on the JVM Coil decodes through Skia and
- * landscapist-core decodes through ImageIO, so an end to end number would be comparing decoders
- * rather than loaders. Decoding is measured separately, and labelled as such.
- */
-/**
- * A real decoded bitmap, sized to what the request asked for.
- *
- * It has to be real and it has to be painted by both sides. An opaque stand in that neither
- * library's painter recognises makes one of them draw nothing, and a fixed size one makes Coil
- * reject its own cache entry on every near miss. Either way the harness would be measuring the stub
- * rather than the loader.
+ * A real decoded bitmap, sized to what the request asked for. Both libraries' painters have to
+ * recognise it, and a fixed size one makes Coil reject its own cache entry on every near miss.
  */
 internal fun decodedBitmap(width: Int, height: Int): SkiaBitmap {
   val bitmap = SkiaBitmap()
@@ -124,20 +112,14 @@ internal fun newLandscapist(
   .build()
 
 /**
- * The memory cache both loaders get unless a scenario says otherwise.
- *
- * Small on purpose. A 64 MB cache holds every image any of these benchmarks touch, so nothing is
- * ever evicted and no eviction behaviour is measured, which is most of what a real cache does.
+ * The memory cache both loaders get unless a scenario says otherwise. Nothing here is ever
+ * evicted at this size, so eviction is measured only where a scenario sets its own.
  */
 internal const val DEFAULT_MEMORY_CACHE: Long = 64L * 1024 * 1024
 
 /**
- * Stands in for the disk cache neither side is supposed to have.
- *
- * Coil is built with `diskCache(null)`. `Landscapist.Builder` has no equivalent: a null config
- * `diskCache` falls through to `createDefaultDiskCache`, so a loader built the plain way reads and
- * writes the user's real `~/.cache/landscapist`. Without this the two sides are not comparable on
- * any path that misses memory, and the numbers would depend on what happens to be on the disk.
+ * Stands in for the disk cache neither side is supposed to have. A null config `diskCache` falls
+ * through to `createDefaultDiskCache` and would read the user's real cache directory.
  */
 internal object NoDiskCache : DiskCache {
   override val directory: Path = "/nonexistent/landscapist-benchmark".toPath()
@@ -181,10 +163,9 @@ internal class CoilStubFetcher(
     if (latencyMs > 0) delay(latencyMs)
     return ImageFetchResult(
       image = decodedBitmap(width, height).asImage(),
-      // The stub hands back an image scaled to the box that was asked for, never the source, which
-      // is what Coil means by sampled. Saying otherwise short circuits isCacheValueValidForSize:
-      // `!isSampled && precision == INEXACT` returns true before any size is compared, so Coil
-      // would serve a 128px thumbnail to a 512px request and the fetch counts would flatter it.
+      // The stub hands back an image scaled to the box that was asked for, which is what sampled
+      // means. Claiming otherwise short circuits isCacheValueValidForSize before any size is
+      // compared, and Coil would serve a thumbnail to a full size request.
       isSampled = true,
       dataSource = CoilDataSource.NETWORK,
     )
@@ -244,8 +225,7 @@ internal fun coilRequest(model: String, width: Int, height: Int): CoilRequest =
   CoilRequest.Builder(PlatformContext.INSTANCE)
     .data(model)
     .diskCachePolicy(CoilCachePolicy.DISABLED)
-    // AsyncImagePainter forces INEXACT whenever precision is undefined, so this is what every Coil
-    // Compose user actually runs. Leaving the EXACT default would flatter us on size reuse.
+    // AsyncImagePainter forces INEXACT when precision is undefined, so this is what users run.
     .precision(Precision.INEXACT)
     .size(CoilSize(width, height))
     .build()

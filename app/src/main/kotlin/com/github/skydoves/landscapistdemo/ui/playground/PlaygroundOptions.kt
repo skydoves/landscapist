@@ -19,8 +19,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.layout.ContentScale
 
 /**
- * The images the playground loads. Three of them, so a cold cache is one tap away: switching to a
- * url that has not been loaded yet is the only honest way to watch a network load happen again.
+ * Three of them, so a cold cache is one tap away: switching to a url never loaded is the only way
+ * to watch a network load happen again.
  */
 internal val playgroundImageUrls: List<String> = listOf(
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200",
@@ -56,10 +56,8 @@ internal enum class ScaleMode(val label: String, val contentScale: ContentScale)
 }
 
 /**
- * Where the next load is meant to come from.
- *
- * None of these force a data source: they arrange the conditions under which one is reached, and
- * the readout reports what actually happened.
+ * Where the next load is meant to come from. None of these force a data source: they arrange the
+ * conditions, and the readout reports what actually happened.
  */
 internal enum class LoadSource(val label: String, val hint: String) {
   Network(
@@ -84,9 +82,8 @@ internal enum class LoadSource(val label: String, val hint: String) {
 /**
  * Which plugins are attached to the image.
  *
- * Immutable and held in a single state, so it can key the component: `rememberImageComponent`
- * remembers without keys and would otherwise hand back the plugin list built on the first
- * composition, whatever the switches say afterwards.
+ * Immutable and in one state so it can key the component: `rememberImageComponent` remembers
+ * without keys and would otherwise keep the plugin list built on the first composition.
  */
 @Immutable
 internal data class PluginToggles(

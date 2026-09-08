@@ -46,23 +46,17 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 /**
- * The Compose layer, measured the way a user experiences it: how long from entering composition to
- * a frame that actually has the image in it.
- *
- * Rendering happens through [ImageComposeScene], which composes, lays out and rasterizes offscreen,
- * so no window or display is needed. Both libraries are given a warm memory cache first, because
- * that is the state a list is in once it has been scrolled through, and it is the state where a
- * loader either draws immediately or shows a frame of nothing.
+ * The Compose layer as a user experiences it: how long from entering composition to a frame that
+ * has the image in it. Rendered offscreen through [ImageComposeScene]. Both libraries get a warm
+ * memory cache first, which is the state a list is in once it has been scrolled through.
  */
 internal fun composeComparison() {
   val landscapistCounter = FetchCounter()
   val coilCounter = FetchCounter()
   val landscapist = newLandscapist(landscapistCounter)
   val coil = newCoil(coilCounter)
-  // Crossfade is what a Coil user turns on for the same effect landscapist's plugin gives, and on
-  // this platform it costs them no extra composable at all. Same stub fetcher, same cache.
-  // Its own counter, because it is a second loader with a second cache: sharing one made the warm
-  // up look like it had fetched twice per image and tripped the guard below.
+  // Crossfade is what a Coil user turns on for the effect landscapist's plugin gives. Its own
+  // counter, because it is a second loader with a second cache.
   val fadingCoilCounter = FetchCounter()
   val fadingCoil = newCoil(fadingCoilCounter) { crossfade(300) }
   val models = List(ITEM_COUNT) { "https://example.com/list-item-$it.jpg" }
@@ -76,9 +70,8 @@ internal fun composeComparison() {
     }
   }
 
-  // Every variant is warmed before any of them is measured, and the floor is warmed too. Measuring
-  // the first one cold made it pay for warming Compose itself, which the ones after it then got for
-  // free: that alone reported landscapist at four times its steady state cost.
+  // Every variant is warmed before any is measured, floor included: measuring the first one cold
+  // makes it pay for warming Compose itself.
   val warmups = 200
   val iterations = 600
   val variants = listOf<Pair<String, @Composable (Int) -> Unit>>(
@@ -117,23 +110,20 @@ internal fun composeComparison() {
   }
   println()
 
-  // A cache hit and a fetch are not the same measurement, and a variant quietly doing the
-  // second one would look expensive for a reason with nothing to do with its Compose layer.
-  // Both sides are warm before any of this runs, so the honest number here is zero on both.
+  // A cache hit and a fetch are not the same measurement, and a variant quietly doing the second
+  // would look expensive for a reason nothing to do with its Compose layer.
   warmed.forEach { it.reset() }
   for ((_, content) in variants) renderOnce { content(ITEM_SIZE) }
   val fetched = warmed.map { it.count.get() }
   println("  fetches during one pass over every variant: ${fetched.joinToString()} (all zero)")
-  // Every loader, not only the two plain ones. The crossfade variants load through their own, so
-  // leaving it out let the one row this benchmark actually loses report a fetch as a cache hit.
+  // Every loader, not only the two plain ones: the crossfade variants load through their own.
   check(fetched.all { it == 0 }) {
     "a variant fetched during the measured pass, so it is not a warm cache measurement: $fetched"
   }
   println()
 
-  // Interleaved, so drift over the run lands on every variant rather than on whichever went first,
-  // and reported as a median: a mean over these is dragged around by the odd frame that happens to
-  // land on a JIT recompilation or a fresh allocation buffer.
+  // Interleaved, so drift lands on every variant rather than on whichever went first, and a
+  // median rather than a mean, which the odd JIT recompilation frame would drag around.
   val samples = Array(variants.size) { LongArray(iterations) }
   repeat(iterations) { round ->
     for ((index, variant) in variants.withIndex()) {
@@ -150,12 +140,10 @@ internal fun composeComparison() {
   }
   println()
 
-  // Paired with the empty scene inside every iteration rather than compared p50 to p50. Building
-  // and rasterizing the scene is about 14 ms and drifts by more than the images cost, so two
-  // separately measured medians differ by noise; the difference measured per iteration does not.
+  // Paired with the empty scene inside each iteration rather than p50 to p50: the scene drifts by
+  // more than the images cost, so two separately measured medians differ only by noise.
   println("time added to a first frame of $ITEM_COUNT images, over the same scene with no images")
-  // Fewer iterations than the allocation table, because each one renders the scene twice and the
-  // scene is 14 ms. The pairing is what makes it steady, not the count.
+  // Fewer iterations, because each renders the scene twice. The pairing is what steadies it.
   val timedIterations = iterations / 4
   for (index in 1 until variants.size) {
     val variant = variants[index]
@@ -181,11 +169,9 @@ internal fun composeComparison() {
     Metrics.record("compose.resize-frame.${variants[index].first.metricKey()}.bytes", perFrame)
     println("  ${variants[index].first.padEnd(22)}${perFrame.formatBytes()}")
   }
-  // The sized painter row is not comparable here and should not be read as one. Giving
-  // `rememberAsyncImagePainter` a size means building a request, and a request built against a size
-  // that changes every frame is rebuilt every frame, which restarts the load. `AsyncImage` resolves
-  // its size inside one request and does not. That is a real cost of the sized spelling under an
-  // animating bound, and it is a different thing from what the other rows measure.
+  // The sized painter row is not comparable here: a request built against a size that changes
+  // every frame is rebuilt every frame, which restarts the load. `AsyncImage` resolves its size
+  // inside one request and does not.
   println(
     "    coil painter sized rebuilds its request whenever the bound moves, which is every frame " +
       "here. That is the row's cost, not the painter's.",
@@ -197,12 +183,8 @@ internal fun composeComparison() {
 internal fun String.metricKey(): String = replace(' ', '-')
 
 /**
- * What one frame costs once the images are on screen and their bounds are animating.
- *
- * The scene is built once and each item is then resized by a pixel per frame, which is what a
- * shared element transition does. Everything measures, places and draws again while nothing is
- * composed for the first time, so this is the cost that repeats for the length of the animation.
- * The first frame number cannot show it.
+ * What one frame costs while the images are on screen and their bounds animate, as a shared
+ * element transition does. Nothing composes for the first time, so the first frame rows miss it.
  */
 private fun resizeAllocation(content: @Composable (Int) -> Unit): Long {
   var offset by mutableIntStateOf(0)
@@ -234,11 +216,8 @@ private fun resizeAllocation(content: @Composable (Int) -> Unit): Long {
 }
 
 /**
- * The share of the frame each list actually filled with image pixels.
- *
- * An allocation number is only worth reading once both sides are proven to draw. A loader that
- * misses its cache on the first frame renders nothing, allocates less for it, and would otherwise
- * look like the faster one.
+ * The share of the frame each list actually filled with image pixels. A loader that misses its
+ * cache renders nothing, allocates less for it, and would otherwise look like the faster one.
  */
 private fun paintedFraction(content: @Composable () -> Unit): Double {
   val scene = benchmarkScene(ITEM_SIZE, ITEM_SIZE * ITEM_COUNT) { content() }
@@ -253,10 +232,8 @@ private const val ITEM_COUNT = 20
 private const val ITEM_SIZE = 128
 
 /**
- * Composes, lays out and rasterizes one frame.
- *
- * The scene is created and closed per measurement on purpose: a composable that resolves its image
- * on first composition is exactly what is being measured, and reusing a scene would hide it.
+ * Composes, lays out and rasterizes one frame. The scene is created and closed per measurement,
+ * because resolving the image on first composition is what is being measured.
  */
 private inline fun renderOnce(crossinline content: @Composable () -> Unit) {
   val scene = ImageComposeScene(
@@ -300,10 +277,8 @@ private fun LandscapistList(
 }
 
 /**
- * The composed path: a caller success slot, which is what plugins and custom content take.
- *
- * It draws the same painter as the container path, so the two are comparable. A slot that drew
- * nothing would report a smaller number for doing less work.
+ * The composed path: a caller success slot, drawing the same painter as the container path so the
+ * two are comparable.
  */
 @Composable
 private fun LandscapistComposedList(
@@ -330,11 +305,8 @@ private fun LandscapistComposedList(
 }
 
 /**
- * The model is handed over as a plain string, not a pre-built request.
- *
- * Both sides then resolve their size from the modifier and build their own request internally,
- * which is the parity that matters: building a request in composition is an allocation, and only
- * one of the two libraries would have been paying it.
+ * The model is handed over as a plain string, so both sides resolve their size from the modifier
+ * and build their own request. Building a request in composition is an allocation.
  */
 @Composable
 private fun CoilList(
@@ -380,11 +352,8 @@ internal fun profileComposeOnly(which: String) {
 }
 
 /**
- * Coil's answer to a caller supplied success slot.
- *
- * A slot is the comparison for landscapist's composed path, not plain [AsyncImage]: both have to
- * hand the caller a painter and let it decide what to draw. Coil reaches for subcomposition to do
- * it, landscapist composes the slot in place.
+ * Coil's answer to a caller supplied success slot, which is the comparison for landscapist's
+ * composed path rather than plain [AsyncImage].
  */
 @Composable
 private fun CoilSubcomposeList(
@@ -412,19 +381,9 @@ private fun CoilSubcomposeList(
 }
 
 /**
- * What Coil's own documentation tells you to write for a caller supplied slot.
- *
- * `SubcomposeAsyncImage` carries the note "this API uses subcomposition, which is slow. Avoid using
- * this composable in places that need high performance", and points at `rememberAsyncImagePainter`
- * instead. Both are measured, because comparing only against the one Coil warns you off would be
- * picking the opponent.
- *
- * The request carries a size, which the obvious spelling of this does not. `AsyncImage` attaches a
- * `ConstraintsSizeResolver`, but `rememberAsyncImagePainter(model)` falls back to
- * `SizeResolver.ORIGINAL`, so it asks for the full sized image and cannot reuse what `AsyncImage`
- * left in the memory cache at the layout size. Measured that way it draws nothing on the first
- * frame and decodes the original, which is a real Coil footgun but not a comparison of slots.
- * [firstFrameComparison] measures the naive spelling and reports what it costs.
+ * The painter spelling Coil's documentation points a performance minded caller at. The request
+ * carries a size on purpose: `rememberAsyncImagePainter(model)` falls back to
+ * `SizeResolver.ORIGINAL` and cannot reuse what `AsyncImage` cached at the layout size.
  */
 @Composable
 private fun CoilPainterList(
@@ -465,12 +424,8 @@ private fun LandscapistCrossfadeList(
 }
 
 /**
- * The painter landscapist hands a caller, drawn in the caller's own [Image].
- *
- * The same shape as the Coil painter row, node for node: one layout node per image and no container
- * around it, so what is left between the two is the loader and nothing else. It is the comparison
- * Coil's own documentation steers people to, and the one the slot API cannot win, because a slot
- * needs a container to put the caller's content in and that is a second layout node.
+ * The painter landscapist hands a caller, drawn in the caller's own [Image]. The same node shape
+ * as the Coil painter row, so what is left between the two is the loader.
  */
 @Composable
 private fun LandscapistPainterList(

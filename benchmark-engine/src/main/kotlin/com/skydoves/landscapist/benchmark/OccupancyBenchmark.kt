@@ -22,15 +22,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 /**
- * What each cache is still holding when the requests stop.
- *
- * Cumulative allocation says how much garbage a run made. It says nothing about what survives, and
- * survival is the number that decides whether an app is killed on a small device. The two libraries
- * differ here by design and the difference has never been measured: landscapist's memory key
- * carries the target size, so one image asked for at n sizes becomes n entries, while Coil leaves
- * the size out of the key entirely unless a transformation is attached and keeps overwriting one.
- * Coil pays for that with a cache that can hand back an image at the wrong resolution; landscapist
- * pays for it in bytes held.
+ * What each cache is still holding when the requests stop, which is what gets an app killed.
+ * Landscapist's memory key carries the target size, so one image at n sizes becomes n entries;
+ * Coil leaves the size out of the key and keeps overwriting one.
  */
 internal fun occupancyComparison() {
   println("what the caches hold afterwards")
@@ -40,12 +34,7 @@ internal fun occupancyComparison() {
   println()
 }
 
-/**
- * One image, fifteen sizes a pixel or two apart, which is a grid on a screen it does not divide.
- *
- * Nothing in this benchmark showed this before. The fetch count row shows a size sequence costing
- * extra decodes; it cannot show that every one of those decodes is still resident afterwards.
- */
+/** One image at fifteen sizes a pixel apart, which is a grid on a screen it does not divide. */
 private fun nearDuplicateSizes() {
   val sizes = List(15) { 352 + it }
   val landscapistCounter = FetchCounter()
@@ -66,9 +55,7 @@ private fun nearDuplicateSizes() {
   compare("decodes", landscapistCounter.count.get().toLong(), coilCounter.count.get().toLong()) {
     "$it"
   }
-  // Coil counts its weak tier in `keys`, so landscapist is counted the same way. Nothing is
-  // evicted at this cache size, so both weak tiers are empty and the two are the same number
-  // either way, but the shape has to match or the next person to change a cache size is misled.
+  // Coil counts its weak tier in `keys`, so landscapist is counted the same way.
   compare(
     "entries held",
     (cache.strongCacheCount + cache.weakCacheCount).toLong(),
@@ -80,20 +67,14 @@ private fun nearDuplicateSizes() {
 private const val NEAR_MODEL = "https://example.com/occupancy-grid.jpg"
 
 /**
- * A cache large enough that nothing here is ever evicted.
- *
- * The question these rows ask is what each library chooses to keep. A cache that starts evicting
- * answers a different question, and answers it in whichever library's favour happens to have hit
- * the ceiling first.
+ * A cache large enough that nothing here is ever evicted, so these rows measure what each library
+ * chooses to keep rather than which one hit the ceiling first.
  */
 private const val HEADROOM: Long = 1024L * 1024 * 1024
 
 /**
- * Forty images the way one screen of an app actually asks for them.
- *
- * A thumbnail in a list, the same image opened full width, and the same image again in a slightly
- * different grid. This is the shape that makes a size keyed cache expensive, and it is a shape a
- * user produces by tapping through a normal app, not a contrived one.
+ * Forty images the way an app asks for them: a thumbnail in a list, the same image full width,
+ * then again in a slightly different grid. The shape that makes a size keyed cache expensive.
  */
 private fun mixedSizeApp() {
   val models = List(40) { "https://example.com/occupancy-$it.jpg" }
@@ -121,9 +102,7 @@ private fun mixedSizeApp() {
   compare("decodes", landscapistCounter.count.get().toLong(), coilCounter.count.get().toLong()) {
     "$it"
   }
-  // Coil counts its weak tier in `keys`, so landscapist is counted the same way. Nothing is
-  // evicted at this cache size, so both weak tiers are empty and the two are the same number
-  // either way, but the shape has to match or the next person to change a cache size is misled.
+  // Coil counts its weak tier in `keys`, so landscapist is counted the same way.
   compare(
     "entries held",
     (cache.strongCacheCount + cache.weakCacheCount).toLong(),
@@ -131,9 +110,8 @@ private fun mixedSizeApp() {
   ) { "$it" }
   compare("bytes held", cache.size, coilCache.size) { it.formatBytes() }
 
-  // What a cache holds and what it can serve are different questions, and the second one is where
-  // the bytes are bought back. Going back to the thumbnail, both caches answer without decoding.
-  // Only one of them answers with a thumbnail.
+  // What a cache holds and what it can serve are different questions. Both answer the thumbnail
+  // without decoding; only one answers with a thumbnail.
   val landscapistServed: Int
   val coilServed: Int
   runBlocking {
@@ -155,16 +133,9 @@ private fun mixedSizeApp() {
 }
 
 /**
- * The bytes neither cache counts.
- *
- * `TwoTierMemoryCache` bounds only its strong tier: an evicted entry is moved to a weak reference,
- * stays reachable, and `size` stops counting it the moment it moves. Coil does exactly the same
- * thing. `MemoryCache.Builder` has `weakReferencesEnabled`, on by default, and its own
- * documentation says weak references "do not contribute to the current size of the memory cache".
- *
- * So this row corrects a claim rather than making one. Landscapist's own comparison table lists the
- * weak second tier as something it has and Coil does not. Coil has had it since 3.0, with the same
- * accounting hole, and configured at a megabyte either library can be holding ten.
+ * The bytes neither cache counts. Both move an evicted entry to a weak reference that stays
+ * reachable and stops counting toward `size`, so either library can be holding ten times what it
+ * reports.
  */
 private fun weakTierDisclosure() {
   val budget = 1L * 1024 * 1024
@@ -184,9 +155,7 @@ private fun weakTierDisclosure() {
   }
   cache.cleanupWeakReferences()
   val coilCache = coil.memoryCache!!
-  // `keys` on Coil's cache is the union of its strong and weak tiers, so landscapist is counted the
-  // same way. Comparing landscapist's two tiers against Coil's one would have been the same mistake
-  // in the other direction, and it is the mistake this row was written with.
+  // `keys` on Coil's cache is the union of both tiers, so landscapist is counted the same way.
   val landscapistKeys = (cache.strongCacheCount + cache.weakCacheCount).toLong()
   val coilKeys = coilCache.keys.size.toLong()
   println("  $entries images of ${perImage.formatBytes()} into a ${budget.formatBytes()} cache")

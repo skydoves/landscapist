@@ -22,11 +22,8 @@ import kotlinx.coroutines.Dispatchers
 import org.jetbrains.skia.Bitmap
 
 /**
- * The colour every stubbed image is painted, so a frame can be asked what is actually in it.
- *
- * Counting non transparent pixels is not enough. A placeholder, a crossfade halfway through and a
- * failure colour are all opaque, and a loader that drew one of them instead of the image would pass
- * an alpha check while showing the user nothing they asked for.
+ * The colour every stubbed image is painted, so a frame can be asked what is in it. Counting
+ * opaque pixels is not enough: a placeholder or a half faded crossfade is opaque too.
  */
 internal const val STUB_COLOR: Int = 0xFF6750A4.toInt()
 
@@ -53,8 +50,7 @@ internal fun ImageComposeScene.imagePixelFraction(nanoTime: Long = 0L): Double {
     val pixels = bitmap.readPixels() ?: error("no pixels")
     var matched = 0
     var i = 0
-    // N32 is BGRA here and the stub is opaque, so the three colour bytes are compared and alpha is
-    // required to be full. A half faded crossfade frame fails, which is the point.
+    // N32 is BGRA here, and full alpha is required so a half faded crossfade frame fails.
     val b = (STUB_COLOR and 0xFF).toByte()
     val g = (STUB_COLOR shr 8 and 0xFF).toByte()
     val r = (STUB_COLOR shr 16 and 0xFF).toByte()

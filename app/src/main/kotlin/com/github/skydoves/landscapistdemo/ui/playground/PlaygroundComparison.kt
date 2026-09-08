@@ -42,11 +42,8 @@ import com.skydoves.landscapist.image.LandscapistImage
 import com.skydoves.landscapist.image.LandscapistImageState
 
 /**
- * The same url, at the same size and content scale, through Landscapist and through Coil.
- *
- * Neither side has a plugin or a placeholder on it, so what differs between the two boxes is the
- * loader: when the first frame with pixels in it arrives, and how the image is scaled into a box
- * that is not its shape.
+ * The same url, size and content scale through Landscapist and through Coil. Neither side has a
+ * plugin or placeholder, so what differs is the loader.
  */
 @Composable
 internal fun PlaygroundComparison(url: String, contentScale: ContentScale) {

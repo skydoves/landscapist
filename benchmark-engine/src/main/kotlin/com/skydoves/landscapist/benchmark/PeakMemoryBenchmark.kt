@@ -23,18 +23,9 @@ import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 
 /**
- * The high water mark, which is what actually kills an app.
- *
- * Cumulative allocation understates a decoder badly. A decoder that materialises a full raster and
- * then throws it away allocates the same total as one that never made it, near enough, but only one
- * of the two needs the memory to exist at once. That peak is what an `OutOfMemoryError` is measured
- * against, and nothing here was reporting it.
- *
- * Three paths, because two of them are the same stack and the third is a different one:
- * landscapist as it decodes now, the same ImageIO stack made to decode at full size and scale down
- * afterwards, and Coil's Skia path. The first two are the honest before and after of subsampling.
- * The third decodes into native memory, so its Java heap row is close to zero and means nothing;
- * the resident set row is the one to read for it.
+ * The high water mark, which is what an `OutOfMemoryError` is measured against: a decoder that
+ * materialises a full raster and throws it away allocates the same total as one that never made
+ * it. Skia decodes into native memory, so read Coil's resident set row and not its heap row.
  */
 internal fun peakMemoryComparison() {
   val photo = largePhoto()
@@ -55,8 +46,8 @@ internal fun peakMemoryComparison() {
     "coil (skia)" to { skiaDecodeThenScale(photo) },
   )
 
-  // Warm every path first. A cold ImageIO reader registry, a cold Skia codec table and a heap that
-  // has not grown to its working size all land on whichever path runs first.
+  // Warm every path first, or a cold reader registry and a cold codec table land on whichever
+  // path runs first.
   for ((_, run) in paths) repeat(3) { run() }
 
   println("  peak Java heap above the resting heap, median of 5")
@@ -89,10 +80,8 @@ internal fun peakMemoryComparison() {
 }
 
 /**
- * Runs one decode path in a fresh JVM and reports how far its resident set rose to do it.
- *
- * The child reads the photo from a file rather than generating it, so it has never held a
- * forty eight megabyte raster for any other reason, and its baseline is honest.
+ * Runs one decode path in a fresh JVM and reports how far its resident set rose to do it. The
+ * child reads the photo from a file, so its baseline has never held a full raster.
  */
 private fun childPeakResident(path: String, photoPath: String): Long {
   val process = ProcessBuilder(
@@ -133,18 +122,15 @@ private fun childPeakResident(path: String, photoPath: String): Long {
 }
 
 /**
- * The child half of [childPeakResident]: read the photo, wait, decode once, say so.
- *
- * Called from `main` before anything else, so the process has done nothing but load classes.
+ * The child half of [childPeakResident]: read the photo, wait, decode once, say so. Called from
+ * `main` before anything else, so the process has done nothing but load classes.
  */
 internal fun runDecodeChild(path: String, photoPath: String) {
   val photo = java.io.File(photoPath).readBytes()
   val decoder = createPlatformDecoder()
   val config = LandscapistConfig()
-  // Every child warms every path on a thumbnail before it reports ready, so loading the ImageIO
-  // plugin registry and the skiko native library land in the baseline rather than in whichever
-  // path happens to be the one being measured. The thumbnail is small enough that the heap does
-  // not grow to hide the real decode.
+  // Warm every path on a thumbnail before reporting ready, so loading the ImageIO registry and
+  // the skiko native library land in the baseline rather than in the path being measured.
   val thumbnail = jpegBytes(64, 48)
   runBlocking { decoder.decode(thumbnail, "image/jpeg", 32, 24, config) }
   fullDecodeThenScale(thumbnail)

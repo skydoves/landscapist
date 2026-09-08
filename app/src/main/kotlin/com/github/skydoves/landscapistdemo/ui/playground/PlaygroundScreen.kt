@@ -69,11 +69,8 @@ import com.skydoves.landscapist.zoomable.rememberZoomableState
 import kotlinx.coroutines.launch
 
 /**
- * A screen for exercising every plugin, every sizing mode and every loading source against a real
- * network image on a real device, with a readout of what the loader actually reported.
- *
- * This exists because a stub fetcher and a stub decoder can both be green while the thing on the
- * device is broken. Everything here is driven by the public API a caller would use.
+ * Exercises every plugin, sizing mode and loading source against a real network image on a real
+ * device, with a readout of what the loader reported. Driven only by public API.
  */
 @Composable
 fun PlaygroundScreen(paddingValues: PaddingValues) {
@@ -376,10 +373,8 @@ private fun LandscapistImageState.toReadout(elapsedMs: Long): ImageReadout = whe
 }
 
 /**
- * The request customisations that are not plugins.
- *
- * Built outside composition and remembered by the caller, so the request the image builds from it
- * is stable across recompositions and does not restart the load on every frame.
+ * The request customisations that are not plugins. Built outside composition and remembered, so
+ * the request is stable and the load does not restart every frame.
  */
 private fun playgroundRequestBuilder(
   bypassCaches: Boolean,

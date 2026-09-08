@@ -24,11 +24,8 @@ import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
 /**
- * Each library's real decoder against the same bytes.
- *
- * This is the one comparison where the two are genuinely doing different work: Coil decodes through
- * Skia, landscapist-core through ImageIO. It is reported separately from the engine numbers for
- * exactly that reason, and it says as much about the two imaging stacks as about the loaders.
+ * Each library's real decoder against the same bytes. Reported apart from the engine numbers
+ * because Coil decodes through Skia and landscapist-core through ImageIO.
  */
 internal fun decodeComparison() {
   val photo = syntheticPhoto(4000, 3000)

@@ -35,10 +35,8 @@ internal class Samples(val label: String, private val values: LongArray) {
 }
 
 /**
- * Times [operation] after warming the JIT, and reports percentiles rather than a mean.
- *
- * A mean hides the bimodality that shows up when a loader occasionally takes a slow path, and these
- * loaders are full of slow paths, so the percentiles are the honest summary.
+ * Times [operation] after warming the JIT, reporting percentiles rather than a mean: a mean hides
+ * the bimodality of loaders that occasionally take a slow path.
  */
 internal inline fun measure(
   label: String,
@@ -51,8 +49,7 @@ internal inline fun measure(
 
   val values = LongArray(iterations)
   for (i in 0 until iterations) {
-    // Past the warmup's indices, so a scenario that builds its input from the index is measured on
-    // inputs it has not already seen. A cold load that reused them would be timing cache hits.
+    // Past the warmup's indices, so an index-derived input is not already cached.
     val index = warmups + i
     val start = System.nanoTime()
     operation(index)
@@ -68,10 +65,8 @@ internal fun settle() {
 }
 
 /**
- * Bytes allocated while running [block], summed over every thread, or -1 when unavailable.
- *
- * The sum has to cover every thread because both loaders push work onto their own dispatchers, and
- * a current thread reading would report zero. See [AllocationSnapshot] for what that costs.
+ * Bytes allocated while running [block], or -1 when unavailable. Summed over every thread because
+ * both loaders push work onto their own dispatchers.
  */
 internal inline fun allocatedBytes(block: () -> Unit): Long {
   val before = AllocationSnapshot.take() ?: return -1
@@ -81,19 +76,9 @@ internal inline fun allocatedBytes(block: () -> Unit): Long {
 }
 
 /**
- * Per thread allocation counters, keyed by thread id rather than summed on the spot.
- *
- * Summing first and subtracting the totals, which is the obvious way to write this, is wrong in
- * both directions and silently so. A thread that starts during the measured block arrives with a
- * lifetime total that is billed to the block, and a thread that exits during it takes its
- * allocation out of the second sum, so the block is credited with freeing memory. Diffing per
- * thread fixes the first: a thread the block created is counted from zero, which is right, because
- * everything it allocated it allocated during the block.
- *
- * The second cannot be fixed after the fact, only detected. A thread that exits has already taken
- * its counter with it. [threadsLost] counts every time that happened, and the benchmark prints it,
- * because an allocation table built out of measurements that lost threads is not a table anyone
- * should read.
+ * Per thread allocation counters. Diffing per thread, rather than summing totals, keeps a thread
+ * born inside a measured block from billing its lifetime total; a thread that exits still takes
+ * its counter with it, which [threadsLost] records.
  */
 internal class AllocationSnapshot private constructor(
   private val ids: LongArray,
@@ -107,8 +92,7 @@ internal class AllocationSnapshot private constructor(
       if (bytes[i] < 0) continue
       total += bytes[i] - before.bytesFor(ids[i])
     }
-    // Threads that were alive before and are gone now took their counters with them. Nothing here
-    // can recover the bytes; the count is so the reader knows the number is short.
+    // A thread that has exited took its counter with it; count it, because the total is short.
     for (i in before.ids.indices) {
       if (before.bytes[i] >= 0 && indexOf(before.ids[i]) < 0) threadsLost++
     }
@@ -177,13 +161,7 @@ internal fun Long.formatNanos(): String = when {
   else -> "$this ns"
 }
 
-/**
- * Subtracts a floor from a measurement, keeping an unavailable reading unavailable.
- *
- * [allocatedBytes] answers -1 when the counter is not there. Subtracting a floor from that produces
- * an ordinary looking negative number, which formats as "n/a" by luck rather than by intent, and a
- * floor that is itself unavailable would turn a real measurement into a large positive one.
- */
+/** Subtracts a floor, keeping an unavailable (-1) reading unavailable rather than negative. */
 internal fun Long.above(floor: Long): Long = if (this < 0 || floor < 0) -1 else this - floor
 
 internal fun Long.formatBytes(): String = when {

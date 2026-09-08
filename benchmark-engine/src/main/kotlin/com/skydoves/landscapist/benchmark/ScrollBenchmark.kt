@@ -40,22 +40,16 @@ import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.image.LandscapistImage
 
 /**
- * A real scrolling list: one scene, node reuse, and a working set that does not fit in the cache.
- *
- * Every other Compose row in this benchmark builds a fresh scene per iteration and drops twenty
- * images into composition at once. That is a screen appearing, not a list scrolling, and it denies
- * Coil the painter reuse `ContentPainterElement` exists for: a reused node is handed a new model
- * and updates in place instead of composing from nothing. A list also evicts, which is the only
- * place a cache policy can be seen at all. Both matter more than the first frame, because a user
- * spends one frame entering a screen and hundreds scrolling it.
+ * A real scrolling list: one scene, node reuse, and a working set larger than the cache. A fresh
+ * scene per iteration, as the other Compose rows use, denies Coil the painter reuse
+ * `ContentPainterElement` exists for and never evicts anything.
  */
 internal fun scrollComparison() {
   val landscapistCounter = FetchCounter()
   val coilCounter = FetchCounter()
   val landscapist = newLandscapist(landscapistCounter)
   val coil = newCoil(coilCounter)
-  // Its own counter, because it is a second loader with a second cache. Sharing one would report
-  // Coil fetching twice as often as landscapist for no reason but how the benchmark is wired.
+  // Its own counter, because it is a second loader with a second cache.
   val fadingCounter = FetchCounter()
   val fadingCoil = newCoil(fadingCounter) { crossfade(300) }
   val models = List(LIST_ITEMS) { "https://example.com/feed-$it.jpg" }
@@ -71,8 +65,7 @@ internal fun scrollComparison() {
     "coil crossfade" to { state -> CoilLazyList(fadingCoil, models, state) },
   )
 
-  // Warm every variant before any of them is measured, and warm the floor too, so no variant pays
-  // for warming Compose on behalf of the ones that follow it.
+  // Warm every variant before any is measured, floor included, so none pays for warming Compose.
   for ((_, content) in variants) {
     warmScroll(content, frames = 120)
   }
@@ -83,15 +76,12 @@ internal fun scrollComparison() {
   for ((name, share) in painted) {
     println("  ${name.padEnd(22)}${share.asPercent()}")
   }
-  // The list is taller than the viewport and the items are square and full width, so a frame is
-  // essentially all image once the loaders are warm. Anything much under that means a variant is
-  // showing empty boxes, and its allocation number is just the cost of drawing nothing.
+  // The list is taller than the viewport and the items are full width, so a warm frame is
+  // essentially all image. Much under that means a variant is drawing empty boxes.
   val blank = painted.filterKeys { it != "empty list" }.filterValues { it <= 0.85 }.keys
   check(blank.isEmpty()) { "$blank drew nothing mid scroll, so the rows below are not comparable" }
-  // Unlike the first frame rows, a scroll is supposed to fetch: the list is longer than anything
-  // that was warmed, and items scrolling in are new. Both sides should be fetching the same amount,
-  // and a gap here is a cache that is not reusing what it has rather than a Compose layer that is
-  // cheaper. The measured window is the same distance for both, so the counts are comparable.
+  // A scroll is supposed to fetch, unlike the first frame rows: both sides should fetch the same
+  // amount, and a gap is a cache not reusing what it has rather than a cheaper Compose layer.
   println(
     "  fetches so far, per loader: landscapist ${landscapistCounter.count.get()}, " +
       "coil ${coilCounter.count.get()}, coil crossfade ${fadingCounter.count.get()}",
@@ -101,16 +91,11 @@ internal fun scrollComparison() {
   println(
     "allocation per frame while scrolling $LIST_ITEMS items at ${SCROLL_STEP.toInt()} px per frame",
   )
-  // Interleaved, so drift over the run lands on every variant rather than on whichever went last,
-  // and so every variant is at the same scroll position on the same round. A list allocates
-  // differently at different offsets, and running one variant to completion before starting the
-  // next would compare frame 1 of one against frame 401 of another.
+  // Interleaved, so every variant is at the same scroll position on the same round. A list
+  // allocates differently at different offsets.
   val samples = interleavedScrollAllocation(variants.map { it.second }, SCROLL_FRAMES)
-  // Median and mean, because for a scroll they answer different questions and only one of them is
-  // flattering. At 16 px a frame a 180 px item enters every eleventh frame, so the median frame
-  // composes nothing at all and reports only the cost of laying out and drawing what is already
-  // there. The mean is the one a user feels, because the frames that do compose are the frames that
-  // drop. Reporting the median alone would hide the entire composition cost of a scrolling list.
+  // Median and mean, because a scroll answers them differently: the median frame composes
+  // nothing, and the mean is the one a user feels, since composing frames are dropping frames.
   val floorMedian = samples[0].median()
   val floorMean = samples[0].mean()
   println(
@@ -151,17 +136,9 @@ internal fun scrollComparison() {
 }
 
 /**
- * One fling down the list and back up, with a cache far smaller than the list.
- *
- * This is the only row where an eviction policy is visible. Both caches are sized to hold about a
- * tenth of the images, so the way back up finds most of what it needs already gone, and every miss
- * is a decode a user would have paid for.
- *
- * A collection is forced at the turn, and that is what makes the row mean anything. Both libraries
- * keep evicted entries behind weak references, so without it the number says whether the collector
- * happened to run during the fling rather than what either cache does. It moved between 240 and 440
- * on the same code for that reason alone, and read as a policy difference that is not there: with
- * the collection forced, both sides re-decode the same 456 images.
+ * One fling down the list and back up, with a cache sized for a tenth of it, which is the only
+ * row where an eviction policy is visible. A collection is forced at the turn: both libraries
+ * keep evicted entries behind weak references, so without it the row reports collector timing.
  */
 private fun thrashComparison() {
   val cacheBytes = LIST_ITEMS.toLong() * bytesPerItem() / 10
@@ -186,11 +163,8 @@ private fun thrashComparison() {
   ) { "$it" }
   val coilCache = coil.memoryCache!!
   landscapistCache.cleanupWeakReferences()
-  // Entries that still hold an image, not keys. Both libraries keep evicted entries behind weak
-  // references, and a key whose referent has been collected outlives the image on both sides:
-  // landscapist's until the tier is swept, Coil's for as long as the key is in `keys`. Counting
-  // keys therefore counted images that are gone, and did it for one side only, since the sweep
-  // above has already dropped landscapist's. Each key is asked for its image instead.
+  // Entries that still hold an image, not keys: a key whose referent has been collected outlives
+  // the image on both sides, and the sweep above has already dropped landscapist's.
   val landscapistKeys = (landscapistCache.strongCacheCount + landscapistCache.weakCacheCount)
     .toLong()
   val coilKeys = coilCache.keys.count { coilCache[it] != null }.toLong()
@@ -216,16 +190,15 @@ private fun scrollThereAndBack(label: String, content: @Composable (LazyListStat
     scene.render(0L).close()
     val frames = (LIST_ITEMS * ITEM_HEIGHT - VIEWPORT_HEIGHT) / FLING_STEP.toInt() + 1
     repeat(frames) { advance(scene, state, FLING_STEP, it) }
-    // Before the way back, so both libraries face the same question: what does the cache still
-    // hold, rather than what has the collector not got round to yet.
+    // Before the way back, so both face the same question: what the cache still holds, rather
+    // than what the collector has not got round to.
     System.gc()
     Thread.sleep(GC_SETTLE_MS)
     System.gc()
     val bottom = state.firstVisibleItemIndex
     repeat(frames) { advance(scene, state, -FLING_STEP, frames + it) }
     val top = state.firstVisibleItemIndex
-    // A scroll that silently did not move would report one fetch per item and look like a perfect
-    // cache. The trip has to be shown to have happened before its fetch count means anything.
+    // A scroll that did not move would report one fetch per item and look like a perfect cache.
     check(bottom > LIST_ITEMS - 10 && top == 0) {
       "$label did not scroll: reached item $bottom and came back to $top"
     }
@@ -388,10 +361,8 @@ private fun CoilLazyList(imageLoader: ImageLoader, models: List<String>, state: 
 }
 
 /**
- * The painter form Coil points a performance minded caller at, with a size on the request.
- *
- * Without one it falls back to `SizeResolver.ORIGINAL` and cannot reuse anything `AsyncImage`
- * cached at the layout size, which is a different comparison. [firstFrameComparison] measures that.
+ * The painter form Coil points a performance minded caller at, sized on the request. Without a
+ * size it falls back to `SizeResolver.ORIGINAL`, which is a different comparison.
  */
 @Composable
 private fun CoilPainterLazyList(
