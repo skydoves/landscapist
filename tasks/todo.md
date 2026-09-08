@@ -102,9 +102,11 @@ platform decoder.
       telling the decoder which, and `ImageRequest` is a public data class, so a field for it
       changes the constructor and `copy` signatures. That is a binary break, so it needs a release
       that takes one. Measured: 1200x801 decoded for a 550px box.
-- [ ] `GlobalBitmapPool` is dead. Both call sites, `ImageDecoder.android.kt:194` and
-      `RegionDecoder.android.kt:104`, only ask for a reusable bitmap; nothing anywhere calls
-      `put`, so the pool is always empty and `inBitmap` reuse never happens. Either wire it up
-      or delete it, but it should not sit in the middle of the decode path doing nothing.
-- [ ] Android and desktop disagree on a truncated image: BitmapFactory returns the rows it read,
-      the desktop Skia path throws. Worth deciding which is right.
+- [x] `GlobalBitmapPool` is never filled by the library, so `inBitmap` reuse does not happen.
+      Deleting it would break the ABI and filling it safely needs to know when a bitmap has
+      stopped being drawn, which is a feature rather than a fix. Documented on the class so
+      nobody assumes pooling is happening.
+- [x] A download that stops short of its declared length fails rather than becoming half an
+      image, on both platforms; pinned by a test. The disagreement that remains is a complete
+      response carrying corrupt bytes, where Android returns the rows it read and desktop throws.
+      Neither is wrong and the dangerous path is covered.

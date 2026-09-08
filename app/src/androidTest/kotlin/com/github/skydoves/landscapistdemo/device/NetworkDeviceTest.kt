@@ -240,4 +240,21 @@ class NetworkDeviceTest {
     const val LOAD_TIMEOUT_MS = 20_000L
     val READ_TIMEOUT = 1.seconds
   }
+
+  @Test
+  fun aDownloadThatStopsShortOfItsLengthDoesNotBecomeAHalfImage() {
+    // What a dropped connection looks like: the response promises a length and the socket closes
+    // before it arrives. Android's decoder is happy to return the rows it managed to read, so
+    // without the short body being caught this would cache half an image under the real url.
+    val whole = ImageFixtures.photo(200, 200)
+    server.serve(
+      "/short.jpg",
+      whole.copyOf(whole.size / 3),
+      declaredLength = whole.size,
+    )
+
+    val result = load(server.url("/short.jpg"), 100, 100)
+
+    assertTrue("a truncated download succeeded: $result", result is ImageResult.Failure)
+  }
 }

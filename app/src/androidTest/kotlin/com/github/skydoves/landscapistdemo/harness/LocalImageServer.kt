@@ -57,8 +57,9 @@ class LocalImageServer : AutoCloseable {
     delayMs: Long = 0,
     headers: List<String> = emptyList(),
     gate: CountDownLatch? = null,
+    declaredLength: Int? = null,
   ) {
-    routes[path] = Route(body, contentType, status, delayMs, headers, gate)
+    routes[path] = Route(body, contentType, status, delayMs, headers, gate, declaredLength)
   }
 
   fun redirect(path: String, target: String, headers: List<String> = emptyList()) {
@@ -69,11 +70,12 @@ class LocalImageServer : AutoCloseable {
       delayMs = 0,
       headers = listOf("Location: $target") + headers,
       gate = null,
+      declaredLength = null,
     )
   }
 
   fun fail(path: String, status: Int = 404) {
-    routes[path] = Route(ByteArray(0), "text/plain", status, 0, emptyList(), null)
+    routes[path] = Route(ByteArray(0), "text/plain", status, 0, emptyList(), null, null)
   }
 
   init {
@@ -113,12 +115,19 @@ class LocalImageServer : AutoCloseable {
       val route = routes[path]
       val output = client.getOutputStream()
       if (route == null) {
-        write(output, 404, "text/plain", ByteArray(0), emptyList())
+        write(output, 404, "text/plain", ByteArray(0), emptyList(), 0)
         return
       }
       if (route.delayMs > 0) Thread.sleep(route.delayMs)
       route.gate?.await(30, TimeUnit.SECONDS)
-      write(output, route.status, route.contentType, route.body, route.headers)
+      write(
+        output = output,
+        status = route.status,
+        contentType = route.contentType,
+        body = route.body,
+        headers = route.headers,
+        declaredLength = route.declaredLength ?: route.body.size,
+      )
     }
   }
 
@@ -128,11 +137,14 @@ class LocalImageServer : AutoCloseable {
     contentType: String,
     body: ByteArray,
     headers: List<String>,
+    declaredLength: Int,
   ) {
     val head = buildString {
       append("HTTP/1.1 ").append(status).append(' ').append(reason(status)).append("\r\n")
       append("Content-Type: ").append(contentType).append("\r\n")
-      append("Content-Length: ").append(body.size).append("\r\n")
+      // Declared rather than actual, so a route can promise more than it sends, which is what a
+      // dropped connection looks like to a client.
+      append("Content-Length: ").append(declaredLength).append("\r\n")
       append("Connection: close\r\n")
       // Verbatim, so a header a parser would refuse still reaches the client.
       for (header in headers) append(header).append("\r\n")
@@ -176,6 +188,7 @@ class LocalImageServer : AutoCloseable {
     val delayMs: Long,
     val headers: List<String>,
     val gate: CountDownLatch?,
+    val declaredLength: Int?,
   )
 
   data class Recorded(val path: String, val headers: List<String>) {
