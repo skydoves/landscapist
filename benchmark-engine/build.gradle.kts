@@ -19,6 +19,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 plugins {
   kotlin("jvm")
   application
+  alias(libs.plugins.jetbrains.compose)
+  alias(libs.plugins.compose.compiler)
   id("landscapist.spotless")
 }
 
@@ -33,8 +35,13 @@ application {
 }
 
 dependencies {
+  implementation(project(":landscapist"))
   implementation(project(":landscapist-core"))
+  implementation(project(":landscapist-image"))
   implementation(libs.coil3)
+  implementation("io.coil-kt.coil3:coil-compose:${libs.versions.coil3.get()}")
+  implementation(compose.desktop.currentOs)
+  implementation(compose.foundation)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.okio)
   runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skiko.get()}")
@@ -51,6 +58,25 @@ fun skikoHostTarget(): String {
   }
   val archPart = if (arch.contains("aarch64") || arch.contains("arm64")) "arm64" else "x64"
   return "$osPart-$archPart"
+}
+
+// Nothing consumes a distribution of a benchmark, and building one on every assemble both wastes
+// CI time and trips over duplicate jars in the Compose dependency graph. `run` is the entry point.
+tasks.named("distTar") { enabled = false }
+tasks.named("distZip") { enabled = false }
+
+// Allocation profiling for one Compose variant at a time, which is how the numbers above were
+// tracked down: `./gradlew :benchmark-engine:run -Pjfr=/path/rec.jfr -Pprofile=landscapist-resize`.
+// Without -Pjfr the benchmark runs normally.
+tasks.named<JavaExec>("run") {
+  val recording = providers.gradleProperty("jfr").orNull
+  if (recording != null) {
+    jvmArgs(
+      "-XX:StartFlightRecording=settings=profile,filename=$recording,dumponexit=true",
+      "-XX:StartFlightRecording:jdk.ObjectAllocationSample#throttle=6000/s",
+    )
+    environment("LANDSCAPIST_PROFILE", providers.gradleProperty("profile").getOrElse("landscapist"))
+  }
 }
 
 tasks.withType<KotlinJvmCompile>().configureEach {

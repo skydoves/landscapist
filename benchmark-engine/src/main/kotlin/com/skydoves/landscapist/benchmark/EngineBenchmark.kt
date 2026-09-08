@@ -38,6 +38,12 @@ import kotlinx.coroutines.runBlocking
  * engines against each other, not as absolute figures for any device.
  */
 fun main() {
+  // A profiling mode that renders one list over and over, so an allocation profiler sees nothing
+  // but the Compose path. Not part of the reported numbers.
+  System.getenv("LANDSCAPIST_PROFILE")?.let {
+    profileComposeOnly(it)
+    return
+  }
   println("Engine benchmark: landscapist-core vs Coil ${coilVersion()}")
   println("JVM ${System.getProperty("java.version")} on ${System.getProperty("os.arch")}")
   println("Fetcher returns a pre-decoded image for both, so decoding is out of the measurement.")
@@ -50,6 +56,8 @@ fun main() {
   allocations()
   coalescing()
   nearIdenticalSizes()
+  decodeComparison()
+  composeComparison()
 
   println("=".repeat(96))
   println("Percentiles over the reported iteration count. Lower is better.")
@@ -183,23 +191,34 @@ private fun allocations() {
  * rather than reusing the bitmap it already had.
  */
 private fun nearIdenticalSizes() {
-  val landscapistCounter = FetchCounter()
-  val coilCounter = FetchCounter()
-  val landscapist = newLandscapist(landscapistCounter)
-  val coil = newCoil(coilCounter)
-  val model = "https://example.com/grid-item.jpg"
-  val widths = listOf(360, 359, 361, 360, 358, 360)
-
-  runBlocking {
-    for (width in widths) {
-      landscapist.load(landscapistRequest(model, width)).first { it is ImageResult.Success }
-      coil.execute(coilRequest(model, width))
+  // More than one sequence, because only some of them flatter either side. A grid that jitters by a
+  // pixel reuses what it has; a sequence that keeps growing genuinely needs more pixels every time,
+  // and landscapist refuses to upscale where Coil's stub, handed isSampled = false, accepts before
+  // it ever compares sizes.
+  val sequences = listOf(
+    "a grid jittering by a pixel" to listOf(360, 359, 361, 360, 358, 360),
+    "the same grid, ascending" to listOf(358, 359, 360, 361, 362, 363),
+    "an image growing into a transition" to listOf(120, 200, 320, 480, 640, 800),
+    "the same transition, shrinking" to listOf(800, 640, 480, 320, 200, 120),
+  )
+  println("fetches for one image asked for at six sizes in a row")
+  for ((name, widths) in sequences) {
+    val landscapistCounter = FetchCounter()
+    val coilCounter = FetchCounter()
+    val landscapist = newLandscapist(landscapistCounter)
+    val coil = newCoil(coilCounter)
+    val model = "https://example.com/grid-item.jpg"
+    runBlocking {
+      for (width in widths) {
+        landscapist.load(landscapistRequest(model, width)).first { it is ImageResult.Success }
+        coil.execute(coilRequest(model, width))
+      }
     }
+    println(
+      "  ${name.padEnd(36)}landscapist ${landscapistCounter.count.get()}, " +
+        "coil ${coilCounter.count.get()}   $widths",
+    )
   }
-
-  println("same image at ${widths.size} near identical sizes $widths")
-  println("  landscapist    ${landscapistCounter.count.get()} fetch(es)")
-  println("  coil           ${coilCounter.count.get()} fetch(es)")
   println()
 }
 

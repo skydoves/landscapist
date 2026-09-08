@@ -51,8 +51,11 @@ internal inline fun measure(
 
   val values = LongArray(iterations)
   for (i in 0 until iterations) {
+    // Past the warmup's indices, so a scenario that builds its input from the index is measured on
+    // inputs it has not already seen. A cold load that reused them would be timing cache hits.
+    val index = warmups + i
     val start = System.nanoTime()
-    operation(i)
+    operation(index)
     values[i] = System.nanoTime() - start
   }
   return Samples(label, values)
