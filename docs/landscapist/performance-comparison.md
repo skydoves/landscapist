@@ -56,7 +56,20 @@ These observations come from our own engine-level runs and will differ on your h
 - Glide tends to win on repeated decodes of the same size (the scrolling case), because it reuses bitmap buffers through an `inBitmap` pool. That is a trade of memory for speed that Coil deliberately forgoes too, and landscapist-core does not match Glide's pooled decode throughput.
 - Measure with a matched configuration. Hardware bitmaps (the Android default) decode slowly under an emulator's software GPU, which makes any emulator number unrepresentative of a real device, so compare matched configs and prefer a physical device for absolute figures.
 
-The honest positioning: landscapist-core's edge is the smaller footprint and the Kotlin Multiplatform reach, not a faster decoder. On raw loader speed it is a competitive peer to Coil3, not a leader.
+The honest positioning, and it is worth being precise about which "footprint" is meant. The AAR is
+smaller; the runtime memory is not. landscapist-core keys its memory cache on the size an image is
+drawn at, so it holds one entry per distinct size where Coil holds one per image: three times the
+entries and up to seven times the bytes for a screen that asks for near duplicate sizes. What it
+buys is that a 96 px slot is answered with 96 px, where Coil answers it with whatever it has, which
+can be the 720 px detail bitmap and 56 times the pixels to sample on every frame that draws it.
+
+On speed, measured on the JVM against Coil 3.6.2 in the same process (`./gradlew
+:benchmark-engine:run`): landscapist decodes a 4000x3000 JPEG down to 400x300 in 42 ms against
+Coil's 49 ms, allocates 748 B per memory cache hit against 1.6 KiB, and reaches the network once
+where Coil reaches it 32 times for 32 concurrent requests for one image. It loses on a cold load,
+by about 15 percent, to a thread hop it takes deliberately so that blocking disk reads stay off the
+caller's thread. **None of this is measured on Android**, which is the platform that ships, and the
+decoders there are different code on both sides.
 
 ### 2. Macrobenchmark (frame timing and jank)
 
@@ -76,13 +89,19 @@ The core engines are in the same family. landscapist-core is a from-scratch Kotl
 
 | Capability | landscapist-core | Coil3 |
 |-----------|------------------|-------|
-| Memory cache (LRU, byte-bounded) | Yes, plus a weak reference second tier | Yes |
+| Memory cache (LRU, byte-bounded) | Yes, plus a weak reference second tier | Yes, with the same second tier |
 | Disk cache | Yes (Okio based) | Yes |
 | Downsampling at decode (Android) | Yes (two-pass `inSampleSize`) | Yes |
 | Hardware bitmaps (Android) | Yes (opaque images, API 26+) | Yes |
 | Bitmap pooling / `inBitmap` reuse | Yes (Android) | Dropped (net negative in Coil's testing) |
 | Kotlin Multiplatform (Android / iOS / Desktop / Web) | Yes | Yes |
 | Cancellation on composable dispose | Yes | Yes |
+
+Two notes on that first row, because it reads as a difference and is not one. Coil keeps the same
+weak reference tier, enabled by default, so an evicted entry stays reachable there on both sides.
+And "byte-bounded" bounds only what each cache reports: 40 images of 256 KiB put through a 1 MiB
+cache leave both of them reporting 1.00 MiB while holding 10.00 MiB that the collector has not run
+on yet.
 
 ## When to choose which
 

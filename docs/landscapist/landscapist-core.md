@@ -317,9 +317,18 @@ yourself. The exact target size is matched first, and when nothing is cached for
 decoded size of the same image is returned, since a composable that has not been measured yet has no
 target size to ask for.
 
+This is about an image that is **already in memory**. Nothing about it helps a cold cache: a
+composable cannot size its request until a layout pass has told it the bounds, so a first load
+starts a frame later than one whose size was known up front, and the image arrives a frame or two
+behind Coil, which suspends inside a request it has already issued. What `peekMemoryCache` buys is
+the second time an image is shown, which in a list is most of the time.
+
 ### Disk Cache
 
 Persistent disk cache for offline access:
+
+The key is the URL, so one download answers every size the image is drawn at. Pass `noDiskCache()`
+to the builder for a loader that writes nothing to disk; leaving it unset gives you the default one.
 
 ```kotlin
 // Disk cache is managed automatically
