@@ -38,15 +38,17 @@ import kotlinx.coroutines.runBlocking
  * engines against each other, not as absolute figures for any device.
  */
 fun main() {
+  // A child forked to have its resident set watched from outside while it decodes exactly once.
+  // Checked first, because a child inherits this process's environment: a run started with -Pjfr
+  // sets LANDSCAPIST_PROFILE, and the child would have profiled a Compose list instead of decoding.
+  System.getenv("LANDSCAPIST_DECODE_PATH")?.let {
+    runDecodeChild(it, System.getenv("LANDSCAPIST_DECODE_PHOTO"))
+    return
+  }
   // A profiling mode that renders one list over and over, so an allocation profiler sees nothing
   // but the Compose path. Not part of the reported numbers.
   System.getenv("LANDSCAPIST_PROFILE")?.let {
     profileComposeOnly(it)
-    return
-  }
-  // A child forked to have its resident set watched from outside while it decodes exactly once.
-  System.getenv("LANDSCAPIST_DECODE_PATH")?.let {
-    runDecodeChild(it, System.getenv("LANDSCAPIST_DECODE_PHOTO"))
     return
   }
   // A child of a spread run narrates nothing and reports its recorded metrics instead. The rows it

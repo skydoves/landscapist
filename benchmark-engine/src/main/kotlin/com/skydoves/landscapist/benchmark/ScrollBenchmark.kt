@@ -118,8 +118,8 @@ internal fun scrollComparison() {
       "mean ${floorMean.formatBytes()}  (the floor, subtracted below)",
   )
   for (index in 1 until variants.size) {
-    val perFrame = samples[index].median() - floorMedian
-    val meanFrame = samples[index].mean() - floorMean
+    val perFrame = samples[index].median().above(floorMedian)
+    val meanFrame = samples[index].mean().above(floorMean)
     Metrics.record("scroll.frame.${variants[index].first.metricKey()}.bytes", meanFrame)
     println(
       "  ${variants[index].first.padEnd(22)}median ${perFrame.formatBytes().padEnd(12)}" +

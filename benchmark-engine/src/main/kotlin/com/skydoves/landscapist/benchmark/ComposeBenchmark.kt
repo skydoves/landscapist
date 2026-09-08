@@ -97,6 +97,12 @@ internal fun composeComparison() {
   val painted = variants.associate { (name, content) ->
     name to paintedFraction { content(ITEM_SIZE) }
   }
+  check(landscapistCounter.count.get() == models.size && coilCounter.count.get() == models.size) {
+    "the warm up pass still reached the fetcher: landscapist " +
+      "${landscapistCounter.count.get()}, coil ${coilCounter.count.get()} for ${models.size} " +
+      "images. Nothing below is a warm cache measurement."
+  }
+
   println("share of the first frame actually covered by image pixels")
   for ((name, share) in painted) {
     println("  ${name.padEnd(22)}${share.asPercent()}")
@@ -132,7 +138,7 @@ internal fun composeComparison() {
   println("allocation per first frame of $ITEM_COUNT images")
   println("  ${"empty scene".padEnd(22)}${floor.formatBytes()}  (the floor, subtracted below)")
   for (index in 1 until variants.size) {
-    val perFrame = samples[index].median() - floor
+    val perFrame = samples[index].median().above(floor)
     Metrics.record("compose.first-frame.${variants[index].first.metricKey()}.bytes", perFrame)
     println("  ${variants[index].first.padEnd(22)}${perFrame.formatBytes()}")
   }
@@ -165,7 +171,7 @@ internal fun composeComparison() {
   val floorLabel = "empty scene".padEnd(22)
   println("  $floorLabel${scrollFloor.formatBytes()}  (the floor, subtracted below)")
   for (index in 1 until variants.size) {
-    val perFrame = resizeAllocation(variants[index].second) - scrollFloor
+    val perFrame = resizeAllocation(variants[index].second).above(scrollFloor)
     Metrics.record("compose.resize-frame.${variants[index].first.metricKey()}.bytes", perFrame)
     println("  ${variants[index].first.padEnd(22)}${perFrame.formatBytes()}")
   }

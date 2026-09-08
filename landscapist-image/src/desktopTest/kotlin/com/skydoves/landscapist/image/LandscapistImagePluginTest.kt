@@ -134,10 +134,11 @@ class LandscapistImagePluginTest {
     try {
       val image = scene.render(nanos)
       try {
-        val bitmap = org.jetbrains.skia.Bitmap()
-        bitmap.allocN32Pixels(image.width, image.height)
-        check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
-        val bytes = bitmap.readPixels() ?: error("no pixels")
+        val bytes = org.jetbrains.skia.Bitmap().use { bitmap ->
+          bitmap.allocN32Pixels(image.width, image.height)
+          check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
+          bitmap.readPixels() ?: error("no pixels")
+        }
         return IntArray(sceneSize * sceneSize) { index ->
           val offset = index * 4
           (bytes[offset + 3].toInt() and 0xFF shl 24) or
@@ -172,10 +173,11 @@ class LandscapistImagePluginTest {
       repeat(count) { frame ->
         val image = scene.render(frame.toLong() * 16_000_000)
         try {
-          val bitmap = org.jetbrains.skia.Bitmap()
-          bitmap.allocN32Pixels(image.width, image.height)
-          check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
-          val bytes = bitmap.readPixels() ?: error("no pixels")
+          val bytes = org.jetbrains.skia.Bitmap().use { bitmap ->
+            bitmap.allocN32Pixels(image.width, image.height)
+            check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
+            bitmap.readPixels() ?: error("no pixels")
+          }
           pixels = IntArray(sceneSize * sceneSize) { index ->
             val offset = index * 4
             (bytes[offset + 3].toInt() and 0xFF shl 24) or
@@ -259,10 +261,11 @@ class LandscapistImagePluginTest {
       listOf(1L, 20L * 1_000_000, 400L * 1_000_000, 800L * 1_000_000).map { nanos ->
         val frame = scene.render(nanos)
         try {
-          val bitmap = org.jetbrains.skia.Bitmap()
-          bitmap.allocN32Pixels(frame.width, frame.height)
-          check(frame.readPixels(bitmap, 0, 0))
-          val bytes = bitmap.readPixels() ?: error("no pixels")
+          val bytes = org.jetbrains.skia.Bitmap().use { bitmap ->
+            bitmap.allocN32Pixels(frame.width, frame.height)
+            check(frame.readPixels(bitmap, 0, 0))
+            bitmap.readPixels() ?: error("no pixels")
+          }
           var painted = 0
           var i = 0
           while (i + 3 < bytes.size) {
@@ -470,7 +473,10 @@ class LandscapistImagePluginTest {
 
     val pixels = render(content = image(loader, component(CrossfadePlugin(duration = 300))))
 
-    assertEquals(1.0, pixels.coverage(), "the first frame faded in from nothing")
+    // Every pixel at full alpha, not merely non-zero: a frame part way through a fade covers the
+    // whole node too, so coverage alone cannot tell the two apart.
+    val faintest = pixels.minOf { it ushr 24 }
+    assertEquals(0xFF, faintest, "the first frame was faded rather than drawn")
   }
 
   @Test
@@ -512,10 +518,11 @@ class LandscapistImagePluginTest {
 
   /** The centre pixel of [image] as ARGB, closing it on the way out. */
   private fun readCentre(image: org.jetbrains.skia.Image): Int = try {
-    val bitmap = org.jetbrains.skia.Bitmap()
-    bitmap.allocN32Pixels(image.width, image.height)
-    check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
-    val bytes = bitmap.readPixels() ?: error("no pixels")
+    val bytes = org.jetbrains.skia.Bitmap().use { bitmap ->
+      bitmap.allocN32Pixels(image.width, image.height)
+      check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
+      bitmap.readPixels() ?: error("no pixels")
+    }
     val offset = ((sceneSize / 2) * sceneSize + sceneSize / 2) * 4
     (bytes[offset + 3].toInt() and 0xFF shl 24) or
       (bytes[offset + 2].toInt() and 0xFF shl 16) or

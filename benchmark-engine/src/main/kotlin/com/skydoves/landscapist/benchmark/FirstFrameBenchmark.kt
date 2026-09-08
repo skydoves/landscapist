@@ -245,7 +245,9 @@ private fun loadingAndFailure() {
   val samples = cases.map { (_, content) -> stateFrames(content) }
   val floor = samples[0].median()
   for (index in 1 until cases.size) {
-    println("  ${cases[index].first.padEnd(22)}${(samples[index].median() - floor).formatBytes()}")
+    println(
+      "  ${cases[index].first.padEnd(22)}${samples[index].median().above(floor).formatBytes()}",
+    )
   }
   println()
 }
@@ -270,7 +272,9 @@ private fun placeholderCase() {
   val samples = cases.map { (_, content) -> stateFrames(content) }
   val floor = samples[0].median()
   for (index in 1 until cases.size) {
-    println("  ${cases[index].first.padEnd(22)}${(samples[index].median() - floor).formatBytes()}")
+    println(
+      "  ${cases[index].first.padEnd(22)}${samples[index].median().above(floor).formatBytes()}",
+    )
   }
   // Both are meant to be showing something. A placeholder that never drew would allocate less for
   // doing nothing, and would read as the cheaper one.

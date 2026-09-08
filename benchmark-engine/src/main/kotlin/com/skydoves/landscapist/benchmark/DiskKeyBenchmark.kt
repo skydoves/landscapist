@@ -82,13 +82,12 @@ internal fun diskKeyComparison() {
       val result = landscapist.load(request).first { it is ImageResult.Success }
       check(result is ImageResult.Success)
       if (result.dataSource == DataSource.NETWORK) {
-        // The write is launched off the critical path, so give it a moment to land before the
-        // next size asks whether anything is there.
-        Thread.sleep(120)
+        // The write is launched off the critical path, so wait for the entry to appear rather than
+        // sleeping and hoping. A fixed sleep is a race, and losing it counts a download twice.
+        awaitEntry(directory, CacheKey.create(model, width = size, height = size).diskKey)
       }
     }
   }
-  Thread.sleep(250)
 
   val files = FileSystem.SYSTEM.list(directory.toString().toPath())
     .filterNot { it.name.endsWith(".tmp") }
@@ -147,5 +146,16 @@ private fun smallJpeg(): ByteArray {
   return ByteArrayOutputStream().use { out ->
     ImageIO.write(image, "jpg", out)
     out.toByteArray()
+  }
+}
+
+/** Waits for [key] to appear in [directory], or gives up after a second and lets the count stand. */
+private fun awaitEntry(directory: java.nio.file.Path, key: String) {
+  val deadline = System.nanoTime() + 1_000_000_000L
+  while (System.nanoTime() < deadline) {
+    val present = FileSystem.SYSTEM.list(directory.toString().toPath())
+      .any { it.name.startsWith(key) && !it.name.endsWith(".tmp") }
+    if (present) return
+    Thread.sleep(5)
   }
 }

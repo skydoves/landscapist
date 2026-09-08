@@ -44,13 +44,15 @@ public fun ImageComponent.ComposeLoadingStatePlugins(
   executor: @Composable (IntSize) -> Unit,
 ) {
   val plugins = imagePlugins
+  var seen = 0
   for (index in plugins.indices) {
     val plugin = plugins[index]
     if (plugin is ImagePlugin.LoadingStatePlugin) {
-      // Keyed on the plugin, so what it remembers follows the plugin rather than its position.
-      // Adding a plugin of another kind ahead of it used to shift every index after it, which
-      // discarded whatever the plugins there had remembered.
-      key(plugin) {
+      // Keyed on the plugin and on how many equal ones came before it. The plugin alone would let
+      // a component holding the same plugin twice hand both of them the same key, and neither
+      // would keep what it remembered; the position alone would move every plugin after one of
+      // another kind was added ahead of it.
+      key(plugin, seen++) {
         plugin.compose(modifier = modifier, imageOptions = imageOptions, executor = executor)
       }
     }
@@ -67,10 +69,11 @@ public fun ImageComponent.ComposeSuccessStatePlugins(
   imageBitmap: ImageBitmap?,
 ) {
   val plugins = imagePlugins
+  var seen = 0
   for (index in plugins.indices) {
     val plugin = plugins[index]
     if (plugin is ImagePlugin.SuccessStatePlugin) {
-      key(plugin) {
+      key(plugin, seen++) {
         plugin.compose(
           modifier = modifier,
           imageModel = imageModel,
@@ -91,10 +94,15 @@ public fun ImageComponent.ComposeFailureStatePlugins(
   reason: Throwable?,
 ) {
   val plugins = imagePlugins
+  var seen = 0
   for (index in plugins.indices) {
     val plugin = plugins[index]
     if (plugin is ImagePlugin.FailureStatePlugin) {
-      key(plugin) {
+      // Keyed on the plugin and on how many equal ones came before it. The plugin alone would let
+      // a component holding the same plugin twice hand both of them the same key, and neither
+      // would keep what it remembered; the position alone would move every plugin after one of
+      // another kind was added ahead of it.
+      key(plugin, seen++) {
         plugin.compose(modifier = modifier, imageOptions = imageOptions, reason = reason)
       }
     }

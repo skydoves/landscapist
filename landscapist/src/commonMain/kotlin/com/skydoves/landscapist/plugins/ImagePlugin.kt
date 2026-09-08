@@ -124,12 +124,14 @@ public fun Painter.composePainterPlugins(
 
   val bitmap = imageBitmap()
   var painter: Painter = this
+  var seen = 0
   for (index in imagePlugins.indices) {
     val plugin = imagePlugins[index]
     if (plugin is ImagePlugin.PainterPlugin) {
-      // Keyed on the plugin, so an animating painter keeps what it remembered when a plugin of
-      // another kind is added ahead of it and shifts every index after it.
-      painter = key(plugin) { plugin.compose(imageBitmap = bitmap, painter = painter) }
+      // Keyed on the plugin and on how many equal ones came before it, so an animating painter
+      // keeps what it remembered when another kind of plugin is added ahead of it, and a component
+      // holding the same plugin twice does not hand both of them the same key.
+      painter = key(plugin, seen++) { plugin.compose(imageBitmap = bitmap, painter = painter) }
     }
   }
   return painter

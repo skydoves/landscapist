@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okio.ByteString.Companion.encodeUtf8
 import okio.buffer
 import okio.use
 
@@ -299,7 +300,7 @@ public class Landscapist private constructor(
   private fun Int?.asPixelBound(): Int? = this?.takeIf { it > 0 && it != Int.MAX_VALUE }
 
   private fun ImageRequest.cacheKey(): CacheKey = CacheKey.create(
-    model = model,
+    model = identityScopedModel(),
     // Most requests carry no transformations, and map() would allocate a list to say so.
     transformationKeys = if (transformations.isEmpty()) {
       emptyList()
@@ -309,6 +310,24 @@ public class Landscapist private constructor(
     width = targetWidth,
     height = targetHeight,
   )
+
+  /**
+   * The model, scoped by any headers the request carries.
+   *
+   * Two requests for the same URL with different headers are not the same image. An Authorization
+   * or a Cookie header makes it a different viewer's image, and content negotiation makes it
+   * different bytes. Without this they share a cache entry, and on disk they share a file that
+   * outlives the process, so one caller's image is handed to another.
+   *
+   * A request with no headers, which is nearly all of them, keys exactly as it did before.
+   */
+  private fun ImageRequest.identityScopedModel(): Any? {
+    if (headers.isEmpty()) return model
+    val scope = headers.entries
+      .sortedBy { it.key }
+      .joinToString(separator = "\n") { "${it.key}: ${it.value}" }
+    return "$model#${scope.encodeUtf8().sha256().hex()}"
+  }
 
   private fun CachedImage.toSuccess(): ImageResult.Success = ImageResult.Success(
     data = data,

@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -418,7 +419,13 @@ private fun LandscapistImageInternal(
   // Converting allocates, and the loader's state only changes when the flow emits, not on every
   // frame the caller recomposes on.
   val landscapistState = state.toLandscapistImageState()
-  onState(landscapistState)
+  // Dispatched after the composition rather than during it, and only when the state has actually
+  // changed. Called inline it ran on every recomposition, so a caller that writes state from it
+  // recomposed this image, which called it again. The node path reports on change too, so both
+  // paths tell a caller the same story. rememberUpdatedState keeps a caller free to pass a fresh
+  // lambda every composition without the effect having to restart to see it.
+  val currentOnState by rememberUpdatedState(onState)
+  LaunchedEffect(landscapistState) { currentOnState(landscapistState) }
   // When nothing needs to be composed inside, the image is drawn by this node instead of a child.
   // That is one layout node per image rather than two, and it is the shape Image itself uses.
   val painter = if (paintOnContainer && landscapistState is LandscapistImageState.Success) {

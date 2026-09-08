@@ -76,8 +76,10 @@ tasks.named<JavaExec>("run") {
   val recording = providers.gradleProperty("jfr").orNull
   if (recording != null) {
     jvmArgs(
-      "-XX:StartFlightRecording=settings=profile,filename=$recording,dumponexit=true",
-      "-XX:StartFlightRecording:jdk.ObjectAllocationSample#throttle=6000/s",
+      // One option, because each -XX:StartFlightRecording starts a recording of its own: the
+      // throttle in a second option applied to a second recording that nothing ever read.
+      "-XX:StartFlightRecording=settings=profile,filename=$recording,dumponexit=true," +
+        "jdk.ObjectAllocationSample#throttle=6000/s",
     )
     environment("LANDSCAPIST_PROFILE", providers.gradleProperty("profile").getOrElse("landscapist"))
   }

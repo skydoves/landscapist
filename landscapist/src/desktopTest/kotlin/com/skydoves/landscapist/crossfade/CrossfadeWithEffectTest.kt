@@ -77,10 +77,11 @@ class CrossfadeWithEffectTest {
     fun renderCentre(nanos: Long): Int {
       val image = scene.render(nanos)
       try {
-        val bitmap = org.jetbrains.skia.Bitmap()
-        bitmap.allocN32Pixels(image.width, image.height)
-        check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
-        val bytes = bitmap.readPixels() ?: error("no pixels")
+        val bytes = org.jetbrains.skia.Bitmap().use { bitmap ->
+          bitmap.allocN32Pixels(image.width, image.height)
+          check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
+          bitmap.readPixels() ?: error("no pixels")
+        }
         val offset = ((size / 2) * size + size / 2) * 4
         return (bytes[offset + 3].toInt() and 0xFF shl 24) or
           (bytes[offset + 2].toInt() and 0xFF shl 16) or
@@ -203,10 +204,11 @@ class CrossfadeWithEffectTest {
       Snapshot.sendApplyNotifications()
       val image = scene.render(2L)
       try {
-        val bitmap = org.jetbrains.skia.Bitmap()
-        bitmap.allocN32Pixels(image.width, image.height)
-        check(image.readPixels(bitmap, 0, 0))
-        val bytes = bitmap.readPixels() ?: error("no pixels")
+        val bytes = org.jetbrains.skia.Bitmap().use { bitmap ->
+          bitmap.allocN32Pixels(image.width, image.height)
+          check(image.readPixels(bitmap, 0, 0))
+          bitmap.readPixels() ?: error("no pixels")
+        }
         val offset = ((size / 2) * size + size / 2) * 4
         (bytes[offset + 3].toInt() and 0xFF shl 24) or
           (bytes[offset + 2].toInt() and 0xFF shl 16) or
@@ -270,10 +272,11 @@ class CrossfadeWithEffectTest {
     try {
       val image = scene.render(0L)
       try {
-        val bitmap = org.jetbrains.skia.Bitmap()
-        bitmap.allocN32Pixels(image.width, image.height)
-        check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
-        val bytes = bitmap.readPixels() ?: error("no pixels")
+        val bytes = org.jetbrains.skia.Bitmap().use { bitmap ->
+          bitmap.allocN32Pixels(image.width, image.height)
+          check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
+          bitmap.readPixels() ?: error("no pixels")
+        }
         return IntArray(size * size) { index ->
           val offset = index * 4
           (bytes[offset + 3].toInt() and 0xFF shl 24) or

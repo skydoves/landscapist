@@ -101,6 +101,13 @@ internal object SkiaJvmDecoder {
           maxSize = maxSize,
         )
 
+        // Only a JPEG can be decoded straight into a smaller raster here, because that is
+        // libjpeg's eighths scaling and nothing else offers it. Anything else would decode at full
+        // size and shrink afterwards, which is what ImageIO already does and does with subsampling,
+        // so it is handed back rather than decoded worse.
+        val shrinking = finalWidth < originalWidth || finalHeight < originalHeight
+        if (shrinking && codec.encodedImageFormat != EncodedImageFormat.JPEG) return null
+
         val decoded = readScaled(codec, originalWidth, originalHeight, finalWidth, finalHeight)
         try {
           val exact = if (decoded.width == finalWidth && decoded.height == finalHeight) {

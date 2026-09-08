@@ -25,6 +25,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.layout.ContentScale
@@ -113,10 +114,11 @@ class LandscapistImageClipTest {
     try {
       val image = scene.render(0L)
       try {
-        val bitmap = org.jetbrains.skia.Bitmap()
-        bitmap.allocN32Pixels(image.width, image.height)
-        check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
-        val bytes = bitmap.readPixels() ?: error("no pixels")
+        val bytes = org.jetbrains.skia.Bitmap().use { bitmap ->
+          bitmap.allocN32Pixels(image.width, image.height)
+          check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
+          bitmap.readPixels() ?: error("no pixels")
+        }
         return IntArray(sceneSize * sceneSize) { index ->
           val offset = index * 4
           (bytes[offset + 3].toInt() and 0xFF shl 24) or
@@ -182,5 +184,48 @@ class LandscapistImageClipTest {
     }
 
     assertEquals(nodeSize * nodeSize, painted, "the node was not fully covered")
+  }
+
+  @Test
+  fun `a colour filter and an alpha reach the drawing`() {
+    // These live on ImageOptions and the container path has to carry them onto the paint modifier
+    // rather than drop them with the child it replaced. Asserting the size cannot see that: the
+    // size is fixed by the caller's modifier whether the filter arrives or not.
+    val loader = warmLoader()
+
+    val tinted = render {
+      Box(Modifier.size(sceneSize.dp)) {
+        LandscapistImage(
+          imageModel = { url },
+          landscapist = loader,
+          modifier = Modifier.size(nodeSize.dp),
+          imageOptions = ImageOptions(
+            contentScale = ContentScale.FillBounds,
+            colorFilter = ColorFilter.tint(Color.Blue),
+          ),
+          requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+        )
+      }
+    }
+    val faded = render {
+      Box(Modifier.size(sceneSize.dp)) {
+        LandscapistImage(
+          imageModel = { url },
+          landscapist = loader,
+          modifier = Modifier.size(nodeSize.dp),
+          imageOptions = ImageOptions(contentScale = ContentScale.FillBounds, alpha = 0.5f),
+          requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+        )
+      }
+    }
+
+    val centre = nodeSize / 2
+    assertEquals(
+      0xFF0000FF.toInt(),
+      tinted[centre * sceneSize + centre],
+      "the colour filter never reached the drawing",
+    )
+    val alpha = faded[centre * sceneSize + centre] ushr 24
+    assertTrue(alpha in 1..0xFE, "alpha never reached the drawing, read $alpha")
   }
 }

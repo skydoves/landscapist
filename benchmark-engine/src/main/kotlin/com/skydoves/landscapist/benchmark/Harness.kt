@@ -177,6 +177,15 @@ internal fun Long.formatNanos(): String = when {
   else -> "$this ns"
 }
 
+/**
+ * Subtracts a floor from a measurement, keeping an unavailable reading unavailable.
+ *
+ * [allocatedBytes] answers -1 when the counter is not there. Subtracting a floor from that produces
+ * an ordinary looking negative number, which formats as "n/a" by luck rather than by intent, and a
+ * floor that is itself unavailable would turn a real measurement into a large positive one.
+ */
+internal fun Long.above(floor: Long): Long = if (this < 0 || floor < 0) -1 else this - floor
+
 internal fun Long.formatBytes(): String = when {
   this < 0 -> "n/a"
   this >= 1_048_576 -> String.format(Locale.ROOT, "%.2f MiB", this / 1_048_576.0)

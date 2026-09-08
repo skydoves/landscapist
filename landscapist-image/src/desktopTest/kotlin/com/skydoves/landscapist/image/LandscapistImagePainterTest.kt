@@ -131,10 +131,11 @@ class LandscapistImagePainterTest {
       while (true) {
         val image = scene.render(frame.toLong() * 16_000_000)
         try {
-          val bitmap = org.jetbrains.skia.Bitmap()
-          bitmap.allocN32Pixels(image.width, image.height)
-          check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
-          val bytes = bitmap.readPixels() ?: error("no pixels")
+          val bytes = org.jetbrains.skia.Bitmap().use { bitmap ->
+            bitmap.allocN32Pixels(image.width, image.height)
+            check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
+            bitmap.readPixels() ?: error("no pixels")
+          }
           pixels = IntArray(sceneSize * sceneSize) { index ->
             val offset = index * 4
             (bytes[offset + 3].toInt() and 0xFF shl 24) or
