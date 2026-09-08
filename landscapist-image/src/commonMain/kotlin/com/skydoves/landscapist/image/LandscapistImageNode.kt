@@ -16,6 +16,9 @@
 package com.skydoves.landscapist.image
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
@@ -32,8 +35,6 @@ import androidx.compose.ui.layout.times
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.node.invalidateDraw
-import androidx.compose.ui.node.invalidateMeasurement
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
@@ -45,6 +46,9 @@ import com.skydoves.landscapist.core.Landscapist
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.ContinuationInterceptor
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.roundToInt
 
 /**
@@ -131,7 +135,16 @@ internal class LandscapistImageNode(
    * its own measurement and drawing directly, and a snapshot read from inside measure and draw
    * costs the observer a subscription per node per pass for a value that changes once.
    */
-  private var painter: Painter? = null
+  /**
+   * What the node draws, held as snapshot state rather than a plain field.
+   *
+   * The load finishes on whatever dispatcher the loader ends on, and telling the node to lay out
+   * and draw again from there reaches into the owner: on Android that is `View.requestLayout`,
+   * which throws `CalledFromWrongThreadException` off the main thread and fails the image with an
+   * error about view hierarchies. Snapshot state is safe to write from any thread by design, and
+   * measure and draw both read this, so Compose invalidates them itself, on the thread it chooses.
+   */
+  private var painter: Painter? by mutableStateOf(null)
 
   /** The last state handed to [onState], or null when none has been yet. */
   private var state: LandscapistImageState? = null
@@ -215,9 +228,9 @@ internal class LandscapistImageNode(
       cancelLoad()
       started = false
       state = null
-      // Through setPainter, so the image on screen is taken down in the same pass that puts the new
+      // Through showPainter, so the image on screen is taken down in the same pass that puts the new
       // one up rather than being left there until the load comes back.
-      setPainter(null)
+      showPainter(null)
       peek()
     }
   }
@@ -257,6 +270,17 @@ internal class LandscapistImageNode(
     val sized = buildSizedRequest(request, imageOptions, constraints)
     cancelLoad()
     loadJob = coroutineScope.launch {
+      // The dispatcher this node's scope runs on, which is the composition's, which is the UI
+      // thread. Captured because the collector below does not stay on it: the loader emits from
+      // whatever dispatcher it finished on, and a flow's collector runs wherever the emission
+      // happens. Publishing from there calls invalidateDraw on the layout node, which reaches
+      // straight into the owner and must be on the UI thread. On Android that throws
+      // CalledFromWrongThreadException and the image fails with an error about views.
+      //
+      // The composable this replaced never had the problem: it wrote Compose state, which is
+      // snapshot state and safe from any thread, and let Compose schedule the recomposition.
+      val ui = coroutineContext[ContinuationInterceptor] ?: EmptyCoroutineContext
+
       // Collected directly rather than through flow {}, catch {} and distinctUntilChanged(). Each
       // of those is another flow, another collector and another continuation per image, and none of
       // them is needed here: the conversion happens in the collector, publish already drops a state
@@ -265,11 +289,16 @@ internal class LandscapistImageNode(
       // No loading state is emitted up front either: Landscapist.load emits one only when the image
       // is not already in memory, so a cached image never passes through one.
       try {
-        landscapist.load(sized).collect { publish(it.toLandscapistImageState()) }
+        landscapist.load(sized).collect { result ->
+          val next = result.toLandscapistImageState()
+          // A no-op when the emission already arrived on the UI thread, which a memory cache hit
+          // does, so the common path pays nothing for this.
+          withContext(ui) { publish(next) }
+        }
       } catch (cancellation: CancellationException) {
         throw cancellation
       } catch (throwable: Throwable) {
-        publish(LandscapistImageState.Failure(reason = throwable))
+        withContext(ui) { publish(LandscapistImageState.Failure(reason = throwable)) }
       }
     }
   }
@@ -291,9 +320,9 @@ internal class LandscapistImageNode(
       }
       // With nowhere to hand it to, an image with no painter draws nothing, which is what a
       // composed painter for an unrecognised type did too. The state still reaches the caller.
-      setPainter(painted)
+      showPainter(painted)
     } else {
-      setPainter(null)
+      showPainter(null)
     }
     state = next
     onState?.invoke(next)
@@ -305,12 +334,9 @@ internal class LandscapistImageNode(
    * Measurement as well as drawing, because an axis the parent left unbounded is sized from the
    * image itself, so the first one to arrive changes how much space this node takes.
    */
-  private fun setPainter(next: Painter?) {
+  private fun showPainter(next: Painter?) {
     if (painter == next) return
     painter = next
-    if (!isAttached) return
-    invalidateMeasurement()
-    invalidateDraw()
   }
 
   /**

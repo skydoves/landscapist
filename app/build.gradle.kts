@@ -53,6 +53,8 @@ dependencies {
 
   implementation(project(":glide"))
   implementation(project(":coil3"))
+  // Coil's own Compose API, so the playground can put AsyncImage next to LandscapistImage.
+  implementation(libs.coil3.compose)
   implementation(project(":fresco"))
   implementation(project(":fresco-websupport"))
 

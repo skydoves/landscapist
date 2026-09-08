@@ -1,0 +1,339 @@
+/*
+ * Designed and developed by 2020-2023 skydoves (Jaewoong Eum)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.github.skydoves.landscapistdemo.device
+
+import android.graphics.Color
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.test.ComposeTimeoutException
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
+import com.github.skydoves.landscapistdemo.harness.ImageFixtures
+import com.github.skydoves.landscapistdemo.harness.LocalImageServer
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.core.Landscapist
+import com.skydoves.landscapist.image.LandscapistImage
+import com.skydoves.landscapist.image.LandscapistImageState
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import kotlin.math.abs
+
+/**
+ * What [LandscapistImage] measures to, and what size it asks the loader for, on a real device
+ * against real bytes over real HTTP.
+ *
+ * The equivalent desktop tests hand the composable a stub decoder that returns whatever size it
+ * was built with, so they can pin the layout but say nothing about the decode. Here the bytes are
+ * a real JPEG, the decoder is the platform one, and the size reported through
+ * `onImageStateChanged` is the size the bitmap actually came back at. That is what makes
+ * [theImageIsDecodedAtTheSizeItIsDrawnAt] meaningful: it is the claim the whole node structure
+ * exists for, and nothing else checks it on device.
+ *
+ * Sizes are compared against a sibling measured the same way rather than against a pixel count
+ * computed from a density, so the assertions hold on any screen.
+ */
+@LargeTest
+@RunWith(AndroidJUnit4::class)
+class SizingDeviceTest {
+
+  @get:Rule val compose = createComposeRule()
+
+  private lateinit var server: LocalImageServer
+
+  /** Built per test, so each starts with an empty memory cache and no disk cache at all. */
+  private lateinit var loader: Landscapist
+
+  @Before fun start() {
+    server = LocalImageServer()
+    loader = Landscapist.builder().noDiskCache().build()
+  }
+
+  @After fun stop() = server.close()
+
+  /** Collects what one image reported and what it measured to. */
+  private class Probe {
+    val states: MutableList<LandscapistImageState> = mutableListOf()
+    var size: IntSize = IntSize.Zero
+
+    val settled: Boolean
+      get() = states.any {
+        it is LandscapistImageState.Success || it is LandscapistImageState.Failure
+      }
+
+    val success: LandscapistImageState.Success?
+      get() = states.filterIsInstance<LandscapistImageState.Success>().lastOrNull()
+
+    fun trace(): String = states.joinToString { it::class.simpleName ?: "?" }
+  }
+
+  /** Waits for every [probes] entry to load, and fails with what they did instead. */
+  private fun awaitLoaded(vararg probes: Probe) {
+    try {
+      compose.waitUntil(LOAD_TIMEOUT_MS) { probes.all { probe -> probe.settled } }
+    } catch (timeout: ComposeTimeoutException) {
+      throw AssertionError(
+        "an image never reached a terminal state, saw ${probes.map { it.trace() }}",
+        timeout,
+      )
+    }
+    compose.waitForIdle()
+    for (probe in probes) {
+      val failure = probe.states.filterIsInstance<LandscapistImageState.Failure>().lastOrNull()
+      if (failure != null) throw AssertionError("the image failed to load: ${failure.reason}")
+    }
+  }
+
+  private fun Probe.loaded(): LandscapistImageState.Success =
+    success ?: throw AssertionError("no success reached the caller, saw ${trace()}")
+
+  private fun assertSameSize(what: String, expected: IntSize, actual: IntSize) {
+    assertTrue(
+      "$what was compared against a parent that never laid out, which proves nothing",
+      expected.width > 0 && expected.height > 0,
+    )
+    assertEquals(
+      "$what is ${actual.width}px wide, not the ${expected.width}px its parent offered",
+      expected.width,
+      actual.width,
+    )
+    assertEquals(
+      "$what is ${actual.height}px tall, not the ${expected.height}px its parent offered",
+      expected.height,
+      actual.height,
+    )
+  }
+
+  @Test
+  fun aSizeModifierIsHonoured() {
+    server.serve(PHOTO, ImageFixtures.photo(400, 300))
+    val url = server.url(PHOTO)
+    val probe = Probe()
+    var reference = IntSize.Zero
+
+    compose.setContent {
+      Row {
+        // A plain box under the same modifier, so the expected pixel size is measured rather than
+        // computed from a density this test would then have to be right about.
+        Box(Modifier.size(120.dp).onGloballyPositioned { reference = it.size })
+        LandscapistImage(
+          imageModel = { url },
+          landscapist = loader,
+          modifier = Modifier.size(120.dp).onGloballyPositioned { probe.size = it.size },
+          onImageStateChanged = { probe.states += it },
+        )
+      }
+    }
+    awaitLoaded(probe)
+
+    assertSameSize("an image under Modifier.size(120.dp)", reference, probe.size)
+  }
+
+  @Test
+  fun withNoSizeModifierTheImageFillsItsParent() {
+    // Drawing on the container node rather than in a child must not hand the painter's intrinsic
+    // size to the layout: a 400x300 image in a 200.dp parent fills it, as a child Image would.
+    server.serve(PHOTO, ImageFixtures.photo(400, 300))
+    val url = server.url(PHOTO)
+    val probe = Probe()
+    var parent = IntSize.Zero
+
+    compose.setContent {
+      Box(Modifier.size(200.dp).onGloballyPositioned { parent = it.size }) {
+        LandscapistImage(
+          imageModel = { url },
+          landscapist = loader,
+          modifier = Modifier.onGloballyPositioned { probe.size = it.size },
+          onImageStateChanged = { probe.states += it },
+        )
+      }
+    }
+    awaitLoaded(probe)
+
+    assertSameSize("an image with no size modifier", parent, probe.size)
+    val loaded = probe.loaded()
+    assertTrue(
+      "the image measured to its parent but never decoded anything, so the fill proves nothing",
+      loaded.originalWidth > 0 && loaded.originalHeight > 0,
+    )
+  }
+
+  @Test
+  fun fillMaxWidthAloneStillFillsTheParent() {
+    server.serve(PHOTO, ImageFixtures.photo(400, 300))
+    val url = server.url(PHOTO)
+    val probe = Probe()
+    var parent = IntSize.Zero
+
+    compose.setContent {
+      Box(Modifier.size(200.dp).onGloballyPositioned { parent = it.size }) {
+        LandscapistImage(
+          imageModel = { url },
+          landscapist = loader,
+          modifier = Modifier.fillMaxWidth().onGloballyPositioned { probe.size = it.size },
+          onImageStateChanged = { probe.states += it },
+        )
+      }
+    }
+    awaitLoaded(probe)
+
+    assertSameSize("an image under fillMaxWidth in a bounded parent", parent, probe.size)
+  }
+
+  @Test
+  fun anUnboundedHeightFollowsTheImageAspectRatio() {
+    // A scrolling column leaves the height unbounded, so the height has to come from the image. An
+    // 80x40 source is 2:1, so whatever width the column hands over, the image is half as tall.
+    server.serve(WIDE, ImageFixtures.photo(80, 40))
+    val url = server.url(WIDE)
+    val probe = Probe()
+
+    compose.setContent {
+      Column(Modifier.width(200.dp).verticalScroll(rememberScrollState())) {
+        LandscapistImage(
+          imageModel = { url },
+          landscapist = loader,
+          modifier = Modifier.fillMaxWidth().onGloballyPositioned { probe.size = it.size },
+          onImageStateChanged = { probe.states += it },
+        )
+      }
+    }
+    awaitLoaded(probe)
+
+    val measured = probe.size
+    assertTrue("the image never laid out inside the scrolling column", measured.width > 0)
+    val expectedHeight = measured.width / 2
+    assertTrue(
+      "a 2:1 image ${measured.width}px wide measured ${measured.height}px tall, not the " +
+        "${expectedHeight}px its own shape asks for",
+      abs(measured.height - expectedHeight) <= 1,
+    )
+    assertTrue(
+      "the image took the decoded bitmap's own ${probe.loaded().originalHeight}px height rather " +
+        "than the height its measured width implies",
+      measured.height != probe.loaded().originalHeight,
+    )
+  }
+
+  @Test
+  fun everyContentScaleStillMeasuresToItsParent() {
+    // How the pixels are fitted is a drawing decision. None of these may change how much room the
+    // image takes from the layout around it.
+    server.serve(PHOTO, ImageFixtures.photo(320, 240))
+    val url = server.url(PHOTO)
+    val scales = listOf(
+      "Crop" to ImageOptions(contentScale = ContentScale.Crop),
+      "Fit" to ImageOptions(contentScale = ContentScale.Fit),
+      "Inside" to ImageOptions(contentScale = ContentScale.Inside),
+      "None" to ImageOptions(contentScale = ContentScale.None),
+      "FillBounds" to ImageOptions(contentScale = ContentScale.FillBounds),
+    )
+    val probes = scales.associate { (name, _) -> name to Probe() }
+    val parents = mutableMapOf<String, IntSize>()
+
+    compose.setContent {
+      Row {
+        for ((name, options) in scales) {
+          val probe = probes.getValue(name)
+          Box(Modifier.size(48.dp).onGloballyPositioned { parents[name] = it.size }) {
+            LandscapistImage(
+              imageModel = { url },
+              landscapist = loader,
+              modifier = Modifier.onGloballyPositioned { probe.size = it.size },
+              imageOptions = options,
+              onImageStateChanged = { probe.states += it },
+            )
+          }
+        }
+      }
+    }
+    awaitLoaded(*probes.values.toTypedArray())
+
+    for ((name, _) in scales) {
+      assertSameSize(
+        "an image under ContentScale.$name",
+        parents[name] ?: IntSize.Zero,
+        probes.getValue(name).size,
+      )
+    }
+  }
+
+  @Test
+  fun theImageIsDecodedAtTheSizeItIsDrawnAt() {
+    // The claim the node structure exists for. The size to decode at is read off the parent's
+    // constraints while measuring, so a 2048px source drawn into a 120.dp slot must never reach the
+    // bitmap at 2048px. The platform decoder samples in powers of two, so it lands somewhere in
+    // [slot, 2 * slot): at or above the slot because it may not lose detail the slot can show, and
+    // under twice it because one more halving would have.
+    val source = 2048
+    server.serve(BIG, ImageFixtures.solid(source, source, Color.MAGENTA))
+    val url = server.url(BIG)
+    val probe = Probe()
+
+    compose.setContent {
+      Box(Modifier.size(120.dp)) {
+        LandscapistImage(
+          imageModel = { url },
+          landscapist = loader,
+          modifier = Modifier.onGloballyPositioned { probe.size = it.size },
+          onImageStateChanged = { probe.states += it },
+        )
+      }
+    }
+    awaitLoaded(probe)
+
+    val drawn = probe.size.width
+    val decoded = probe.loaded().originalWidth
+    assertTrue("the image never laid out, so there is no drawn size to compare against", drawn > 0)
+    assertTrue(
+      "a ${source}px source drawn into a ${drawn}px slot was decoded at ${decoded}px: the size " +
+        "the layout measured never reached the request",
+      decoded <= source / 2,
+    )
+    assertTrue(
+      "decoded at ${decoded}px for a ${drawn}px slot, which is less than the slot draws",
+      decoded >= drawn,
+    )
+    assertTrue(
+      "decoded at ${decoded}px for a ${drawn}px slot, more than twice what is drawn, so one " +
+        "further halving was available and was not taken",
+      decoded < drawn * 2,
+    )
+  }
+
+  private companion object {
+    const val PHOTO = "/photo.jpg"
+    const val WIDE = "/wide.jpg"
+    const val BIG = "/big.jpg"
+    const val LOAD_TIMEOUT_MS = 20_000L
+  }
+}
