@@ -14,39 +14,50 @@ This replaces that with verification that runs the real path on a real device.
 
 ## Phase 0: infrastructure
 
-- [ ] Local HTTP server for androidTest: real responses, controllable latency, status,
-      headers, redirects, content type, and byte payloads
-- [ ] Real image fixtures: JPEG, PNG, WebP, GIF, at several sizes, and a malformed one
-- [ ] On-device Compose measurement helper: frame timing and allocation per composable
+- [x] Local HTTP server for androidTest: latency, gates, status, headers, redirects, payloads
+- [~] Real image fixtures. JPEG and PNG are exercised, and a truncated and an undecodable one.
+      WebP is never served, and GIF cannot be produced by `Bitmap.compress` at all, so it needs a
+      bundled asset. The decoder branches on both, so neither is covered.
+- [~] On-device measurement helper. Allocation, wall time and resident set are there. Frame
+      timing is not, so nothing measures jank.
 
 ## Phase 1: on device regression sweep
 
-- [ ] Sizing and layout: bounded, unbounded, fillMaxWidth, aspectRatio, every ContentScale
-- [ ] Network: success, 404, timeout, redirect, malformed cookie, malformed bytes
-- [ ] Caching: memory hit, disk hit, size variant reuse, dedup of concurrent loads
-- [ ] Node path and composed path both draw
-- [ ] Model change, LazyColumn reuse, painter API
-- [ ] Crossfade on both paths
+- [~] Sizing and layout. Bounded, unbounded, fillMaxWidth, every ContentScale, and the decode
+      size. `Modifier.aspectRatio` is covered nowhere, on device or on desktop.
+- [~] Network. 404, 500, a body cut before its header, a redirect chain, a malformed cookie, and
+      a slow response passing through Loading. No timeout test.
+- [x] Caching: memory hit, disk hit, size variant reuse, an entry oversized on one axis, dedup
+- [x] Node path and composed path both draw
+- [~] Model change, LazyColumn reuse and the painter API are covered on desktop only. The
+      threading bug this branch shipped was invisible on desktop, so device coverage is what
+      counts here and these three do not have it.
+- [x] Crossfade on both paths
 
 ## Phase 2: plugin UI tests, one per plugin
 
-- [ ] Crossfade, CircularReveal, Shimmer, Palette, Zoomable
-- [ ] BlurTransformation, BlurHash, ThumbHash, Thumbnail
-- [ ] Placeholder (loading, failure), ProgressiveLoading
-- [ ] Plugin combinations that pick different internal paths
+- [x] Crossfade, CircularReveal, Shimmer, Palette, Zoomable
+- [x] BlurTransformation, BlurHash, ThumbHash, Thumbnail
+- [x] Placeholder (loading, failure), ProgressiveLoading
+- [x] Plugin combinations that pick different internal paths
 
 ## Phase 3: playground screen in the demo app
 
-- [ ] Every plugin toggleable and visible on device
-- [ ] Every loading behaviour: sizes, content scales, cache states, failures
+- [x] Every plugin toggleable and visible on device
+- [x] Every loading behaviour: sizes, content scales, cache states, failures
 
 ## Phase 4: real device measurement against Coil
 
-- [ ] First frame, scroll, memory, decode, on the emulator rather than the JVM
+- [~] Cold load, scroll allocation and decode are measured, three runs each. Time to the first
+      frame with pixels in it is not, and neither is resident memory, so the row the JVM
+      benchmark leads with has no device equivalent.
 
 ## Phase 5
 
-- [ ] Fix what the sweep finds, re-verify, update PR #988
+- [x] Fix what the sweep found: the threading regression and the blur radius that threw
+- [x] Re-verify: 649 unit tests, 79 device tests
+- [ ] Update PR #988. Its body still describes JVM measurements and says nothing about the
+      device suite, the threading regression, or the decode row that goes the other way.
 
 ## Device measurement, emulator, three runs
 
