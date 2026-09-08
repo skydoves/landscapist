@@ -15,11 +15,10 @@ This replaces that with verification that runs the real path on a real device.
 ## Phase 0: infrastructure
 
 - [x] Local HTTP server for androidTest: latency, gates, status, headers, redirects, payloads
-- [~] Real image fixtures. JPEG and PNG are exercised, and a truncated and an undecodable one.
-      WebP is never served, and GIF cannot be produced by `Bitmap.compress` at all, so it needs a
-      bundled asset. The decoder branches on both, so neither is covered.
-- [~] On-device measurement helper. Allocation, wall time and resident set are there. Frame
-      timing is not, so nothing measures jank.
+- [x] Real image fixtures: JPEG, PNG, WebP (lossy, lossless, and lossy with alpha), an animated
+      GIF built as a verified byte literal, a truncated one and an undecodable one
+- [x] On-device measurement: allocation, wall time, resident set, time to the first image, and
+      frame timing through the macrobenchmark module that was already here and had never run
 
 ## Phase 1: on device regression sweep
 
@@ -48,9 +47,8 @@ This replaces that with verification that runs the real path on a real device.
 
 ## Phase 4: real device measurement against Coil
 
-- [~] Cold load, scroll allocation and decode are measured, three runs each. Time to the first
-      frame with pixels in it is not, and neither is resident memory, so the row the JVM
-      benchmark leads with has no device equivalent.
+- [x] First image, all images, resident set, decode, scroll allocation and frame timing, each
+      in a fresh process where the measurement needs one
 
 ## Phase 5
 
@@ -112,5 +110,9 @@ platform decoder.
       plugin that reads pixels, such as the palette. The demo's palette does work over JPEG on this
       emulator, so either the palette port copies first or something else intervenes. Worth pinning
       with a test either way, and worth turning hardware off for a palette plugin if it does not.
+- [ ] `GlobalBitmapPool` is dead. Both call sites, `ImageDecoder.android.kt:194` and
+      `RegionDecoder.android.kt:104`, only ask for a reusable bitmap; nothing anywhere calls
+      `put`, so the pool is always empty and `inBitmap` reuse never happens. Either wire it up
+      or delete it, but it should not sit in the middle of the decode path doing nothing.
 - [ ] Android and desktop disagree on a truncated image: BitmapFactory returns the rows it read,
       the desktop Skia path throws. Worth deciding which is right.

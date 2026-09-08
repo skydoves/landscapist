@@ -19,6 +19,7 @@ import android.graphics.Color
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -47,6 +48,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 /** Sizes are compared against a sibling measured the same way, so they hold on any screen. */
 @LargeTest
@@ -229,6 +231,89 @@ class SizingDeviceTest {
   }
 
   @Test
+  fun anAspectRatioModifierIsHonouredAndReachesTheDecode() {
+    // A 4:3 source in a 16:9 box, so the ratio the layout settles on is not the image's own.
+    val source = 2048
+    server.serve(RATIO, ImageFixtures.solid(source, source * 3 / 4, Color.CYAN))
+    val url = server.url(RATIO)
+    val probe = Probe()
+
+    compose.setContent {
+      Box(Modifier.size(200.dp)) {
+        LandscapistImage(
+          imageModel = { url },
+          landscapist = loader,
+          modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(WIDESCREEN)
+            .onGloballyPositioned { probe.size = it.size },
+          onImageStateChanged = { probe.states += it },
+        )
+      }
+    }
+    awaitLoaded(probe)
+
+    val measured = probe.size
+    assertTrue("the image never laid out under Modifier.aspectRatio", measured.width > 0)
+    assertRatio(measured)
+    val decoded = probe.loaded().originalWidth
+    assertTrue(
+      "a ${source}px source drawn into a ${measured.width}px wide box was decoded at " +
+        "${decoded}px: the box the ratio settled on never reached the request",
+      decoded <= source / 2,
+    )
+    assertTrue(
+      "decoded at ${decoded}px for a ${measured.width}px wide box, less than the box draws",
+      decoded >= measured.width,
+    )
+    assertTrue(
+      "decoded at ${decoded}px for a ${measured.width}px wide box, more than twice what is " +
+        "drawn, so one further halving was available and was not taken",
+      decoded < measured.width * 2,
+    )
+  }
+
+  @Test
+  fun anAspectRatioBeatsTheImagesOwnShapeWhereTheHeightIsUnbounded() {
+    // The scrolling column leaves the height unbounded, which is where the 2:1 source would win.
+    server.serve(WIDE, ImageFixtures.photo(80, 40))
+    val url = server.url(WIDE)
+    val probe = Probe()
+
+    compose.setContent {
+      Column(Modifier.width(200.dp).verticalScroll(rememberScrollState())) {
+        LandscapistImage(
+          imageModel = { url },
+          landscapist = loader,
+          modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(WIDESCREEN)
+            .onGloballyPositioned { probe.size = it.size },
+          onImageStateChanged = { probe.states += it },
+        )
+      }
+    }
+    awaitLoaded(probe)
+
+    val measured = probe.size
+    assertTrue("the image never laid out inside the scrolling column", measured.width > 0)
+    assertRatio(measured)
+    assertTrue(
+      "the image took its own 2:1 shape rather than the ratio the caller asked for",
+      abs(measured.height - measured.width / 2) > 1,
+    )
+  }
+
+  private fun assertRatio(measured: IntSize) {
+    val expectedHeight = (measured.width / WIDESCREEN).roundToInt()
+    assertTrue(
+      "an image under aspectRatio(16:9) measured ${measured.width}x${measured.height}, not the " +
+        "${measured.width}x$expectedHeight the ratio asks for",
+      abs(measured.height - expectedHeight) <= 1,
+    )
+  }
+
+  @Test
   fun everyContentScaleStillMeasuresToItsParent() {
     // How the pixels are fitted is a drawing decision, not a layout one.
     server.serve(PHOTO, ImageFixtures.photo(320, 240))
@@ -315,6 +400,8 @@ class SizingDeviceTest {
     const val PHOTO = "/photo.jpg"
     const val WIDE = "/wide.jpg"
     const val BIG = "/big.jpg"
+    const val RATIO = "/ratio.jpg"
+    const val WIDESCREEN = 16f / 9f
     const val LOAD_TIMEOUT_MS = 20_000L
   }
 }

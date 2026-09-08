@@ -26,6 +26,8 @@ import com.github.skydoves.landscapistdemo.harness.ImageFixtures
 import com.github.skydoves.landscapistdemo.harness.LocalImageServer
 import com.skydoves.landscapist.core.ImageRequest
 import com.skydoves.landscapist.core.Landscapist
+import com.skydoves.landscapist.core.LandscapistConfig
+import com.skydoves.landscapist.core.NetworkConfig
 import com.skydoves.landscapist.core.model.CachePolicy
 import com.skydoves.landscapist.core.model.ImageResult
 import com.skydoves.landscapist.image.LandscapistImage
@@ -40,6 +42,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import kotlin.time.Duration.Companion.seconds
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -121,6 +125,48 @@ class NetworkDeviceTest {
   }
 
   @Test
+  fun aResponseThatNeverArrivesFailsAtTheConfiguredReadTimeout() {
+    val gate = CountDownLatch(1)
+    server.serve(STALLED, ImageFixtures.photo(64, 64), gate = gate)
+    val impatient = Landscapist.builder()
+      .noDiskCache()
+      .config(LandscapistConfig(networkConfig = NetworkConfig(readTimeout = READ_TIMEOUT)))
+      .build()
+    val request = ImageRequest.builder()
+      .model(server.url(STALLED))
+      .diskCachePolicy(CachePolicy.DISABLED)
+      .size(64, 64)
+      .build()
+
+    val started = System.nanoTime()
+    val result = try {
+      runBlocking {
+        withTimeoutOrNull(LOAD_TIMEOUT_MS) {
+          impatient.load(request).first {
+            it is ImageResult.Success || it is ImageResult.Failure
+          }
+        }
+      }
+    } finally {
+      // Released here, so the server thread is never left holding the response open.
+      gate.countDown()
+    }
+    val elapsedMs = (System.nanoTime() - started) / 1_000_000
+
+    assertEquals("the loader never opened the stalled request", 1, server.hitCount(STALLED))
+    assertTrue(
+      "a response that never arrived never settled at all in ${LOAD_TIMEOUT_MS}ms",
+      result != null,
+    )
+    assertTrue("a stalled response did not fail the load: $result", result is ImageResult.Failure)
+    assertTrue(
+      "the load failed after ${elapsedMs}ms, far past the " +
+        "${READ_TIMEOUT.inWholeMilliseconds}ms read timeout it was built with",
+      elapsedMs < TIMEOUT_SLACK_MS,
+    )
+  }
+
+  @Test
   fun aRedirectChainResolves() {
     // Two hops, because one hop is the case a client can get right by accident.
     server.redirect(FIRST_HOP, server.url(SECOND_HOP))
@@ -189,6 +235,9 @@ class NetworkDeviceTest {
     const val SECOND_HOP = "/hop-two.jpg"
     const val TARGET = "/target.jpg"
     const val SLOW = "/slow.jpg"
+    const val STALLED = "/stalled.jpg"
+    const val TIMEOUT_SLACK_MS = 10_000L
     const val LOAD_TIMEOUT_MS = 20_000L
+    val READ_TIMEOUT = 1.seconds
   }
 }
