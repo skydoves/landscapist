@@ -58,18 +58,27 @@ These observations come from our own engine-level runs and will differ on your h
 
 The honest positioning, and it is worth being precise about which "footprint" is meant. The AAR is
 smaller; the runtime memory is not. landscapist-core keys its memory cache on the size an image is
-drawn at, so it holds one entry per distinct size where Coil holds one per image: three times the
-entries and up to seven times the bytes for a screen that asks for near duplicate sizes. What it
-buys is that a 96 px slot is answered with 96 px, where Coil answers it with whatever it has, which
-can be the 720 px detail bitmap and 56 times the pixels to sample on every frame that draws it.
+drawn at, so it holds one entry per distinct size where Coil holds one per image. Forty images each
+asked for at a thumbnail, a list row, a jittered grid and a detail size gives it three times the
+entries and 1.27 times the bytes; one image asked for at fifteen sizes between 352 and 366 px gives
+it eight entries against Coil's one, and 7.7 times the bytes. What it buys is that a 96 px slot is
+answered with 96 px, where Coil answers it with whatever it has, which can be the 720 px detail
+bitmap and 56 times the pixels to sample on every frame that draws it.
 
-On speed, measured on the JVM against Coil 3.6.2 in the same process (`./gradlew
-:benchmark-engine:run`): landscapist decodes a 4000x3000 JPEG down to 400x300 in 42 ms against
-Coil's 49 ms, allocates 748 B per memory cache hit against 1.6 KiB, and reaches the network once
-where Coil reaches it 32 times for 32 concurrent requests for one image. It loses on a cold load,
-by about 15 percent, to a thread hop it takes deliberately so that blocking disk reads stay off the
-caller's thread. **None of this is measured on Android**, which is the platform that ships, and the
-decoders there are different code on both sides.
+On speed, on the JVM (`./gradlew :benchmark-engine:run`), landscapist allocates 748 B per memory
+cache hit against Coil's 1.6 KiB, and reaches the network once where Coil reaches it 32 times for
+32 concurrent requests for one image. Both of those run the real Coil engine in the same process.
+
+It decodes a 4000x3000 JPEG down to 400x300 in 42 ms against 49 ms, and that row is a model rather
+than a head to head: the comparison is against a hand written `Image.makeFromEncoded` plus a canvas
+scale, which is what Coil's `SkiaImageDecoder` does, not against Coil itself.
+
+It loses on a cold load, to a thread hop it takes deliberately so that blocking disk reads stay off
+the caller's thread. The size of that loss is not quoted here because the timing rows do not
+reproduce closely enough across JVM invocations to quote.
+
+**None of this is measured on Android**, which is the platform that ships, and the decoders there
+are different code on both sides.
 
 ### 2. Macrobenchmark (frame timing and jank)
 
@@ -99,9 +108,9 @@ The core engines are in the same family. landscapist-core is a from-scratch Kotl
 
 Two notes on that first row, because it reads as a difference and is not one. Coil keeps the same
 weak reference tier, enabled by default, so an evicted entry stays reachable there on both sides.
-And "byte-bounded" bounds only what each cache reports: 40 images of 256 KiB put through a 1 MiB
-cache leave both of them reporting 1.00 MiB while holding 10.00 MiB that the collector has not run
-on yet.
+And "byte-bounded" bounds only what each cache reports on either side: an entry evicted from the
+strong tier is still reachable through the weak one, and neither library counts it. What a cache
+reports is what it holds strongly, not what is in the heap.
 
 ## When to choose which
 

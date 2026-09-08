@@ -68,7 +68,9 @@ class DesktopBufferedImageTest {
   }
 
   /** No decoder override, so this exercises the real DesktopImageDecoder. */
-  private fun newLoader(): Landscapist = Landscapist.builder().fetcher(PngFetcher()).build()
+  private fun newLoader(): Landscapist = Landscapist.builder().noDiskCache().fetcher(
+    PngFetcher(),
+  ).build()
 
   private fun request() = ImageRequest.builder()
     .model(url)

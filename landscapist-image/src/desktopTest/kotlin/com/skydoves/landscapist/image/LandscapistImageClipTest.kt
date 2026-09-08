@@ -93,7 +93,9 @@ class LandscapistImageClipTest {
   }
 
   private fun warmLoader(): Landscapist {
-    val loader = Landscapist.builder().fetcher(StubFetcher()).decoder(StubDecoder()).build()
+    val loader = Landscapist.builder().noDiskCache().fetcher(
+      StubFetcher(),
+    ).decoder(StubDecoder()).build()
     runBlocking {
       loader.load(
         ImageRequest.builder().model(url).diskCachePolicy(CachePolicy.DISABLED).build(),

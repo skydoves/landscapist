@@ -61,7 +61,10 @@ internal fun composeComparison() {
   val coil = newCoil(coilCounter)
   // Crossfade is what a Coil user turns on for the same effect landscapist's plugin gives, and on
   // this platform it costs them no extra composable at all. Same stub fetcher, same cache.
-  val fadingCoil = newCoil(coilCounter) { crossfade(300) }
+  // Its own counter, because it is a second loader with a second cache: sharing one made the warm
+  // up look like it had fetched twice per image and tripped the guard below.
+  val fadingCoilCounter = FetchCounter()
+  val fadingCoil = newCoil(fadingCoilCounter) { crossfade(300) }
   val models = List(ITEM_COUNT) { "https://example.com/list-item-$it.jpg" }
 
   // Warm both caches, which is what a second pass over a list sees.
@@ -97,10 +100,11 @@ internal fun composeComparison() {
   val painted = variants.associate { (name, content) ->
     name to paintedFraction { content(ITEM_SIZE) }
   }
-  check(landscapistCounter.count.get() == models.size && coilCounter.count.get() == models.size) {
-    "the warm up pass still reached the fetcher: landscapist " +
-      "${landscapistCounter.count.get()}, coil ${coilCounter.count.get()} for ${models.size} " +
-      "images. Nothing below is a warm cache measurement."
+  val warmed = listOf(landscapistCounter, coilCounter, fadingCoilCounter)
+  check(warmed.all { it.count.get() == models.size }) {
+    "the warm up pass reached the fetcher a different number of times than there are images: " +
+      "${warmed.map { it.count.get() }} for ${models.size} images. Nothing below is a warm " +
+      "cache measurement."
   }
 
   println("share of the first frame actually covered by image pixels")

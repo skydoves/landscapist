@@ -89,7 +89,7 @@ class SizeToleranceTest {
   private class Loader(sourceWidth: Int, sourceHeight: Int) {
     val decoder = FittingDecoder(sourceWidth, sourceHeight)
     val landscapist: Landscapist =
-      Landscapist.builder().fetcher(StubFetcher).decoder(decoder).build()
+      Landscapist.builder().noDiskCache().fetcher(StubFetcher).decoder(decoder).build()
 
     fun load(width: Int?, height: Int?): String = runBlocking {
       val request = ImageRequest.builder()

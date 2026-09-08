@@ -22,17 +22,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -122,6 +123,47 @@ public fun LandscapistImage(
   // would freeze a plugin set the caller can still add to, and the plugin would never run. The
   // scans allocate nothing, which is what made remembering them look worthwhile.
   val plugins = component.imagePlugins
+  // Nothing at all needs to be composed inside this image: no caller slot, no plugin of any kind,
+  // and so no crossfade. It is then one layout node that measures, draws, and runs its own load,
+  // which is the shape Image itself has and the shape Coil's AsyncImage has.
+  //
+  // The saving is not the node count. It is that the size to decode at is read while measuring
+  // instead of written back into composition as state, and that the loaded image lives in the node
+  // rather than in a MutableState the composition reads: an image resolving then invalidates one
+  // node's drawing rather than recomposing the image.
+  //
+  // A DrawableResource is excluded because its painter comes from painterResource, which is
+  // composable.
+  val canOwnNode = success == null && loading == null && failure == null &&
+    plugins.isEmpty() && model !is DrawableResource
+  if (canOwnNode) {
+    // Set by the node when the loader hands back something only a composed painter can draw, an
+    // animated drawable being the one that matters, and read here to hand that image back to the
+    // composed path below. Only Android's decoder can produce one, so only Android holds the state
+    // and only Android's composition subscribes to it.
+    val composedPainter = if (ComposedPainterEverNeeded) {
+      remember(request) { mutableStateOf(false) }
+    } else {
+      null
+    }
+    if (composedPainter?.value != true) {
+      val ratio = imageOptions.placeholderAspectRatio
+      Layout(
+        modifier = (if (ratio != null && ratio > 0f) modifier.aspectRatio(ratio) else modifier)
+          .imageSemantics(imageOptions)
+          .landscapistImageNode(
+            landscapist = landscapist,
+            request = request,
+            imageOptions = imageOptions,
+            onState = onImageStateChanged,
+            unpaintable = composedPainter,
+          ),
+        measurePolicy = LandscapistImageMeasurePolicy,
+      )
+      return
+    }
+  }
+
   val crossfadePlugin = plugins.firstInstanceOrNull<CrossfadePlugin>()
   // Only a SuccessStatePlugin is handed the decoded pixels. A painter plugin is offered them and
   // usually ignores them, so it gets a function to call rather than a decode it did not ask for.
@@ -424,8 +466,16 @@ private fun LandscapistImageInternal(
   // recomposed this image, which called it again. The node path reports on change too, so both
   // paths tell a caller the same story. rememberUpdatedState keeps a caller free to pass a fresh
   // lambda every composition without the effect having to restart to see it.
-  val currentOnState by rememberUpdatedState(onState)
-  LaunchedEffect(landscapistState) { currentOnState(landscapistState) }
+  // A SideEffect rather than a LaunchedEffect: the callback needs to run after the composition
+  // rather than inside it, but it does not need a coroutine to do that, and one per image is the
+  // difference between a crossfade costing 141 KiB a frame and 125.
+  val dispatched = remember { arrayOfNulls<LandscapistImageState>(1) }
+  SideEffect {
+    if (dispatched[0] != landscapistState) {
+      dispatched[0] = landscapistState
+      onState(landscapistState)
+    }
+  }
   // When nothing needs to be composed inside, the image is drawn by this node instead of a child.
   // That is one layout node per image rather than two, and it is the shape Image itself uses.
   val painter = if (paintOnContainer && landscapistState is LandscapistImageState.Success) {

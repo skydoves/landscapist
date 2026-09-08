@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.LocalImageSourceBytes
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.ImagePluginComponent
@@ -109,7 +108,9 @@ class LandscapistImagePluginTest {
 
   /** A loader whose image is already in memory, so the first frame can draw it. */
   private fun warmLoader(): Landscapist {
-    val loader = Landscapist.builder().fetcher(StubFetcher()).decoder(StubDecoder()).build()
+    val loader = Landscapist.builder().noDiskCache().fetcher(
+      StubFetcher(),
+    ).decoder(StubDecoder()).build()
     runBlocking {
       loader.load(
         ImageRequest.builder().model(url).diskCachePolicy(CachePolicy.DISABLED).build(),
@@ -120,7 +121,9 @@ class LandscapistImagePluginTest {
 
   /** A loader that never resolves, so the loading state stays on screen. */
   private fun hangingLoader(): Landscapist =
-    Landscapist.builder().fetcher(StubFetcher(hang = true)).decoder(StubDecoder()).build()
+    Landscapist.builder().noDiskCache().fetcher(
+      StubFetcher(hang = true),
+    ).decoder(StubDecoder()).build()
 
   /** Renders one frame at [nanos] and returns its pixels as ARGB, row major. */
   private fun render(nanos: Long = 0L, content: @Composable () -> Unit): IntArray {
@@ -312,17 +315,14 @@ class LandscapistImagePluginTest {
   }
 
   @Test
-  fun `a composable plugin still wraps the content, and can read the image source`() {
+  fun `a composable plugin still wraps the content`() {
     val loader = warmLoader()
     var wrapped = false
-    var sawLocal = false
+
     val plugin = object : ImagePlugin.ComposablePlugin {
       @Composable
       override fun compose(content: @Composable () -> Unit) {
         wrapped = true
-        // Provided only on the paths that can read it, so a plugin has to be one of them.
-        LocalImageSourceBytes.current
-        sawLocal = true
         content()
       }
     }
@@ -330,7 +330,6 @@ class LandscapistImagePluginTest {
     val pixels = render(content = image(loader, component(plugin)))
 
     assertTrue(wrapped, "the composable plugin never wrapped the content")
-    assertTrue(sawLocal)
     assertTrue(pixels.coverage() > 0.9, "the wrapped content drew nothing")
   }
 
@@ -375,16 +374,15 @@ class LandscapistImagePluginTest {
   }
 
   @Test
-  fun `a caller success slot is inside the image source provider`() {
-    // LocalImageSourceBytes is public, so a slot may read it with no plugin installed at all, and
-    // the provider has to be on the path a slot takes. The value is null here because the memory
-    // cache does not keep raw bytes, which is a separate and pre-existing limitation; what this
-    // pins is that the read happens where a provider is, not that it finds bytes.
+  fun `a caller success slot receives the painter and draws it`() {
+    // A slot is handed the painter and its content is drawn. It may also read
+    // LocalImageSourceBytes, but nothing here can prove it is inside a provider: that local
+    // defaults to null, so a read succeeds whether the provider is there or not, and the memory
+    // cache keeps no raw bytes for it to find. That is left to the code, not claimed here.
     val loader = warmLoader()
     var reached = false
     val pixels = render(
       content = image(loader, component()) { _, painter ->
-        LocalImageSourceBytes.current
         reached = true
         Image(
           painter = painter,
@@ -446,6 +444,11 @@ class LandscapistImagePluginTest {
     val revealing = ancestorDraws(frames = 12, component = component(CircularRevealPlugin(200)))
 
     assertTrue(
+      still <= 4,
+      "the control redrew its ancestor $still times over 12 frames, so it has regressed too and " +
+        "the comparison below means nothing",
+    )
+    assertTrue(
       revealing <= still,
       "the reveal cost $revealing ancestor redraws where a still image cost $still",
     )
@@ -453,7 +456,9 @@ class LandscapistImagePluginTest {
 
   /** Warms [urls] into one loader, so each is drawable in the frame it first appears in. */
   private fun warmLoader(urls: List<String>): Landscapist {
-    val loader = Landscapist.builder().fetcher(StubFetcher()).decoder(StubDecoder()).build()
+    val loader = Landscapist.builder().noDiskCache().fetcher(
+      StubFetcher(),
+    ).decoder(StubDecoder()).build()
     runBlocking {
       for (url in urls) {
         loader.load(
@@ -499,21 +504,26 @@ class LandscapistImagePluginTest {
         )
       },
     )
-    val (before, during) = try {
+    val (before, alphas) = try {
       scene.render(0L).close()
       val first = readCentre(scene.render(1L))
       model = second
       Snapshot.sendApplyNotifications()
-      first to readCentre(scene.render(2L))
+      // Frames across the fade. The animation runs on the scene's clock, so it only advances when
+      // a frame is drawn, and the first frame after the switch is the one that starts it at zero.
+      first to (1..12).map { frame -> readCentre(scene.render(frame * 25L * 1_000_000)) ushr 24 }
     } finally {
       scene.close()
     }
 
     assertEquals(0xFF, before ushr 24, "the image already on screen was not opaque")
+    // Somewhere in the middle it is part drawn, which is the fade. Only asserting "not full" would
+    // pass just as happily on a frame that drew nothing at all.
     assertTrue(
-      during ushr 24 < 0xFF,
-      "the replacing image appeared at full strength instead of fading in",
+      alphas.any { it in 1..0xFE },
+      "no frame was part way through the fade, the alphas were $alphas",
     )
+    assertEquals(0xFF, alphas.last(), "the fade never finished, the alphas were $alphas")
   }
 
   /** The centre pixel of [image] as ARGB, closing it on the way out. */

@@ -88,7 +88,7 @@ class LandscapistImagePainterTest {
   private val requested = mutableListOf<Pair<Int?, Int?>>()
 
   private fun newLoader(): Landscapist =
-    Landscapist.builder().fetcher(StubFetcher()).decoder(StubDecoder()).build()
+    Landscapist.builder().noDiskCache().fetcher(StubFetcher()).decoder(StubDecoder()).build()
 
   /** A loader whose image is already in memory, so the first frame can draw it. */
   private fun warmLoader(): Landscapist = newLoader().also { loader ->

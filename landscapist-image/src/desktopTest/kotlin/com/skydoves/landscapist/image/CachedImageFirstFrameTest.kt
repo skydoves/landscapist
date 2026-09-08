@@ -74,7 +74,7 @@ class CachedImageFirstFrameTest {
   }
 
   private fun newLoader(): Landscapist =
-    Landscapist.builder().fetcher(StubFetcher).decoder(StubDecoder).build()
+    Landscapist.builder().noDiskCache().fetcher(StubFetcher).decoder(StubDecoder).build()
 
   private fun Landscapist.warmCache(width: Int = 200, height: Int = 200) = runBlocking {
     val request = ImageRequest.builder()
@@ -130,6 +130,8 @@ class CachedImageFirstFrameTest {
     landscapist.warmCache()
 
     val states = composedStates(landscapist) { rememberImageComponent {} }
+
+    assertTrue(states.isNotEmpty(), "no state ever reached the callback")
 
     assertTrue(
       states.none { it is LandscapistImageState.Loading || it is LandscapistImageState.None },

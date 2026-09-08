@@ -19,6 +19,7 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Codec
 import org.jetbrains.skia.ColorAlphaType
+import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.ColorType
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.EncodedImageFormat
@@ -30,6 +31,8 @@ import org.jetbrains.skia.SamplingMode
 import org.jetbrains.skia.SurfaceProps
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferInt
+import java.io.ByteArrayInputStream
+import javax.imageio.ImageIO
 
 /**
  * Decodes through Skia, when skiko is on the classpath.
@@ -103,10 +106,19 @@ internal object SkiaJvmDecoder {
 
         // Only a JPEG can be decoded straight into a smaller raster here, because that is
         // libjpeg's eighths scaling and nothing else offers it. Anything else would decode at full
-        // size and shrink afterwards, which is what ImageIO already does and does with subsampling,
-        // so it is handed back rather than decoded worse.
+        // size and shrink afterwards, which is what ImageIO already does and does with
+        // subsampling, so it is handed back rather than decoded worse.
+        //
+        // Only when ImageIO can actually read the format, though. Handing back a WebP would make
+        // the same image decode at one size and fail at another, and make two cache entries for it
+        // disagree about whether it exists.
         val shrinking = finalWidth < originalWidth || finalHeight < originalHeight
-        if (shrinking && codec.encodedImageFormat != EncodedImageFormat.JPEG) return null
+        if (shrinking &&
+          codec.encodedImageFormat != EncodedImageFormat.JPEG &&
+          imageIoCanRead(data)
+        ) {
+          return null
+        }
 
         val decoded = readScaled(codec, originalWidth, originalHeight, finalWidth, finalHeight)
         try {
@@ -153,15 +165,21 @@ internal object SkiaJvmDecoder {
     if (codec.encodedImageFormat == EncodedImageFormat.JPEG) {
       val eighths = eighthsCovering(originalWidth, originalHeight, finalWidth, finalHeight)
       if (eighths < 8) {
-        val scaledWidth = originalWidth * eighths / 8
-        val scaledHeight = originalHeight * eighths / 8
-        val sampled = allocate(scaledWidth, scaledHeight)
+        val sampled = allocate(scaledUp(originalWidth, eighths), scaledUp(originalHeight, eighths))
         val read = runCatching { codec.readPixels(sampled) }.isSuccess
         if (read) return sampled
         sampled.close()
       }
     }
-    return allocate(originalWidth, originalHeight).also { codec.readPixels(it) }
+    val full = allocate(originalWidth, originalHeight)
+    return try {
+      full.also { codec.readPixels(it) }
+    } catch (throwable: Throwable) {
+      // Truncated bytes are ordinary: a cut off download, a torn disk cache entry. The pixels are
+      // off heap, so leaving them to a cleaner hides them from every heap measurement there is.
+      full.close()
+      throw throwable
+    }
   }
 
   /** The smallest eighth of the source that still covers the requested box. */
@@ -173,8 +191,8 @@ internal object SkiaJvmDecoder {
   ): Int {
     if (finalWidth <= 0 || finalHeight <= 0) return 8
     for (eighths in 1..7) {
-      if (originalWidth * eighths / 8 >= finalWidth &&
-        originalHeight * eighths / 8 >= finalHeight
+      if (scaledUp(originalWidth, eighths) >= finalWidth &&
+        scaledUp(originalHeight, eighths) >= finalHeight
       ) {
         return eighths
       }
@@ -182,10 +200,31 @@ internal object SkiaJvmDecoder {
     return 8
   }
 
+  /** Whether ImageIO has a reader for these bytes, and so can subsample them itself. */
+  private fun imageIoCanRead(data: ByteArray): Boolean = runCatching {
+    ImageIO.createImageInputStream(ByteArrayInputStream(data)).use { stream ->
+      ImageIO.getImageReaders(stream).hasNext()
+    }
+  }.getOrDefault(false)
+
+  /**
+   * The size libjpeg produces for [eighths] of [dimension].
+   *
+   * Rounded up, because that is what libjpeg does (`jdiv_round_up`) and because SkJpegCodec accepts
+   * a request only when it matches exactly. Asking for the rounded down size instead is refused for
+   * every dimension that is not a multiple of eight, which is most photographs, and the decode then
+   * falls back to a full size read: slower than the subsampling this replaced, and holding the
+   * whole raster that subsampling never materialised.
+   */
+  private fun scaledUp(dimension: Int, eighths: Int): Int = (dimension * eighths + 7) / 8
+
   private fun allocate(width: Int, height: Int): Bitmap = Bitmap().apply {
     // Premultiplied, because a Skia canvas will only draw into premultiplied pixels. The readback
     // undoes it, since a TYPE_INT_ARGB raster is unpremultiplied.
-    allocPixels(ImageInfo(width, height, ColorType.N32, ColorAlphaType.PREMUL))
+    // sRGB explicitly. The four argument ImageInfo leaves the colour space null, which tells Skia
+    // to apply no transform, so an ICC tagged photograph came back oversaturated against the
+    // ImageIO path that converts it. Measured at 26 of 255 on a Display P3 capture.
+    allocPixels(ImageInfo(width, height, ColorType.N32, ColorAlphaType.PREMUL, ColorSpace.sRGB))
   }
 
   /**
@@ -197,23 +236,28 @@ internal object SkiaJvmDecoder {
    */
   private fun resample(source: Bitmap, width: Int, height: Int): Bitmap {
     val target = allocate(width, height)
-    val canvas = Canvas(target, surfaceProps)
     try {
-      val image = Image.makeFromBitmap(source)
+      val canvas = Canvas(target, surfaceProps)
       try {
-        canvas.drawImageRect(
-          image,
-          Rect.makeWH(source.width.toFloat(), source.height.toFloat()),
-          Rect.makeWH(width.toFloat(), height.toFloat()),
-          SamplingMode.MITCHELL,
-          null,
-          true,
-        )
+        val image = Image.makeFromBitmap(source)
+        try {
+          canvas.drawImageRect(
+            image,
+            Rect.makeWH(source.width.toFloat(), source.height.toFloat()),
+            Rect.makeWH(width.toFloat(), height.toFloat()),
+            SamplingMode.MITCHELL,
+            null,
+            true,
+          )
+        } finally {
+          image.close()
+        }
       } finally {
-        image.close()
+        canvas.close()
       }
-    } finally {
-      canvas.close()
+    } catch (throwable: Throwable) {
+      target.close()
+      throw throwable
     }
     return target
   }

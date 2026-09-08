@@ -58,7 +58,7 @@ class MemoryCacheFastPathTest {
   }
 
   private fun newLoader(): Landscapist =
-    Landscapist.builder().fetcher(StubFetcher).decoder(StubDecoder).build()
+    Landscapist.builder().noDiskCache().fetcher(StubFetcher).decoder(StubDecoder).build()
 
   private fun request(width: Int? = null, height: Int? = null): ImageRequest =
     ImageRequest.builder()

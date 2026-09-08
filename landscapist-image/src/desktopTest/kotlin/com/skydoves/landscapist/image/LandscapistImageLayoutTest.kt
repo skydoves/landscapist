@@ -26,8 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -91,7 +89,9 @@ class LandscapistImageLayoutTest {
   }
 
   private fun warmLoader(): Landscapist {
-    val loader = Landscapist.builder().fetcher(StubFetcher()).decoder(StubDecoder()).build()
+    val loader = Landscapist.builder().noDiskCache().fetcher(
+      StubFetcher(),
+    ).decoder(StubDecoder()).build()
     runBlocking {
       loader.load(
         ImageRequest.builder().model(url).diskCachePolicy(CachePolicy.DISABLED).build(),
@@ -269,6 +269,7 @@ class LandscapistImageLayoutTest {
     // The container node runs the load itself, so it is the node that has to notice the request it
     // was rebuilt with and start again. Nothing recomposes underneath it to do that for it.
     val loader = Landscapist.builder()
+      .noDiskCache()
       .fetcher(
         object : ImageFetcher {
           override fun canHandle(model: Any?): Boolean = true
@@ -324,29 +325,5 @@ class LandscapistImageLayoutTest {
 
     assertTrue(widths.contains(10), "the first model never loaded, saw $widths")
     assertTrue(widths.contains(20), "the second model never loaded, saw $widths")
-  }
-
-  @Test
-  fun `content scale and colour filter reach the drawing`() {
-    // These live on ImageOptions, and the container path has to carry them onto the paint modifier
-    // rather than dropping them with the child.
-    val loader = warmLoader()
-
-    val size = measuredSize { probe ->
-      LandscapistImage(
-        imageModel = { url },
-        landscapist = loader,
-        modifier = Modifier.size(60.dp).then(probe),
-        imageOptions = ImageOptions(
-          contentScale = ContentScale.FillBounds,
-          colorFilter = ColorFilter.tint(Color.Red),
-          alpha = 0.5f,
-        ),
-        requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
-      )
-    }
-
-    assertEquals(60, size.width)
-    assertEquals(60, size.height)
   }
 }

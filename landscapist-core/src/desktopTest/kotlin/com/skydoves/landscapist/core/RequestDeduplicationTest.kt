@@ -66,7 +66,7 @@ class RequestDeduplicationTest {
   }
 
   private fun newLoader(fetcher: ImageFetcher, decoder: ImageDecoder): Landscapist =
-    Landscapist.builder().fetcher(fetcher).decoder(decoder).build()
+    Landscapist.builder().noDiskCache().fetcher(fetcher).decoder(decoder).build()
 
   private suspend fun Landscapist.awaitTerminal(model: String): ImageResult {
     val request = ImageRequest.builder()

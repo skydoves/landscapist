@@ -168,7 +168,13 @@ class CrossfadeWithEffectTest {
       harness.renderCentre(pastTheAnimation() * 5 + 1L)
     }
 
-    assertTrue(justAfter != red, "coming back to the entry state skipped the animation")
+    // Not merely "different from red": a frame that drew nothing is different from red too.
+    val alpha = justAfter ushr 24
+    assertTrue(
+      justAfter != red && alpha > 0,
+      "coming back to the entry state either skipped the animation or drew nothing, read " +
+        justAfter.toUInt().toString(16),
+    )
   }
 
   @Test
