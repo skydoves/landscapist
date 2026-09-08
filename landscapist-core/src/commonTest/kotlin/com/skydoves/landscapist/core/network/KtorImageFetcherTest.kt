@@ -29,6 +29,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class KtorImageFetcherTest {
@@ -120,6 +122,98 @@ class KtorImageFetcherTest {
     assertTrue(
       result.throwable is SendCountExceedException,
       "expected SendCountExceedException but was ${result.throwable}",
+    )
+  }
+
+  /**
+   * A `Set-Cookie` a strict parser refuses must not take the image down with it.
+   *
+   * unsplash.com sends `max-age=7.0` on one of its cookies. Ktor's own cookie plugin parses that
+   * attribute with `toLong()`, where the `expires` beside it is wrapped in `runCatching`, so the
+   * NumberFormatException leaves the response pipeline and fails the request. Every image on
+   * unsplash stopped loading because of a cookie no image needs.
+   */
+  @Test
+  fun aCookieAttributeNoParserAcceptsDoesNotFailTheDownload() = runTest {
+    val imageBytes = byteArrayOf(0x9, 0x8, 0x7)
+    val engine = MockEngine {
+      respond(
+        content = imageBytes,
+        status = HttpStatusCode.OK,
+        headers = headersOf(
+          HttpHeaders.ContentType to listOf("image/png"),
+          HttpHeaders.SetCookie to listOf(
+            "arpa_context=%7B%7D; path=/; max-age=7.0; expires=not a date; HttpOnly; secure",
+          ),
+        ),
+      )
+    }
+
+    val result = fetchImage(engine, NetworkConfig(), "https://example.com/image.png")
+
+    assertTrue(result is FetchResult.Success, "expected success but was $result")
+    assertContentEquals(imageBytes, result.data)
+  }
+
+  @Test
+  fun aCookieIsNotSentToAnotherSite() = runTest {
+    val seen = mutableListOf<String?>()
+    val engine = MockEngine { request ->
+      seen += request.headers[HttpHeaders.Cookie]
+      if (request.url.host == "first.example.com") {
+        respond(
+          content = "",
+          status = HttpStatusCode.Found,
+          headers = headersOf(
+            HttpHeaders.Location to listOf("https://unrelated.test/image.png"),
+            HttpHeaders.SetCookie to listOf("session=granted; Path=/"),
+          ),
+        )
+      } else {
+        respond(
+          content = byteArrayOf(0x1),
+          status = HttpStatusCode.OK,
+          headers = headersOf(HttpHeaders.ContentType, "image/png"),
+        )
+      }
+    }
+
+    fetchImage(engine, NetworkConfig(), "https://first.example.com/image.png")
+
+    assertEquals(2, seen.size, "the redirect was not followed, saw $seen")
+    assertNull(seen[1], "a cookie set by one site was sent to another, saw $seen")
+  }
+
+  @Test
+  fun aDomainCookieReachesTheSubdomainItWasSetFor() = runTest {
+    // What issue 859 is: the cookie is set by the site and needed by its own CDN host.
+    val seen = mutableListOf<String?>()
+    val engine = MockEngine { request ->
+      seen += request.headers[HttpHeaders.Cookie]
+      if (request.url.host == "example.com") {
+        respond(
+          content = "",
+          status = HttpStatusCode.Found,
+          headers = headersOf(
+            HttpHeaders.Location to listOf("https://cdn.example.com/image.png"),
+            HttpHeaders.SetCookie to listOf("session=granted; Domain=.example.com; Path=/"),
+          ),
+        )
+      } else {
+        respond(
+          content = byteArrayOf(0x1),
+          status = HttpStatusCode.OK,
+          headers = headersOf(HttpHeaders.ContentType, "image/png"),
+        )
+      }
+    }
+
+    fetchImage(engine, NetworkConfig(), "https://example.com/image.png")
+
+    assertEquals(2, seen.size, "the redirect was not followed, saw $seen")
+    assertTrue(
+      seen[1]?.contains("session=granted") == true,
+      "the cookie did not reach the subdomain it was set for, saw $seen",
     )
   }
 }
