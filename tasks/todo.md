@@ -59,18 +59,37 @@ This replaces that with verification that runs the real path on a real device.
 - [ ] Update PR #988. Its body still describes JVM measurements and says nothing about the
       device suite, the threading regression, or the decode row that goes the other way.
 
-## Device measurement, emulator, three runs
+## Device measurement, emulator
+
+A fresh process per measured loader. Two rows had to be measured that way and were wrong
+before it: whichever loader ran second in a process read as faster by more than the
+difference being measured, and warming both stacks first did not fix it, because the
+sockets, the thread pools and the JIT of everything under Compose are shared too. The
+comparison now refuses to measure a second loader in a process that has already measured
+one. The decode and scroll rows were checked against fresh processes and did not move.
 
 | | landscapist | coil 3.6.2 |
 |---|---|---|
-| cold load, 20 images, until all report success | 154 to 161 ms | 209 to 231 ms |
-| decode 2000x1500 to 200x150, median of 8 | 36 to 39 ms | 22 to 24 ms |
-| the same decode, bytes allocated | 5.5 MiB | 1.82 MiB |
-| scroll, 8 swipes over 60 rows, allocated | 2.1 to 2.8 MiB | 2.2 to 2.6 MiB |
+| first image on screen, 20 composed at once | 197, 218, 365 ms | 154, 182, 267 ms |
+| until all 20 report success | 243, 265, 403 ms | 214, 219, 333 ms |
+| resident set above resting, 20 images | 51, 52, 60 MiB | 45.2, 45.2, 45.3 MiB |
+| decode 2000x1500 to 200x150, median of 8 | 34, 35 ms | 24, 25 ms |
+| the same decode, allocated | 5.4 MiB | 1.9 MiB |
+| scroll, 8 swipes over 60 rows, allocated | 2.8, 3.3 MiB | 2.7, 2.8 MiB |
 
-The decode row is a real loss and a large one. The Android decoder is untouched by this branch,
-so it is not a regression, but it is the opposite of what the JVM benchmark says about desktop.
-Worth its own look: where 5.5 MiB goes for one decode is the first question.
+Frame timing comes from the repository's own macrobenchmark, five iterations each, scrolling
+thirty images. Emulator, so the absolute values mean little; the two columns were taken the
+same way.
+
+| frame, ms | landscapist | coil 3.6.2 |
+|---|---|---|
+| duration P50 / P90 / P95 / P99 | 4.6 / 15.0 / 17.7 / 29.0 | 6.0 / 18.0 / 19.9 / 38.0 |
+| overrun P50 / P90 / P95 / P99 | -10.7 / 1.3 / 1.8 / 35.6 | -9.6 / 2.7 / 6.7 / 27.4 |
+
+So: ahead on frame time while scrolling, behind on cold load, on decode and on resident
+memory. The decode path is untouched by this branch. The cold load and memory rows are not
+what the JVM benchmark says about desktop, and the JVM benchmark is not measuring the
+platform decoder.
 
 ## Found so far
 

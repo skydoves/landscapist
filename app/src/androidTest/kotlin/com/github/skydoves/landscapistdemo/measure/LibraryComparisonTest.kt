@@ -46,6 +46,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import coil3.request.ImageRequest as CoilRequest
 
 /** Numbers land in logcat under MEASURE; a timing threshold on an emulator is a flaky test. */
@@ -66,12 +67,57 @@ class LibraryComparisonTest {
     repeat(images) { index ->
       server.serve("/image-$index.jpg", ImageFixtures.photo(360, 360))
     }
+    warmBothStacks()
+  }
+
+  /**
+   * Loads one image through each library, so neither pays for the other's class loading.
+   *
+   * Not enough on its own to make two loaders comparable in one process. See [claimTheProcess].
+   */
+  private fun warmBothStacks() {
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    server.serve("/warm.jpg", ImageFixtures.photo(360, 360))
+    val url = server.url("/warm.jpg")
+    runBlocking {
+      Landscapist.builder().noDiskCache().build().load(
+        ImageRequest.builder()
+          .model(url)
+          .diskCachePolicy(CachePolicy.DISABLED)
+          .size(side, side)
+          .build(),
+      ).first { it is ImageResult.Success || it is ImageResult.Failure }
+      ImageLoader.Builder(context).memoryCache(null).diskCache(null).build().execute(
+        CoilRequest.Builder(context).data(url).size(side, side).build(),
+      )
+    }
+    server.resetCounts()
+    DeviceMeasure.settle()
   }
 
   @After
   fun stop() = server.close()
 
   private fun urls() = List(images) { server.url("/image-$it.jpg") }
+
+  /**
+   * Refuses to measure a second loader in a process that has already measured one.
+   *
+   * Whichever ran second read as faster by more than the difference being measured, and warming
+   * both stacks first did not fix it: the sockets, the thread pools and the JIT of everything under
+   * Compose are shared too. Run one test per instrumentation invocation, so each gets its own
+   * process:
+   *
+   * `-Pandroid.testInstrumentationRunnerArguments.class=...LibraryComparisonTest#coldLoadCoil`
+   */
+  private fun claimTheProcess(label: String) {
+    val previous = measuredInThisProcess
+    check(previous == null || previous == label) {
+      "$previous was already measured in this process, so $label cannot be compared against it. " +
+        "Run one measurement per instrumentation invocation."
+    }
+    measuredInThisProcess = label
+  }
 
   private fun newLandscapist(): Landscapist = Landscapist.builder().noDiskCache().build()
 
@@ -87,6 +133,7 @@ class LibraryComparisonTest {
   // would find the server warm.
   @Test
   fun coldLoadLandscapist() {
+    claimTheProcess("landscapist")
     val elapsed = measureFirstSuccess("landscapist") { url, done ->
       LandscapistImage(
         imageModel = { url },
@@ -104,6 +151,7 @@ class LibraryComparisonTest {
 
   @Test
   fun coldLoadCoil() {
+    claimTheProcess("coil")
     val elapsed = measureFirstSuccess("coil") { url, done ->
       AsyncImage(
         model = CoilRequest.Builder(InstrumentationRegistry.getInstrumentation().targetContext)
@@ -131,14 +179,73 @@ class LibraryComparisonTest {
   ): Long {
     val urls = urls()
     val done = AtomicInteger()
+    val firstAt = AtomicLong()
     val start = System.nanoTime()
     compose.setContent {
-      for (url in urls) content(url) { done.incrementAndGet() }
+      for (url in urls) {
+        content(url) {
+          firstAt.compareAndSet(0, System.nanoTime() - start)
+          done.incrementAndGet()
+        }
+      }
     }
     compose.waitUntil(timeoutMillis = 30_000) { done.get() >= urls.size }
     val elapsed = System.nanoTime() - start
     check(done.get() >= urls.size) { "$label loaded only ${done.get()} of ${urls.size}" }
+    DeviceMeasure.report("first image on screen, $label", firstAt.get().formatNanos())
     return elapsed
+  }
+
+  @Test
+  fun residentMemoryForAScreenOfImages() {
+    claimTheProcess("landscapist")
+    // The only number that sees native bitmaps, which the allocation counter cannot.
+    val landscapist = residentCostOf { url, done ->
+      LandscapistImage(
+        imageModel = { url },
+        landscapist = newLandscapistShared,
+        modifier = Modifier.size(side.dp),
+        requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+        onImageStateChanged = { if (it is LandscapistImageState.Success) done() },
+      )
+    }
+    DeviceMeasure.report(
+      "resident set above resting for $images images, landscapist",
+      (landscapist * 1024).formatBytes(),
+    )
+  }
+
+  @Test
+  fun residentMemoryForAScreenOfImagesCoil() {
+    claimTheProcess("coil")
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val coil = residentCostOf { url, done ->
+      AsyncImage(
+        model = CoilRequest.Builder(context).data(url).build(),
+        imageLoader = sharedCoil,
+        contentDescription = null,
+        modifier = Modifier.size(side.dp),
+        onState = { if (it is AsyncImagePainter.State.Success) done() },
+      )
+    }
+    DeviceMeasure.report(
+      "resident set above resting for $images images, coil",
+      (coil * 1024).formatBytes(),
+    )
+  }
+
+  /** Kilobytes of resident set the process grew by while holding [images] on screen. */
+  private fun residentCostOf(content: @Composable (String, () -> Unit) -> Unit): Long {
+    val urls = urls()
+    val done = AtomicInteger()
+    DeviceMeasure.settle()
+    val resting = DeviceMeasure.residentKb()
+    compose.setContent {
+      for (url in urls) content(url) { done.incrementAndGet() }
+    }
+    compose.waitUntil(timeoutMillis = 30_000) { done.get() >= urls.size }
+    DeviceMeasure.settle()
+    return DeviceMeasure.residentKb() - resting
   }
 
   @Test
@@ -208,5 +315,10 @@ class LibraryComparisonTest {
       "decode 2000x1500 to 200x150, coil",
       "median ${timings.median().formatNanos()}, allocated ${allocated.formatBytes()}",
     )
+  }
+
+  private companion object {
+    /** Which loader this process has already measured, if any. */
+    var measuredInThisProcess: String? = null
   }
 }
