@@ -42,12 +42,12 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import kotlin.math.abs
 
-/**
+/*
  * What the plugin tests share: a real image on a real screen, read back a pixel at a time.
  *
  * A plugin test that only asks whether the composable exists passes on a blank screen, so every
  * assertion here is made against what was actually rasterised. Two things make that possible on a
- * device. The image sits on a [Backdrop] of a colour no fixture contains, because a capture reads
+ * device. The image sits on a backdrop of a colour no fixture contains, because a capture reads
  * the window and has no alpha channel of its own: what the image failed to paint comes back as the
  * backdrop rather than as transparency. And the test drives the frame clock itself, because these
  * plugins animate, one of them forever.
@@ -97,11 +97,15 @@ internal val PluginRequestBuilder: ImageRequest.Builder.() -> Unit = {
   size(PluginRequestPx, PluginRequestPx)
 }
 
-/** A loader that keeps nothing on disk, so every test starts from an empty memory cache. */
-internal fun pluginLoader(): Landscapist = Landscapist.builder().noDiskCache().build()
+/**
+ * A loader for the visual plugin tests that keeps nothing on disk.
+ *
+ * Every test builds its own, so each starts from an empty memory cache.
+ */
+internal fun visualPluginLoader(): Landscapist = Landscapist.builder().noDiskCache().build()
 
-/** The modifier every image under test carries. */
-internal fun pluginImageModifier(): Modifier = Modifier
+/** The modifier every image in the visual plugin tests carries. */
+internal fun visualImageModifier(): Modifier = Modifier
   .size(PluginImageSize)
   .testTag(PluginImageTag)
 
@@ -180,7 +184,7 @@ internal fun ComposeTestRule.advanceUntil(
 }
 
 /** The pixels of the image under test, as they are on screen right now. */
-internal fun ComposeTestRule.readPixels(): PixelMap =
+internal fun ComposeTestRule.readVisualPixels(): PixelMap =
   onNodeWithTag(PluginImageTag).captureToImage().toPixelMap()
 
 /**

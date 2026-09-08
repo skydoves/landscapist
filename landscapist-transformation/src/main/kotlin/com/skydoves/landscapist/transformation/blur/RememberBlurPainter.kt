@@ -58,22 +58,31 @@ internal fun Painter.rememberBlurPainter(
   }
 }
 
+/**
+ * Blurs by [radius], in passes, because the toolkit takes no more than 25 at a time.
+ *
+ * The remainder pass is skipped when there is no remainder. It used to run unconditionally, at
+ * `(radius + 1) % 25`, which is zero for a radius of 24, 49, 74 and so on, and the toolkit rejects
+ * a radius of zero: `BlurTransformationPlugin(radius = 24)` threw from inside composition.
+ */
 private fun iterativeBlur(
   androidBitmap: Bitmap,
   radius: Int,
 ): Bitmap {
-  val iterate = (radius + 1) / 25
-  var bitmap: Bitmap = RenderScriptToolkit.blur(
-    inputBitmap = androidBitmap,
-    radius = (radius + 1) % 25,
-  )
+  val amount = (radius + 1).coerceAtLeast(1)
+  val remainder = amount % MAX_BLUR_RADIUS
+  var bitmap: Bitmap = if (remainder > 0) {
+    RenderScriptToolkit.blur(inputBitmap = androidBitmap, radius = remainder)
+  } else {
+    androidBitmap
+  }
 
-  for (i in 0 until iterate) {
-    bitmap = RenderScriptToolkit.blur(
-      inputBitmap = bitmap,
-      radius = 25,
-    )
+  repeat(amount / MAX_BLUR_RADIUS) {
+    bitmap = RenderScriptToolkit.blur(inputBitmap = bitmap, radius = MAX_BLUR_RADIUS)
   }
 
   return bitmap
 }
+
+/** The largest radius [RenderScriptToolkit.blur] accepts in one pass. */
+private const val MAX_BLUR_RADIUS = 25

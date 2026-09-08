@@ -20,8 +20,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.github.skydoves.landscapistdemo.harness.LocalImageServer
 import com.skydoves.landscapist.image.LandscapistImage
-import com.skydoves.landscapist.placeholder.blurhash.BlurHashDecoder
-import com.skydoves.landscapist.placeholder.blurhash.BlurHashPlugin
+import com.skydoves.landscapist.placeholder.thumbhash.ThumbHashDecoder
+import com.skydoves.landscapist.placeholder.thumbhash.ThumbHashPlugin
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -32,16 +32,15 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 
 /**
- * [BlurHashPlugin], with the response held open so the placeholder can be photographed.
+ * [ThumbHashPlugin], held in its loading state and read back off the screen.
  *
- * The plugin's whole promise is that something is on screen before the image is, so the assertions
- * are about what the device drew while the socket was still waiting. The backdrop behind the image
- * is what makes "it drew nothing" a colour rather than an absence, and the hash is one whose
- * decoded colours are nothing like it.
+ * The same shape as the blur hash tests. The placeholder has to be on screen while the socket is
+ * still waiting, it has to be the picture the hash decodes to rather than any colour at all, and
+ * the loaded image has to take its place.
  */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class BlurHashPluginTest {
+class ThumbHashPluginTest {
 
   @get:Rule
   val composeTestRule = createComposeRule()
@@ -53,7 +52,6 @@ class BlurHashPluginTest {
   @Before
   fun start() {
     server = LocalImageServer()
-    // Held until a test lets it go, so everything on screen before that is the placeholder.
     server.serve("/held.png", solidPng(BlueFixture), PngContentType, gate = gate)
   }
 
@@ -66,13 +64,17 @@ class BlurHashPluginTest {
   private fun held(): String = server.url("/held.png")
 
   @Test
-  fun theBlurHashIsOnScreenBeforeTheImageAndTheImageReplacesIt() {
+  fun theThumbHashIsOnScreenBeforeTheImageAndTheImageReplacesIt() {
     val loader = contentPluginLoader()
     val state = StateRecorder()
-    val decoded = checkNotNull(BlurHashDecoder.decode(Hash, 32, 32, 1f)) {
+    val plugin = checkNotNull(ThumbHashPlugin.fromBase64(Hash)) {
+      "the plugin could not read the hash from its own documentation"
+    }
+    val decoded = checkNotNull(ThumbHashDecoder.decodeBase64(Hash)) {
       "the hash under test does not decode, so nothing below would mean anything"
     }
-    val component = pluginComponent(BlurHashPlugin(blurHash = Hash, width = 32, height = 32))
+    val expected = decoded.toArgbIntArray().centreColour(decoded.width, decoded.height)
+    val component = pluginComponent(plugin)
 
     composeTestRule.setContent {
       OnBackdrop {
@@ -97,22 +99,22 @@ class BlurHashPluginTest {
       state.isSuccess,
     )
     assertFalse(
-      "the blur hash never reached the screen, the node was still the backdrop",
-      centre.isBackdrop(),
+      "the thumb hash never reached the screen, the node was still the backdrop",
+      centre.matches(Backdrop, tolerance = 0.15f),
     )
     assertTrue(
       "what was drawn is not what the hash decodes to: the screen held ${centre.describe()} " +
-        "where the decoder produced ${decoded.centreColour(32, 32).describe()}",
-      centre.matches(decoded.centreColour(32, 32), tolerance = 0.1f),
+        "where the decoder produced ${expected.describe()}",
+      centre.matches(expected, tolerance = 0.1f),
     )
-    // The hash holds a horizontal ramp, so its two edges are different colours. A flat fill of the
-    // right average would pass everything above, and is the shape a mistake here would take.
-    val leftEdge = whileLoading.at(x = 0.05f, y = 0.5f)
-    val rightEdge = whileLoading.at(x = 0.95f, y = 0.5f)
+    // A brighter sky over a darker foreground, so the top and the bottom are different colours. A
+    // flat fill of the right average would pass everything above it.
+    val top = whileLoading.at(x = 0.5f, y = 0.05f)
+    val bottom = whileLoading.at(x = 0.5f, y = 0.95f)
     assertFalse(
-      "the placeholder was a flat fill rather than the decoded hash: its left edge was " +
-        "${leftEdge.describe()} and its right edge was ${rightEdge.describe()}",
-      leftEdge.matches(rightEdge, tolerance = 0.15f),
+      "the placeholder was a flat fill rather than the decoded hash: its top was " +
+        "${top.describe()} and its bottom was ${bottom.describe()}",
+      top.matches(bottom, tolerance = 0.15f),
     )
 
     gate.countDown()
@@ -121,21 +123,17 @@ class BlurHashPluginTest {
     val settled = composeTestRule.readContentPixels()
     val wrong = settled.samples().notMatching(BlueFixture)
     assertTrue(
-      "the image did not replace the blur hash: ${wrong.size} of ${settled.samples().size} " +
+      "the image did not replace the thumb hash: ${wrong.size} of ${settled.samples().size} " +
         "pixels were not the image, the first was ${wrong.firstOrNull()?.describe()}",
       wrong.isEmpty(),
     )
   }
 
   @Test
-  fun aHashThatDoesNotDecodeDrawsNothingRatherThanBringingTheImageDown() {
-    // Also the control for every assertion above: with nothing composed the node reads back as the
-    // backdrop, so a colour read off this node in the test above is something a plugin drew.
+  fun aHashTooShortToDecodeDrawsNothingRatherThanBringingTheImageDown() {
     val loader = contentPluginLoader()
     val state = StateRecorder()
-    val component = pluginComponent(
-      BlurHashPlugin(blurHash = "not a hash", width = 32, height = 32),
-    )
+    val component = pluginComponent(ThumbHashPlugin(byteArrayOf(1, 2)))
 
     composeTestRule.setContent {
       OnBackdrop {
@@ -154,7 +152,7 @@ class BlurHashPluginTest {
     val covered = composeTestRule.readContentPixels().covered()
 
     assertTrue(
-      "an undecodable hash drew over ${(covered * 100).toInt()}% of the node",
+      "a hash with no image in it drew over ${(covered * 100).toInt()}% of the node",
       covered < 0.01f,
     )
 
@@ -170,13 +168,7 @@ class BlurHashPluginTest {
   }
 
   private companion object {
-    /**
-     * One row of two components: an orange base colour with a red to amber ramp across it.
-     *
-     * Written out rather than taken from the BlurHash samples, because the well known ones decode
-     * to a mid grey, and a placeholder has to be a colour nothing else on the screen is for a
-     * pixel to say which of them was drawn.
-     */
-    private const val Hash = "1ZTMYr@N"
+    /** The hash from the plugin's own documentation, which decodes to 32 by 23 pixels. */
+    private const val Hash = "1QcSHQRnh493V4dIh4eXh1h4kJUI"
   }
 }

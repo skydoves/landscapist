@@ -15,22 +15,19 @@
  */
 package com.github.skydoves.landscapistdemo.plugins
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.github.skydoves.landscapistdemo.harness.ImageFixtures
 import com.github.skydoves.landscapistdemo.harness.LocalImageServer
+import com.skydoves.landscapist.image.LandscapistImage
 import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
 import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.transformation.blur.BlurTransformationPlugin
@@ -45,24 +42,30 @@ import java.util.concurrent.CountDownLatch
 /**
  * [BlurTransformationPlugin], rendered on a device and read back a pixel at a time.
  *
- * A blur cannot be checked against a reference image: the toolkit is native code and the result
- * depends on the decode, so what is asserted here is the one thing a blur is for. Neighbouring
- * pixels of a blurred image are closer together than they were before, further apart at a small
- * radius than at a large one, and an image the plugin quietly left alone has exactly the detail of
- * the one it was made from.
+ * A blur cannot be checked against a reference image: the blur is native code and what it is given
+ * depends on the decode. What is asserted instead is the thing a blur is for. Pixels side by side
+ * in a blurred image are closer together than they were before it, further apart at a small radius
+ * than at a large one, and an image the plugin quietly left alone has exactly the detail of the one
+ * it was made from.
  */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class BlurTransformationPluginTest {
 
   @get:Rule
-  val compose = createComposeRule()
+  val composeTestRule = createComposeRule()
 
   private lateinit var server: LocalImageServer
 
   @Before
   fun start() {
     server = LocalImageServer()
+    server.serve("/detail.png", quadrantPng(), PngContentType)
+    // The same picture as a JPEG. No alpha means the decoder reaches for a hardware bitmap, whose
+    // pixels are in GPU memory: the blur has to copy it back before it can read it, and a plugin
+    // that works on the PNG can still fail on every photograph on the internet.
+    server.serve("/detail.jpg", ImageFixtures.photo(PluginRequestPx, PluginRequestPx))
+    server.serve("/flat.png", solidPng(BlueFixture), PngContentType)
   }
 
   @After
@@ -70,48 +73,12 @@ class BlurTransformationPluginTest {
     server.close()
   }
 
-  /** Detail for the blur to remove: flat quadrants, and noise a blur flattens. */
-  private fun servePhoto(gate: CountDownLatch? = null): String {
-    server.serve("/photo.jpg", ImageFixtures.photo(240, 240), gate = gate)
-    return server.url("/photo.jpg")
-  }
-
   @Test
   fun aBlurredImageHasLessDetailThanTheImageItWasMadeFrom() {
-    val url = servePhoto()
-    val loader = pluginLoader()
-    val plainState = StateRecorder()
-    val blurredState = StateRecorder()
-
-    // Both images are drawn by the same path, one carrying a painter plugin that hands the painter
-    // straight back. An image with no plugin at all is drawn by its own layout node instead, and a
-    // difference between the two paths would be read here as a difference the blur made.
-    compose.setContent {
-      Column {
-        PluginImage(
-          url = url,
-          loader = loader,
-          component = component(IdentityPainterPlugin),
-          tag = PLAIN_TAG,
-          onState = plainState::record,
-        )
-        PluginImage(
-          url = url,
-          loader = loader,
-          component = component(BlurTransformationPlugin(radius = 20)),
-          tag = BLURRED_TAG,
-          onState = blurredState::record,
-        )
-      }
-    }
-
-    compose.waitUntil(LOAD_TIMEOUT_MS) { plainState.isSuccess && blurredState.isSuccess }
-
-    val plain = compose.onNodeWithTag(PLAIN_TAG).pixels().localContrast()
-    val blurred = compose.onNodeWithTag(BLURRED_TAG).pixels().localContrast()
+    val (plain, blurred) = detailOfPlainAndBlurred(server.url("/detail.png"))
 
     assertTrue(
-      "the unblurred image has no detail to lose, so nothing below can be shown: $plain",
+      "the unblurred image has no detail to lose, so nothing below could be shown: $plain",
       plain > 0.01f,
     )
     assertTrue(
@@ -121,34 +88,50 @@ class BlurTransformationPluginTest {
   }
 
   @Test
-  fun changingTheRadiusChangesTheBlur() {
-    // The blur once kept the first result it produced and ignored every later radius, which on
-    // screen is a plugin that appears to work and never responds to being configured.
-    val url = servePhoto()
-    val loader = pluginLoader()
-    val state = StateRecorder()
-    var radius by mutableStateOf(1)
-
-    compose.setContent {
-      PluginImage(
-        url = url,
-        loader = loader,
-        component = component(BlurTransformationPlugin(radius = radius)),
-        onState = state::record,
-      )
-    }
-
-    compose.waitUntil(LOAD_TIMEOUT_MS) { state.isSuccess }
-    val gentle = compose.onNodeWithTag(IMAGE_TAG).pixels().localContrast()
-
-    compose.runOnIdle { radius = 21 }
-    compose.waitForIdle()
-    val heavy = compose.onNodeWithTag(IMAGE_TAG).pixels().localContrast()
+  fun aJpegThatDecodedIntoAHardwareBitmapIsStillBlurred() {
+    val (plain, blurred) = detailOfPlainAndBlurred(server.url("/detail.jpg"))
 
     assertTrue(
-      "a radius of 1 already flattened the image, so a larger one cannot be shown to do more: " +
-        "$gentle",
-      gentle > 0.01f,
+      "the JPEG never drew anything to blur: $plain",
+      plain > 0.01f,
+    )
+    assertTrue(
+      "a JPEG was not blurred, so the blur cannot read a hardware bitmap: detail was $plain " +
+        "unblurred and $blurred blurred",
+      blurred < plain * 0.6f,
+    )
+  }
+
+  @Test
+  fun changingTheRadiusChangesTheBlur() {
+    // The blur once kept the first result it produced and ignored every radius after it, which on
+    // screen is a plugin that looks like it works and never responds to being configured.
+    val loader = contentPluginLoader()
+    val url = server.url("/detail.png")
+    loader.warm(url)
+    var radius by mutableStateOf(1)
+
+    composeTestRule.setContent {
+      OnBackdrop {
+        LandscapistImage(
+          imageModel = { url },
+          landscapist = loader,
+          component = pluginComponent(BlurTransformationPlugin(radius = radius)),
+          modifier = contentImageModifier(),
+          requestBuilder = PluginRequestBuilder,
+        )
+      }
+    }
+
+    val gentle = composeTestRule.readContentPixels().localContrast()
+    composeTestRule.runOnIdle { radius = 21 }
+    composeTestRule.waitForIdle()
+    val heavy = composeTestRule.readContentPixels().localContrast()
+
+    assertTrue(
+      "a radius of 1 already flattened the image, or the node is empty, so a larger radius " +
+        "cannot be shown to do any more: detail was $gentle",
+      gentle > 0.005f,
     )
     assertTrue(
       "the larger radius did not blur any further, so the first result was kept: detail was " +
@@ -161,65 +144,71 @@ class BlurTransformationPluginTest {
   fun aBlurStillRunsWithALoadingPlaceholderInstalled() {
     // Two kinds of plugin at once. Which drawing path an image takes is decided from the plugins
     // installed on it, so a painter plugin that works alone is not yet a painter plugin that works
-    // next to one that composes content of its own.
+    // beside one that composes content of its own.
     val gate = CountDownLatch(1)
-    val url = servePhoto(gate)
-    val loader = pluginLoader()
-    val placeholder = ImageFixtures
-      .solid(24, 24, Color.Blue.toArgb(), Bitmap.CompressFormat.PNG)
-      .decodeToImageBitmap()
-    val plainState = StateRecorder()
-    val blurredState = StateRecorder()
+    server.serve("/held.png", quadrantPng(), PngContentType, gate = gate)
+    val url = server.url("/held.png")
+    val loader = contentPluginLoader()
+    val plain = StateRecorder()
+    val blurred = StateRecorder()
+    val placeholder = solidPng(BlueFixture).decodeToImageBitmap()
 
-    compose.setContent {
-      Column {
-        PluginImage(
-          url = url,
-          loader = loader,
-          component = component(IdentityPainterPlugin),
-          tag = PLAIN_TAG,
-          onState = plainState::record,
-        )
-        PluginImage(
-          url = url,
-          loader = loader,
-          component = component(
-            BlurTransformationPlugin(radius = 20),
-            PlaceholderPlugin.Loading(placeholder),
-          ),
-          tag = BLURRED_TAG,
-          onState = blurredState::record,
-        )
+    composeTestRule.setContent {
+      OnBackdrop {
+        Column {
+          LandscapistImage(
+            imageModel = { url },
+            landscapist = loader,
+            component = pluginComponent(IdentityPainterPlugin),
+            modifier = contentImageModifier(PlainTag),
+            requestBuilder = PluginRequestBuilder,
+            onImageStateChanged = plain::record,
+          )
+          LandscapistImage(
+            imageModel = { url },
+            landscapist = loader,
+            component = pluginComponent(
+              BlurTransformationPlugin(radius = 20),
+              PlaceholderPlugin.Loading(placeholder),
+            ),
+            modifier = contentImageModifier(BlurredTag),
+            requestBuilder = PluginRequestBuilder,
+            onImageStateChanged = blurred::record,
+          )
+        }
       }
     }
 
-    compose.waitForIdle()
-    assertColourNear(
-      "the placeholder did not render next to a painter plugin.",
-      Color.Blue,
-      compose.onNodeWithTag(BLURRED_TAG).pixels().centreColour(),
+    composeTestRule.waitForIdle()
+    val held = composeTestRule.readContentPixels(BlurredTag).centre()
+    val neighbour = composeTestRule.readContentPixels(PlainTag).centre()
+
+    assertTrue(
+      "the placeholder did not render beside a painter plugin, ${held.describe()} was drawn",
+      held.matches(BlueFixture),
     )
-    assertColourNear(
-      "the image without a placeholder drew something while the response was held.",
-      backdrop,
-      compose.onNodeWithTag(PLAIN_TAG).pixels().centreColour(),
+    assertTrue(
+      "the image with no placeholder drew ${neighbour.describe()} while the response was held",
+      neighbour.isBackdrop(),
     )
 
     gate.countDown()
-    compose.waitUntil(LOAD_TIMEOUT_MS) { plainState.isSuccess && blurredState.isSuccess }
+    composeTestRule.awaitUntil("both images to arrive") { plain.isSuccess && blurred.isSuccess }
 
-    val plain = compose.onNodeWithTag(PLAIN_TAG).pixels().localContrast()
-    val blurred = compose.onNodeWithTag(BLURRED_TAG).pixels().localContrast()
+    val plainPixels = composeTestRule.readContentPixels(PlainTag)
+    val blurredPixels = composeTestRule.readContentPixels(BlurredTag)
+    val plainDetail = plainPixels.localContrast()
+    val blurredDetail = blurredPixels.localContrast()
+    val settled = blurredPixels.centre()
 
-    assertColourFar(
-      "the placeholder is still on screen after the image arrived.",
-      Color.Blue,
-      compose.onNodeWithTag(BLURRED_TAG).pixels().centreColour(),
+    assertTrue(
+      "the placeholder is still on screen after the image arrived: ${settled.describe()}",
+      !settled.matches(BlueFixture),
     )
     assertTrue(
       "the blur stopped running once a loading plugin was installed beside it: detail was " +
-        "$plain unblurred and $blurred blurred",
-      blurred < plain * 0.6f,
+        "$plainDetail unblurred and $blurredDetail blurred",
+      blurredDetail < plainDetail * 0.6f,
     )
   }
 
@@ -227,32 +216,74 @@ class BlurTransformationPluginTest {
   fun aRadiusOfTwentyFourStillRenders() {
     // The plugin splits a radius into passes with `(radius + 1) % 25` and `(radius + 1) / 25`, so
     // a radius of 24 asks the toolkit for a pass of radius 0, which it refuses. 24, 49 and 74 are
-    // all inside the documented range and all take the composition down with them.
-    val url = servePhoto()
-    val loader = pluginLoader()
-    val state = StateRecorder()
+    // all inside the range the plugin documents and all take the composition down with them.
+    val loader = contentPluginLoader()
+    val url = server.url("/flat.png")
+    loader.warm(url)
 
-    compose.setContent {
-      PluginImage(
-        url = url,
-        loader = loader,
-        component = component(BlurTransformationPlugin(radius = 24)),
-        onState = state::record,
-      )
+    composeTestRule.setContent {
+      OnBackdrop {
+        LandscapistImage(
+          imageModel = { url },
+          landscapist = loader,
+          component = pluginComponent(BlurTransformationPlugin(radius = 24)),
+          modifier = contentImageModifier(),
+          requestBuilder = PluginRequestBuilder,
+        )
+      }
     }
 
-    compose.waitUntil(LOAD_TIMEOUT_MS) { state.isSuccess }
+    // A blur of a flat colour is the same flat colour, so the radius cannot change what this reads.
+    val pixels = composeTestRule.readContentPixels()
+    val wrong = pixels.samples().notMatching(BlueFixture)
 
-    assertColourFar(
-      "a radius of 24 drew nothing.",
-      backdrop,
-      compose.onNodeWithTag(IMAGE_TAG).pixels().centreColour(),
+    assertTrue(
+      "a radius of 24 drew ${wrong.size} of ${pixels.samples().size} pixels wrong, the first was " +
+        "${wrong.firstOrNull()?.describe()}",
+      wrong.isEmpty(),
     )
   }
 
+  /**
+   * Draws [url] twice side by side, once through a plugin that changes nothing and once blurred,
+   * and returns how much detail each of them kept.
+   *
+   * The control carries a painter plugin of its own on purpose. An image with no plugins at all is
+   * drawn by a layout node that owns its load rather than through a composed painter, and a
+   * difference between those two paths would be read here as a difference the blur made.
+   */
+  private fun detailOfPlainAndBlurred(url: String): Pair<Float, Float> {
+    val loader = contentPluginLoader()
+    loader.warm(url)
+
+    composeTestRule.setContent {
+      OnBackdrop {
+        Column {
+          LandscapistImage(
+            imageModel = { url },
+            landscapist = loader,
+            component = pluginComponent(IdentityPainterPlugin),
+            modifier = contentImageModifier(PlainTag),
+            requestBuilder = PluginRequestBuilder,
+          )
+          LandscapistImage(
+            imageModel = { url },
+            landscapist = loader,
+            component = pluginComponent(BlurTransformationPlugin(radius = 20)),
+            modifier = contentImageModifier(BlurredTag),
+            requestBuilder = PluginRequestBuilder,
+          )
+        }
+      }
+    }
+
+    return composeTestRule.readContentPixels(PlainTag).localContrast() to
+      composeTestRule.readContentPixels(BlurredTag).localContrast()
+  }
+
   private companion object {
-    private const val PLAIN_TAG = "plainImage"
-    private const val BLURRED_TAG = "blurredImage"
+    private const val PlainTag = "plainImage"
+    private const val BlurredTag = "blurredImage"
   }
 }
 
