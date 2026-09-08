@@ -190,4 +190,34 @@ class LibraryComparisonTest {
       "median ${timings.median().formatNanos()}, allocated ${allocated.formatBytes()}",
     )
   }
+
+  @Test
+  fun coilDecodesTheSamePhoto() {
+    // The same bytes, the same target, through Coil's own pipeline with both caches off, so the
+    // row is one loader against the other rather than one against a hand written decode.
+    val photo = ImageFixtures.photo(2000, 1500)
+    server.serve("/large-coil.jpg", photo)
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val loader = ImageLoader.Builder(context).memoryCache(null).diskCache(null).build()
+    val url = server.url("/large-coil.jpg")
+    val request = CoilRequest.Builder(context)
+      .data(url)
+      .size(200, 150)
+      .memoryCachePolicy(coil3.request.CachePolicy.DISABLED)
+      .diskCachePolicy(coil3.request.CachePolicy.DISABLED)
+      .build()
+
+    val timings = DeviceMeasure.timed(warmups = 2, iterations = 8) {
+      val result = runBlocking { loader.execute(request) }
+      check(result is coil3.request.SuccessResult) { "coil decode failed: $result" }
+    }
+    val allocated = DeviceMeasure.allocatedDuring {
+      runBlocking { loader.execute(request) }
+    }
+
+    DeviceMeasure.report(
+      "decode 2000x1500 to 200x150, coil",
+      "median ${timings.median().formatNanos()}, allocated ${allocated.formatBytes()}",
+    )
+  }
 }

@@ -48,6 +48,19 @@ This replaces that with verification that runs the real path on a real device.
 
 - [ ] Fix what the sweep finds, re-verify, update PR #988
 
+## Device measurement, emulator, three runs
+
+| | landscapist | coil 3.6.2 |
+|---|---|---|
+| cold load, 20 images, until all report success | 154 to 161 ms | 209 to 231 ms |
+| decode 2000x1500 to 200x150, median of 8 | 36 to 39 ms | 22 to 24 ms |
+| the same decode, bytes allocated | 5.5 MiB | 1.82 MiB |
+| scroll, 8 swipes over 60 rows, allocated | 2.1 to 2.8 MiB | 2.2 to 2.6 MiB |
+
+The decode row is a real loss and a large one. The Android decoder is untouched by this branch,
+so it is not a regression, but it is the opposite of what the JVM benchmark says about desktop.
+Worth its own look: where 5.5 MiB goes for one decode is the first question.
+
 ## Found so far
 
 - [x] FIXED: the node asked the layout to run again from the loader's thread, so a screen of
