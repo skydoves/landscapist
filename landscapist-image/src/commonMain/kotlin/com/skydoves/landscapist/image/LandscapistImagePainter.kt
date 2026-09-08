@@ -138,19 +138,12 @@ private class LandscapistImagePainter(
     val sized = if (request.targetWidth != null && request.targetHeight != null) {
       request
     } else {
-      // A painter has no constraints to read, so the first draw is what tells it how big the image
-      // has to be. Held from then on, so bounds that animate do not decode again every frame.
+      // The first draw is what tells a painter how big the image has to be, and it is held from
+      // then on. A caller who bounds neither axis is never drawn at a size, so the wait gives up
+      // and loads at the image's own size, which is Coil's fallback too.
       //
-      // A painter with no image yet has no intrinsic size, so a caller who bounds neither axis
-      // measures it to nothing, it is never drawn, and waiting here for a size would leave it
-      // permanently blank with no error and no state to explain it. Past the wait it loads at the
-      // image's own size, which is what Coil falls back to for the same reason.
-      //
-      // Counted in frames rather than milliseconds. A wall clock cannot tell that layout apart from
-      // a first frame that is simply slow to arrive, and a cold start slow enough to trip the clock
-      // would decode every image on the screen at its full size at the worst possible moment. A
-      // painter that is being drawn at all is drawn on the frame after the one that composed it, so
-      // a few frames with no draw means there is no draw coming.
+      // Counted in frames, not milliseconds: a clock cannot tell that layout apart from a slow
+      // first frame, and giving up on a slow cold start would decode every image at full size.
       var size = drawSize.value
       var frames = 0
       while (size == IntSize.Zero && frames < FRAMES_BEFORE_UNSIZED) {

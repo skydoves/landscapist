@@ -78,16 +78,11 @@ public fun <T> CrossfadeWithEffect(
     return
   }
 
-  // Seeded with the state this composable entered composition with, for two reasons. Waiting for
-  // the effect below to add it leaves the first frame empty, and content that was already resolved
-  // when the composable appeared (an image read straight from the memory cache, say) has nothing to
-  // fade in from. Only content that arrives later animates.
+  // Seeded with the entry state, so the first frame is not empty and content already resolved when
+  // the composable appeared has nothing to fade in from. Only later arrivals animate.
   //
-  // These live inside this branch on purpose. A caller can install or drop a crossfade plugin
-  // between compositions, and slots kept across that would still hold the state the composable
-  // first entered with, which by then is stale: the crossfade would fade a placeholder back in over
-  // an image already on screen. Seeded here, a newly enabled crossfade starts from what is being
-  // shown, draws it without animating, and animates the next change like any other.
+  // Inside this branch on purpose: a crossfade enabled later must start from what is on screen, not
+  // from the state the composable first entered with.
   val currentlyVisibleItems = remember { mutableStateListOf(targetState) }
   val initialContentKey = remember { contentKey(targetState) }
   // Once something else has been the target, the initial state has stopped being the one that was

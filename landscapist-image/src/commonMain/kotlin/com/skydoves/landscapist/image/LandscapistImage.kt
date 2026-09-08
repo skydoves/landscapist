@@ -461,11 +461,8 @@ private fun LandscapistImageInternal(
   }
 
   // Modifier.layout reads what the parent offered, unlike onSizeChanged which reports what was
-  // rendered, so a bounded width is known while the content is still empty.
-  //
-  // It is only in the chain until the first measurement lands. The value is locked after that, so a
-  // node that stayed would measure and place every frame to compute nothing, which in a list is one
-  // extra layout node and one extra measure pass per image for the lifetime of the item.
+  // rendered, so a bounded width is known while the content is still empty. Dropped once the value
+  // is locked, since a node that stayed would measure every frame to compute nothing.
   val constraintProbe = if (hasMeasured) {
     Modifier
   } else {
@@ -664,12 +661,9 @@ private fun ImageLoadState.toLandscapistImageState(): LandscapistImageState = wh
  * Draws [painter] on the node this modifies, the same way [androidx.compose.foundation.Image] does.
  */
 private fun ImageOptions.paintModifier(painter: Painter): Modifier = Modifier
-  // The fill comes first, because Modifier.paint sizes the node to the painter's own size unless it
-  // is handed fixed constraints. The child Image this replaces carried fillMaxSize for the same
-  // reason, and without it a caller with no size modifier shrinks to the decoded image.
-  //
-  // Anything other than a plain bitmap painter may animate as it draws, and needs a layer of its
-  // own for that not to invalidate the tree around it. A painter plugin produces exactly that.
+  // The fill comes first, because Modifier.paint sizes the node to the painter unless given fixed
+  // constraints, and without it a caller with no size modifier shrinks to the decoded image.
+  // Anything but a plain bitmap painter may animate as it draws and needs a layer of its own.
   .fillAndClip(ownLayer = painter !is BitmapPainter)
   .paint(
     painter = painter,
