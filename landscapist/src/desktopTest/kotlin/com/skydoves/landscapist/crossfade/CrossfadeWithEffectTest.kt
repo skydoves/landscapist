@@ -144,18 +144,21 @@ class CrossfadeWithEffectTest {
 
   @Test
   fun `content that arrives later fades in rather than appearing at once`() {
-    val frames = harness { harness ->
+    val (partial, settled) = harness { harness ->
       harness.renderCentre(0L)
       harness.switchTo("blue")
-      // A frame early in the animation, then one past the end of it.
-      harness.renderCentre(1L) to harness.renderSettled(1L)
+      // Frames across the fade. The animation runs on the scene's clock, so it only moves when a
+      // frame is drawn, and the alpha is what says a fade is happening rather than nothing being
+      // drawn: "not blue yet" is true of an empty frame too.
+      val alphas = (1..12).map { frame -> harness.renderCentre(frame * 25L * 1_000_000) ushr 24 }
+      alphas to harness.renderSettled(1L)
     }
 
     assertTrue(
-      frames.first != blue,
-      "the new content appeared at full strength instead of fading in",
+      partial.any { it in 1..0xFE },
+      "no frame was part way through the fade, the alphas were $partial",
     )
-    assertEquals(blue, frames.second, "the new content never reached full strength")
+    assertEquals(blue, settled, "the new content never reached full strength")
   }
 
   @Test

@@ -43,6 +43,7 @@ import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.core.ImageRequest
 import com.skydoves.landscapist.core.Landscapist
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -136,6 +137,15 @@ internal class LandscapistImageNode(
   private var state: LandscapistImageState? = null
   private var started = false
 
+  /**
+   * The load in flight, so a reload can stop it.
+   *
+   * Without this, rebinding a list item to another image left the first load running: it came back
+   * later, published, and put the previous image over the one the item now shows. The node's own
+   * scope only cancels on detach, and a rebind is not a detach.
+   */
+  private var loadJob: Job? = null
+
   override fun onAttach() {
     peek()
   }
@@ -171,6 +181,8 @@ internal class LandscapistImageNode(
     this.onState = onState
     this.unpaintable = unpaintable
     if (reload) {
+      loadJob?.cancel()
+      loadJob = null
       started = false
       state = null
       // Through setPainter, so the image on screen is taken down in the same pass that puts the new
@@ -213,7 +225,8 @@ internal class LandscapistImageNode(
 
   private fun startLoad(constraints: Constraints) {
     val sized = buildSizedRequest(request, imageOptions, constraints)
-    coroutineScope.launch {
+    loadJob?.cancel()
+    loadJob = coroutineScope.launch {
       // Collected directly rather than through flow {}, catch {} and distinctUntilChanged(). Each
       // of those is another flow, another collector and another continuation per image, and none of
       // them is needed here: the conversion happens in the collector, publish already drops a state

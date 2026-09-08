@@ -13,7 +13,7 @@ Artifact size is the one comparison that is stable and reproducible, because it 
 | Library | Module measured | Release AAR | vs landscapist-core |
 |---------|-----------------|-------------|---------------------|
 | **landscapist-core** | `landscapist-core` | **313 KiB** | baseline |
-| Coil3 | `coil-core` 3.5.0 | 468 KiB | +50% |
+| Coil3 | `coil-core` 3.6.2 | 468 KiB | +50% |
 | Glide | `glide` 5.0.7 | 693 KiB | +121% |
 | Fresco | core pipeline artifacts | ~1.0 MiB | roughly 3.3x |
 

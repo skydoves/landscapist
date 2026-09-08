@@ -134,6 +134,16 @@ private class LandscapistImagePainter(
 
   /** Loads at the size this painter is drawn at, then follows the loader until it is cancelled. */
   suspend fun load() {
+    // Checked before the size is waited for: a bundled resource is drawn at whatever size it is
+    // given, so making it wait for the first draw left that draw with nothing to show.
+    if (request.model is DrawableResource) {
+      // A bundled resource is neither fetched nor cached, and painterResource draws it directly.
+      data = request.model
+      onImageStateChanged?.invoke(
+        LandscapistImageState.Success(data = request.model, dataSource = DataSource.RESOURCE),
+      )
+      return
+    }
     val sized = if (request.targetWidth != null && request.targetHeight != null) {
       request
     } else {
@@ -141,14 +151,6 @@ private class LandscapistImagePainter(
       // has to be. Held from then on, so bounds that animate do not decode again every frame.
       val size = drawSize.first { it.width > 0 && it.height > 0 }
       request.copy(targetWidth = size.width, targetHeight = size.height)
-    }
-    if (sized.model is DrawableResource) {
-      // A bundled resource is neither fetched nor cached, and painterResource draws it directly.
-      data = sized.model
-      onImageStateChanged?.invoke(
-        LandscapistImageState.Success(data = sized.model, dataSource = DataSource.RESOURCE),
-      )
-      return
     }
     landscapist.load(sized)
       .catch { onImageStateChanged?.invoke(LandscapistImageState.Failure(reason = it)) }
