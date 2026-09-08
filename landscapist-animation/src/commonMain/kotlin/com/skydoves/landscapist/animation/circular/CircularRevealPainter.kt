@@ -15,31 +15,67 @@
  */
 package com.skydoves.landscapist.animation.circular
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.geometry.toRect
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.graphics.withSaveLayer
 
 /**
  * CircularRevealPainter is a [Painter] which animates a clipping circle to reveal an image.
  * Reveal animations provide users visual continuity when we show an image.
  *
- * @param imageBitmap an image bitmap for loading for the content.
- * @param painter an image painter to draw an [ImageBitmap] into the provided canvas.
+ * The image itself is drawn by [painter], never rescaled here. A painter is handed the exact size
+ * its caller wants it to fill, already worked out from the caller's `ContentScale`, so scaling the
+ * image again would quietly override that and render everything as `ContentScale.Crop`. Delegating
+ * also keeps a reveal composed on top of another painter plugin showing that plugin's work.
+ *
+ * @param painter an image painter to draw into the provided canvas.
  */
-internal expect class CircularRevealPainter(
-  imageBitmap: ImageBitmap,
-  painter: Painter,
-) : Painter {
-  internal val imageBitmap: ImageBitmap
-  internal val painter: Painter
-  internal var radius: Float
-  override fun DrawScope.onDraw()
+internal class CircularRevealPainter(
+  private val painter: Painter,
+) : Painter() {
 
-  override val intrinsicSize: Size
-  override fun applyAlpha(alpha: Float): Boolean
-  override fun applyColorFilter(colorFilter: ColorFilter?): Boolean
-  override fun applyLayoutDirection(layoutDirection: LayoutDirection): Boolean
+  var radius: Float by mutableStateOf(0f, policy = neverEqualPolicy())
+
+  // Held rather than allocated per draw: onDraw runs on every frame of the animation.
+  private val maskPaint = Paint()
+  private val contentPaint = Paint().apply { blendMode = BlendMode.SrcIn }
+
+  override fun DrawScope.onDraw() {
+    // The reveal is measured against the longest side, so it has covered the corners by the time it
+    // finishes.
+    val revealRadius = size.maxDimension * radius
+    if (revealRadius <= 0f) return
+
+    val bounds = size.toRect()
+    drawIntoCanvas { canvas ->
+      // The circle goes down first as a mask, then the image composites onto it with SrcIn, so the
+      // image survives only inside the circle and the reveal edge keeps the circle's anti-aliasing.
+      // Clipping to a circular path instead would leave that edge hard and jagged on Android's
+      // hardware canvas, which is why the reveal has always been a shape rather than a clip.
+      canvas.withSaveLayer(bounds, maskPaint) {
+        drawCircle(
+          color = Color.Black,
+          radius = revealRadius,
+          center = Offset(size.width / 2f, size.height / 2f),
+        )
+        canvas.withSaveLayer(bounds, contentPaint) {
+          with(painter) { draw(size) }
+        }
+      }
+    }
+  }
+
+  /** return the dimension size of the [painter]'s intrinsic width and height. */
+  override val intrinsicSize: Size get() = painter.intrinsicSize
 }

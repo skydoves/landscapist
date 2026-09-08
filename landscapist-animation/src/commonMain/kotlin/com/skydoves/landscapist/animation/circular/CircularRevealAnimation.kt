@@ -22,19 +22,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 
 /**
  * This is an extension of the [Painter] for animating a clipping circle to reveal an image.
  * The animation has two states [CircularRevealState.None], [CircularRevealState.Finished].
  *
- * @param imageBitmap an image bitmap for loading the content.
  * @param durationMs milli-second times from start to finish animation.
  */
 @Composable
 internal fun Painter.rememberCircularRevealPainter(
-  imageBitmap: ImageBitmap,
   durationMs: Int,
   onFinishListener: CircularRevealFinishListener? = null,
 ): Painter {
@@ -62,10 +59,7 @@ internal fun Painter.rememberCircularRevealPainter(
   }
 
   return remember(this) {
-    CircularRevealPainter(
-      imageBitmap = imageBitmap,
-      painter = this,
-    )
+    CircularRevealPainter(painter = this)
   }.also {
     it.radius = radius
   }
