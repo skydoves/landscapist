@@ -15,22 +15,11 @@
  */
 package com.skydoves.landscapist.image
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ProvidedValue
+import com.skydoves.landscapist.LocalImageSourceBytes
 
-/**
- * Android implementation that provides the disk cache file for sub-sampling.
- */
-@Composable
-public actual fun ProvideImageSource(
+/** The raw bytes, which is what the Skia targets sub-sample from. */
+internal actual fun imageSourceProvidedValue(
   diskCachePath: String?,
   rawData: ByteArray?,
-  content: @Composable () -> Unit,
-) {
-  // Always provided, even when null. Calling this conditionally would put content() in two
-  // different groups, so the whole success subtree would be destroyed and rebuilt the moment a
-  // disk path appeared, resetting anything a plugin remembered.
-  CompositionLocalProvider(imageSourceProvidedValue(diskCachePath, rawData)) {
-    content()
-  }
-}
+): ProvidedValue<*> = LocalImageSourceBytes provides rawData

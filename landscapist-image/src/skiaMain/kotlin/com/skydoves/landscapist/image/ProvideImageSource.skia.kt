@@ -16,7 +16,7 @@
 package com.skydoves.landscapist.image
 
 import androidx.compose.runtime.Composable
-import com.skydoves.landscapist.ProvideImageSourceBytes
+import androidx.compose.runtime.CompositionLocalProvider
 
 /**
  * Skia implementation that provides the raw bytes for sub-sampling.
@@ -31,7 +31,7 @@ public actual fun ProvideImageSource(
   // Always provided, even when null. Calling this conditionally would put content() in two
   // different groups, so the whole success subtree would be destroyed and rebuilt the moment a
   // disk path appeared, resetting anything a plugin remembered.
-  ProvideImageSourceBytes(bytes = rawData) {
+  CompositionLocalProvider(imageSourceProvidedValue(diskCachePath, rawData)) {
     content()
   }
 }

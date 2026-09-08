@@ -40,6 +40,7 @@ import com.skydoves.landscapist.core.Landscapist
 import com.skydoves.landscapist.core.model.ImageResult
 import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.image.LandscapistImage
+import com.skydoves.landscapist.image.rememberLandscapistImagePainter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -82,6 +83,7 @@ internal fun composeComparison() {
     "landscapist" to { size -> LandscapistList(landscapist, models, size) },
     "coil" to { size -> CoilList(coil, models, size) },
     "landscapist slot" to { size -> LandscapistComposedList(landscapist, models, size) },
+    "landscapist painter" to { size -> LandscapistPainterList(landscapist, models, size) },
     "coil painter sized" to { size -> CoilPainterList(coil, models, size) },
     "coil subcompose slot" to { size -> CoilSubcomposeList(coil, models, size) },
     "landscapist crossfade" to { size -> LandscapistCrossfadeList(landscapist, models, size) },
@@ -444,6 +446,31 @@ private fun LandscapistCrossfadeList(
         imageModel = { model },
         landscapist = landscapist,
         component = component,
+        modifier = Modifier.size(itemSize.dp),
+      )
+    }
+  }
+}
+
+/**
+ * The painter landscapist hands a caller, drawn in the caller's own [Image].
+ *
+ * The same shape as the Coil painter row, node for node: one layout node per image and no container
+ * around it, so what is left between the two is the loader and nothing else. It is the comparison
+ * Coil's own documentation steers people to, and the one the slot API cannot win, because a slot
+ * needs a container to put the caller's content in and that is a second layout node.
+ */
+@Composable
+private fun LandscapistPainterList(
+  landscapist: Landscapist,
+  models: List<String>,
+  itemSize: Int = ITEM_SIZE,
+) {
+  Column {
+    for (model in models) {
+      Image(
+        painter = rememberLandscapistImagePainter(model = model, landscapist = landscapist),
+        contentDescription = null,
         modifier = Modifier.size(itemSize.dp),
       )
     }

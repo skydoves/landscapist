@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -132,7 +133,8 @@ public fun LandscapistImage(
   // as this composable does, so the success subtree never moves between groups. Conditioning on the
   // source itself, which an earlier attempt did, rebuilt that subtree the moment a disk path
   // appeared and reset whatever a plugin had remembered.
-  val providesImageSource = success != null || plugins.anyIs<ImagePlugin.ComposablePlugin>()
+  val hasComposablePlugin = plugins.anyIs<ImagePlugin.ComposablePlugin>()
+  val providesImageSource = success != null || hasComposablePlugin
   // A crossfade can be drawn by the container too, as long as nothing was on screen for it to fade
   // out from. That is an image with no loading or failure content of its own, which is what a list
   // usually is. Anything that does have content to leave still stacks the two states in
@@ -145,7 +147,7 @@ public fun LandscapistImage(
   // The container can draw the image itself only when nothing else claims the inside of it.
   val canPaintOnContainer = success == null &&
     (crossfadePlugin == null || fadesWhilePainting) &&
-    !plugins.anyIs<ImagePlugin.ComposablePlugin>() &&
+    !hasComposablePlugin &&
     !plugins.anyIs<ImagePlugin.SuccessStatePlugin>()
   val requestHolder = remember(request) { StableHolder(request) }
   val landscapistHolder = remember(landscapist) { StableHolder(landscapist) }
@@ -204,12 +206,21 @@ public fun LandscapistImage(
           }
 
           if (providesImageSource) {
-            // Source data for sub-sampling support (zoomable plugin).
-            ProvideImageSource(
-              diskCachePath = state.diskCachePath,
-              rawData = state.rawData,
+            // Source data for sub-sampling support (zoomable plugin), through one provider rather
+            // than a composable that wraps another: each of those is a composition group per image.
+            CompositionLocalProvider(
+              imageSourceProvidedValue(
+                diskCachePath = state.diskCachePath,
+                rawData = state.rawData,
+              ),
             ) {
-              component.ComposeWithComposablePlugins {
+              // Wrapping is a composable call too, so with nothing to wrap it is one more group
+              // per image that forwards its content and does nothing else.
+              if (hasComposablePlugin) {
+                component.ComposeWithComposablePlugins {
+                  successContent(success, state, painter, imageOptions)
+                }
+              } else {
                 successContent(success, state, painter, imageOptions)
               }
             }
@@ -567,6 +578,9 @@ private fun rememberSuccessPainter(
   } else {
     rememberLandscapistPainter(state.data)
   }
+  // Composing plugins onto the painter is a composable call, so with none installed it is a
+  // composition group per image that hands back the painter it was given.
+  if (!component.imagePlugins.anyIs<ImagePlugin.PainterPlugin>()) return basePainter
   return basePainter.composePainterPlugins(
     imagePlugins = component.imagePlugins,
     imageBitmap = {
@@ -810,10 +824,14 @@ private fun LandscapistThumbnail(
   }
 }
 
-/** The caller's success slot, or the image drawn as it would be with no slot at all. */
+/**
+ * The caller's success slot, or the image drawn as it would be with no slot at all.
+ *
+ * Inline, so the slot is composed in the group the image already has rather than in one of its own.
+ */
 @Composable
-private fun BoxScope.successContent(
-  success: @Composable (BoxScope.(LandscapistImageState.Success, Painter) -> Unit)?,
+private inline fun BoxScope.successContent(
+  noinline success: @Composable (BoxScope.(LandscapistImageState.Success, Painter) -> Unit)?,
   state: LandscapistImageState.Success,
   painter: Painter,
   imageOptions: ImageOptions,
