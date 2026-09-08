@@ -44,6 +44,23 @@ fun main() {
     profileComposeOnly(it)
     return
   }
+  // A child forked to have its resident set watched from outside while it decodes exactly once.
+  System.getenv("LANDSCAPIST_DECODE_PATH")?.let {
+    runDecodeChild(it, System.getenv("LANDSCAPIST_DECODE_PHOTO"))
+    return
+  }
+  // A child of a spread run narrates nothing and reports its recorded metrics instead. The rows it
+  // skips are the ones dominated by sleeping or by decoding a twelve megapixel JPEG, and neither of
+  // those is where the disputed numbers are.
+  if (Metrics.collecting) {
+    memoryCacheHit(quiet = true)
+    allocations(quiet = true)
+    composeComparison()
+    scrollComparison()
+    Metrics.emit()
+    return
+  }
+
   println("Engine benchmark: landscapist-core vs Coil ${coilVersion()}")
   println("JVM ${System.getProperty("java.version")} on ${System.getProperty("os.arch")}")
   println("Fetcher returns a pre-decoded image for both, so decoding is out of the measurement.")
@@ -56,12 +73,31 @@ fun main() {
   allocations()
   coalescing()
   nearIdenticalSizes()
+  occupancyComparison()
+  diskKeyComparison()
   decodeComparison()
+  peakMemoryComparison()
   composeComparison()
+  scrollComparison()
+  firstFrameComparison()
+
+  System.getenv("LANDSCAPIST_SPREAD_RUNS")?.toIntOrNull()?.let { runSpread(it) }
 
   println("=".repeat(96))
   println("Percentiles over the reported iteration count. Lower is better.")
   println("The ratio on each second row is Coil measured against landscapist.")
+  println(
+    "Every allocation row counts Java heap only. Pixels live in Skia's native memory on both " +
+      "sides, so no allocation row here includes a single byte of any bitmap. The peak memory " +
+      "rows are the only ones that see native memory at all.",
+  )
+  if (AllocationSnapshot.threadsLost > 0) {
+    println(
+      "WARNING: ${AllocationSnapshot.threadsLost} threads exited part way through a measured " +
+        "block. A thread takes its allocation counter with it, so whatever it had allocated " +
+        "since that block started is missing: those rows are lower bounds.",
+    )
+  }
 }
 
 private fun coilVersion(): String = "3.6.2"
@@ -99,7 +135,7 @@ private fun coldLoad() {
 /**
  * The same model over and over, which is what a scrolling list mostly does once it has warmed up.
  */
-private fun memoryCacheHit() {
+private fun memoryCacheHit(quiet: Boolean = false) {
   val landscapist = newLandscapist(FetchCounter())
   val coil = newCoil(FetchCounter())
   val model = "https://example.com/hot.jpg"
@@ -126,12 +162,17 @@ private fun memoryCacheHit() {
     }
   }
 
-  report("memory cache hit", landscapistSamples, coilSamples)
+  Metrics.record("engine.memory-hit.landscapist.ns", landscapistSamples.p50)
+  Metrics.record("engine.memory-hit.coil.ns", coilSamples.p50)
 
   // The synchronous probe landscapist-image uses on the first frame, with no coroutine at all.
   val peek = measure("landscapist peek", warmups, iterations) {
     check(landscapist.peekMemoryCache(landscapistRequest(model)) != null)
   }
+  Metrics.record("engine.peek.landscapist.ns", peek.p50)
+  if (quiet) return
+
+  report("memory cache hit", landscapistSamples, coilSamples)
   println(
     String.format(
       java.util.Locale.ROOT,
@@ -147,7 +188,7 @@ private fun memoryCacheHit() {
 }
 
 /** Bytes allocated per operation, which is what drives GC pressure while a list is scrolling. */
-private fun allocations() {
+private fun allocations(quiet: Boolean = false) {
   val landscapist = newLandscapist(FetchCounter())
   val coil = newCoil(FetchCounter())
   val model = "https://example.com/alloc.jpg"
@@ -179,6 +220,10 @@ private fun allocations() {
     }
   }
 
+  Metrics.record("engine.memory-hit.landscapist.bytes", landscapistBytes / rounds)
+  Metrics.record("engine.memory-hit.coil.bytes", coilBytes / rounds)
+  if (quiet) return
+
   println("allocation per memory cache hit")
   println("  landscapist    ${(landscapistBytes / rounds).formatBytes()}")
   println("  coil           ${(coilBytes / rounds).formatBytes()}")
@@ -193,8 +238,13 @@ private fun allocations() {
 private fun nearIdenticalSizes() {
   // More than one sequence, because only some of them flatter either side. A grid that jitters by a
   // pixel reuses what it has; a sequence that keeps growing genuinely needs more pixels every time,
-  // and landscapist refuses to upscale where Coil's stub, handed isSampled = false, accepts before
-  // it ever compares sizes.
+  // and neither library can serve it from what it has. A sequence that shrinks is where they part:
+  // Coil reuses the large entry however far down it has to scale, and landscapist refuses anything
+  // more than twice the size it is drawing into, so it decodes again and Coil does not.
+  //
+  // These counts moved when the stub stopped claiming `isSampled = false`. That flag makes Coil's
+  // isCacheValueValidForSize return true before it compares any sizes at all, so Coil used to
+  // report one fetch for every sequence here regardless of what was asked for.
   val sequences = listOf(
     "a grid jittering by a pixel" to listOf(360, 359, 361, 360, 358, 360),
     "the same grid, ascending" to listOf(358, 359, 360, 361, 362, 363),

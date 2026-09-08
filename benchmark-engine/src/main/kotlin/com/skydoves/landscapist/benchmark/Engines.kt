@@ -28,11 +28,17 @@ import coil3.size.pxOrElse
 import com.skydoves.landscapist.core.ImageRequest
 import com.skydoves.landscapist.core.Landscapist
 import com.skydoves.landscapist.core.LandscapistConfig
+import com.skydoves.landscapist.core.cache.CacheKey
+import com.skydoves.landscapist.core.cache.DiskCache
+import com.skydoves.landscapist.core.cache.MemoryCache
 import com.skydoves.landscapist.core.model.CachePolicy
 import com.skydoves.landscapist.core.model.DataSource
 import com.skydoves.landscapist.core.network.FetchResult
 import com.skydoves.landscapist.core.network.ImageFetcher
 import kotlinx.coroutines.delay
+import okio.FileSystem
+import okio.Path
+import okio.Path.Companion.toPath
 import java.util.concurrent.atomic.AtomicInteger
 import coil3.decode.DataSource as CoilDataSource
 import coil3.fetch.FetchResult as CoilFetchResult
@@ -100,11 +106,58 @@ internal class LandscapistStubFetcher(
   }
 }
 
-internal fun newLandscapist(counter: FetchCounter, latencyMs: Long = 0): Landscapist =
-  Landscapist.builder()
-    .config(LandscapistConfig(memoryCacheSize = 64L * 1024 * 1024))
-    .fetcher(LandscapistStubFetcher(counter, latencyMs))
-    .build()
+internal fun newLandscapist(
+  counter: FetchCounter,
+  latencyMs: Long = 0,
+  memoryCacheBytes: Long = DEFAULT_MEMORY_CACHE,
+  memoryCache: MemoryCache? = null,
+  fetcher: ImageFetcher = LandscapistStubFetcher(counter, latencyMs),
+): Landscapist = Landscapist.builder()
+  .config(
+    LandscapistConfig(
+      memoryCacheSize = memoryCacheBytes,
+      memoryCache = memoryCache,
+      diskCache = NoDiskCache,
+    ),
+  )
+  .fetcher(fetcher)
+  .build()
+
+/**
+ * The memory cache both loaders get unless a scenario says otherwise.
+ *
+ * Small on purpose. A 64 MB cache holds every image any of these benchmarks touch, so nothing is
+ * ever evicted and no eviction behaviour is measured, which is most of what a real cache does.
+ */
+internal const val DEFAULT_MEMORY_CACHE: Long = 64L * 1024 * 1024
+
+/**
+ * Stands in for the disk cache neither side is supposed to have.
+ *
+ * Coil is built with `diskCache(null)`. `Landscapist.Builder` has no equivalent: a null config
+ * `diskCache` falls through to `createDefaultDiskCache`, so a loader built the plain way reads and
+ * writes the user's real `~/.cache/landscapist`. Without this the two sides are not comparable on
+ * any path that misses memory, and the numbers would depend on what happens to be on the disk.
+ */
+internal object NoDiskCache : DiskCache {
+  override val directory: Path = "/nonexistent/landscapist-benchmark".toPath()
+  override val maxSize: Long = 0
+  override val size: Long = 0
+  override val fileSystem: FileSystem = FileSystem.SYSTEM
+  override suspend fun get(key: CacheKey): DiskCache.Snapshot? = null
+  override suspend fun edit(key: CacheKey): DiskCache.Editor? = null
+  override suspend fun remove(key: CacheKey): Boolean = false
+  override suspend fun clear() = Unit
+}
+
+/** Fails every fetch, so the failure path can be measured rather than assumed to be free. */
+internal class LandscapistFailingFetcher(private val latencyMs: Long = 0) : ImageFetcher {
+  override fun canHandle(model: Any?): Boolean = true
+  override suspend fun fetch(request: ImageRequest): FetchResult {
+    if (latencyMs > 0) delay(latencyMs)
+    return FetchResult.Error(IllegalStateException("benchmark failure"))
+  }
+}
 
 internal fun landscapistRequest(model: String, size: Int = 512): ImageRequest =
   ImageRequest.builder()
@@ -128,7 +181,11 @@ internal class CoilStubFetcher(
     if (latencyMs > 0) delay(latencyMs)
     return ImageFetchResult(
       image = decodedBitmap(width, height).asImage(),
-      isSampled = false,
+      // The stub hands back an image scaled to the box that was asked for, never the source, which
+      // is what Coil means by sampled. Saying otherwise short circuits isCacheValueValidForSize:
+      // `!isSampled && precision == INEXACT` returns true before any size is compared, so Coil
+      // would serve a 128px thumbnail to a 512px request and the fetch counts would flatter it.
+      isSampled = true,
       dataSource = CoilDataSource.NETWORK,
     )
   }
@@ -150,21 +207,45 @@ internal class CoilStubFetcher(
 internal fun newCoil(
   counter: FetchCounter,
   latencyMs: Long = 0,
+  memoryCacheBytes: Long = DEFAULT_MEMORY_CACHE,
+  failing: Boolean = false,
   configure: ImageLoader.Builder.() -> Unit = {},
 ): ImageLoader =
   ImageLoader.Builder(PlatformContext.INSTANCE)
     .apply(configure)
-    .components { add(CoilStubFetcher.Factory(counter, latencyMs)) }
-    .memoryCache { CoilMemoryCache.Builder().maxSizeBytes(64L * 1024 * 1024).build() }
+    .components {
+      if (failing) {
+        add(CoilFailingFetcher.Factory(latencyMs))
+      } else {
+        add(CoilStubFetcher.Factory(counter, latencyMs))
+      }
+    }
+    .memoryCache { CoilMemoryCache.Builder().maxSizeBytes(memoryCacheBytes).build() }
     .diskCache(null)
     .build()
 
+/** Coil's half of the failure path. */
+internal class CoilFailingFetcher(private val latencyMs: Long) : Fetcher {
+  override suspend fun fetch(): CoilFetchResult {
+    if (latencyMs > 0) delay(latencyMs)
+    throw IllegalStateException("benchmark failure")
+  }
+
+  class Factory(private val latencyMs: Long) : Fetcher.Factory<Any> {
+    override fun create(data: Any, options: Options, imageLoader: ImageLoader): Fetcher =
+      CoilFailingFetcher(latencyMs)
+  }
+}
+
 internal fun coilRequest(model: String, size: Int = 512): CoilRequest =
+  coilRequest(model, size, size)
+
+internal fun coilRequest(model: String, width: Int, height: Int): CoilRequest =
   CoilRequest.Builder(PlatformContext.INSTANCE)
     .data(model)
     .diskCachePolicy(CoilCachePolicy.DISABLED)
     // AsyncImagePainter forces INEXACT whenever precision is undefined, so this is what every Coil
     // Compose user actually runs. Leaving the EXACT default would flatter us on size reuse.
     .precision(Precision.INEXACT)
-    .size(CoilSize(size, size))
+    .size(CoilSize(width, height))
     .build()

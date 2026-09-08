@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.ImageComposeScene
@@ -59,7 +60,7 @@ internal fun composeComparison() {
   val coil = newCoil(coilCounter)
   // Crossfade is what a Coil user turns on for the same effect landscapist's plugin gives, and on
   // this platform it costs them no extra composable at all. Same stub fetcher, same cache.
-  val fadingCoil = newCoil(FetchCounter()) { crossfade(300) }
+  val fadingCoil = newCoil(coilCounter) { crossfade(300) }
   val models = List(ITEM_COUNT) { "https://example.com/list-item-$it.jpg" }
 
   // Warm both caches, which is what a second pass over a list sees.
@@ -81,7 +82,7 @@ internal fun composeComparison() {
     "landscapist" to { size -> LandscapistList(landscapist, models, size) },
     "coil" to { size -> CoilList(coil, models, size) },
     "landscapist slot" to { size -> LandscapistComposedList(landscapist, models, size) },
-    "coil painter slot" to { size -> CoilPainterList(coil, models, size) },
+    "coil painter sized" to { size -> CoilPainterList(coil, models, size) },
     "coil subcompose slot" to { size -> CoilSubcomposeList(coil, models, size) },
     "landscapist crossfade" to { size -> LandscapistCrossfadeList(landscapist, models, size) },
     "coil crossfade" to { size -> CoilList(fadingCoil, models, size) },
@@ -104,6 +105,18 @@ internal fun composeComparison() {
   }
   println()
 
+  // A cache hit and a fetch are not the same measurement, and a variant quietly doing the
+  // second one would look expensive for a reason with nothing to do with its Compose layer.
+  // Both sides are warm before any of this runs, so the honest number here is zero on both.
+  landscapistCounter.reset()
+  coilCounter.reset()
+  for ((_, content) in variants) renderOnce { content(ITEM_SIZE) }
+  println(
+    "  fetches during one pass over every variant: landscapist " +
+      "${landscapistCounter.count.get()}, coil ${coilCounter.count.get()} (both should be zero)",
+  )
+  println()
+
   // Interleaved, so drift over the run lands on every variant rather than on whichever went first,
   // and reported as a median: a mean over these is dragged around by the odd frame that happens to
   // land on a JIT recompilation or a fresh allocation buffer.
@@ -118,6 +131,7 @@ internal fun composeComparison() {
   println("  ${"empty scene".padEnd(22)}${floor.formatBytes()}  (the floor, subtracted below)")
   for (index in 1 until variants.size) {
     val perFrame = samples[index].median() - floor
+    Metrics.record("compose.first-frame.${variants[index].first.metricKey()}.bytes", perFrame)
     println("  ${variants[index].first.padEnd(22)}${perFrame.formatBytes()}")
   }
   println()
@@ -150,10 +164,23 @@ internal fun composeComparison() {
   println("  $floorLabel${scrollFloor.formatBytes()}  (the floor, subtracted below)")
   for (index in 1 until variants.size) {
     val perFrame = resizeAllocation(variants[index].second) - scrollFloor
+    Metrics.record("compose.resize-frame.${variants[index].first.metricKey()}.bytes", perFrame)
     println("  ${variants[index].first.padEnd(22)}${perFrame.formatBytes()}")
   }
+  // The sized painter row is not comparable here and should not be read as one. Giving
+  // `rememberAsyncImagePainter` a size means building a request, and a request built against a size
+  // that changes every frame is rebuilt every frame, which restarts the load. `AsyncImage` resolves
+  // its size inside one request and does not. That is a real cost of the sized spelling under an
+  // animating bound, and it is a different thing from what the other rows measure.
+  println(
+    "    coil painter sized rebuilds its request whenever the bound moves, which is every frame " +
+      "here. That is the row's cost, not the painter's.",
+  )
   println()
 }
+
+/** A row label turned into something a metric table can key on. */
+internal fun String.metricKey(): String = replace(' ', '-')
 
 /**
  * What one frame costs once the images are on screen and their bounds are animating.
@@ -200,30 +227,9 @@ private fun resizeAllocation(content: @Composable (Int) -> Unit): Long {
  * look like the faster one.
  */
 private fun paintedFraction(content: @Composable () -> Unit): Double {
-  val scene = ImageComposeScene(
-    width = ITEM_SIZE,
-    height = ITEM_SIZE * ITEM_COUNT,
-    density = Density(1f),
-    coroutineContext = Dispatchers.Unconfined,
-    content = { content() },
-  )
+  val scene = benchmarkScene(ITEM_SIZE, ITEM_SIZE * ITEM_COUNT) { content() }
   try {
-    val image = scene.render(0L)
-    try {
-      val bitmap = org.jetbrains.skia.Bitmap()
-      bitmap.allocN32Pixels(image.width, image.height)
-      check(image.readPixels(bitmap, 0, 0)) { "could not read the rendered frame" }
-      val pixels = bitmap.readPixels() ?: error("no pixels")
-      var painted = 0
-      var i = 0
-      while (i + 3 < pixels.size) {
-        if (pixels[i + 3] != 0.toByte()) painted++
-        i += 4
-      }
-      return painted.toDouble() / (image.width * image.height)
-    } finally {
-      image.close()
-    }
+    return scene.imagePixelFraction()
   } finally {
     scene.close()
   }
@@ -334,9 +340,6 @@ private fun CoilList(
   }
 }
 
-private fun Double.asPercent(): String =
-  String.format(java.util.Locale.ROOT, "%.1f%%", this * 100)
-
 /** Renders one list repeatedly under whatever profiler is attached. */
 internal fun profileComposeOnly(which: String) {
   val landscapist = newLandscapist(FetchCounter())
@@ -394,8 +397,6 @@ private fun CoilSubcomposeList(
   }
 }
 
-private fun LongArray.median(): Long = copyOf().also { it.sort() }[size / 2]
-
 /**
  * What Coil's own documentation tells you to write for a caller supplied slot.
  *
@@ -403,6 +404,13 @@ private fun LongArray.median(): Long = copyOf().also { it.sort() }[size / 2]
  * this composable in places that need high performance", and points at `rememberAsyncImagePainter`
  * instead. Both are measured, because comparing only against the one Coil warns you off would be
  * picking the opponent.
+ *
+ * The request carries a size, which the obvious spelling of this does not. `AsyncImage` attaches a
+ * `ConstraintsSizeResolver`, but `rememberAsyncImagePainter(model)` falls back to
+ * `SizeResolver.ORIGINAL`, so it asks for the full sized image and cannot reuse what `AsyncImage`
+ * left in the memory cache at the layout size. Measured that way it draws nothing on the first
+ * frame and decodes the original, which is a real Coil footgun but not a comparison of slots.
+ * [firstFrameComparison] measures the naive spelling and reports what it costs.
  */
 @Composable
 private fun CoilPainterList(
@@ -412,8 +420,9 @@ private fun CoilPainterList(
 ) {
   Column {
     for (model in models) {
+      val request = remember(model, itemSize) { coilRequest(model, itemSize) }
       Image(
-        painter = rememberAsyncImagePainter(model = model, imageLoader = imageLoader),
+        painter = rememberAsyncImagePainter(model = request, imageLoader = imageLoader),
         contentDescription = null,
         modifier = Modifier.size(itemSize.dp),
       )

@@ -67,29 +67,108 @@ internal fun settle() {
   Thread.sleep(120)
 }
 
-/** Bytes allocated by the current thread while running [block], or -1 when unavailable. */
+/**
+ * Bytes allocated while running [block], summed over every thread, or -1 when unavailable.
+ *
+ * The sum has to cover every thread because both loaders push work onto their own dispatchers, and
+ * a current thread reading would report zero. See [AllocationSnapshot] for what that costs.
+ */
 internal inline fun allocatedBytes(block: () -> Unit): Long {
-  val before = threadAllocatedBytes()
+  val before = AllocationSnapshot.take() ?: return -1
   block()
-  val after = threadAllocatedBytes()
-  return if (before < 0 || after < 0) -1 else after - before
+  val after = AllocationSnapshot.take() ?: return -1
+  return after.since(before)
 }
 
 /**
- * Allocation summed over every live thread, not just this one.
+ * Per thread allocation counters, keyed by thread id rather than summed on the spot.
  *
- * Both loaders push work onto their own dispatchers, so a current thread reading reports zero and
- * says nothing at all.
+ * Summing first and subtracting the totals, which is the obvious way to write this, is wrong in
+ * both directions and silently so. A thread that starts during the measured block arrives with a
+ * lifetime total that is billed to the block, and a thread that exits during it takes its
+ * allocation out of the second sum, so the block is credited with freeing memory. Diffing per
+ * thread fixes the first: a thread the block created is counted from zero, which is right, because
+ * everything it allocated it allocated during the block.
+ *
+ * The second cannot be fixed after the fact, only detected. A thread that exits has already taken
+ * its counter with it. [threadsLost] counts every time that happened, and the benchmark prints it,
+ * because an allocation table built out of measurements that lost threads is not a table anyone
+ * should read.
  */
-private val allocationBean: com.sun.management.ThreadMXBean? by lazy {
-  val bean = java.lang.management.ManagementFactory.getThreadMXBean()
-  (bean as? com.sun.management.ThreadMXBean)?.takeIf { it.isThreadAllocatedMemorySupported }
-    ?.apply { isThreadAllocatedMemoryEnabled = true }
+internal class AllocationSnapshot private constructor(
+  private val ids: LongArray,
+  private val bytes: LongArray,
+) {
+
+  /** Bytes allocated between [before] and this snapshot, over every thread alive in either. */
+  fun since(before: AllocationSnapshot): Long {
+    var total = 0L
+    for (i in ids.indices) {
+      if (bytes[i] < 0) continue
+      total += bytes[i] - before.bytesFor(ids[i])
+    }
+    // Threads that were alive before and are gone now took their counters with them. Nothing here
+    // can recover the bytes; the count is so the reader knows the number is short.
+    for (i in before.ids.indices) {
+      if (before.bytes[i] >= 0 && indexOf(before.ids[i]) < 0) threadsLost++
+    }
+    return total
+  }
+
+  private fun bytesFor(id: Long): Long {
+    val index = indexOf(id)
+    return if (index < 0) 0L else bytes[index].coerceAtLeast(0L)
+  }
+
+  private fun indexOf(id: Long): Int {
+    for (i in ids.indices) if (ids[i] == id) return i
+    return -1
+  }
+
+  companion object {
+    /** How many measurements lost a thread, and with it whatever that thread had allocated. */
+    var threadsLost: Int = 0
+      private set
+
+    private val bean: com.sun.management.ThreadMXBean? by lazy {
+      val bean = java.lang.management.ManagementFactory.getThreadMXBean()
+      (bean as? com.sun.management.ThreadMXBean)?.takeIf { it.isThreadAllocatedMemorySupported }
+        ?.apply { isThreadAllocatedMemoryEnabled = true }
+    }
+
+    fun take(): AllocationSnapshot? {
+      val bean = bean ?: return null
+      val ids = bean.allThreadIds
+      return AllocationSnapshot(ids, bean.getThreadAllocatedBytes(ids))
+    }
+  }
 }
 
-private fun threadAllocatedBytes(): Long {
-  val bean = allocationBean ?: return -1
-  return bean.getThreadAllocatedBytes(bean.allThreadIds).filter { it > 0 }.sum()
+/** Peak Java heap in use while [block] runs, above where it started. Sampled, so approximate. */
+internal fun peakHeapBytes(sampleMicros: Long = 200, block: () -> Unit): Long {
+  val memory = java.lang.management.ManagementFactory.getMemoryMXBean()
+  System.gc()
+  Thread.sleep(150)
+  val baseline = memory.heapMemoryUsage.used
+  val peak = java.util.concurrent.atomic.AtomicLong(baseline)
+  val running = java.util.concurrent.atomic.AtomicBoolean(true)
+  val sampler = Thread {
+    while (running.get()) {
+      val used = memory.heapMemoryUsage.used
+      peak.updateAndGet { if (used > it) used else it }
+      java.util.concurrent.locks.LockSupport.parkNanos(sampleMicros * 1_000)
+    }
+  }
+  sampler.isDaemon = true
+  sampler.priority = Thread.MAX_PRIORITY
+  sampler.start()
+  try {
+    block()
+  } finally {
+    running.set(false)
+    sampler.join()
+  }
+  return peak.get() - baseline
 }
 
 internal fun Long.formatNanos(): String = when {
@@ -104,6 +183,10 @@ internal fun Long.formatBytes(): String = when {
   this >= 1024 -> String.format(Locale.ROOT, "%.1f KiB", this / 1024.0)
   else -> "$this B"
 }
+
+internal fun LongArray.median(): Long = copyOf().also { it.sort() }[size / 2]
+
+internal fun LongArray.mean(): Long = if (isEmpty()) 0 else sum() / size
 
 /** Prints one comparison row, with the ratio expressed against [baseline]. */
 internal fun report(scenario: String, baseline: Samples, challenger: Samples) {
@@ -132,4 +215,19 @@ internal fun report(scenario: String, baseline: Samples, challenger: Samples) {
     ),
   )
   println()
+}
+
+/** Prints a two sided row where lower is better, with the multiple Coil is off by. */
+internal fun compare(label: String, landscapist: Long, coil: Long, render: (Long) -> String) {
+  val ratio = if (landscapist == 0L) 0.0 else coil.toDouble() / landscapist.toDouble()
+  println(
+    String.format(
+      Locale.ROOT,
+      "  %-38s landscapist %-12s coil %-12s (%.2fx)",
+      label,
+      render(landscapist),
+      render(coil),
+      ratio,
+    ),
+  )
 }

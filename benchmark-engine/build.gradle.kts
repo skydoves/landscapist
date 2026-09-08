@@ -38,6 +38,7 @@ dependencies {
   implementation(project(":landscapist"))
   implementation(project(":landscapist-core"))
   implementation(project(":landscapist-image"))
+  implementation(project(":landscapist-placeholder"))
   implementation(libs.coil3)
   implementation("io.coil-kt.coil3:coil-compose:${libs.versions.coil3.get()}")
   implementation(compose.desktop.currentOs)
@@ -69,6 +70,9 @@ tasks.named("distZip") { enabled = false }
 // tracked down: `./gradlew :benchmark-engine:run -Pjfr=/path/rec.jfr -Pprofile=landscapist-resize`.
 // Without -Pjfr the benchmark runs normally.
 tasks.named<JavaExec>("run") {
+  // `-Pspread=5` re-runs the contested rows in five more JVMs and prints the spread, so a number
+  // can be told apart from the machine it was measured on. Off by default: it costs five more runs.
+  providers.gradleProperty("spread").orNull?.let { environment("LANDSCAPIST_SPREAD_RUNS", it) }
   val recording = providers.gradleProperty("jfr").orNull
   if (recording != null) {
     jvmArgs(

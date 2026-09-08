@@ -116,6 +116,7 @@ public final class com/skydoves/landscapist/core/Landscapist$Builder {
 	public final fun dispatcher (Lkotlinx/coroutines/CoroutineDispatcher;)Lcom/skydoves/landscapist/core/Landscapist$Builder;
 	public final fun fetcher (Lcom/skydoves/landscapist/core/network/ImageFetcher;)Lcom/skydoves/landscapist/core/Landscapist$Builder;
 	public final fun memoryCache (Lcom/skydoves/landscapist/core/cache/MemoryCache;)Lcom/skydoves/landscapist/core/Landscapist$Builder;
+	public final fun noDiskCache ()Lcom/skydoves/landscapist/core/Landscapist$Builder;
 }
 
 public final class com/skydoves/landscapist/core/Landscapist$Companion {

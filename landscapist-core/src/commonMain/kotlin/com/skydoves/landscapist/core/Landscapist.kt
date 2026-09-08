@@ -871,6 +871,7 @@ public class Landscapist private constructor(
    */
   public class Builder {
     private var config: LandscapistConfig = LandscapistConfig()
+    private var diskCacheDisabled: Boolean = false
     private var memoryCache: MemoryCache? = null
     private var diskCache: DiskCache? = null
     private var fetcher: ImageFetcher? = null
@@ -897,6 +898,19 @@ public class Landscapist private constructor(
     /** Sets a custom disk cache. */
     public fun diskCache(cache: DiskCache): Builder = apply {
       this.diskCache = cache
+      this.diskCacheDisabled = false
+    }
+
+    /**
+     * Builds a loader with no disk cache at all.
+     *
+     * Without this a loader always ends up owning one, because leaving it unset falls through to
+     * the default on disk. A caller who does not want anything written to disk, or who has their
+     * own caching in front of the fetcher, had no way to say so.
+     */
+    public fun noDiskCache(): Builder = apply {
+      this.diskCache = null
+      this.diskCacheDisabled = true
     }
 
     /** Sets a custom network fetcher. */
@@ -929,9 +943,11 @@ public class Landscapist private constructor(
           LruMemoryCache(config.memoryCacheSize)
         }
 
-      val finalDiskCache = diskCache
-        ?: config.diskCache
-        ?: createDefaultDiskCache(config.diskCacheSize)
+      val finalDiskCache = if (diskCacheDisabled) {
+        null
+      } else {
+        diskCache ?: config.diskCache ?: createDefaultDiskCache(config.diskCacheSize)
+      }
 
       val finalFetcher = fetcher
         ?: KtorImageFetcher.create(config.networkConfig)
