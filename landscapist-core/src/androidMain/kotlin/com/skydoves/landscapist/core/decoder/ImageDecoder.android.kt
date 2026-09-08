@@ -216,10 +216,15 @@ internal class AndroidImageDecoder : ImageDecoder {
       IllegalArgumentException("Failed to decode bitmap"),
     )
 
+    // The decoded size, not the source size. The memory cache charges an entry by the dimensions
+    // reported here, so reporting the source size of a downsampled image overcharges it by the
+    // square of the sample size: a 4000x3000 JPEG sampled 8x really costs 0.7 MiB and was being
+    // billed 46 MiB, which evicted the whole cache after one image. The desktop decoder already
+    // reports its decoded size, so this also makes the two agree.
     return DecodeResult.Success(
       bitmap = bitmap,
-      width = originalWidth,
-      height = originalHeight,
+      width = bitmap.width,
+      height = bitmap.height,
       isAnimated = false,
     )
   }

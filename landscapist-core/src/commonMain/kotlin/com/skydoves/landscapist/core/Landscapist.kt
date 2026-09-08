@@ -140,10 +140,19 @@ public class Landscapist private constructor(
    * @param request The image request.
    * @return A flow emitting [ImageResult] states.
    */
-  public fun load(request: ImageRequest): Flow<ImageResult> = flow {
+  public fun load(request: ImageRequest): Flow<ImageResult> {
+    val flow = flow { emitLoad(request) }
+    // Progressive streams its previews straight from that body, doing disk and network work inline,
+    // so it needs a dispatcher of its own. The standard path does its fetching and decoding on this
+    // loader's scope already, so imposing a dispatcher on it only added a round trip to every call,
+    // memory cache hits included, and those are most of what a scrolling list does.
+    return if (request.progressiveEnabled) flow.flowOn(dispatcher) else flow
+  }
+
+  private suspend fun FlowCollector<ImageResult>.emitLoad(request: ImageRequest) {
     if (request.model == null) {
       emit(ImageResult.Failure(NullPointerException("Image model is null")))
-      return@flow
+      return
     }
 
     val cacheKey = request.cacheKey()
@@ -153,7 +162,7 @@ public class Landscapist private constructor(
     if (request.memoryCachePolicy.readEnabled) {
       memoryCache[cacheKey]?.let { cached ->
         emit(cached.toSuccess())
-        return@flow
+        return
       }
     }
 
@@ -162,12 +171,12 @@ public class Landscapist private constructor(
     // 2. Progressive loading is an opt-in streaming mode and is not coalesced.
     if (request.progressiveEnabled) {
       loadProgressive(request, cacheKey)
-      return@flow
+      return
     }
 
     // 3. Standard path: coalesce concurrent identical loads into one fetch and decode.
     emit(dedupedStandardTerminal(cacheKey.memoryKey, request, cacheKey))
-  }.flowOn(dispatcher)
+  }
 
   /**
    * Reads [request] out of the memory cache without suspending, or returns null when it is not
@@ -202,7 +211,12 @@ public class Landscapist private constructor(
 
   private fun ImageRequest.cacheKey(): CacheKey = CacheKey.create(
     model = model,
-    transformationKeys = transformations.map { it.key },
+    // Most requests carry no transformations, and map() would allocate a list to say so.
+    transformationKeys = if (transformations.isEmpty()) {
+      emptyList()
+    } else {
+      transformations.map { it.key }
+    },
     width = targetWidth,
     height = targetHeight,
   )
