@@ -52,8 +52,7 @@ This replaces that with verification that runs the real path on a real device.
 
 - [x] Fix what the sweep found: the threading regression and the blur radius that threw
 - [x] Re-verify: 649 unit tests, 79 device tests
-- [ ] Update PR #988. Its body still describes JVM measurements and says nothing about the
-      device suite, the threading regression, or the decode row that goes the other way.
+- [x] Update PR #988
 
 ## Device measurement, emulator
 
