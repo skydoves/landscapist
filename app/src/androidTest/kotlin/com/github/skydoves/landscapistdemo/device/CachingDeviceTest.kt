@@ -50,15 +50,6 @@ import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 
-/**
- * What the caches actually save, measured against a server that counts requests and a decoder that
- * counts decodes.
- *
- * The equivalent desktop tests answer every fetch from a stub, so a cache miss is invisible: the
- * only way to see one is to count something. Here a miss is a socket the server accepted, which is
- * the cost the cache exists to avoid, and the decoder is the platform one wrapped in a counter, so
- * "reused the entry" and "decoded it again" are separate observations rather than the same one.
- */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class CachingDeviceTest {
@@ -75,7 +66,7 @@ class CachingDeviceTest {
     diskDirectories.forEach { it.deleteRecursively() }
   }
 
-  /** The real platform decoder, with a count of how many times it was asked to run. */
+  /** The real platform decoder, counted. */
   private class CountingDecoder : ImageDecoder {
     private val delegate = createPlatformDecoder()
     val decodes = AtomicInteger()
@@ -100,10 +91,7 @@ class CachingDeviceTest {
     val decodes: Int get() = decoder.decodes.get()
   }
 
-  /**
-   * A loader with a memory cache and nothing else, so anything not served from memory is a request
-   * the server sees.
-   */
+  /** No disk cache, so anything not served from memory is a request the server sees. */
   private fun memoryOnlyLoader(): Loader {
     val decoder = CountingDecoder()
     return Loader(
@@ -112,7 +100,7 @@ class CachingDeviceTest {
     )
   }
 
-  /** A loader with a disk cache of its own, in a directory this test deletes afterwards. */
+  /** A disk cache in a directory this test deletes afterwards. */
   private fun diskBackedLoader(): Loader {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     val directory = File(context.cacheDir, "landscapist-device-${System.nanoTime()}")
@@ -121,8 +109,8 @@ class CachingDeviceTest {
     val disk = DiskLruCache.create(directory.toOkioPath(), DISK_CACHE_BYTES, FileSystem.SYSTEM)
     return Loader(
       Landscapist.builder()
-        // Strong references only, so clearMemoryCache really empties the memory cache and a hit
-        // afterwards can only have come from disk.
+        // Strong references only, so clearMemoryCache really empties it and a later hit can
+        // only have come from disk.
         .config(LandscapistConfig(weakReferencesEnabled = false))
         .diskCache(disk)
         .decoder(decoder)
@@ -142,12 +130,7 @@ class CachingDeviceTest {
   private suspend fun Landscapist.terminal(request: ImageRequest): ImageResult =
     load(request).first { it is ImageResult.Success || it is ImageResult.Failure }
 
-  /**
-   * Loads [url] at [width] x [height] and returns the success, failing with what happened instead.
-   *
-   * The disk cache is out of the way by default, so a load that is not served from memory is a
-   * request the server counts.
-   */
+  /** Disk is out of the way by default, so a load not served from memory reaches the server. */
   private fun Loader.load(
     url: String,
     width: Int,
@@ -189,8 +172,7 @@ class CachingDeviceTest {
 
   @Test
   fun theSizesAGridActuallyMeasuresShareOneDecode() {
-    // A grid whose columns do not divide evenly asks for 359, 360 and 361 wide. Keying strictly on
-    // the target size makes those three entries and three decodes of one picture.
+    // A grid whose columns do not divide evenly asks for 359, 360 and 361 wide.
     server.serve(SQUARE, largeSquare())
     val url = server.url(SQUARE)
     val loader = memoryOnlyLoader()
@@ -239,8 +221,7 @@ class CachingDeviceTest {
 
   @Test
   fun aMuchLargerRequestDecodesAgain() {
-    // The other half of the tolerance: reuse may not hand a slot an image with fewer pixels than it
-    // can draw.
+    // The other half of the tolerance: reuse may not hand a slot fewer pixels than it draws.
     server.serve(SQUARE, largeSquare())
     val url = server.url(SQUARE)
     val loader = memoryOnlyLoader()
@@ -259,9 +240,8 @@ class CachingDeviceTest {
 
   @Test
   fun anEntryOversizedOnOneAxisAloneIsNotReused() {
-    // A panorama cached for a wide slot is exactly the height a narrow slot wants and eight times
-    // its width. Asking for both axes to be oversized before re-decoding keeps that entry, and the
-    // narrow slot then draws a bitmap several times the size it needs on every frame.
+    // A panorama cached for a wide slot is the height a narrow slot wants and eight times its
+    // width, so a rule that needed both axes oversized would keep it.
     server.serve(PANORAMA, ImageFixtures.solid(4000, 500, Color.GREEN))
     val url = server.url(PANORAMA)
     val loader = memoryOnlyLoader()
@@ -280,8 +260,7 @@ class CachingDeviceTest {
 
   @Test
   fun concurrentLoadsOfTheSameUrlReachTheServerOnce() {
-    // The response is held open while every caller starts, so they are genuinely in flight together
-    // rather than being served one after another out of the memory cache.
+    // The response is held open while every caller starts, so they are in flight together.
     val gate = CountDownLatch(1)
     server.serve(SQUARE, largeSquare(), gate = gate)
     val url = server.url(SQUARE)
@@ -295,8 +274,7 @@ class CachingDeviceTest {
           }
         }
       }
-      // Wait until the server has actually accepted a request, then give the rest of the callers
-      // room to open one of their own if coalescing is not working.
+      // Give the other callers room to open a request of their own if coalescing is broken.
       withTimeoutOrNull(FIRST_HIT_TIMEOUT_MS) {
         while (server.hitCount(SQUARE) == 0) delay(20)
       }
@@ -347,8 +325,8 @@ class CachingDeviceTest {
       ?: throw AssertionError("the loader reported no disk cache path, so nothing was written")
     val disk = loader.diskCache
       ?: throw AssertionError("the disk backed loader was built without a disk cache")
-    // The disk write runs off the critical path so the decode can start immediately, so the entry
-    // the result names is not there the instant the result is.
+    // The disk write runs off the critical path, so the entry is not there the instant the
+    // result is.
     awaitDiskWrite(disk, File(written))
 
     loader.landscapist.clearMemoryCache()
@@ -367,22 +345,18 @@ class CachingDeviceTest {
     )
   }
 
-  /** Blocks until [cache] has committed the entry at [file], or fails saying it never did. */
+  /** Blocks until [cache] has committed the entry at [file]. */
   private fun awaitDiskWrite(cache: DiskLruCache, file: File) {
     val deadline = System.nanoTime() + DISK_WRITE_TIMEOUT_MS * 1_000_000
     while (System.nanoTime() < deadline) {
-      // The size is only counted once the temp file has been moved into place and the entry
-      // registered, so waiting on it rather than on the file avoids reading between the two.
+      // The size is only counted once the entry is registered, so it is the safer wait.
       if (cache.size > 0 && file.isFile) return
       Thread.sleep(20)
     }
     throw AssertionError("the disk cache never committed anything for $file")
   }
 
-  /**
-   * A 1200x1200 source. Square, because the platform decoder halves only while both axes still
-   * cover the request, so a square keeps the size a request comes back at predictable.
-   */
+  /** Square, because the decoder halves only while both axes still cover the request. */
   private fun largeSquare(): ByteArray = ImageFixtures.solid(1200, 1200, Color.BLUE)
 
   private companion object {

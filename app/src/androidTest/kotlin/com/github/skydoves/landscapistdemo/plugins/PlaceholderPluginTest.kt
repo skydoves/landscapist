@@ -31,16 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 
-/**
- * [PlaceholderPlugin], both halves of it, told apart by colour.
- *
- * Each of the four things that can be on this node is a different colour, so one pixel says which
- * of them was drawn: the loading placeholder is blue, the failure placeholder is red, the image is
- * magenta, and a node that drew nothing at all is the green behind it.
- *
- * Both plugins are installed in both tests. Each of them composes on a state the other does not,
- * so an image that shows the right one has also had to keep the other one off the screen.
- */
+/** Loading is blue, failure red, the image magenta, and a node that drew nothing is green. */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class PlaceholderPluginTest {

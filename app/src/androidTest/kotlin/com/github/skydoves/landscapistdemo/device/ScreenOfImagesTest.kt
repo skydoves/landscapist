@@ -43,16 +43,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.atomic.AtomicInteger
 
-/**
- * A screen of images has to load, on the device, through real HTTP.
- *
- * This is the test that was missing. The node this branch introduced drew and measured itself, and
- * told the layout to run again from whatever thread the loader finished on. On Android that is
- * `View.requestLayout` off the main thread, which throws, and every image on the screen failed with
- * an error about view hierarchies. Nothing caught it: the desktop tests have no such thread, the
- * JVM benchmark hands over pre-decoded bitmaps from the collector's own thread, and the demo app
- * has few enough images that it usually won a race it should never have been in.
- */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ScreenOfImagesTest {
@@ -68,7 +58,7 @@ class ScreenOfImagesTest {
 
   @After fun stop() = server.close()
 
-  /** Loads [count] distinct urls through the loader alone, with no Compose in the way. */
+  /** Loads [count] distinct urls with no Compose in the way. */
   private fun loaderOnly(count: Int): Int {
     val loader = Landscapist.builder().noDiskCache().build()
     return runBlocking {
@@ -88,8 +78,6 @@ class ScreenOfImagesTest {
   }
 
   @Test fun theLoaderAloneResolvesEveryUrl() {
-    // The same work with no Compose in it, so a failure above can be told apart from a failure in
-    // the loader.
     assertEquals("the loader alone did not resolve every url", 20, loaderOnly(20))
   }
 

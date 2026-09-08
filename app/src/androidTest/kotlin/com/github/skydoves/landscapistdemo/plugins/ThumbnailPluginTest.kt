@@ -31,15 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * [ThumbnailPlugin] against the same URL loaded twice at two sizes.
- *
- * The plugin asks the loader for a small version of the image the composable is already loading,
- * and draws that until the real one arrives. Both halves of that are checked: the sizes the loader
- * was actually asked for, which never reach the wire and so are read off a fetcher rather than the
- * server, and what was on screen while the full sized response was held, which has to be a picture
- * with fifteen pixels of detail in it rather than the image itself.
- */
+/** The sizes asked for never reach the wire, so they are read off a fetcher, not the server. */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ThumbnailPluginTest {
@@ -49,7 +41,7 @@ class ThumbnailPluginTest {
 
   private lateinit var server: LocalImageServer
 
-  /** Holds the full sized request, which is anything larger than a preview, until released. */
+  /** Anything larger than a thumbnail is the full sized request. */
   private val fetcher = RecordingFetcher(holdLargerThan = 64)
 
   @Before
@@ -69,8 +61,7 @@ class ThumbnailPluginTest {
     val loader = contentPluginLoader(fetcher)
     val state = StateRecorder()
     val url = server.url("/detail.png")
-    // Held outside the composition: a plugin rebuilt on every composition is a new key inside the
-    // image, and the thumbnail load would start again each time the state changed.
+    // Outside the composition: a plugin rebuilt each time would restart the thumbnail load.
     val component = pluginComponent(ThumbnailPlugin())
 
     composeTestRule.setContent {
@@ -80,8 +71,6 @@ class ThumbnailPluginTest {
           landscapist = loader,
           component = component,
           modifier = contentImageModifier(),
-          // No size on the request, because a request that already carries one is passed through
-          // untouched and the size the plugin asks for would be dropped.
           requestBuilder = UnsizedRequestBuilder,
           onImageStateChanged = state::record,
         )
@@ -121,9 +110,8 @@ class ThumbnailPluginTest {
 
   @Test
   fun withoutThePluginNothingIsOnScreenWhileTheImageLoads() {
-    // The control for the test above. The plugin installed here composes on the same state and
-    // draws nothing, so the image is on the same drawing path with nothing to show, and both the
-    // pixels and the single recorded request say the thumbnail above came from the plugin.
+    // The control: this plugin composes on the same state and draws nothing, so the image takes
+    // the same drawing path with nothing to show.
     val loader = contentPluginLoader(fetcher)
     val state = StateRecorder()
     val url = server.url("/detail.png")

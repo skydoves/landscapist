@@ -37,15 +37,7 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 
-/**
- * [ShimmerPlugin] against real bytes on a real screen.
- *
- * The server holds the response until the test lets it go, so the image is genuinely still loading
- * rather than loading quickly, and a shimmer that never appears cannot hide behind the image
- * arriving first. Both shimmers are given the same colour for their base and their highlight, so
- * whatever phase the animation is in the node is one known colour and an assertion can name it.
- * Sampling a moving gradient instead would only say that something grey was drawn.
- */
+/** Base and highlight are one colour, so the node is a known colour whatever phase it is in. */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ShimmerPluginTest {
@@ -63,8 +55,7 @@ class ShimmerPluginTest {
     server = LocalImageServer()
     gate = CountDownLatch(1)
     server.serve("/held.png", solidPng(BlueFixture), PngContentType, gate = gate)
-    // A shimmer repeats forever, so waiting for the composition to go idle never returns. The test
-    // hands out the frames instead.
+    // A shimmer repeats forever, so waiting for idle never returns; the test hands out frames.
     composeTestRule.mainClock.autoAdvance = false
   }
 
@@ -105,8 +96,7 @@ class ShimmerPluginTest {
 
   @Test
   fun theFadeShimmerStillShowsWhenTheCallerTakesTheSuccessSlot() {
-    // A success slot takes the drawing off the container, so the loading content is composed on a
-    // different path from the one above. The shimmer has to survive both.
+    // A success slot composes the loading content on a different path; both have to shimmer.
     val loader = visualPluginLoader()
 
     composeTestRule.setContent {
@@ -142,10 +132,8 @@ class ShimmerPluginTest {
     assertTheShimmerShowsThenGivesWayToTheImage()
   }
 
-  /** Reads the node while the response is held, then again once it has been let through. */
   private fun assertTheShimmerShowsThenGivesWayToTheImage() {
-    // Frames enough for the placeholder to have settled, but the response is still held, so the
-    // image cannot have arrived however many of them are drawn.
+    // Frames enough for the placeholder to settle; the response is still held.
     composeTestRule.mainClock.advanceTimeBy(240L)
 
     val loading = composeTestRule.readVisualPixels()

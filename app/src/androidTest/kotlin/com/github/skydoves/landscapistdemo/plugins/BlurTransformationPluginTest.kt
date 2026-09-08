@@ -39,15 +39,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 
-/**
- * [BlurTransformationPlugin], rendered on a device and read back a pixel at a time.
- *
- * A blur cannot be checked against a reference image: the blur is native code and what it is given
- * depends on the decode. What is asserted instead is the thing a blur is for. Pixels side by side
- * in a blurred image are closer together than they were before it, further apart at a small radius
- * than at a large one, and an image the plugin quietly left alone has exactly the detail of the one
- * it was made from.
- */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class BlurTransformationPluginTest {
@@ -61,9 +52,8 @@ class BlurTransformationPluginTest {
   fun start() {
     server = LocalImageServer()
     server.serve("/detail.png", quadrantPng(), PngContentType)
-    // The same picture as a JPEG. No alpha means the decoder reaches for a hardware bitmap, whose
-    // pixels are in GPU memory: the blur has to copy it back before it can read it, and a plugin
-    // that works on the PNG can still fail on every photograph on the internet.
+    // The same picture as a JPEG, which decodes to a hardware bitmap the blur has to copy back
+    // before it can read it.
     server.serve("/detail.jpg", ImageFixtures.photo(PluginRequestPx, PluginRequestPx))
     server.serve("/flat.png", solidPng(BlueFixture), PngContentType)
   }
@@ -104,8 +94,6 @@ class BlurTransformationPluginTest {
 
   @Test
   fun changingTheRadiusChangesTheBlur() {
-    // The blur once kept the first result it produced and ignored every radius after it, which on
-    // screen is a plugin that looks like it works and never responds to being configured.
     val loader = contentPluginLoader()
     val url = server.url("/detail.png")
     loader.warm(url)
@@ -142,9 +130,7 @@ class BlurTransformationPluginTest {
 
   @Test
   fun aBlurStillRunsWithALoadingPlaceholderInstalled() {
-    // Two kinds of plugin at once. Which drawing path an image takes is decided from the plugins
-    // installed on it, so a painter plugin that works alone is not yet a painter plugin that works
-    // beside one that composes content of its own.
+    // Two kinds of plugin at once: the drawing path is chosen from the plugins installed.
     val gate = CountDownLatch(1)
     server.serve("/held.png", quadrantPng(), PngContentType, gate = gate)
     val url = server.url("/held.png")
@@ -214,9 +200,8 @@ class BlurTransformationPluginTest {
 
   @Test
   fun aRadiusOfTwentyFourStillRenders() {
-    // The plugin splits a radius into passes with `(radius + 1) % 25` and `(radius + 1) / 25`, so
-    // a radius of 24 asks the toolkit for a pass of radius 0, which it refuses. 24, 49 and 74 are
-    // all inside the range the plugin documents and all take the composition down with them.
+    // The plugin splits a radius with `(radius + 1) % 25`, so 24 asks the toolkit for a pass of
+    // radius 0, which it refuses.
     val loader = contentPluginLoader()
     val url = server.url("/flat.png")
     loader.warm(url)
@@ -244,14 +229,7 @@ class BlurTransformationPluginTest {
     )
   }
 
-  /**
-   * Draws [url] twice side by side, once through a plugin that changes nothing and once blurred,
-   * and returns how much detail each of them kept.
-   *
-   * The control carries a painter plugin of its own on purpose. An image with no plugins at all is
-   * drawn by a layout node that owns its load rather than through a composed painter, and a
-   * difference between those two paths would be read here as a difference the blur made.
-   */
+  /** The control carries a painter plugin too, so both are drawn by the same path. */
   private fun detailOfPlainAndBlurred(url: String): Pair<Float, Float> {
     val loader = contentPluginLoader()
     loader.warm(url)
@@ -287,7 +265,7 @@ class BlurTransformationPluginTest {
   }
 }
 
-/** A painter plugin that changes nothing, so a control is drawn by the path a blur is drawn by. */
+/** Changes nothing, so a control is drawn by the path a blur is drawn by. */
 private object IdentityPainterPlugin : ImagePlugin.PainterPlugin {
 
   @Composable

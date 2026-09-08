@@ -31,14 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * [ProgressiveLoadingPlugin], against what it does rather than what its documentation says.
- *
- * The documentation promises a blurred preview that sharpens into the image. The plugin itself
- * only asks the loader for a thirty two pixel preview and lets that be drawn: the blur radius and
- * the transition it takes are never read, and the composable that would use them is not wired to
- * anything. What is testable is therefore the preview, which is real and does arrive first.
- */
+/** The plugin never reads its blur radius or transition, so only the preview is testable. */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ProgressiveLoadingPluginTest {
@@ -48,7 +41,7 @@ class ProgressiveLoadingPluginTest {
 
   private lateinit var server: LocalImageServer
 
-  /** Holds the full sized request, which is anything larger than a preview, until released. */
+  /** Anything larger than a preview is the full sized request. */
   private val fetcher = RecordingFetcher(holdLargerThan = 64)
 
   @Before
@@ -69,8 +62,7 @@ class ProgressiveLoadingPluginTest {
     val loader = contentPluginLoader(fetcher)
     val state = StateRecorder()
     val url = server.url("/first.png")
-    // Held outside the composition: a plugin rebuilt on every composition is a new key inside the
-    // image, and the preview load would start again each time the state changed.
+    // Outside the composition: a plugin rebuilt each time would restart the preview load.
     val component = pluginComponent(ProgressiveLoadingPlugin())
 
     composeTestRule.setContent {
@@ -80,8 +72,6 @@ class ProgressiveLoadingPluginTest {
           landscapist = loader,
           component = component,
           modifier = contentImageModifier(),
-          // No size on the request, because a request that already carries one is passed through
-          // untouched and the size the plugin asks for would be dropped.
           requestBuilder = UnsizedRequestBuilder,
           onImageStateChanged = state::record,
         )
@@ -117,9 +107,8 @@ class ProgressiveLoadingPluginTest {
 
   @Test
   fun theTunedFactoriesAskForTheSamePreviewAsTheDefaultOne() {
-    // The factories differ only in a blur radius and a duration, neither of which the plugin ever
-    // reads, so both ask for the same preview. Two URLs rather than one, because two loads of the
-    // same image at the same size are coalesced into a single fetch and only one would be seen.
+    // Two URLs rather than one: two loads of the same image at the same size are coalesced into
+    // a single fetch, and only one would be seen.
     val loader = contentPluginLoader(fetcher)
     val first = StateRecorder()
     val second = StateRecorder()

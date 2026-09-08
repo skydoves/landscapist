@@ -31,14 +31,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 
-/**
- * [BlurHashPlugin], with the response held open so the placeholder can be photographed.
- *
- * The plugin's whole promise is that something is on screen before the image is, so the assertions
- * are about what the device drew while the socket was still waiting. The backdrop behind the image
- * is what makes "it drew nothing" a colour rather than an absence, and the hash is one whose
- * decoded colours are nothing like it.
- */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class BlurHashPluginTest {
@@ -53,7 +45,7 @@ class BlurHashPluginTest {
   @Before
   fun start() {
     server = LocalImageServer()
-    // Held until a test lets it go, so everything on screen before that is the placeholder.
+    // Held until a test lets it go, so what is on screen before then is the placeholder.
     server.serve("/held.png", solidPng(BlueFixture), PngContentType, gate = gate)
   }
 
@@ -105,8 +97,7 @@ class BlurHashPluginTest {
         "where the decoder produced ${decoded.centreColour(32, 32).describe()}",
       centre.matches(decoded.centreColour(32, 32), tolerance = 0.1f),
     )
-    // The hash holds a horizontal ramp, so its two edges are different colours. A flat fill of the
-    // right average would pass everything above, and is the shape a mistake here would take.
+    // The hash is a horizontal ramp, so a flat fill of the right average would pass the above.
     val leftEdge = whileLoading.at(x = 0.05f, y = 0.5f)
     val rightEdge = whileLoading.at(x = 0.95f, y = 0.5f)
     assertFalse(
@@ -129,8 +120,7 @@ class BlurHashPluginTest {
 
   @Test
   fun aHashThatDoesNotDecodeDrawsNothingRatherThanBringingTheImageDown() {
-    // Also the control for every assertion above: with nothing composed the node reads back as the
-    // backdrop, so a colour read off this node in the test above is something a plugin drew.
+    // Also the control for the test above: with nothing drawn the node reads back as backdrop.
     val loader = contentPluginLoader()
     val state = StateRecorder()
     val component = pluginComponent(
@@ -170,13 +160,7 @@ class BlurHashPluginTest {
   }
 
   private companion object {
-    /**
-     * One row of two components: an orange base colour with a red to amber ramp across it.
-     *
-     * Written out rather than taken from the BlurHash samples, because the well known ones decode
-     * to a mid grey, and a placeholder has to be a colour nothing else on the screen is for a
-     * pixel to say which of them was drawn.
-     */
+    /** A red to amber ramp, in colours nothing else on the screen is. */
     private const val Hash = "1ZTMYr@N"
   }
 }

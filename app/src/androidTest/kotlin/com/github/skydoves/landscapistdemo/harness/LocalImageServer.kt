@@ -27,15 +27,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-/**
- * An HTTP server the tests run against, in the test process, on the device.
- *
- * Written on a raw socket rather than against a mock client. Every layer that a stub replaces is a
- * layer nothing checks: a cookie no image needed took the whole demo app down while 643 tests built
- * on stub fetchers and stub decoders passed. What reaches the loader here is bytes on a socket, so
- * the headers, the status line, the redirect and the decode are all real, and the response can be
- * made as malformed as a real server's.
- */
+/** A raw socket server in the test process, so a response can be as malformed as a real one. */
 class LocalImageServer : AutoCloseable {
 
   private val socket = ServerSocket(0, 50, InetAddress.getByName("127.0.0.1"))
@@ -43,14 +35,12 @@ class LocalImageServer : AutoCloseable {
   private val routes = ConcurrentHashMap<String, Route>()
   private val hits = ConcurrentHashMap<String, AtomicInteger>()
 
-  /** Every request the server has answered, in order. */
   val requests: MutableList<Recorded> = CopyOnWriteArrayList()
 
   val port: Int get() = socket.localPort
 
   fun url(path: String): String = "http://127.0.0.1:$port$path"
 
-  /** How many times [path] has been asked for. The point of most cache assertions. */
   fun hitCount(path: String): Int = hits[path]?.get() ?: 0
 
   fun resetCounts() {
@@ -58,15 +48,7 @@ class LocalImageServer : AutoCloseable {
     requests.clear()
   }
 
-  /**
-   * Serves [body] at [path].
-   *
-   * @param delayMs held before the response is written, for tests that need a loading state
-   * @param status the status line code
-   * @param headers extra response headers, written exactly as given so a malformed one stays
-   * malformed
-   * @param gate when set, the response waits on it, so a test decides when the load finishes
-   */
+  /** [gate], when set, holds the response open so a test decides when the load finishes. */
   fun serve(
     path: String,
     body: ByteArray,
@@ -79,7 +61,6 @@ class LocalImageServer : AutoCloseable {
     routes[path] = Route(body, contentType, status, delayMs, headers, gate)
   }
 
-  /** Answers [path] with a redirect to [target], optionally setting a cookie on the way. */
   fun redirect(path: String, target: String, headers: List<String> = emptyList()) {
     routes[path] = Route(
       body = ByteArray(0),
@@ -91,7 +72,6 @@ class LocalImageServer : AutoCloseable {
     )
   }
 
-  /** Answers [path] with [status] and no body. */
   fun fail(path: String, status: Int = 404) {
     routes[path] = Route(ByteArray(0), "text/plain", status, 0, emptyList(), null)
   }
@@ -148,8 +128,7 @@ class LocalImageServer : AutoCloseable {
       append("Content-Type: ").append(contentType).append("\r\n")
       append("Content-Length: ").append(body.size).append("\r\n")
       append("Connection: close\r\n")
-      // Written verbatim, so a header a parser would refuse reaches the client exactly as a real
-      // server would send it.
+      // Verbatim, so a header a parser would refuse still reaches the client.
       for (header in headers) append(header).append("\r\n")
       append("\r\n")
     }
@@ -167,7 +146,7 @@ class LocalImageServer : AutoCloseable {
     else -> "Status"
   }
 
-  /** Reads one CRLF terminated line, or null at the end of the stream. */
+  /** Null at the end of the stream. */
   private fun readLine(input: BufferedInputStream): String? {
     val line = StringBuilder()
     while (true) {

@@ -36,21 +36,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * [CrossfadePlugin] against real bytes on a real screen.
- *
- * The plugin has two jobs that pull against each other. An image the viewer is already looking at,
- * because it came out of the memory cache, must appear whole in the frame the composable first
- * draws: fading that one in is the blink a crossfade exists to prevent. An image that replaces one
- * already on screen must dissolve over it, and the composite must stay covered the whole way, which
- * is what fading the new one in over nothing would lose.
- *
- * Which of those two runs depends on how the image is drawn. With nothing composed inside it the
- * container fades the painter itself; hand the painter to a caller's success slot instead and the
- * fade has to move into the composition. Both are covered here, because deciding it from "could
- * this image have faded a painter" rather than "is it going to" once left the second with no
- * crossfade at all.
- */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class CrossfadePluginTest {
@@ -68,8 +53,7 @@ class CrossfadePluginTest {
     server = LocalImageServer()
     server.serve("/red.png", solidPng(RedFixture), PngContentType)
     server.serve("/blue.png", solidPng(BlueFixture), PngContentType)
-    // Nothing advances the clock but this test, so a frame only happens when it asks for one and
-    // an animation can be read at any point along it.
+    // Only this test advances the clock, so an animation can be read at any point along it.
     composeTestRule.mainClock.autoAdvance = false
   }
 
@@ -99,8 +83,7 @@ class CrossfadePluginTest {
       }
     }
 
-    // The clock has not moved since the content was set, so no animation has had a frame to run in.
-    // Whatever is on screen is the first frame, and a faded one would be mostly backdrop.
+    // The clock has not moved since the content was set, so this is the first frame.
     val pixels = composeTestRule.readVisualPixels()
     val wrong = pixels.samples().notMatching(RedFixture)
 
@@ -137,19 +120,15 @@ class CrossfadePluginTest {
 
     val frames = replaceModelAndSampleTheFade(model)
 
-    // The arriving image dissolves over the one it replaces, which is drawn underneath at full
-    // strength. Fading it in over nothing instead makes the image dip through transparent on its
-    // way in, and the backdrop is the only green thing on screen, so the green channel says how
-    // much of the node the image stopped covering.
+    // The backdrop is the only green thing on screen, so the green channel says how much of the
+    // node the image stopped covering.
     val transparent = frames.filter { it.green > opaqueGreenCeiling }
     assertTrue(
       "the image went transparent while the new one faded in, ${transparent.size} of " +
         "${frames.size} frames showed the backdrop, the first was ${transparent.firstOrNull()}",
       transparent.isEmpty(),
     )
-    // Opacity alone cannot tell a dissolve from no crossfade at all, since an image that simply
-    // appears covers the node on every frame too. A frame that is neither colour is what only a
-    // dissolve produces.
+    // A frame that is neither colour is what only a dissolve produces.
     assertTrue(
       "no frame was part way between the two images, so nothing faded: $frames",
       frames.any { !it.matches(RedFixture) && !it.matches(BlueFixture) },
@@ -162,10 +141,8 @@ class CrossfadePluginTest {
 
   @Test
   fun aCallerSuccessSlotStillCrossfades() {
-    // A success slot means the container cannot draw the image itself, so the painter cannot be the
-    // thing that fades and the composable crossfade has to run instead. Nothing is claimed here
-    // about the composite staying covered: that path stacks two independently faded composables,
-    // so a dip part way through is what it is built out of.
+    // A success slot moves the fade into the composition. Coverage is not asserted here: that
+    // path stacks two independently faded composables, so a dip part way through is expected.
     val loader = visualPluginLoader()
     loader.warm(red())
     loader.warm(blue())
@@ -209,13 +186,7 @@ class CrossfadePluginTest {
     )
   }
 
-  /**
-   * Points [model] at the blue image and reads the middle pixel on each frame of the fade.
-   *
-   * The animation runs on the test clock, so it only moves when this asks for a frame. Sixteen of
-   * them at 40ms reaches past the 400ms the saturation takes, so the last frame is the settled one
-   * rather than a shade short of it.
-   */
+  /** Sixteen frames at 40ms reaches past the 400ms fade, so the last frame is the settled one. */
   private fun replaceModelAndSampleTheFade(model: MutableState<String>): List<Color> {
     composeTestRule.runOnUiThread { model.value = blue() }
     return (1..16).map {

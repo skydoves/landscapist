@@ -18,13 +18,7 @@ package com.github.skydoves.landscapistdemo.measure
 import android.os.Debug
 import android.util.Log
 
-/**
- * Measurement primitives for the device, where the JVM's counters do not exist.
- *
- * The JVM benchmark in this repository reads `ThreadMXBean.getThreadAllocatedBytes`, which Android
- * has no equivalent of. ART keeps a process wide counter instead, so allocation here is measured
- * across the process with everything else quiet, and reported as such.
- */
+/** ART's allocation counter is process wide, so nothing else may run while it counts. */
 object DeviceMeasure {
 
   private const val TAG = "MEASURE"
@@ -33,12 +27,7 @@ object DeviceMeasure {
   fun allocatedBytes(): Long =
     Debug.getRuntimeStat("art.gc.bytes-allocated")?.toLongOrNull() ?: -1L
 
-  /**
-   * Bytes allocated while [block] ran.
-   *
-   * Process wide, so nothing else may be running. A negative reading means the device does not
-   * expose the counter, and the row should be dropped rather than reported as zero.
-   */
+  /** A negative reading means the device does not expose the counter. */
   inline fun allocatedDuring(block: () -> Unit): Long {
     val before = allocatedBytes()
     block()
@@ -46,7 +35,6 @@ object DeviceMeasure {
     return if (before < 0 || after < 0) -1L else after - before
   }
 
-  /** Runs [block] [iterations] times after [warmups] discarded runs, and returns the timings. */
   inline fun timed(
     warmups: Int = 3,
     iterations: Int = 10,
@@ -61,7 +49,7 @@ object DeviceMeasure {
     }
   }
 
-  /** Gives the collector a chance to run so one measurement does not pay for the last one. */
+  /** Gives the collector a chance to run, so one measurement does not pay for the last. */
   fun settle() {
     Runtime.getRuntime().gc()
     Thread.sleep(80)

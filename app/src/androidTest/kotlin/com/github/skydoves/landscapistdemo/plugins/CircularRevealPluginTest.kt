@@ -34,17 +34,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * [CircularRevealPlugin] against real bytes on a real screen.
- *
- * The reveal masks the image with a circle that grows from the middle of the node, so what it is
- * doing is visible as coverage: how much of the node the image reached, measured against the
- * backdrop showing through everywhere it has not. Three things have to hold. It must not be
- * finished on the frame it starts, or it never animated. It has to grow, which on the path where
- * the container draws the painter itself means the container's paint has to invalidate along with
- * a radius the painter reads while drawing. And it has to end with the image covering the node,
- * because a reveal that stops short leaves the corners of every image in the app cut off.
- */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class CircularRevealPluginTest {
@@ -90,8 +79,7 @@ class CircularRevealPluginTest {
 
   @Test
   fun theRevealStillRunsWhenTheCallerTakesThePainter() {
-    // A success slot takes the painter off the container, so the reveal is composed inside the
-    // image rather than painted by it. The painter plugin still has to reach the drawing.
+    // A success slot takes the painter off the container, so the plugin must still reach the draw.
     val loader = visualPluginLoader()
     loader.warm(server.url("/blue.png"))
 
@@ -118,13 +106,7 @@ class CircularRevealPluginTest {
     assertTheRevealAnimates()
   }
 
-  /**
-   * Reads the reveal at three points and pins what each of them has to look like.
-   *
-   * The clock has not moved when the first is read, so that one is the frame the composable first
-   * drew. The image is already in memory by then, which is what makes "not yet revealed" mean the
-   * reveal rather than a load that has not finished.
-   */
+  /** The first read is the frame the composable drew, with the image already in memory. */
   private fun assertTheRevealAnimates() {
     val first = composeTestRule.readVisualPixels()
     composeTestRule.mainClock.advanceTimeBy(revealMs / 3L)
@@ -142,8 +124,7 @@ class CircularRevealPluginTest {
         "${describe(first)} then ${describe(middle)}",
       middle.covered() > first.covered(),
     )
-    // A circle, not a rectangle fading up: the middle of the node is inside the reveal long before
-    // a corner is.
+    // A circle, not a rectangle fading up: the middle is revealed long before a corner.
     assertTrue(
       "the middle of the node was not revealed first, it was ${middle.centre()}",
       middle.centre().matches(BlueFixture),

@@ -48,20 +48,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.math.abs
 
-/**
- * What [LandscapistImage] measures to, and what size it asks the loader for, on a real device
- * against real bytes over real HTTP.
- *
- * The equivalent desktop tests hand the composable a stub decoder that returns whatever size it
- * was built with, so they can pin the layout but say nothing about the decode. Here the bytes are
- * a real JPEG, the decoder is the platform one, and the size reported through
- * `onImageStateChanged` is the size the bitmap actually came back at. That is what makes
- * [theImageIsDecodedAtTheSizeItIsDrawnAt] meaningful: it is the claim the whole node structure
- * exists for, and nothing else checks it on device.
- *
- * Sizes are compared against a sibling measured the same way rather than against a pixel count
- * computed from a density, so the assertions hold on any screen.
- */
+/** Sizes are compared against a sibling measured the same way, so they hold on any screen. */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class SizingDeviceTest {
@@ -70,7 +57,7 @@ class SizingDeviceTest {
 
   private lateinit var server: LocalImageServer
 
-  /** Built per test, so each starts with an empty memory cache and no disk cache at all. */
+  /** Built per test, so each starts with an empty memory cache. */
   private lateinit var loader: Landscapist
 
   @Before fun start() {
@@ -96,7 +83,6 @@ class SizingDeviceTest {
     fun trace(): String = states.joinToString { it::class.simpleName ?: "?" }
   }
 
-  /** Waits for every [probes] entry to load, and fails with what they did instead. */
   private fun awaitLoaded(vararg probes: Probe) {
     try {
       compose.waitUntil(LOAD_TIMEOUT_MS) { probes.all { probe -> probe.settled } }
@@ -142,8 +128,7 @@ class SizingDeviceTest {
 
     compose.setContent {
       Row {
-        // A plain box under the same modifier, so the expected pixel size is measured rather than
-        // computed from a density this test would then have to be right about.
+        // A plain box under the same modifier, so the expected size is measured, not computed.
         Box(Modifier.size(120.dp).onGloballyPositioned { reference = it.size })
         LandscapistImage(
           imageModel = { url },
@@ -160,8 +145,8 @@ class SizingDeviceTest {
 
   @Test
   fun withNoSizeModifierTheImageFillsItsParent() {
-    // Drawing on the container node rather than in a child must not hand the painter's intrinsic
-    // size to the layout: a 400x300 image in a 200.dp parent fills it, as a child Image would.
+    // The painter's intrinsic size must not reach the layout: a 400x300 image fills a 200.dp
+    // parent, as a child Image would.
     server.serve(PHOTO, ImageFixtures.photo(400, 300))
     val url = server.url(PHOTO)
     val probe = Probe()
@@ -211,8 +196,7 @@ class SizingDeviceTest {
 
   @Test
   fun anUnboundedHeightFollowsTheImageAspectRatio() {
-    // A scrolling column leaves the height unbounded, so the height has to come from the image. An
-    // 80x40 source is 2:1, so whatever width the column hands over, the image is half as tall.
+    // The scrolling column leaves the height unbounded, and the 80x40 source is 2:1.
     server.serve(WIDE, ImageFixtures.photo(80, 40))
     val url = server.url(WIDE)
     val probe = Probe()
@@ -246,8 +230,7 @@ class SizingDeviceTest {
 
   @Test
   fun everyContentScaleStillMeasuresToItsParent() {
-    // How the pixels are fitted is a drawing decision. None of these may change how much room the
-    // image takes from the layout around it.
+    // How the pixels are fitted is a drawing decision, not a layout one.
     server.serve(PHOTO, ImageFixtures.photo(320, 240))
     val url = server.url(PHOTO)
     val scales = listOf(
@@ -289,11 +272,9 @@ class SizingDeviceTest {
 
   @Test
   fun theImageIsDecodedAtTheSizeItIsDrawnAt() {
-    // The claim the node structure exists for. The size to decode at is read off the parent's
-    // constraints while measuring, so a 2048px source drawn into a 120.dp slot must never reach the
-    // bitmap at 2048px. The platform decoder samples in powers of two, so it lands somewhere in
-    // [slot, 2 * slot): at or above the slot because it may not lose detail the slot can show, and
-    // under twice it because one more halving would have.
+    // The platform decoder samples in powers of two, so it lands in [slot, 2 * slot): at or above
+    // the slot because it may not lose detail the slot can show, and under twice because one more
+    // halving would have.
     val source = 2048
     server.serve(BIG, ImageFixtures.solid(source, source, Color.MAGENTA))
     val url = server.url(BIG)

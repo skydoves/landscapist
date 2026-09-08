@@ -21,15 +21,9 @@ import android.graphics.Color
 import android.graphics.Paint
 import java.io.ByteArrayOutputStream
 
-/**
- * Real encoded images, made by the platform encoder the decoder under test will read back.
- *
- * A stub that hands over an already decoded bitmap skips the format, the header, the colour space
- * and the sampling, which between them are most of what a decoder does.
- */
+/** Real encoded images, so the format, header, colour space and sampling are all real. */
 object ImageFixtures {
 
-  /** A solid [color] image, encoded as [format]. */
   fun solid(
     width: Int,
     height: Int,
@@ -42,12 +36,7 @@ object ImageFixtures {
     return encode(bitmap, format, quality)
   }
 
-  /**
-   * An image with enough detail that an encoder cannot collapse it, for decode timing.
-   *
-   * Four quadrants of flat colour plus noise, so a downscale of it is still recognisably it and a
-   * test can tell one fixture from another by reading one pixel.
-   */
+  /** Four quadrants plus noise, so a downscale is still identifiable from one pixel. */
   fun photo(
     width: Int,
     height: Int,
@@ -74,13 +63,11 @@ object ImageFixtures {
     return encode(bitmap, format, quality = 90)
   }
 
-  /** Bytes that begin like a JPEG and stop part way, which is a cut off download. */
   fun truncatedJpeg(width: Int = 64, height: Int = 64): ByteArray {
     val whole = photo(width, height)
     return whole.copyOf(whole.size / 3)
   }
 
-  /** Bytes no decoder can read at all. */
   fun garbage(size: Int = 512): ByteArray = ByteArray(size) { (it * 31).toByte() }
 
   private fun encode(

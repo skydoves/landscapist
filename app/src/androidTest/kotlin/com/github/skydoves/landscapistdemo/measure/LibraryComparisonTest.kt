@@ -48,17 +48,7 @@ import org.junit.runner.RunWith
 import java.util.concurrent.atomic.AtomicInteger
 import coil3.request.ImageRequest as CoilRequest
 
-/**
- * Landscapist against Coil, on the device, over real HTTP.
- *
- * The comparison in `benchmark-engine` runs on the JVM against Skia, which is neither the decoder
- * nor the graphics stack that ships. This one runs both libraries in one Android process, against
- * one local server, with the same fixtures and the same sizes, and prints what it finds.
- *
- * Numbers land in logcat under the MEASURE tag rather than in assertions, because a timing
- * threshold on an emulator is a flaky test. The assertions here only check that both libraries
- * actually loaded, so a run that measured nothing cannot report a win.
- */
+/** Numbers land in logcat under MEASURE; a timing threshold on an emulator is a flaky test. */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class LibraryComparisonTest {
@@ -93,8 +83,8 @@ class LibraryComparisonTest {
       .build()
   }
 
-  // One test each, because a compose rule accepts setContent once per test and the two libraries
-  // must not share a composition either way: whichever went second would find the server warm.
+  // One test each: a compose rule accepts setContent once, and whichever library went second
+  // would find the server warm.
   @Test
   fun coldLoadLandscapist() {
     val elapsed = measureFirstSuccess("landscapist") { url, done ->
@@ -193,8 +183,7 @@ class LibraryComparisonTest {
 
   @Test
   fun coilDecodesTheSamePhoto() {
-    // The same bytes, the same target, through Coil's own pipeline with both caches off, so the
-    // row is one loader against the other rather than one against a hand written decode.
+    // The same bytes and target through Coil's own pipeline, with both caches off.
     val photo = ImageFixtures.photo(2000, 1500)
     server.serve("/large-coil.jpg", photo)
     val context = InstrumentationRegistry.getInstrumentation().targetContext

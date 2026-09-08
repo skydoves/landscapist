@@ -31,13 +31,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 
-/**
- * [ThumbHashPlugin], held in its loading state and read back off the screen.
- *
- * The same shape as the blur hash tests. The placeholder has to be on screen while the socket is
- * still waiting, it has to be the picture the hash decodes to rather than any colour at all, and
- * the loaded image has to take its place.
- */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ThumbHashPluginTest {
@@ -107,8 +100,7 @@ class ThumbHashPluginTest {
         "where the decoder produced ${expected.describe()}",
       centre.matches(expected, tolerance = 0.1f),
     )
-    // A brighter sky over a darker foreground, so the top and the bottom are different colours. A
-    // flat fill of the right average would pass everything above it.
+    // The hash is a bright sky over a dark foreground, so a flat fill would pass the above.
     val top = whileLoading.at(x = 0.5f, y = 0.05f)
     val bottom = whileLoading.at(x = 0.5f, y = 0.95f)
     assertFalse(
@@ -168,7 +160,7 @@ class ThumbHashPluginTest {
   }
 
   private companion object {
-    /** The hash from the plugin's own documentation, which decodes to 32 by 23 pixels. */
+    /** The hash from the plugin's own documentation. */
     private const val Hash = "1QcSHQRnh493V4dIh4eXh1h4kJUI"
   }
 }

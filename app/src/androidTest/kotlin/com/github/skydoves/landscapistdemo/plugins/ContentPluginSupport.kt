@@ -46,64 +46,33 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
-/**
- * What the content and transformation plugin tests need on top of the shared harness.
- *
- * These plugins do not animate, so the clock is left to run itself here and the only thing a test
- * waits for is a load resolving on another thread. What they do instead is put something on screen
- * that is not the image, either before it arrives or in place of it, which is why so much of this
- * is about telling one drawn thing from another by its pixels.
- */
-
-/** How long a load is given before a test gives up on it. */
 internal const val LoadTimeoutMs: Long = 15_000
 
-/**
- * A request with no size of its own, so the layout decides what to decode at.
- *
- * The thumbnail and progressive plugins ask for a size, and [PluginRequestBuilder] would settle it
- * before they were asked: a request that already carries a target size is passed through untouched,
- * and the size a loading plugin asks for is dropped.
- */
+/** No size of its own: a request that already carries one ignores the size a plugin asks for. */
 internal val UnsizedRequestBuilder: ImageRequest.Builder.() -> Unit = {
   diskCachePolicy(CachePolicy.DISABLED)
 }
 
-/**
- * A component holding exactly [plugins], built outside a composition.
- *
- * [com.skydoves.landscapist.components.rememberImageComponent] keeps the first component it built
- * and discards every later one, so a plugin reconfigured between compositions would never reach
- * the image. A test that changes a plugin has to hand the image a component that really changed.
- */
+/** rememberImageComponent keeps its first component, so a changed plugin would never arrive. */
 internal fun pluginComponent(vararg plugins: ImagePlugin): ImageComponent =
   ImagePluginComponent().addPlugins(plugins.toList())
 
-/** The tag an image under test carries, so a capture knows which node to read back. */
 internal const val ContentImageTag: String = "landscapistContentImage"
 
-/** A loader that keeps nothing on disk, so every test starts from an empty memory cache. */
+/** One per test, so each starts from an empty memory cache. */
 internal fun contentPluginLoader(): Landscapist = Landscapist.builder().noDiskCache().build()
 
-/** A loader that fetches through [fetcher], for a test that needs to see the requests. */
 internal fun contentPluginLoader(fetcher: ImageFetcher): Landscapist =
   Landscapist.builder().noDiskCache().fetcher(fetcher).build()
 
-/** The modifier an image under test carries, tagged so a capture can find it again. */
 internal fun contentImageModifier(tag: String = ContentImageTag): Modifier = Modifier
   .size(PluginImageSize)
   .testTag(tag)
 
-/** The pixels of the image tagged [tag], as they are on screen right now. */
 internal fun ComposeTestRule.readContentPixels(tag: String = ContentImageTag): PixelMap =
   onNodeWithTag(tag).captureToImage().toPixelMap()
 
-/**
- * Waits until [condition] holds, or fails saying what it was waiting for.
- *
- * The counterpart of [advanceUntil] for tests that leave the clock alone: nothing here animates,
- * and driving the clock by hand would only hide a plugin that never asked for a frame.
- */
+/** The counterpart of [advanceUntil] where nothing animates and the clock is left alone. */
 internal fun ComposeTestRule.awaitUntil(
   what: String,
   timeoutMs: Long = LoadTimeoutMs,
@@ -136,18 +105,7 @@ internal class StateRecorder {
   override fun toString(): String = seen.joinToString { it::class.simpleName ?: "?" }
 }
 
-/**
- * The real network fetcher, with the target size of every request recorded.
- *
- * A target size never reaches the wire, so a plugin that asks for a thumbnail and the image that
- * replaces it look identical to the server. This is the only place the two can be told apart, and
- * the bytes still come off the socket: every fetch is delegated to the fetcher the loader would
- * have built for itself.
- *
- * A request wider than [holdLargerThan] waits for [release], which is what keeps one image in its
- * loading state while another finishes. A delay on the route cannot do that job, because both
- * requests are for the same URL and the route would hold them both.
- */
+/** Records target sizes, and holds a request wider than [holdLargerThan] open until [release]. */
 internal class RecordingFetcher(
   private val holdLargerThan: Int = Int.MAX_VALUE,
   private val delegate: ImageFetcher = KtorImageFetcher.create(),
@@ -156,10 +114,8 @@ internal class RecordingFetcher(
   private val released = CountDownLatch(1)
   private val recorded = CopyOnWriteArrayList<Fetched>()
 
-  /** What was asked for, and at what size, in the order the requests were made. */
   val fetches: List<Fetched> get() = recorded
 
-  /** The target size of every request, in the order they were made. */
   val sizes: List<IntSize> get() = recorded.map { it.size }
 
   override fun canHandle(model: Any?): Boolean = delegate.canHandle(model)
@@ -175,12 +131,10 @@ internal class RecordingFetcher(
     return delegate.fetch(request)
   }
 
-  /** Lets the held request through. */
   fun release() {
     released.countDown()
   }
 
-  /** One request the loader made, as the fetcher saw it. */
   data class Fetched(val model: String, val size: IntSize)
 }
 
@@ -191,26 +145,13 @@ internal fun PixelMap.at(x: Float, y: Float): Color {
   return this[column, row]
 }
 
-/**
- * How much of the node holds red, which is how much of the quadrant fixture is on it.
- *
- * [covered] cannot answer that here: it reads the backdrop off the green channel, and two of the
- * four quadrants have green in them. Nothing in the backdrop has any red, and half of the fixture
- * does, so a node showing the fixture at any size comes out near a half and an empty one at zero.
- */
+/** Read off red: two quadrants are green, so [covered] would read them as backdrop. */
 internal fun PixelMap.quadrantCoverage(): Float {
   val pixels = samples()
   return pixels.count { it.red > 0.3f }.toFloat() / pixels.size
 }
 
-/**
- * How much fine detail survived, as the mean difference in brightness between side by side pixels.
- *
- * Blurring lowers it, and lowers it further the larger the radius; decoding at fifteen pixels and
- * drawing the result across the node lowers it too. It is the only way to say "this is a smoothed
- * version of that" without a reference image, and unlike a checksum it says which way round the
- * two are.
- */
+/** Mean brightness difference between neighbouring pixels; blur and downscaling lower it. */
 internal fun PixelMap.localContrast(): Float {
   var total = 0f
   var count = 0
@@ -249,12 +190,10 @@ internal fun IntArray.centreColour(width: Int, height: Int): Color {
   return Color(red / count, green / count, blue / count)
 }
 
-/** Decodes fixture bytes, for a test that hands a plugin an image rather than a URL. */
 internal fun ByteArray.decodeToImageBitmap(): ImageBitmap =
   checkNotNull(BitmapFactory.decodeByteArray(this, 0, size)) { "the fixture did not decode" }
     .asImageBitmap()
 
-/** A colour named the way a failure message can read it. */
 internal fun Color.describe(): String =
   "rgb(${(red * 255).toInt()}, ${(green * 255).toInt()}, ${(blue * 255).toInt()})"
 

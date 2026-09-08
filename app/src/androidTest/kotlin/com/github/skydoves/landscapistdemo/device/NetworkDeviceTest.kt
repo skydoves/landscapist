@@ -41,14 +41,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * What a real server does to a load when it does not simply hand over an image.
- *
- * Every one of these is a shape a stub fetcher cannot produce: a status line, a redirect chain, a
- * body that stops part way, a response that takes long enough for the caller to see a loading
- * state. A malformed cookie on a real response is what took the demo app down while 643 stub-backed
- * tests passed, so the value here is that the bytes on the socket are the ones under test.
- */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class NetworkDeviceTest {
@@ -65,12 +57,7 @@ class NetworkDeviceTest {
 
   @After fun stop() = server.close()
 
-  /**
-   * Loads [url] and returns the terminal result.
-   *
-   * A load that never terminates fails here rather than hanging the run, which is half of what
-   * these tests are for: the failure path has to end somewhere.
-   */
+  /** A load that never terminates fails here rather than hanging the run. */
   private fun load(url: String, width: Int = 64, height: Int = 64): ImageResult {
     val request = ImageRequest.builder()
       .model(url)
@@ -105,8 +92,7 @@ class NetworkDeviceTest {
 
   @Test
   fun bytesCutBeforeTheirHeaderFail() {
-    // A download that stopped before the dimensions were readable. Nothing can be decoded from it,
-    // and the loader has to say so rather than caching an empty success.
+    // A download that stopped before the dimensions were readable.
     server.serve(CUT_HEADER, ImageFixtures.photo(64, 64).copyOf(48))
 
     val result = load(server.url(CUT_HEADER))
@@ -119,10 +105,8 @@ class NetworkDeviceTest {
 
   @Test
   fun aTruncatedJpegReachesATerminalStateAndNeverReportsMoreThanItHolds() {
-    // A body cut part way through the scan. Android is deliberately tolerant here: BitmapFactory
-    // accepts an incomplete JPEG and returns the rows it managed to read, so unlike the desktop
-    // decoder this can legitimately come back as a success. What may not happen either way is that
-    // the load hangs, or that a partial decode is reported at a size the header never declared.
+    // BitmapFactory accepts an incomplete JPEG and returns the rows it read, so a success here
+    // is legitimate. What may not happen is a hang, or a size the header never declared.
     server.serve(TRUNCATED, ImageFixtures.truncatedJpeg(64, 64))
 
     when (val result = load(server.url(TRUNCATED))) {
@@ -157,8 +141,6 @@ class NetworkDeviceTest {
 
   @Test
   fun aSlowResponsePassesThroughLoadingBeforeSuccess() {
-    // The caller has to be told the image is on its way before it arrives, or a list has nothing to
-    // put in the row until the bytes land.
     server.serve(SLOW, ImageFixtures.photo(200, 200), delayMs = 700)
     val url = server.url(SLOW)
     val states = mutableListOf<LandscapistImageState>()

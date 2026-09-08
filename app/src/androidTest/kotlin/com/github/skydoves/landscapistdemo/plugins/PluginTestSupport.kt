@@ -42,81 +42,39 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import kotlin.math.abs
 
-/*
- * What the plugin tests share: a real image on a real screen, read back a pixel at a time.
- *
- * A plugin test that only asks whether the composable exists passes on a blank screen, so every
- * assertion here is made against what was actually rasterised. Two things make that possible on a
- * device. The image sits on a backdrop of a colour no fixture contains, because a capture reads
- * the window and has no alpha channel of its own: what the image failed to paint comes back as the
- * backdrop rather than as transparency. And the test drives the frame clock itself, because these
- * plugins animate, one of them forever.
- */
-
-/** The tag every image under test carries, so a capture knows which node to read back. */
 internal const val PluginImageTag: String = "landscapistPluginImage"
 
-/** The pixel size every request is decoded at. */
 internal const val PluginRequestPx: Int = 240
 
-/** The content type the fixtures are served as. */
 internal const val PngContentType: String = "image/png"
 
-/** One frame of the test clock. */
 internal const val FrameMs: Long = 16L
 
-/**
- * What is drawn behind the image under test.
- *
- * Pure green, and no fixture is made of a colour with any green in it, so the green channel of a
- * pixel is a measure of how much of the image is missing there.
- */
+/** Pure green, and no fixture has any green in it, so an unpainted pixel reads as backdrop. */
 internal val Backdrop: Color = Color(0xFF00FF00)
 
-/** The colour of the red fixture, as it must read back off the screen. */
 internal val RedFixture: Color = Color(0xFFFF0000)
 
-/** The colour of the blue fixture, as it must read back off the screen. */
 internal val BlueFixture: Color = Color(0xFF0000FF)
 
-/** The colour a shimmer is configured with, so what it drew is recognisable on screen. */
 internal val ShimmerFixture: Color = Color(0xFFFF00FF)
 
-/** The side of the image under test. */
 internal val PluginImageSize = 96.dp
 
-/**
- * The request every image under test is loaded with.
- *
- * The target size is set rather than left to the layout, so the key a warm up writes into the
- * memory cache is the same one the composable reads back out of it, and the image is drawn in the
- * frame the composable first appears in rather than a frame later.
- */
+/** The size is set explicitly, so a warm up writes the key the composable reads back. */
 internal val PluginRequestBuilder: ImageRequest.Builder.() -> Unit = {
   diskCachePolicy(CachePolicy.DISABLED)
   size(PluginRequestPx, PluginRequestPx)
 }
 
-/**
- * A loader for the visual plugin tests that keeps nothing on disk.
- *
- * Every test builds its own, so each starts from an empty memory cache.
- */
+/** One per test, so each starts from an empty memory cache. */
 internal fun visualPluginLoader(): Landscapist = Landscapist.builder().noDiskCache().build()
 
-/** The modifier every image in the visual plugin tests carries. */
 internal fun visualImageModifier(): Modifier = Modifier
   .size(PluginImageSize)
   .testTag(PluginImageTag)
 
-/**
- * A solid [color] image, encoded losslessly.
- *
- * PNG rather than JPEG for two reasons. Lossless means an assertion can name the exact colour the
- * fixture was made with instead of a range around it. And the decoder only reaches for a hardware
- * bitmap on a format that cannot carry alpha, so a JPEG here would hand the palette plugin pixels
- * that live in GPU memory and cannot be read back.
- */
+/** PNG, not JPEG: lossless, and a JPEG would decode to an unreadable hardware bitmap. */
 internal fun solidPng(color: Color): ByteArray = ImageFixtures.solid(
   width = PluginRequestPx,
   height = PluginRequestPx,
@@ -124,19 +82,13 @@ internal fun solidPng(color: Color): ByteArray = ImageFixtures.solid(
   format = Bitmap.CompressFormat.PNG,
 )
 
-/** The four quadrant fixture, encoded losslessly, for a test whose image needs detail in it. */
 internal fun quadrantPng(): ByteArray = ImageFixtures.photo(
   width = PluginRequestPx,
   height = PluginRequestPx,
   format = Bitmap.CompressFormat.PNG,
 )
 
-/**
- * Loads [url] into this loader before the composable exists.
- *
- * The image is then in the memory cache, which is what lets a test say what the very first frame
- * of the composable must look like.
- */
+/** Loads [url] into the memory cache before the composable exists. */
 internal fun Landscapist.warm(url: String) {
   val result = runBlocking {
     load(ImageRequest.builder().model(url).apply(PluginRequestBuilder).build())
@@ -145,7 +97,6 @@ internal fun Landscapist.warm(url: String) {
   assertTrue("could not warm $url into the memory cache: $result", result is ImageResult.Success)
 }
 
-/** Places [content] in the middle of the [Backdrop]. */
 @Composable
 internal fun OnBackdrop(content: @Composable () -> Unit) {
   Box(
@@ -158,15 +109,7 @@ internal fun OnBackdrop(content: @Composable () -> Unit) {
   }
 }
 
-/**
- * Advances the test clock a frame at a time until [condition] holds.
- *
- * These tests turn the clock's auto advance off. A shimmer animates forever, so waiting for
- * idleness would never return, and a fade has to be read part way through rather than after it has
- * settled. Nothing then recomposes on its own, so the test hands out the frames, and it sleeps
- * between them because the load it is waiting for resolves on a thread the clock knows nothing
- * about.
- */
+/** Auto advance is off, since a shimmer animates forever, so the test hands out the frames. */
 internal fun ComposeTestRule.advanceUntil(
   what: String,
   timeoutMs: Long = 15_000,
@@ -183,16 +126,10 @@ internal fun ComposeTestRule.advanceUntil(
   }
 }
 
-/** The pixels of the image under test, as they are on screen right now. */
 internal fun ComposeTestRule.readVisualPixels(): PixelMap =
   onNodeWithTag(PluginImageTag).captureToImage().toPixelMap()
 
-/**
- * Every [step]th pixel of the node, inset by one step.
- *
- * The inset skips the anti-aliased outermost row and column, where a pixel is part image and part
- * backdrop however well the plugin did its job.
- */
+/** Every [step]th pixel, inset by one step to skip the anti-aliased edge. */
 internal fun PixelMap.samples(step: Int = 4): List<Color> = buildList {
   var y = step
   while (y < height - step) {
@@ -205,27 +142,22 @@ internal fun PixelMap.samples(step: Int = 4): List<Color> = buildList {
   }
 }
 
-/** The pixel in the middle of the node. */
 internal fun PixelMap.centre(): Color = this[width / 2, height / 2]
 
-/** A pixel near the top left corner of the node, which a centred reveal reaches last. */
+/** Near the top left, which a centred reveal reaches last. */
 internal fun PixelMap.corner(): Color = this[4, 4]
 
-/** Whether this pixel is the backdrop showing through rather than anything the image drew. */
 internal fun Color.isBackdrop(): Boolean = green > 0.5f
 
-/** How much of the node the image covered, between 0 and 1. */
 internal fun PixelMap.covered(): Float {
   val pixels = samples()
   return pixels.count { !it.isBackdrop() }.toFloat() / pixels.size
 }
 
-/** Whether this pixel is [other] to within [tolerance] on every channel. */
 internal fun Color.matches(other: Color, tolerance: Float = 0.06f): Boolean =
   abs(red - other.red) <= tolerance &&
     abs(green - other.green) <= tolerance &&
     abs(blue - other.blue) <= tolerance
 
-/** How many of these pixels are not [colour], for a failure message that says how badly. */
 internal fun List<Color>.notMatching(colour: Color, tolerance: Float = 0.06f): List<Color> =
   filterNot { it.matches(colour, tolerance) }

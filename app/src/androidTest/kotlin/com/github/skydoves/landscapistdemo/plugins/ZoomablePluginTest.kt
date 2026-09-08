@@ -35,15 +35,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * [ZoomablePlugin] against real bytes on a real screen.
- *
- * The plugin wraps the image rather than painting it, which is the one kind of plugin that takes
- * the drawing off the container entirely, so the first thing to establish is that the image is
- * still there at all. The second is that a gesture reaches it: the pinch here is two real pointers
- * on the node, and what it is held to is not a number inside the state object but the pixels the
- * viewer ends up looking at.
- */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ZoomablePluginTest {
@@ -96,9 +87,8 @@ class ZoomablePluginTest {
 
   @Test
   fun aPinchGestureChangesWhatIsDrawn() {
-    // The four quadrant fixture, because a pinch on a solid colour is invisible however well it
-    // worked. Pinching around a point in the red quadrant pulls that quadrant over the whole node,
-    // so the assertion is on which of the image is on screen rather than on how much moved.
+    // The four quadrant fixture, since a pinch on a solid colour is invisible however well it
+    // worked. Pinching into the red quadrant pulls it over the whole node.
     val loader = visualPluginLoader()
     loader.warm(server.url("/quadrants.png"))
 
@@ -147,10 +137,7 @@ class ZoomablePluginTest {
 
   @Test
   fun aCrossfadeStillDissolvesWithTheZoomablePluginInstalled() {
-    // A plugin that wraps the content means the container cannot paint the image, so it cannot
-    // fade the painter either and the composable crossfade has to run instead. This pairing had no
-    // crossfade at all once, because the choice was made from whether the image could have faded a
-    // painter rather than from whether it was going to.
+    // A wrapping plugin stops the container painting, so the composable crossfade has to run.
     val loader = visualPluginLoader()
     loader.warm(server.url("/red.png"))
     loader.warm(server.url("/blue.png"))
@@ -193,16 +180,10 @@ class ZoomablePluginTest {
     )
   }
 
-  /**
-   * Spreads two pointers apart around a point inside the red quadrant of the fixture.
-   *
-   * Both pointers move in one event and by the same distance in opposite directions, so the gesture
-   * is a pure zoom about that point: the centroid does not move and no pan is reported.
-   */
+  /** Both pointers move the same distance in opposite directions, so it is a pure zoom. */
   private fun pinchAroundTheRedQuadrant() {
     composeTestRule.onNodeWithTag(PluginImageTag).performTouchInput {
-      // Both distances scale with the node, so the pinch is the same gesture whatever the screen
-      // density is, and the ratio between them is what decides how far it zooms.
+      // Distances scale with the node, so the gesture is the same at any density.
       val focusX = width * 0.3f
       val focusY = height * 0.3f
       val grip = (width * 0.03f).coerceAtLeast(6f)
@@ -215,25 +196,17 @@ class ZoomablePluginTest {
       up(0)
       up(1)
     }
-    // The transformation is read while the content composes, so the zoom only reaches the screen
-    // on a frame, and the clock only moves when this asks it to.
+    // The zoom only reaches the screen on a frame, and the clock only moves when asked.
     composeTestRule.mainClock.advanceTimeBy(FrameMs * 5)
   }
 
-  /** How much of the node is showing the red quadrant of the fixture. */
   private fun PixelMap.redFraction(): Float {
     val pixels = samples()
     val red = pixels.count { it.red > 0.5f && it.green < 0.4f && it.blue < 0.4f }
     return red.toFloat() / pixels.size
   }
 
-  /**
-   * How much of the node is green.
-   *
-   * The fixture has a green quadrant of its own, in the same green as the backdrop, so this counts
-   * both without being able to tell them apart. That is what makes it the right measure here:
-   * after a pinch into the red quadrant, neither of them should be on screen.
-   */
+  /** Counts the fixture's green quadrant and the backdrop alike, since neither should show. */
   private fun PixelMap.greenFraction(): Float {
     val pixels = samples()
     val green = pixels.count { it.green > 0.5f && it.red < 0.4f && it.blue < 0.4f }

@@ -37,13 +37,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CopyOnWriteArrayList
 
-/**
- * An image with a caller supplied loading slot still has to finish loading.
- *
- * `LandscapistImageTest.testImageWithFixedSize` never leaves its loading state, on this branch and
- * on main alike. That test goes to the internet, so it could not say whether the slot or the
- * network was at fault. This one serves the bytes locally, so there is nothing left to blame.
- */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class LoadingSlotTest {

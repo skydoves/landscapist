@@ -30,7 +30,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** Proves the harness itself works before anything is measured with it. */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class HarnessSmokeTest {
@@ -68,8 +67,7 @@ class HarnessSmokeTest {
 
   @Test
   fun aCookieNoParserAcceptsDoesNotTakeTheImageDown() {
-    // The header unsplash.com sends. It failed every image on the site until the loader stopped
-    // parsing attributes it does not use.
+    // The malformed cookie unsplash.com sends.
     server.serve(
       "/cookie.jpg",
       ImageFixtures.photo(120, 120),

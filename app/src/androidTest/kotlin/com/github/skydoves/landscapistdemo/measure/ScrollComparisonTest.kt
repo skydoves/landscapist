@@ -46,13 +46,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import coil3.request.ImageRequest as CoilRequest
 
-/**
- * A scrolled list of images, on the device, for both libraries.
- *
- * The JVM benchmark measures this against Skia on a desktop JVM. This measures it where the
- * library ships: the platform decoder, the platform graphics stack, and ART's own allocation
- * counter, which is process wide, so nothing else may run while it counts.
- */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ScrollComparisonTest {
@@ -115,12 +108,7 @@ class ScrollComparisonTest {
     }
   }
 
-  /**
-   * Scrolls the list and reports the bytes allocated doing it.
-   *
-   * The list is scrolled once to fill both caches before anything is counted, so the measured pass
-   * is a scroll over images the library already holds, which is what a user repeats.
-   */
+  /** Scrolled first to fill the caches, so the measured pass is over images already held. */
   private fun measureScroll(label: String, content: @Composable () -> Unit) {
     compose.setContent { content() }
     compose.waitForIdle()
