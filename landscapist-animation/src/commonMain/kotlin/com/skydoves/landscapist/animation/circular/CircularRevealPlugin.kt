@@ -42,7 +42,6 @@ public data class CircularRevealPlugin(
   @Composable
   override fun compose(imageBitmap: ImageBitmap, painter: Painter): Painter {
     return painter.rememberCircularRevealPainter(
-      imageBitmap = imageBitmap,
       durationMs = duration,
       onFinishListener = onFinishListener,
     )

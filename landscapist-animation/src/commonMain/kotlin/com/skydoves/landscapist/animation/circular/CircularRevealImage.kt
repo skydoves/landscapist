@@ -56,7 +56,6 @@ public fun CircularRevealImage(
   Image(
     painter = if (circularReveal != null) {
       bitmapPainter.rememberCircularRevealPainter(
-        bitmap,
         circularReveal.duration,
         circularReveal.onFinishListener,
       )
