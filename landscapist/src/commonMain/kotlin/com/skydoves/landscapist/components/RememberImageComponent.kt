@@ -22,6 +22,11 @@ import androidx.compose.runtime.remember
  * Create and remember a new instance of [ImageComponent] that implements [ImagePluginComponent]
  * on the memory.
  *
+ * The component keeps its identity for as long as the composable does, and its plugins follow
+ * [block]. A `remember` with no keys returned the component built on the first composition, so a
+ * plugin set that depends on state was frozen at whatever it was then and a plugin added, removed
+ * or reconfigured afterwards never reached the image.
+ *
  * @param block The receiver of an instance of [ImagePluginComponent].
  */
 @Composable
@@ -29,6 +34,13 @@ import androidx.compose.runtime.remember
 public fun rememberImageComponent(
   block: @Composable ImagePluginComponent.() -> Unit,
 ): ImagePluginComponent {
-  val imageComponent = imageComponent(block)
-  return remember { imageComponent }
+  val built = imageComponent(block)
+  val component = remember { built }
+  // Contents rather than identity, because a caller may hold the component across recompositions
+  // and a new one each time would rebuild whatever they keyed on it.
+  if (component !== built && component.plugins != built.plugins) {
+    component.mutablePlugins.clear()
+    component.mutablePlugins.addAll(built.plugins)
+  }
+  return component
 }
