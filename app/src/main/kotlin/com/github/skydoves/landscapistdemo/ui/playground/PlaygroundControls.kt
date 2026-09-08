@@ -163,7 +163,10 @@ internal fun ToggleRow(
 internal fun SliderRow(
   label: String,
   value: Int,
-  range: ClosedFloatingPointRange<Float>,
+  // Two ints rather than a range: a ClosedFloatingPointRange is unstable to Compose, which makes
+  // this composable unskippable and shows up in the stability dump.
+  minimum: Int,
+  maximum: Int,
   steps: Int,
   onValueChange: (Int) -> Unit,
 ) {
@@ -176,7 +179,7 @@ internal fun SliderRow(
     Slider(
       value = value.toFloat(),
       onValueChange = { onValueChange(it.roundToInt()) },
-      valueRange = range,
+      valueRange = minimum.toFloat()..maximum.toFloat(),
       steps = steps,
     )
   }

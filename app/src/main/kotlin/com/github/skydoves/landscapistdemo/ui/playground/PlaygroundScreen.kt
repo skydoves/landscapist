@@ -327,7 +327,8 @@ private fun PluginToggleList(
     SliderRow(
       label = "Blur radius",
       value = toggles.blurRadius,
-      range = 1f..25f,
+      minimum = 1,
+      maximum = 25,
       steps = 23,
     ) {
       onTogglesChanged(toggles.copy(blurRadius = it))

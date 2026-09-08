@@ -65,3 +65,111 @@ private fun com.github.skydoves.landscapistdemo.ui.SelectedPoster(poster: com.gi
     - poster: STABLE (marked @Stable or @Immutable)
     - onPaletteUpdated: STABLE (function type)
 
+@Composable
+internal fun com.github.skydoves.landscapistdemo.ui.playground.ActionRow(actions: kotlin.collections.List<kotlin.Pair<kotlin.String, kotlin.Function0<kotlin.Unit>>>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - actions: RUNTIME (requires runtime check)
+
+@Composable
+internal fun com.github.skydoves.landscapistdemo.ui.playground.ChoiceRow(options: kotlin.collections.List<T of com.github.skydoves.landscapistdemo.ui.playground.ChoiceRow>, selected: T of com.github.skydoves.landscapistdemo.ui.playground.ChoiceRow, label: kotlin.Function1<T of com.github.skydoves.landscapistdemo.ui.playground.ChoiceRow, kotlin.String>, onSelected: kotlin.Function1<T of com.github.skydoves.landscapistdemo.ui.playground.ChoiceRow, kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - options: RUNTIME (requires runtime check)
+    - selected: RUNTIME (requires runtime check)
+    - label: STABLE (function type)
+    - onSelected: STABLE (function type)
+
+@Composable
+private fun com.github.skydoves.landscapistdemo.ui.playground.ComparisonColumn(modifier: androidx.compose.ui.Modifier, title: kotlin.String, state: kotlin.String, image: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - title: STABLE (String is immutable)
+    - state: STABLE (String is immutable)
+    - image: STABLE (composable function type)
+
+@Composable
+internal fun com.github.skydoves.landscapistdemo.ui.playground.HintText(text: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+
+@Composable
+internal fun com.github.skydoves.landscapistdemo.ui.playground.PaletteStrip(colors: kotlin.collections.List<kotlin.Int>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - colors: RUNTIME (requires runtime check)
+
+@Composable
+internal fun com.github.skydoves.landscapistdemo.ui.playground.PlaygroundComparison(url: kotlin.String, contentScale: androidx.compose.ui.layout.ContentScale): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - url: STABLE (String is immutable)
+    - contentScale: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun com.github.skydoves.landscapistdemo.ui.playground.PlaygroundScreen(paddingValues: androidx.compose.foundation.layout.PaddingValues): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - paddingValues: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.github.skydoves.landscapistdemo.ui.playground.PluginToggleList(toggles: com.github.skydoves.landscapistdemo.ui.playground.PluginToggles, onTogglesChanged: kotlin.Function1<com.github.skydoves.landscapistdemo.ui.playground.PluginToggles, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - toggles: STABLE (marked @Stable or @Immutable)
+    - onTogglesChanged: STABLE (function type)
+
+@Composable
+private fun com.github.skydoves.landscapistdemo.ui.playground.ReadoutLine(label: kotlin.String, value: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - label: STABLE (String is immutable)
+    - value: STABLE (String is immutable)
+
+@Composable
+internal fun com.github.skydoves.landscapistdemo.ui.playground.ReadoutPanel(readout: com.github.skydoves.landscapistdemo.ui.playground.ImageReadout, url: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - readout: STABLE (marked @Stable or @Immutable)
+    - url: STABLE (String is immutable)
+
+@Composable
+internal fun com.github.skydoves.landscapistdemo.ui.playground.SectionHeader(title: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+
+@Composable
+internal fun com.github.skydoves.landscapistdemo.ui.playground.SliderRow(label: kotlin.String, value: kotlin.Int, minimum: kotlin.Int, maximum: kotlin.Int, steps: kotlin.Int, onValueChange: kotlin.Function1<kotlin.Int, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - label: STABLE (String is immutable)
+    - value: STABLE (primitive type)
+    - minimum: STABLE (primitive type)
+    - maximum: STABLE (primitive type)
+    - steps: STABLE (primitive type)
+    - onValueChange: STABLE (function type)
+
+@Composable
+internal fun com.github.skydoves.landscapistdemo.ui.playground.ToggleRow(label: kotlin.String, checked: kotlin.Boolean, onCheckedChange: kotlin.Function1<kotlin.Boolean, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - label: STABLE (String is immutable)
+    - checked: STABLE (primitive type)
+    - onCheckedChange: STABLE (function type)
+
