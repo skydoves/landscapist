@@ -22,7 +22,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.statement.bodyAsBytes
@@ -141,7 +140,10 @@ internal fun HttpClientConfig<*>.configureForImageLoading(networkConfig: Network
   // producing an endless loop that only ends when the send-count limit is hit. Browsers avoid this
   // because they retain cookies automatically.
   // See https://github.com/skydoves/landscapist/issues/859
-  install(HttpCookies)
+  //
+  // Not ktor's HttpCookies, which cannot read a `Set-Cookie` that any real site might send without
+  // risking an exception that fails the download. See [RedirectCookies].
+  install(RedirectCookies)
 
   install(HttpSend) {
     // maxSendCount is the total number of times a request may be dispatched (the original request
