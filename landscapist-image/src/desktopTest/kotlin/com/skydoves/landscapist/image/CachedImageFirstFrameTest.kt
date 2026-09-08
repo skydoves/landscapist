@@ -40,12 +40,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-/**
- * The blink these tests guard against: a composable that enters composition with its image already
- * in memory used to render nothing until the loading flow came back a frame or two later. Inside a
- * shared element transition that empty box is what animates, so the image appears to vanish and
- * come back.
- */
 @OptIn(ExperimentalTestApi::class)
 class CachedImageFirstFrameTest {
 
@@ -148,8 +142,7 @@ class CachedImageFirstFrameTest {
       rememberImageComponent { +CrossfadePlugin(duration = 300) }
     }
 
-    // With a crossfade plugin the states are the same; what changes is that the first one is the
-    // crossfade's initial content, so it is drawn at full opacity instead of fading up from zero.
+    // The states are the same with a crossfade; what changes is that the first is drawn opaque.
     val first = states.firstOrNull()
     assertTrue(
       first is LandscapistImageState.Success,

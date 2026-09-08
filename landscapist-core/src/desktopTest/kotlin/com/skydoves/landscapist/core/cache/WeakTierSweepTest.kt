@@ -20,17 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-/**
- * The weak tier has to forget an entry once its image is gone.
- *
- * Nothing pruned it before: an entry evicted from the strong cache kept its key and its index entry
- * for the life of the process, so an application that had loaded ten thousand distinct images
- * carried ten thousand dead references and walked all of them on every young collection.
- *
- * This is a JVM test rather than a common one, because only here can the referent actually be
- * cleared. The common test alongside it holds every image on purpose, and proves the other half:
- * that a sweep never drops an entry that is still reachable.
- */
+/** A JVM test rather than a common one, because only here can a weak referent be cleared. */
 class WeakTierSweepTest {
 
   private fun key(index: Int) = CacheKey.create(
@@ -44,11 +34,11 @@ class WeakTierSweepTest {
     // Small enough that every write evicts the one before it into the weak tier.
     val cache = TwoTierMemoryCache(200, weakReferencesEnabled = true)
     repeat(400) { index ->
-      // The entry is unreachable the moment the next one is written, because nothing here keeps it.
+      // Nothing keeps the entry, so it is unreachable once the next one is written.
       cache[key(index)] = CachedImage(ByteArray(64), DataSource.MEMORY, 100, 8, 8)
     }
 
-    // A collection has to have happened for the referents to clear; ask for it and give it a chance.
+    // The referents only clear once a collection has happened, so ask for one and wait.
     var swept = cache.weakCacheCount
     repeat(20) {
       if (swept <= 8) return@repeat
@@ -58,8 +48,6 @@ class WeakTierSweepTest {
       swept = cache.weakCacheCount
     }
 
-    // Nothing holds any of these entries, so a tier that sweeps ends up near empty. Left unswept
-    // it keeps one dead reference per write, which is what the leak was.
     assertTrue(
       swept <= 8,
       "the weak tier still holds $swept entries after 400 writes that nothing keeps alive",
@@ -69,8 +57,7 @@ class WeakTierSweepTest {
   @Test
   fun `a sweep keeps every entry whose image is still held`() {
     val cache = TwoTierMemoryCache(200, weakReferencesEnabled = true)
-    // The weak reference is to the entry, not to the pixels inside it, so it is the entries that
-    // have to be held. Almost all of them are evicted into the weak tier by the writes that follow.
+    // The weak reference is to the entry, not the pixels, so the entries are what must be held.
     val held = (0 until 200).map { CachedImage(ByteArray(64), DataSource.MEMORY, 100, 8, 8) }
     held.forEachIndexed { index, image -> cache[key(index)] = image }
 
@@ -86,9 +73,7 @@ class WeakTierSweepTest {
   @Test
   fun `a cleared cache goes back to sweeping at its floor`() {
     val cache = TwoTierMemoryCache(200, weakReferencesEnabled = true)
-    // Held on purpose, so no sweep can remove anything and the tier grows to its full size. The
-    // point at which it next sweeps is set from that size, which is what has to be undone by the
-    // clear below.
+    // Held on purpose, so the tier grows to full size and sets its next sweep point from that.
     val held = (0 until 600).map { CachedImage(ByteArray(64), DataSource.MEMORY, 100, 8, 8) }
     held.forEachIndexed { index, image -> cache[key(index)] = image }
     assertTrue(cache.weakCacheCount > 400, "the tier never grew, it holds ${cache.weakCacheCount}")
@@ -96,8 +81,7 @@ class WeakTierSweepTest {
     cache.clear()
     assertEquals(0, cache.weakCacheCount, "the clear left entries behind")
 
-    // Now entries nothing keeps. A tier that sweeps at its floor prunes them as it goes; one that
-    // kept the point it reached before the clear waits for hundreds of dead references first.
+    // Now entries nothing keeps: a tier that sweeps at its floor prunes them as it goes.
     repeat(20) { batch ->
       repeat(20) { index ->
         cache[key(10_000 + batch * 20 + index)] =

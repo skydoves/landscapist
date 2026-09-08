@@ -100,7 +100,6 @@ class TwoTierMemoryCacheTest {
     cache[key1] = createCachedImage(sizeBytes = 100L)
     cache[key2] = createCachedImage(sizeBytes = 100L)
 
-    // key1 should be evicted to weak cache
     assertEquals(1, cache.strongCacheCount)
     assertEquals(1, cache.weakCacheCount)
   }
@@ -115,7 +114,6 @@ class TwoTierMemoryCacheTest {
     cache[key1] = createCachedImage(sizeBytes = 100L)
     cache[key2] = createCachedImage(sizeBytes = 100L)
 
-    // key1 should be discarded (no weak cache)
     assertEquals(1, cache.strongCacheCount)
     assertEquals(0, cache.weakCacheCount)
     assertNull(cache[key1])
@@ -165,14 +163,11 @@ class TwoTierMemoryCacheTest {
 
     val key = createKey("https://example.com/image.jpg")
 
-    // Add item, let it be evicted to weak cache
     cache[key] = createCachedImage(sizeBytes = 100L)
     cache[createKey("https://example.com/other.jpg")] = createCachedImage(sizeBytes = 100L)
 
-    // Update the evicted item
     cache[key] = createCachedImage(sizeBytes = 50L)
 
-    // Should be in strong cache now
     assertNotNull(cache[key])
   }
 
@@ -219,10 +214,8 @@ class TwoTierMemoryCacheTest {
     // Access key1 to make it more recently used
     cache[key1]
 
-    // Add key3, should evict key2
     cache[key3] = createCachedImage(sizeBytes = 100L)
 
-    // key1 and key3 should be in strong cache
     assertEquals(2, cache.strongCacheCount)
   }
 
@@ -230,14 +223,12 @@ class TwoTierMemoryCacheTest {
   fun `cleanupWeakReferences removes null references`() {
     val cache = createCache(maxSize = 100L)
 
-    // Add and evict to weak cache
     cache[createKey("https://example.com/1.jpg")] = createCachedImage(sizeBytes = 100L)
     cache[createKey("https://example.com/2.jpg")] = createCachedImage(sizeBytes = 100L)
 
-    // Note: We can't actually force GC, so we just verify the method doesn't crash
+    // A collection cannot be forced, so this only checks the sweep does not throw.
     cache.cleanupWeakReferences()
 
-    // The method should complete without error
     assertTrue(true)
   }
 
@@ -263,9 +254,7 @@ class TwoTierMemoryCacheTest {
 
   @Test
   fun `sweeping the weak tier past its threshold keeps every entry still reachable`() {
-    // Enough evictions to cross the sweep threshold several times over. Every image is still held
-    // here, so a sweep must find nothing to drop: it prunes keys whose image the collector took,
-    // never keys that are still live.
+    // Enough evictions to cross the sweep threshold several times, with every image still held.
     val cache = createCache(maxSize = 100L)
     val images = (0 until 500).map { createCachedImage(sizeBytes = 100L + it) }
     images.forEachIndexed { index, image ->
@@ -274,7 +263,6 @@ class TwoTierMemoryCacheTest {
 
     assertEquals(1, cache.strongCacheCount)
     assertEquals(499, cache.weakCacheCount)
-    // And each one is still reachable through the weak tier, which is the point of having it.
     images.dropLast(1).forEachIndexed { index, image ->
       assertEquals(image, cache[createKey("https://example.com/sweep-$index.jpg")])
     }

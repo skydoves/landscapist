@@ -34,20 +34,12 @@ import kotlin.test.assertIs
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-/**
- * The memory cache reuses a differently sized variant of an image when it already holds every pixel
- * the request would decode, so a grid whose columns do not divide evenly does not decode the same
- * picture three times.
- *
- * The decoder here fits the image inside the requested box and keeps its shape, which is what every
- * real decoder does. That matters: a stub returning exactly what was asked for would make the rule
- * look like a comparison against the box, and a 4000x3000 photo in a 360x360 box is 360x270.
- */
+/** The decoder here fits inside the box it is given rather than matching it, as real ones do. */
 class SizeToleranceTest {
 
   private val url = "https://example.com/photo.jpg"
 
-  /** A 4000x3000 source, scaled down to fit whatever box it is handed. */
+  /** Scales the source down to fit whatever box it is handed. */
   private class FittingDecoder(
     private val sourceWidth: Int,
     private val sourceHeight: Int,
@@ -106,8 +98,7 @@ class SizeToleranceTest {
 
   @Test
   fun `a photo reuses its entry across the sizes a grid actually measures`() {
-    // 4000x3000 in a 360 box is 360x270. Comparing 270 against the box would refuse every one of
-    // these, which is what made the tolerance dead for anything that is not square.
+    // 4000x3000 in a 360 box is 360x270, so it is the pixels that are compared, not the box.
     val loader = photo()
     assertEquals("decoded_360x270", loader.load(360, 360))
 
@@ -137,8 +128,6 @@ class SizeToleranceTest {
 
   @Test
   fun `an entry far larger than the slot is decoded again`() {
-    // Drawing 1080 pixels into a 360 pixel slot costs bandwidth on every frame, and a painter
-    // plugin that works on the source pixels pays for all of them.
     val loader = photo()
     loader.load(1080, 1080)
 
@@ -148,9 +137,7 @@ class SizeToleranceTest {
 
   @Test
   fun `an entry oversized on one axis alone is decoded again`() {
-    // A panorama: 4000x500 in a 1080 wide slot is 1080x135. Asked for in a 360 wide slot it is
-    // eight times the pixels needed across and exactly the height needed down, so a rule that
-    // wants both axes oversized keeps it, and the slot draws a 583 KB bitmap where 65 KB would do.
+    // A panorama: 1080x135 in a 360 wide slot is oversized across but not down.
     val loader = Loader(sourceWidth = 4000, sourceHeight = 500)
     assertEquals("decoded_1080x135", loader.load(1080, 1080))
 
@@ -160,9 +147,7 @@ class SizeToleranceTest {
 
   @Test
   fun `an entry decoded for a box that fills it is not reused for a taller box`() {
-    // What an SVG renderer does: it fills the box rather than fitting inside it, so the pixels an
-    // entry happens to have say nothing about what a taller box would render. Comparing the boxes
-    // rather than the pixels is what makes this hold for both kinds of decoder.
+    // An SVG renderer fills the box rather than fitting it, so boxes are compared, not pixels.
     val loader = Loader(sourceWidth = 100, sourceHeight = 100)
     assertEquals("decoded_100x100", loader.load(100, 100))
 
@@ -172,8 +157,7 @@ class SizeToleranceTest {
 
   @Test
   fun `a thumbnail does not satisfy a request with an unbounded height`() {
-    // What a ThumbnailPlugin leaves behind before the real image loads in a scrolling list. The
-    // bounded axis still has to be covered.
+    // The bounded axis still has to be covered.
     val loader = photo()
     loader.load(15, 15)
 
@@ -201,8 +185,6 @@ class SizeToleranceTest {
 
   @Test
   fun `a lookup keeps offering variants until one is accepted`() {
-    // Only the most recently cached variant used to be considered, so a thumbnail arriving late
-    // hid the entry that could actually serve the request.
     for (cache in listOf(LruMemoryCache(10_000), TwoTierMemoryCache(10_000))) {
       cache[CacheKey.create(url, emptyList(), 1080, 1080)] = entry("full", 1080, 810)
       cache[CacheKey.create(url, emptyList(), 15, 15)] = entry("thumb", 15, 11)
@@ -216,8 +198,7 @@ class SizeToleranceTest {
 
   @Test
   fun `a transformed request is not served by a differently sized variant`() {
-    // A transformation may resize what it is handed, and the size recorded for an entry is the one
-    // the decoder produced, so there is nothing dependable to compare against.
+    // A transformation may resize what it is handed, so the recorded size means nothing here.
     val loader = photo()
     val transformation = object : com.skydoves.landscapist.core.transformation.Transformation {
       override val key: String = "shrink"
@@ -244,9 +225,6 @@ class SizeToleranceTest {
 
   @Test
   fun `a rejected variant is not marked as used`() {
-    // getMatching decides before it touches anything. A lookup that promoted a variant and then
-    // turned it down would refresh an entry nobody wanted, and on the two tier cache would evict
-    // live entries to make room for it.
     val cache = LruMemoryCache(10_000)
     val thumbnail = CacheKey.create(url, emptyList(), 15, 15)
     val unrelated = CacheKey.create("https://example.com/other.jpg", emptyList(), 10, 10)

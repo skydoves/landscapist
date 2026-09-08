@@ -37,16 +37,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-/**
- * [rememberCrossfadePainter], which is the crossfade an image gets when nothing has to be composed
- * inside it.
- *
- * The fade happens inside one painter rather than by stacking two composables, which is what lets a
- * crossfaded image keep the cheap drawing path. That leaves this painter owning three things the
- * stacked version got for free: not fading in what the viewer is already looking at, drawing the
- * outgoing image underneath so the composite never dips through transparent, and letting go of that
- * outgoing image once it is no longer being drawn.
- */
+/** [rememberCrossfadePainter]: the crossfade an image gets with nothing composed inside it. */
 @OptIn(InternalLandscapistApi::class)
 class CrossfadePainterTest {
 
@@ -137,8 +128,7 @@ class CrossfadePainterTest {
       harness.resolved
     }
 
-    // Not merely "draws opaquely": the point is that no wrapper is allocated at all for an image
-    // read straight from the memory cache, which is the common case on a scrolled list.
+    // assertSame, not "draws opaquely": no wrapper is allocated at all for a cached image.
     assertSame(first, resolved, "the entry painter was wrapped")
   }
 
@@ -163,9 +153,7 @@ class CrossfadePainterTest {
 
   @Test
   fun `the replaced painter stops being drawn once the fade is over`() {
-    // It is also released here: the field holding it is cleared on the same frame that stops
-    // drawing it. Without that, a painter keeps the bitmap it replaced alive for as long as it is
-    // on screen, which on a list that swaps images in place is a second full size bitmap per row.
+    // The field holding it is cleared on the same frame, so the replaced bitmap is released.
     val outgoing = red()
     val settled = harness(outgoing) { harness ->
       harness.render(0L)
@@ -185,9 +173,7 @@ class CrossfadePainterTest {
 
   @Test
   fun `an image that left its success state does not come back underneath the next one`() {
-    // A reload drops the painter to null while it resolves. Whatever was on screen has gone with
-    // it, so it is no longer something to dissolve over: keeping it would draw it underneath the
-    // arriving image, which reads as the replaced image flashing back after the gap.
+    // A reload drops the painter to null, and what was on screen goes with it.
     val frames = harness(red()) { harness ->
       harness.render(0L)
       harness.switchTo(null)
@@ -196,9 +182,7 @@ class CrossfadePainterTest {
       (2..12).map { frame -> harness.render(frame * 25L * 1_000_000) }
     }
 
-    // Red against blue rather than red against zero: the fade desaturates on its way in, so a
-    // blue image part way through it has some red in it. What only the outgoing image produces is
-    // red being the stronger of the two.
+    // Red against blue, not against zero: a blue frame part way through the fade has red in it.
     assertTrue(
       frames.none { it.red() > it.blue() },
       "the replaced image was drawn again after the gap, the colours were " +

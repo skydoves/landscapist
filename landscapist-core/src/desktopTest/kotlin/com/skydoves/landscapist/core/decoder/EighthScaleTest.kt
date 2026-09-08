@@ -28,15 +28,7 @@ import javax.imageio.ImageIO
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-/**
- * The eighths fast path has to actually engage, on a photograph whose size is not a round number.
- *
- * libjpeg rounds its scaled output up and SkJpegCodec accepts a request only when it matches
- * exactly, so asking for the rounded down size is refused for every dimension that is not a
- * multiple of eight. That is most photographs, and the decode then falls back to reading the whole
- * raster: slower than the subsampling it replaced, and holding pixels that subsampling never
- * materialised. Nothing catches that with a 1600x1200 or a 4000x3000 fixture.
- */
+/** libjpeg rounds its output up and Skia demands an exact match, so rounding down is refused. */
 class EighthScaleTest {
 
   private fun photo(width: Int, height: Int): ByteArray {
@@ -60,8 +52,7 @@ class EighthScaleTest {
     try {
       val codec = Codec.makeFromData(data)
       try {
-        // The decoder's own rounding, not a second copy of it here. A copy would keep agreeing
-        // with Skia after the decoder stopped, which is the failure this test exists to catch.
+        // The decoder's own rounding, so a change to it cannot silently keep agreeing here.
         val width = SkiaJvmDecoder.scaledUp(codec.width, eighths)
         val height = SkiaJvmDecoder.scaledUp(codec.height, eighths)
         val bitmap = Bitmap()

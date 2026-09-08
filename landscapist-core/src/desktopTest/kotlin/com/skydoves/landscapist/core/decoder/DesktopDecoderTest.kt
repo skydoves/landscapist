@@ -30,11 +30,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-/**
- * The desktop decoder reads through Skia when skiko is present and through ImageIO when it is not,
- * so the two have to agree on everything a caller can observe: the type they hand back, the size
- * they produce for a request, and the pixels inside it.
- */
+/** Skia and the ImageIO fallback have to agree on the type, size and pixels they produce. */
 class DesktopDecoderTest {
 
   private val config = LandscapistConfig()
@@ -90,9 +86,7 @@ class DesktopDecoderTest {
 
   @Test
   fun `a consumer with no skiko gets false from the probe rather than an Error`() {
-    // Everything the app loader can see except skiko, which is what a plain JVM consumer of
-    // landscapist-core has. Naming the Skia helper there fails while that class loads, and it fails
-    // with an Error, so the probe cannot live inside it: it has to sit outside and catch Throwable.
+    // Naming the Skia helper without skiko fails with an Error, so the probe must catch Throwable.
     val withoutSkiko = URLClassLoader(
       System.getProperty("java.class.path")
         .split(File.pathSeparator)

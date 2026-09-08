@@ -52,12 +52,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-/**
- * The painter a caller draws in their own `Image`, which is the one thing [LandscapistImage] cannot
- * offer: no container, no slot, one layout node. What has to hold for it to be worth having is that
- * it still draws a cached image on the first frame, still loads one that is not cached, still asks
- * for it at the size it is drawn at, and keeps its identity while all of that happens.
- */
+/** The painter a caller draws in their own `Image`: no container, no slot, one layout node. */
 class LandscapistImagePainterTest {
 
   private val url = "https://example.com/painter.png"
@@ -108,13 +103,7 @@ class LandscapistImagePainterTest {
     requested.clear()
   }
 
-  /**
-   * Renders frames of one scene until [done] holds, and returns the pixels of the last.
-   *
-   * A load that is not already in memory resolves on the loader's own dispatcher, so frames have to
-   * keep coming for the result to ever be composed. [frames] alone is the count for a scene that is
-   * expected to be finished on the first one.
-   */
+  /** Renders frames of one scene until [done] holds, and returns the pixels of the last. */
   private fun render(
     frames: Int = 1,
     timeoutMs: Long = 10_000,
@@ -185,8 +174,7 @@ class LandscapistImagePainterTest {
   fun `an image that is not cached is loaded and drawn`() {
     val loader = newLoader()
 
-    // The first frame is what tells the painter how big the image has to be, so the load starts
-    // from it and the frame after is the first that can have the image in it.
+    // The first frame gives the painter its size, so the image can only be in the frame after.
     val pixels = render(frames = 2, done = { it.coverage() > 0.9 }) {
       Image(
         painter = rememberLandscapistImagePainter(
@@ -255,11 +243,8 @@ class LandscapistImagePainterTest {
 
   @Test
   fun `a painter the caller never bounds still loads`() {
-    // A painter with no image yet has no intrinsic size, so a caller who bounds neither axis
-    // measures it to nothing and it is never drawn at a size. Waiting for that draw forever left
-    // it permanently blank, with no error and no state to explain it.
-    // Cold: a warm cache is answered by the synchronous peek, which needs no size and would hide
-    // this entirely.
+    // A painter with no image has no intrinsic size, so an unbounded caller never gives it one.
+    // Cold on purpose: a warm cache is answered by the peek, which needs no size.
     val loader = Landscapist.builder().noDiskCache().fetcher(StubFetcher()).decoder(StubDecoder())
       .build()
     val states = mutableListOf<LandscapistImageState>()
@@ -269,8 +254,7 @@ class LandscapistImagePainterTest {
       density = Density(1f),
       coroutineContext = Dispatchers.Unconfined,
       content = {
-        // Width from the parent, height from the image. With no image there is no intrinsic
-        // height, so this measures to zero high and is never drawn at a size.
+        // Width from the parent, height from the image, so with no image it is zero high.
         Column(Modifier.verticalScroll(rememberScrollState())) {
           Image(
             painter = rememberLandscapistImagePainter(
@@ -302,10 +286,8 @@ class LandscapistImagePainterTest {
 
   @Test
   fun `the wait for a size is counted in frames, not on a clock`() {
-    // The fallback for a painter that is never drawn is the image's own size, which for a photo is
-    // millions of pixels nobody asked for. A wall clock reaches that fallback for a first frame
-    // that is merely slow, which is exactly when a screen full of images can least afford it.
-    // Frames tell the two apart: no frames means nothing has been drawn yet, not that nothing will.
+    // The fallback for a painter that is never drawn is the image's own size, so a merely slow
+    // first frame must not reach it. No frames means not drawn yet, not that nothing ever will be.
     val loader = newLoader()
     requested.clear()
     val scene = ImageComposeScene(

@@ -67,14 +67,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-/**
- * Every kind of [ImagePlugin], through the composable a user would install it in.
- *
- * [LandscapistImage] draws the image on its own container node when nothing needs to be composed
- * inside it, and composes a child when something does. Which of the two it picks is decided from
- * the plugin set, so each kind of plugin needs to be shown still working: a painter plugin has to
- * reach the drawing on the container path, and everything else has to keep the child.
- */
+/** Every kind of [ImagePlugin], through the composable a user would install it in. */
 class LandscapistImagePluginTest {
 
   private val url = "https://example.com/photo.png"
@@ -157,12 +150,7 @@ class LandscapistImagePluginTest {
     }
   }
 
-  /**
-   * Renders [count] frames of one scene and returns the last.
-   *
-   * A cold load resolves through a flow, so the state on the frame the composable first appears on
-   * is still Loading. One more frame is what a device would draw anyway.
-   */
+  /** Renders [count] frames of one scene and returns the last, since a cold load needs two. */
   private fun renderFrames(count: Int, content: @Composable () -> Unit): IntArray {
     val scene = ImageComposeScene(
       width = sceneSize,
@@ -221,8 +209,7 @@ class LandscapistImagePluginTest {
 
   @Test
   fun `a painter plugin reaches the drawing on the container path`() {
-    // No slot and no wrapping plugin, so the image is drawn by the container node. A painter
-    // plugin has to survive that: it is applied to the painter, not to a child composable.
+    // No slot and no wrapping plugin, so the container node draws the image itself.
     val loader = warmLoader()
     var used = false
     val plugin = object : ImagePlugin.PainterPlugin {
@@ -249,8 +236,7 @@ class LandscapistImagePluginTest {
 
   @Test
   fun `a circular reveal still animates on the container path`() {
-    // The real painter plugin, and the one that would break most visibly: it animates by reading
-    // state while it draws, so it only works if the container's paint invalidates along with it.
+    // It animates by reading state as it draws, so the container's paint must invalidate too.
     val loader = warmLoader()
     val component = component(CircularRevealPlugin(duration = 200))
     val scene = ImageComposeScene(
@@ -375,10 +361,6 @@ class LandscapistImagePluginTest {
 
   @Test
   fun `a caller success slot receives the painter and draws it`() {
-    // A slot is handed the painter and its content is drawn. It may also read
-    // LocalImageSourceBytes, but nothing here can prove it is inside a provider: that local
-    // defaults to null, so a read succeeds whether the provider is there or not, and the memory
-    // cache keeps no raw bytes for it to find. That is left to the code, not claimed here.
     val loader = warmLoader()
     var reached = false
     val pixels = render(
@@ -427,15 +409,8 @@ class LandscapistImagePluginTest {
 
   @Test
   fun `an animating painter does not repaint the tree around it more than a still one`() {
-    // The container path clips while drawing rather than through a graphics layer, and a painter
-    // that animates by reading state as it draws has that read attributed to the nearest node
-    // owning one. If that is an ancestor, every frame of one image's reveal redraws everything
-    // around it, which in a list is the whole list.
-    //
-    // The control has to be on the same path, so it carries a painter plugin that hands the painter
-    // straight back. An image with no plugins at all is drawn by a single node that owns its load,
-    // which redraws its ancestor less than either of these and would make the comparison mean
-    // nothing.
+    // A painter that reads state as it draws has that read attributed to the nearest node owning
+    // a layer, so the control has to be on the same path: a painter plugin that changes nothing.
     val stillPlugin = object : ImagePlugin.PainterPlugin {
       @Composable
       override fun compose(imageBitmap: ImageBitmap, painter: Painter): Painter = painter
@@ -454,13 +429,7 @@ class LandscapistImagePluginTest {
     )
   }
 
-  /**
-   * Warms [urls] into one loader, so each is drawable in the frame it first appears in.
-   *
-   * Each url decodes to its own colour, in the order given. A crossfade between two images of the
-   * same colour is indistinguishable from no crossfade at all, so the colour is what says the fade
-   * ran rather than the new image simply appearing.
-   */
+  /** Warms [urls] into one loader, each decoding to its own colour so a fade is visible. */
   private fun warmLoader(urls: List<String>): Landscapist {
     val colours = urls.withIndex().associate { (index, url) -> url to distinctColours[index] }
     val loader = Landscapist.builder().noDiskCache().fetcher(
@@ -501,15 +470,12 @@ class LandscapistImagePluginTest {
 
   @Test
   fun `a crossfade does not fade in an image that was already in memory`() {
-    // The container draws the crossfade itself now, which is what makes an image with one cost
-    // about what an image without one costs. It must not cost the blink back: an image read from
-    // the memory cache is already what the viewer is looking at.
+    // An image read from the memory cache is already what the viewer is looking at.
     val loader = warmLoader()
 
     val pixels = render(content = image(loader, component(CrossfadePlugin(duration = 300))))
 
-    // Every pixel at full alpha, not merely non-zero: a frame part way through a fade covers the
-    // whole node too, so coverage alone cannot tell the two apart.
+    // Full alpha, not merely non-zero: a frame part way through a fade covers the node too.
     val faintest = pixels.minOf { it ushr 24 }
     assertEquals(0xFF, faintest, "the first frame was faded rather than drawn")
   }
@@ -542,10 +508,8 @@ class LandscapistImagePluginTest {
       val first = readCentre(scene.render(1L))
       model = second
       Snapshot.sendApplyNotifications()
-      // Frames across the fade. The animation runs on the scene's clock, so it only advances when
-      // a frame is drawn, and the first frame after the switch is the one that starts it at zero.
-      // Past the 300ms duration, so the last frame is the settled one rather than the last frame
-      // of the animation, which is a shade short of it.
+      // The animation runs on the scene's clock, so it only advances when a frame is drawn.
+      // Past the 300ms duration, so the last frame is the settled one.
       first to (1..16).map { frame -> readCentre(scene.render(frame * 40L * 1_000_000)) }
     } finally {
       scene.close()
@@ -553,16 +517,12 @@ class LandscapistImagePluginTest {
     val alphas = colours.map { it ushr 24 }
 
     assertEquals(0xFF, before ushr 24, "the image already on screen was not opaque")
-    // Opaque throughout. The arriving image dissolves over the one it replaces, which is drawn
-    // underneath: fading it in over nothing instead makes the image dip through transparent on its
-    // way in, which is the one thing the composable crossfade never did.
+    // The arriving image dissolves over the one underneath, so it never dips through transparent.
     assertTrue(
       alphas.all { it == 0xFF },
       "the image went transparent while the new one faded in, the alphas were $alphas",
     )
-    // Opacity alone cannot tell a dissolve from no crossfade at all, since an image that simply
-    // appears is opaque on every frame too. A frame that is neither of the two colours is what only
-    // a dissolve produces.
+    // Only a dissolve produces a frame that is neither colour; opacity alone cannot show it.
     assertTrue(
       colours.any { it != pureRed && it != pureBlue },
       "no frame was part way between the two images, the colours were " +
@@ -573,10 +533,7 @@ class LandscapistImagePluginTest {
 
   @Test
   fun `a crossfade still fades when the caller takes the painter with a success slot`() {
-    // A success slot means the container cannot draw the image itself, so the painter cannot be the
-    // thing that fades and the composable crossfade has to run instead. Deciding that from "could
-    // this image have faded a painter" rather than "is it going to" turned both off and left this
-    // combination with no crossfade at all.
+    // A success slot means the painter cannot be what fades, so the composable crossfade runs.
     val second = "https://example.com/second.png"
     val loader = warmLoader(listOf(url, second))
     var model by mutableStateOf(url)

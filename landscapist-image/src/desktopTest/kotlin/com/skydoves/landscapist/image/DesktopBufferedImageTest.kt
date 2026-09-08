@@ -38,10 +38,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-/**
- * The desktop decoder produces a [BufferedImage], so the painter and the bitmap converter have to
- * understand one. Issue #982.
- */
+/** The desktop decoder produces a [BufferedImage], so painter and converter accept one. #982 */
 @OptIn(ExperimentalTestApi::class)
 class DesktopBufferedImageTest {
 

@@ -53,14 +53,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-/**
- * Pins the layout and the callbacks of [LandscapistImage].
- *
- * The composable can draw the image on its own container node rather than in a child, which is one
- * layout node per image instead of two. These cover the cases where that shortcut could change what
- * the caller sees: the measured size with and without a size modifier, the state callback, and the
- * paths that must still compose real content.
- */
+/** The image can be drawn on the container node, so these pin the layout callers still see. */
 @OptIn(ExperimentalTestApi::class)
 class LandscapistImageLayoutTest {
 
@@ -155,8 +148,7 @@ class LandscapistImageLayoutTest {
 
   @Test
   fun `with no size modifier the image fills its parent`() {
-    // Drawing on the container node rather than in a child must not hand the painter's intrinsic
-    // size to the layout. An 80x40 image in a 200x200 parent fills it, as a child Image would.
+    // The painter's intrinsic size must not reach the layout: 80x40 still fills a 200x200 parent.
     assertEquals(IntSize(200, 200), sizeInside200Box())
   }
 
@@ -266,8 +258,7 @@ class LandscapistImageLayoutTest {
 
   @Test
   fun `a changed model loads the new image`() {
-    // The container node runs the load itself, so it is the node that has to notice the request it
-    // was rebuilt with and start again. Nothing recomposes underneath it to do that for it.
+    // The node runs the load itself, so it has to notice the request it was rebuilt with.
     val loader = Landscapist.builder()
       .noDiskCache()
       .fetcher(

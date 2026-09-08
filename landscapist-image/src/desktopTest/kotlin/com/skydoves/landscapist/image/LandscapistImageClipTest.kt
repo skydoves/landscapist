@@ -48,14 +48,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-/**
- * The container draws the image itself, so it is the container that has to keep the drawing inside
- * its own bounds.
- *
- * [ContentScale.Crop] scales a wide image up until it covers the node, which leaves it wider than
- * the node it is drawn in. Nothing else in the layout stops that from spilling over whatever sits
- * next to it, so these render a real frame and read the pixels back.
- */
+/** The container draws the image itself, so it is the container that has to clip it. */
 class LandscapistImageClipTest {
 
   private val url = "https://example.com/wide.png"
@@ -155,8 +148,7 @@ class LandscapistImageClipTest {
 
   @Test
   fun `a cropped image does not paint outside the node it was given`() {
-    // Crop scales an 80x40 image to cover a 40x40 node, so it is drawn 80 wide and centred, which
-    // puts 20 columns past each edge. Everything past the node has to stay empty.
+    // Crop draws the 80x40 image 80 wide in a 40 wide node, so 20 columns fall past each edge.
     val pixels = renderCroppedImage()
 
     val spilled = buildList {
@@ -190,9 +182,7 @@ class LandscapistImageClipTest {
 
   @Test
   fun `a colour filter and an alpha reach the drawing`() {
-    // These live on ImageOptions and the container path has to carry them onto the paint modifier
-    // rather than drop them with the child it replaced. Asserting the size cannot see that: the
-    // size is fixed by the caller's modifier whether the filter arrives or not.
+    // The container path has to carry these onto its paint modifier; the size cannot show that.
     val loader = warmLoader()
 
     val tinted = render {

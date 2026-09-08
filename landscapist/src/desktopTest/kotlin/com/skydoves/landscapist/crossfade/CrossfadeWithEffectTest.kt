@@ -35,15 +35,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-/**
- * What the crossfade does on the frame the composable first appears on.
- *
- * An image read straight from the memory cache is already resolved when the composable enters
- * composition, and fading it in from nothing is what makes it blink, most visibly inside a shared
- * element transition animating the bounds of what is briefly an empty box. So the state a crossfade
- * enters with is drawn at once and at full strength, and only content that arrives later animates.
- * These render real frames and read the pixels back, because the difference is opacity.
- */
+/** What the crossfade does on the frame the composable first appears on. */
 @OptIn(InternalLandscapistApi::class)
 class CrossfadeWithEffectTest {
 
@@ -114,13 +106,7 @@ class CrossfadeWithEffectTest {
   private fun pastTheAnimation(extra: Long = 0L): Long =
     durationMs.toLong() * 4 * 1_000_000 + extra
 
-  /**
-   * Renders frames until the animation has run out, and returns the last one.
-   *
-   * The animation is launched when its node attaches, which is after the frame callbacks of the
-   * frame that composed it, so the frame after the switch is the one that records the start. It
-   * takes another frame past the duration for the value to arrive.
-   */
+  /** Renders frames until the animation runs out; it starts a frame after it was composed. */
   private fun Harness.renderSettled(from: Long): Int {
     var pixel = 0
     repeat(4) { frame -> pixel = renderCentre(from + pastTheAnimation() * (frame + 1)) }
@@ -147,9 +133,7 @@ class CrossfadeWithEffectTest {
     val (partial, settled) = harness { harness ->
       harness.renderCentre(0L)
       harness.switchTo("blue")
-      // Frames across the fade. The animation runs on the scene's clock, so it only moves when a
-      // frame is drawn, and the alpha is what says a fade is happening rather than nothing being
-      // drawn: "not blue yet" is true of an empty frame too.
+      // The alpha separates a fade from nothing drawn: an empty frame is not blue either.
       val alphas = (1..12).map { frame -> harness.renderCentre(frame * 25L * 1_000_000) ushr 24 }
       alphas to harness.renderSettled(1L)
     }
@@ -182,9 +166,7 @@ class CrossfadeWithEffectTest {
 
   @Test
   fun `turning the crossfade on does not fade a stale state back in`() {
-    // A caller can install a crossfade plugin after the image has resolved, which flips `enabled`.
-    // What is already on screen has to stay on screen: the crossfade starts from the current state,
-    // not from whatever the composable entered composition with.
+    // Installing a crossfade plugin after the image resolves flips enabled while it is on screen.
     var target by mutableStateOf("red")
     var enabled by mutableStateOf(false)
     val scene = ImageComposeScene(
@@ -235,13 +217,10 @@ class CrossfadeWithEffectTest {
 
   @Test
   fun `a disabled crossfade keeps every sibling its content emits`() {
-    // The content lambda of every image composable emits more than one child: state plugins, then
-    // the image. The disabled path composes them with no wrapper of its own, so they land in the
-    // caller's own box and have to be measured, placed and stacked exactly as they were.
+    // The content lambda emits several children and the disabled path adds no wrapper of its own.
     val boxSize = size
 
-    // How the image composables call it: minimum constraints forwarded, so every sibling fills and
-    // the later one covers the earlier.
+    // How the image composables call it: minimum constraints forwarded, so every sibling fills.
     val filled = renderAll {
       Box(Modifier.size(boxSize.dp), propagateMinConstraints = true) {
         CrossfadeWithEffect(targetState = "red", durationMs = durationMs, enabled = false) {

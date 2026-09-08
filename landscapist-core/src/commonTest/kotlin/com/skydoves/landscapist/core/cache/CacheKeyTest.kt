@@ -40,9 +40,7 @@ class CacheKeyTest {
 
   @Test
   fun `diskKey ignores the target size`() {
-    // The disk cache holds the image as it was downloaded, and every size is decoded from those
-    // same bytes. A key that varied with the size stored a copy of the same file per size and went
-    // back to the network for each of them.
+    // The disk cache holds the downloaded bytes, and every size is decoded from those same bytes.
     val plain = CacheKey(url = "https://example.com/image.jpg")
     val sized = CacheKey(url = "https://example.com/image.jpg", width = 100, height = 200)
     val otherSize = CacheKey(url = "https://example.com/image.jpg", width = 400, height = 800)

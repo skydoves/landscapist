@@ -40,14 +40,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-/**
- * What happens to the node when a list rebinds the row it is in.
- *
- * The node runs its own load and its scope only ends when the node detaches, which a rebind is not.
- * A first request left in flight comes back later, publishes, and puts the image the item used to
- * show over the one it shows now. A lazy list goes further and reuses the node itself, which resets
- * it and attaches it again before the new composition has handed it the new model.
- */
+/** What happens to the node when a list rebinds or reuses the row it is in. */
 @OptIn(ExperimentalTestApi::class)
 class LandscapistImageNodeReloadTest {
 
@@ -100,11 +93,11 @@ class LandscapistImageNodeReloadTest {
         )
       }
       waitForIdle()
-      // Rebound before the first image ever arrives, which is what a scrolling list does.
+      // Rebound before the first image arrives, as a scrolling list does.
       model = quick
       // waitForIdle does not follow the loader's own scope, so wait for the image itself.
       waitUntil(timeoutMillis = 5_000) { seen.isNotEmpty() }
-      // Now let the abandoned load finish. Nothing it publishes may reach the composable.
+      // Let the abandoned load finish; nothing it publishes may reach the composable.
       gate.complete(Unit)
       repeat(5) {
         waitForIdle()
@@ -122,11 +115,7 @@ class LandscapistImageNodeReloadTest {
 
   @Test
   fun `a reused node does not publish the image of the row it used to be in`() {
-    // What a lazy list does when a row scrolls off and its node is given to the row scrolling on:
-    // the node is reset and attached again, and only then does the new composition reach it. A
-    // cache read in that window looks up the previous row's model, so the previous row's image is
-    // published into the new row and callers are told it succeeded for a model they never asked
-    // for.
+    // A lazy list resets and reattaches the node before the new composition hands it the model.
     val loader = Landscapist.builder()
       .noDiskCache()
       .fetcher(GatedFetcher(CompletableDeferred(Unit)))
@@ -145,8 +134,7 @@ class LandscapistImageNodeReloadTest {
     runComposeUiTest {
       var model by mutableStateOf(slow)
       setContent {
-        // The node is reused rather than disposed and rebuilt, which is what a lazy list does and
-        // what a plain state change does not.
+        // Reused rather than disposed and rebuilt, which a plain state change would not do.
         ReusableContent(model) {
           LandscapistImage(
             imageModel = { model },
