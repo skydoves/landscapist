@@ -58,6 +58,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import com.skydoves.landscapist.DataSource as PublicDataSource
+import com.skydoves.landscapist.core.model.DataSource as CoreDataSource
 
 /**
  * Loads and displays an image using the Landscapist core image loading engine.
@@ -108,12 +110,16 @@ public fun LandscapistImage(
     }.build()
   }
 
-  // Check for CrossfadePlugin to enable crossfade animation
-  val crossfadePlugin = component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+  // Scanning the plugin list allocates, and the plugins do not change between compositions.
+  val crossfadePlugin = remember(component) {
+    component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+  }
+  val requestHolder = remember(request) { StableHolder(request) }
+  val landscapistHolder = remember(landscapist) { StableHolder(landscapist) }
 
   LandscapistImageInternal(
-    request = StableHolder(request),
-    landscapist = StableHolder(landscapist),
+    request = requestHolder,
+    landscapist = landscapistHolder,
     modifier = modifier,
     component = component,
     imageOptions = imageOptions,
@@ -125,7 +131,7 @@ public fun LandscapistImage(
     CrossfadeWithEffect(
       targetState = landscapistState,
       durationMs = crossfadePlugin?.duration ?: 0,
-      contentKey = { it },
+      contentKey = { it.crossfadeKey() },
       enabled = crossfadePlugin != null,
     ) { state ->
       when (state) {
@@ -138,8 +144,8 @@ public fun LandscapistImage(
             executor = { size ->
               LandscapistThumbnail(
                 requestSize = size,
-                recomposeKey = StableHolder(request),
-                landscapist = StableHolder(landscapist),
+                recomposeKey = requestHolder,
+                landscapist = landscapistHolder,
                 imageOptions = imageOptions,
               )
             },
@@ -474,7 +480,7 @@ private fun ImageResult.toImageLoadState(): ImageLoadState = when (this) {
       rawData = rawData,
       diskCachePath = diskCachePath,
     ),
-    dataSource = com.skydoves.landscapist.DataSource.valueOf(dataSource.name),
+    dataSource = dataSource.toLandscapistDataSource(),
   )
   is ImageResult.Failure -> ImageLoadState.Failure(
     data = null,
@@ -492,7 +498,7 @@ private fun ImageLoadState.toImageResult(): ImageResult = when (this) {
     val successData = data as? LandscapistSuccessData
     ImageResult.Success(
       data = successData?.bitmap ?: data ?: Unit,
-      dataSource = com.skydoves.landscapist.core.model.DataSource.valueOf(dataSource.name),
+      dataSource = dataSource.toCoreDataSource(),
       originalWidth = successData?.originalWidth ?: 0,
       originalHeight = successData?.originalHeight ?: 0,
       rawData = successData?.rawData,
@@ -502,6 +508,39 @@ private fun ImageLoadState.toImageResult(): ImageResult = when (this) {
   is ImageLoadState.Failure -> ImageResult.Failure(
     throwable = reason,
   )
+}
+
+/**
+ * What identifies this state to the crossfade.
+ *
+ * Keying on the state itself means `key()` hashes it every composition, and a success state hashes
+ * the encoded image with it. The decoded image is what the crossfade actually distinguishes.
+ */
+private fun LandscapistImageState.crossfadeKey(): Any = when (this) {
+  is LandscapistImageState.Success -> data ?: this
+  else -> this
+}
+
+// Enum.valueOf goes through a name lookup, and these conversions run on every composition. A when
+// is a table switch.
+private fun CoreDataSource.toLandscapistDataSource(): PublicDataSource = when (this) {
+  CoreDataSource.MEMORY -> PublicDataSource.MEMORY
+  CoreDataSource.DISK -> PublicDataSource.DISK
+  CoreDataSource.NETWORK -> PublicDataSource.NETWORK
+  CoreDataSource.LOCAL -> PublicDataSource.LOCAL
+  CoreDataSource.RESOURCE -> PublicDataSource.RESOURCE
+  CoreDataSource.INLINE -> PublicDataSource.INLINE
+  CoreDataSource.UNKNOWN -> PublicDataSource.UNKNOWN
+}
+
+private fun PublicDataSource.toCoreDataSource(): CoreDataSource = when (this) {
+  PublicDataSource.MEMORY -> CoreDataSource.MEMORY
+  PublicDataSource.DISK -> CoreDataSource.DISK
+  PublicDataSource.NETWORK -> CoreDataSource.NETWORK
+  PublicDataSource.LOCAL -> CoreDataSource.LOCAL
+  PublicDataSource.RESOURCE -> CoreDataSource.RESOURCE
+  PublicDataSource.INLINE -> CoreDataSource.INLINE
+  PublicDataSource.UNKNOWN -> CoreDataSource.UNKNOWN
 }
 
 /**
@@ -525,7 +564,7 @@ private data class LandscapistSuccessData(
     if (originalHeight != other.originalHeight) return false
     if (rawData != null) {
       if (other.rawData == null) return false
-      if (!rawData.contentEquals(other.rawData)) return false
+      if (rawData !== other.rawData) return false
     } else if (other.rawData != null) return false
     if (diskCachePath != other.diskCachePath) return false
 
@@ -536,7 +575,7 @@ private data class LandscapistSuccessData(
     var result = bitmap.hashCode()
     result = 31 * result + originalWidth
     result = 31 * result + originalHeight
-    result = 31 * result + (rawData?.contentHashCode() ?: 0)
+    result = 31 * result + (rawData?.size ?: 0)
     result = 31 * result + (diskCachePath?.hashCode() ?: 0)
     return result
   }

@@ -16,6 +16,7 @@
 package com.skydoves.landscapist.image
 
 import androidx.compose.runtime.Composable
+import com.skydoves.landscapist.LocalImageSourceFile
 import com.skydoves.landscapist.ProvideImageSourceFile
 import java.io.File
 
@@ -28,6 +29,13 @@ public actual fun ProvideImageSource(
   rawData: ByteArray?,
   content: @Composable () -> Unit,
 ) {
+  // Providing a composition local rebuilds the local map for the subtree, and only the
+  // sub-sampling plugins ever read this one. The exists() check is a syscall, so it is skipped too
+  // when there is no path.
+  if (diskCachePath == null && LocalImageSourceFile.current == null) {
+    content()
+    return
+  }
   val file = diskCachePath?.let { File(it) }?.takeIf { it.exists() }
   ProvideImageSourceFile(file = file) {
     content()
