@@ -38,7 +38,10 @@ import kotlinx.coroutines.delay
  *
  * @param T The type of the state object.
  * @param targetState The state that drives the content to be displayed.
- * @param modifier Modifier to be applied to the container.
+ * @param modifier Modifier to be applied to the container. With the animation off and no modifier
+ * given, no container is emitted at all and the content is composed where the caller put it, which
+ * is one layout node per image rather than two. So do not alternate between [Modifier] and a real
+ * one: that moves the content between two composition groups and rebuilds it every time.
  * @param durationMs The duration of the fade-in and fade-out animations.
  * @param enabled A boolean to enable or disable the animation. If false, the content
  * will switch instantly. Defaults to true.
@@ -56,10 +59,39 @@ public fun <T> CrossfadeWithEffect(
   contentKey: (T) -> Any? = { it },
   content: @Composable (T) -> Unit,
 ) {
+  if (!enabled) {
+    // With nothing to animate there is nothing to stack, so the wrapper would be a layout node per
+    // image that only forwards its constraints. The parent it would have sat in is a Box with the
+    // same measure policy, alignment and constraint propagation, so removing it cannot move
+    // anything. It is still needed to carry a modifier if one was given.
+    if (modifier === Modifier) {
+      key(contentKey(targetState)) {
+        content(targetState)
+      }
+    } else {
+      Box(modifier = modifier, propagateMinConstraints = true) {
+        key(contentKey(targetState)) {
+          content(targetState)
+        }
+      }
+    }
+    return
+  }
+
   // Seeded with the state this composable entered composition with, for two reasons. Waiting for
   // the effect below to add it leaves the first frame empty, and content that was already resolved
   // when the composable appeared (an image read straight from the memory cache, say) has nothing to
   // fade in from. Only content that arrives later animates.
+  // Seeded with the state this composable entered composition with, for two reasons. Waiting for
+  // the effect below to add it leaves the first frame empty, and content that was already resolved
+  // when the composable appeared (an image read straight from the memory cache, say) has nothing to
+  // fade in from. Only content that arrives later animates.
+  //
+  // These live inside this branch on purpose. A caller can install or drop a crossfade plugin
+  // between compositions, and slots kept across that would still hold the state the composable
+  // first entered with, which by then is stale: the crossfade would fade a placeholder back in over
+  // an image already on screen. Seeded here, a newly enabled crossfade starts from what is being
+  // shown, draws it without animating, and animates the next change like any other.
   val currentlyVisibleItems = remember { mutableStateListOf(targetState) }
   val initialContentKey = remember { contentKey(targetState) }
   // Once something else has been the target, the initial state has stopped being the one that was
@@ -77,41 +109,27 @@ public fun <T> CrossfadeWithEffect(
   }
 
   Box(modifier = modifier, propagateMinConstraints = true) {
-    if (enabled) {
-      currentlyVisibleItems.forEach { state ->
-        key(contentKey(state)) {
-          val stateKey = contentKey(state)
-          val isTarget = stateKey == contentKey(targetState)
+    currentlyVisibleItems.forEach { state ->
+      key(contentKey(state)) {
+        val stateKey = contentKey(state)
+        val isTarget = stateKey == contentKey(targetState)
 
-          val animationModifier = when {
-            !isTarget -> Modifier.fadeOutWithEffect(key = Unit, durationMs = durationMs)
-            !initialContentReplaced && stateKey == initialContentKey -> Modifier
-            else -> Modifier.fadeInWithEffect(key = stateKey ?: Unit, durationMs = durationMs)
-          }
+        val animationModifier = when {
+          !isTarget -> Modifier.fadeOutWithEffect(key = Unit, durationMs = durationMs)
+          !initialContentReplaced && stateKey == initialContentKey -> Modifier
+          else -> Modifier.fadeInWithEffect(key = stateKey ?: Unit, durationMs = durationMs)
+        }
 
-          if (!isTarget) {
-            LaunchedEffect(Unit) {
-              delay(durationMs.toLong())
-              currentlyVisibleItems.remove(state)
-            }
-          }
-
-          Box(modifier = animationModifier, propagateMinConstraints = true) {
-            content(state)
+        if (!isTarget) {
+          LaunchedEffect(Unit) {
+            delay(durationMs.toLong())
+            currentlyVisibleItems.remove(state)
           }
         }
-      }
-    } else {
-      if (currentlyVisibleItems.size > 1 || currentlyVisibleItems.firstOrNull() != targetState) {
-        currentlyVisibleItems.retainAll { contentKey(it) == contentKey(targetState) }
-        if (currentlyVisibleItems.isEmpty()) {
-          currentlyVisibleItems.add(targetState)
-        }
-      }
 
-      // Render the content directly without any animation modifiers.
-      key(contentKey(targetState)) {
-        content(targetState)
+        Box(modifier = animationModifier, propagateMinConstraints = true) {
+          content(state)
+        }
       }
     }
   }

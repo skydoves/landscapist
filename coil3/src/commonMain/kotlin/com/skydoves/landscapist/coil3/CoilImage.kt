@@ -93,7 +93,7 @@ public fun CoilImage(
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   component: ImageComponent = rememberImageComponent {},
   requestListener: (() -> ImageRequest.Listener)? = null,
-  imageOptions: ImageOptions = ImageOptions(),
+  imageOptions: ImageOptions = ImageOptions.Default,
   onImageStateChanged: (CoilImageState) -> Unit = {},
   previewPlaceholder: Painter? = null,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
@@ -162,7 +162,7 @@ public fun CoilImage(
   modifier: Modifier = Modifier,
   imageLoader: @Composable () -> ImageLoader = { LocalCoilProvider.getCoilImageLoader() },
   component: ImageComponent = rememberImageComponent {},
-  imageOptions: ImageOptions = ImageOptions(),
+  imageOptions: ImageOptions = ImageOptions.Default,
   onImageStateChanged: (CoilImageState) -> Unit = {},
   previewPlaceholder: Painter? = null,
   loading: @Composable (BoxScope.(imageState: CoilImageState.Loading) -> Unit)? = null,
@@ -202,7 +202,11 @@ public fun CoilImage(
       }
     }
 
-    val crossfadePlugin = component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+    // Remembered on the component, because scanning for it allocates a list and the plugin set
+    // does not change between compositions of the same component.
+    val crossfadePlugin = remember(component) {
+      component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+    }
 
     CrossfadeWithEffect(
       targetState = coilImageState,

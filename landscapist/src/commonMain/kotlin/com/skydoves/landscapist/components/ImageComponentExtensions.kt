@@ -16,6 +16,7 @@
 package com.skydoves.landscapist.components
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntSize
@@ -42,8 +43,17 @@ public fun ImageComponent.ComposeLoadingStatePlugins(
   imageOptions: ImageOptions,
   executor: @Composable (IntSize) -> Unit,
 ) {
-  imagePlugins.filterIsInstance<ImagePlugin.LoadingStatePlugin>().forEach { plugin ->
-    plugin.compose(modifier = modifier, imageOptions = imageOptions, executor = executor)
+  val plugins = imagePlugins
+  for (index in plugins.indices) {
+    val plugin = plugins[index]
+    if (plugin is ImagePlugin.LoadingStatePlugin) {
+      // Keyed on the plugin, so what it remembers follows the plugin rather than its position.
+      // Adding a plugin of another kind ahead of it used to shift every index after it, which
+      // discarded whatever the plugins there had remembered.
+      key(plugin) {
+        plugin.compose(modifier = modifier, imageOptions = imageOptions, executor = executor)
+      }
+    }
   }
 }
 
@@ -56,13 +66,19 @@ public fun ImageComponent.ComposeSuccessStatePlugins(
   imageOptions: ImageOptions,
   imageBitmap: ImageBitmap?,
 ) {
-  imagePlugins.filterIsInstance<ImagePlugin.SuccessStatePlugin>().forEach { plugin ->
-    plugin.compose(
-      modifier = modifier,
-      imageModel = imageModel,
-      imageOptions = imageOptions,
-      imageBitmap = imageBitmap,
-    )
+  val plugins = imagePlugins
+  for (index in plugins.indices) {
+    val plugin = plugins[index]
+    if (plugin is ImagePlugin.SuccessStatePlugin) {
+      key(plugin) {
+        plugin.compose(
+          modifier = modifier,
+          imageModel = imageModel,
+          imageOptions = imageOptions,
+          imageBitmap = imageBitmap,
+        )
+      }
+    }
   }
 }
 
@@ -74,8 +90,14 @@ public fun ImageComponent.ComposeFailureStatePlugins(
   imageOptions: ImageOptions,
   reason: Throwable?,
 ) {
-  imagePlugins.filterIsInstance<ImagePlugin.FailureStatePlugin>().forEach { plugin ->
-    plugin.compose(modifier = modifier, imageOptions = imageOptions, reason = reason)
+  val plugins = imagePlugins
+  for (index in plugins.indices) {
+    val plugin = plugins[index]
+    if (plugin is ImagePlugin.FailureStatePlugin) {
+      key(plugin) {
+        plugin.compose(modifier = modifier, imageOptions = imageOptions, reason = reason)
+      }
+    }
   }
 }
 
@@ -90,14 +112,24 @@ public fun ImageComponent.ComposeFailureStatePlugins(
 public fun ImageComponent.ComposeWithComposablePlugins(
   content: @Composable () -> Unit,
 ) {
-  val composablePlugins = imagePlugins.filterIsInstance<ImagePlugin.ComposablePlugin>()
-  if (composablePlugins.isEmpty()) {
+  val plugins = imagePlugins
+  // Built in one pass, and only when there is something to build: most components have no
+  // composable plugin at all, and scanning for one and then filtering for it did the work twice.
+  var wrappers: MutableList<ImagePlugin.ComposablePlugin>? = null
+  for (index in plugins.indices) {
+    val plugin = plugins[index]
+    if (plugin is ImagePlugin.ComposablePlugin) {
+      (wrappers ?: mutableListOf<ImagePlugin.ComposablePlugin>().also { wrappers = it }).add(plugin)
+    }
+  }
+  val composablePlugins = wrappers
+  if (composablePlugins == null) {
     content()
   } else {
     // Wrap content with each plugin, innermost first
     composablePlugins.fold(content) { acc, plugin ->
       {
-        plugin.compose(content = acc)
+        key(plugin) { plugin.compose(content = acc) }
       }
     }.invoke()
   }

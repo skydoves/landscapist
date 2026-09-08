@@ -28,6 +28,9 @@ public actual fun ProvideImageSource(
   rawData: ByteArray?,
   content: @Composable () -> Unit,
 ) {
+  // Always provided, even when null. Calling this conditionally would put content() in two
+  // different groups, so the whole success subtree would be destroyed and rebuilt the moment a
+  // disk path appeared, resetting anything a plugin remembered.
   ProvideImageSourceBytes(bytes = rawData) {
     content()
   }

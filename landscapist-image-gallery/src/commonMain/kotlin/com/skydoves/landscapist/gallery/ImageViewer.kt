@@ -122,7 +122,7 @@ public fun ImageViewer(
   dismissThreshold: Float = ImageViewerDefaults.DismissThreshold,
   backgroundColor: Color = ImageViewerDefaults.BackgroundColor,
   component: ImageComponent = rememberImageComponent {},
-  imageOptions: ImageOptions = ImageOptions(),
+  imageOptions: ImageOptions = ImageOptions.Default,
   topBar: (@Composable (currentPage: Int, totalPages: Int) -> Unit)? = null,
   bottomBar: (@Composable (currentPage: Int, totalPages: Int) -> Unit)? = null,
   indicator: (@Composable (currentPage: Int, totalPages: Int) -> Unit)? = null,

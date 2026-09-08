@@ -91,7 +91,7 @@ public fun FrescoImage(
     LocalFrescoProvider.getFrescoImageRequest(imageUrl)
   },
   component: ImageComponent = rememberImageComponent {},
-  imageOptions: ImageOptions = ImageOptions(),
+  imageOptions: ImageOptions = ImageOptions.Default,
   onImageStateChanged: (FrescoImageState) -> Unit = {},
   previewPlaceholder: Painter? = null,
   loading: @Composable (BoxScope.(imageState: FrescoImageState.Loading) -> Unit)? = null,
@@ -125,7 +125,11 @@ public fun FrescoImage(
     modifier = modifier,
   ) ImageRequest@{ imageState ->
 
-    val crossfadePlugin = component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+    // Remembered on the component, because scanning for it allocates a list and the plugin set
+    // does not change between compositions of the same component.
+    val crossfadePlugin = remember(component) {
+      component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+    }
 
     CrossfadeWithEffect(
       targetState = imageState,

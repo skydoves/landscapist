@@ -114,7 +114,7 @@ public fun GlideImage(
   },
   requestListener: (() -> RequestListener<Any>)? = null,
   component: ImageComponent = rememberImageComponent {},
-  imageOptions: ImageOptions = ImageOptions(),
+  imageOptions: ImageOptions = ImageOptions.Default,
   clearTarget: Boolean = false,
   onImageStateChanged: (GlideImageState) -> Unit = {},
   previewPlaceholder: Painter? = null,
@@ -156,7 +156,11 @@ public fun GlideImage(
     modifier = modifier,
   ) ImageRequest@{ imageState ->
 
-    val crossfadePlugin = component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+    // Remembered on the component, because scanning for it allocates a list and the plugin set
+    // does not change between compositions of the same component.
+    val crossfadePlugin = remember(component) {
+      component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+    }
 
     CrossfadeWithEffect(
       targetState = imageState,

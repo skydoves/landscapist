@@ -17,6 +17,7 @@ package com.skydoves.landscapist.plugins
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
@@ -112,13 +113,24 @@ public fun Painter.composePainterPlugins(
   imagePlugins: List<ImagePlugin>,
   imageBitmap: @Composable () -> ImageBitmap,
 ): Painter {
-  val painterPlugins = imagePlugins.filterIsInstance<ImagePlugin.PainterPlugin>()
-  if (painterPlugins.isEmpty()) return this
+  var hasPainterPlugin = false
+  for (index in imagePlugins.indices) {
+    if (imagePlugins[index] is ImagePlugin.PainterPlugin) {
+      hasPainterPlugin = true
+      break
+    }
+  }
+  if (!hasPainterPlugin) return this
 
   val bitmap = imageBitmap()
   var painter: Painter = this
-  painterPlugins.forEach { bitmapImagePlugin ->
-    painter = bitmapImagePlugin.compose(imageBitmap = bitmap, painter = painter)
+  for (index in imagePlugins.indices) {
+    val plugin = imagePlugins[index]
+    if (plugin is ImagePlugin.PainterPlugin) {
+      // Keyed on the plugin, so an animating painter keeps what it remembered when a plugin of
+      // another kind is added ahead of it and shifts every index after it.
+      painter = key(plugin) { plugin.compose(imageBitmap = bitmap, painter = painter) }
+    }
   }
   return painter
 }

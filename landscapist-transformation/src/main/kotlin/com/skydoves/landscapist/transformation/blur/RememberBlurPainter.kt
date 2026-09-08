@@ -36,20 +36,21 @@ internal fun Painter.rememberBlurPainter(
   imageBitmap: ImageBitmap,
   radius: Int,
 ): Painter {
-  var androidBitmap = imageBitmap.asAndroidBitmap()
-
-  if (!(
-      androidBitmap.config == Bitmap.Config.ARGB_8888 ||
-        androidBitmap.config == Bitmap.Config.ALPHA_8
-      )
-  ) {
-    androidBitmap = androidBitmap.copy(Bitmap.Config.ARGB_8888, false)
-  }
-
+  // Inside the remember, all of it. Unwrapping the bitmap and, for a config the blur cannot take,
+  // copying the whole thing used to run on every composition to produce a value that only changes
+  // when the image or the radius does.
   val blurredBitmap = remember(imageBitmap, radius) {
+    var androidBitmap = imageBitmap.asAndroidBitmap()
+    if (!(
+        androidBitmap.config == Bitmap.Config.ARGB_8888 ||
+          androidBitmap.config == Bitmap.Config.ALPHA_8
+        )
+    ) {
+      androidBitmap = androidBitmap.copy(Bitmap.Config.ARGB_8888, false)
+    }
     iterativeBlur(androidBitmap, radius)
   }
-  return remember(this) {
+  return remember(this, blurredBitmap) {
     TransformationPainter(
       imageBitmap = blurredBitmap.asImageBitmap(),
       painter = this,

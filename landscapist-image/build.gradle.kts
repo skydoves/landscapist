@@ -86,6 +86,12 @@ kotlin {
         implementation(kotlin("test"))
         implementation(libs.jetbrains.compose.ui.test.junit4)
         implementation(libs.jetbrains.compose.foundation)
+        // The real plugins, so the paths LandscapistImage picks per plugin kind are covered by
+        // what users actually install rather than by stand-ins written next to the test.
+        implementation(project(":landscapist-animation"))
+        implementation(project(":landscapist-placeholder"))
+        implementation(project(":landscapist-zoomable"))
+        implementation(project(":landscapist-palette"))
         // Skiko native runtime for the host OS, required to render off-screen during the
         // desktop runComposeUiTest runs. The classifier is resolved from the running host so the
         // tests also run on CI (e.g. linux-x64).
