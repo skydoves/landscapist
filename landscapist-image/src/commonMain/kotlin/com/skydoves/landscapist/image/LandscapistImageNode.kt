@@ -230,7 +230,7 @@ internal class LandscapistImageNode(
   }
 
   private fun startLoad(constraints: Constraints) {
-    val sized = buildSizedRequest(request, imageOptions, constraints)
+    val sized = buildSizedRequest(request, imageOptions, constraints.withoutZeroBounds())
     cancelLoad()
     loadJob = coroutineScope.launch {
       // The UI dispatcher, captured because the collector does not stay on it: a flow's collector
@@ -306,6 +306,33 @@ internal class LandscapistImageNode(
     val painter = painter ?: return filled
     if (filled.hasFixedWidth && filled.hasFixedHeight) return filled
     val intrinsic = painter.intrinsicSize
+    // One axis bounded and one not is a feed row: fillMaxWidth in a scrolling column. The open axis
+    // follows the image's shape, which is what the composable this replaced did by applying an
+    // aspect ratio before it painted. Reading it from the content scale instead degenerates, since
+    // the destination on that axis is the intrinsic size itself: a crop then measures the whole
+    // intrinsic height and draws the image wider than the row, losing both edges.
+    if (intrinsic.hasFiniteWidth() && intrinsic.hasFiniteHeight() &&
+      intrinsic.width > 0f && intrinsic.height > 0f
+    ) {
+      if (filled.hasFixedWidth && !filled.hasBoundedHeight) {
+        val height = (filled.maxWidth * intrinsic.height / intrinsic.width).roundToInt()
+        return Constraints(
+          minWidth = filled.minWidth,
+          maxWidth = filled.maxWidth,
+          minHeight = filled.constrainHeight(height),
+          maxHeight = filled.maxHeight,
+        )
+      }
+      if (filled.hasFixedHeight && !filled.hasBoundedWidth) {
+        val width = (filled.maxHeight * intrinsic.width / intrinsic.height).roundToInt()
+        return Constraints(
+          minWidth = filled.constrainWidth(width),
+          maxWidth = filled.maxWidth,
+          minHeight = filled.minHeight,
+          maxHeight = filled.maxHeight,
+        )
+      }
+    }
     val intrinsicWidth = if (intrinsic.hasFiniteWidth()) {
       intrinsic.width.roundToInt()
     } else {
@@ -401,3 +428,22 @@ private fun Size.hasFiniteWidth(): Boolean =
 
 private fun Size.hasFiniteHeight(): Boolean =
   this != Size.Unspecified && !height.isNaN() && height != Float.POSITIVE_INFINITY
+
+/**
+ * The same constraints with a zero bound treated as no bound.
+ *
+ * A parent can measure at zero before it has room: a collapsed AnimatedVisibility, a lazy item
+ * whose container is still empty. A zero target is not a small image, it is no answer at all, and
+ * the decoders read it as one: Android's sample size loop overflows on it and desktop fits the
+ * image into nothing and caches a single pixel under the url.
+ */
+private fun Constraints.withoutZeroBounds(): Constraints = if (maxWidth > 0 && maxHeight > 0) {
+  this
+} else {
+  Constraints(
+    minWidth = minWidth,
+    maxWidth = if (maxWidth > 0) maxWidth else Constraints.Infinity,
+    minHeight = minHeight,
+    maxHeight = if (maxHeight > 0) maxHeight else Constraints.Infinity,
+  )
+}

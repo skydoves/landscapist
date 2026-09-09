@@ -258,8 +258,11 @@ public class TwoTierMemoryCache(
     while (entries.hasNext()) {
       val entry = entries.next()
       if (entry.value.get() == null) {
+        // Read before the removal. A Kotlin/Native LinkedHashMap entry is a view that checks the
+        // modification count on every access, so reading it afterwards throws there.
+        val memoryKey = entry.key
         entries.remove()
-        variantIndex.remove(entry.key)
+        variantIndex.remove(memoryKey)
       }
     }
     weakSweepThreshold = maxOf(MIN_WEAK_SWEEP, weakCache.size * 2)

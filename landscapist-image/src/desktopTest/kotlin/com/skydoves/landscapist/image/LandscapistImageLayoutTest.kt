@@ -189,6 +189,46 @@ class LandscapistImageLayoutTest {
   }
 
   @Test
+  fun `an unbounded height keeps the aspect ratio when the image is wider than the bound`() {
+    // The existing case has an image narrower than the bound, where the arithmetic happens to work
+    // whichever way the unbounded axis is resolved. A wider one separates them.
+    val loader = Landscapist.builder().noDiskCache().fetcher(StubFetcher()).decoder(
+      object : ImageDecoder {
+        override suspend fun decode(
+          data: ByteArray,
+          mimeType: String?,
+          targetWidth: Int?,
+          targetHeight: Int?,
+          config: LandscapistConfig,
+        ): DecodeResult = DecodeResult.Success(ImageBitmap(400, 300), 400, 300)
+      },
+    ).build()
+    runBlocking {
+      loader.load(
+        ImageRequest.builder().model(url).diskCachePolicy(CachePolicy.DISABLED).build(),
+      ).first { it is ImageResult.Success }
+    }
+
+    var size: IntSize? = null
+    runComposeUiTest {
+      setContent {
+        Column(Modifier.size(200.dp).verticalScroll(rememberScrollState())) {
+          LandscapistImage(
+            imageModel = { url },
+            landscapist = loader,
+            modifier = Modifier.fillMaxWidth().onGloballyPositioned { size = it.size },
+            requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+          )
+        }
+      }
+    }
+
+    // 400x300 at 200 wide is 200x150. Reporting the image's own 300 high instead crops it
+    // sideways under the default content scale.
+    assertEquals(IntSize(200, 150), assertNotNull(size))
+  }
+
+  @Test
   fun `a success slot still receives the painter`() {
     val loader = warmLoader()
     var painter: Painter? = null

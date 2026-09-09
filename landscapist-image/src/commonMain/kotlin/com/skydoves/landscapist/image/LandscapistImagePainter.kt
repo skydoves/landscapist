@@ -32,8 +32,12 @@ import com.skydoves.landscapist.core.model.DataSource
 import com.skydoves.landscapist.core.model.ImageResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import kotlin.coroutines.ContinuationInterceptor
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.coroutineContext
 import kotlin.math.roundToInt
 
 /**
@@ -160,13 +164,22 @@ private class LandscapistImagePainter(
         )
       }
     }
+    // The dispatcher this effect runs on. The collector below does not stay on it, because a flow's
+    // collector runs wherever the emission happens, and the caller's callback has to arrive where
+    // the caller expects it. `data` is snapshot state and is safe either way.
+    val ui = coroutineContext[ContinuationInterceptor] ?: EmptyCoroutineContext
     landscapist.load(sized)
-      .catch { onImageStateChanged?.invoke(LandscapistImageState.Failure(reason = it)) }
+      .catch { throwable ->
+        withContext(ui) {
+          onImageStateChanged?.invoke(LandscapistImageState.Failure(reason = throwable))
+        }
+      }
       .collect { result ->
         // An image on screen is kept while a resized one resolves, the same way LandscapistImage
         // keeps it: dropping back to nothing would blink away something the user can already see.
         if (result is ImageResult.Success) data = result.data
-        onImageStateChanged?.invoke(result.toLandscapistImageState())
+        val next = result.toLandscapistImageState()
+        withContext(ui) { onImageStateChanged?.invoke(next) }
       }
   }
 }

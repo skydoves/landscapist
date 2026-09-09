@@ -135,10 +135,16 @@ internal class CrossfadePainter(
  *
  * @param durationMs How long the fade takes from start to finish. Zero returns this painter as it
  * is.
+ * @param keepPreviousWhileAbsent Whether a null [painter] keeps what is on screen rather than
+ * blanking it. True while an image is reloading, false once it has failed or been cleared.
  */
 @Composable
 @InternalLandscapistApi
-public fun rememberCrossfadePainter(painter: Painter?, durationMs: Int): Painter? {
+public fun rememberCrossfadePainter(
+  painter: Painter?,
+  durationMs: Int,
+  keepPreviousWhileAbsent: Boolean = false,
+): Painter? {
   if (durationMs <= 0) return painter
   // Remembered whether there is a painter yet or not, so these survive the image leaving its
   // success state and coming back. Held in a holder rather than as state: they are read and written
@@ -146,9 +152,13 @@ public fun rememberCrossfadePainter(painter: Painter?, durationMs: Int): Painter
   val seen = remember { PainterHistory() }
   val first = remember { painter }
   if (painter == null) {
-    // The image left its success state, so whatever it was showing has already gone. Keeping it as
-    // the thing to dissolve over would bring it back underneath the next one, which reads as the
-    // replaced image flashing in again after the gap.
+    // A reload has no painter yet. Holding the one on screen is what stops the image blanking
+    // while the replacement is fetched, and it is what the composable this replaced did by keeping
+    // the outgoing state until the incoming one arrived.
+    if (keepPreviousWhileAbsent) return seen.previous
+    // Otherwise the image has left its success state for good. Keeping it as the thing to dissolve
+    // over would bring it back underneath the next one, which reads as the replaced image flashing
+    // in again after the gap.
     seen.previous = null
     return null
   }

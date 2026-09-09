@@ -430,7 +430,7 @@ class LandscapistImagePluginTest {
   }
 
   /** Warms [urls] into one loader, each decoding to its own colour so a fade is visible. */
-  private fun warmLoader(urls: List<String>): Landscapist {
+  private fun warmLoader(urls: List<String>, warm: Int = Int.MAX_VALUE): Landscapist {
     val colours = urls.withIndex().associate { (index, url) -> url to distinctColours[index] }
     val loader = Landscapist.builder().noDiskCache().fetcher(
       object : ImageFetcher {
@@ -459,7 +459,7 @@ class LandscapistImagePluginTest {
     ).build()
     check(colours.size == urls.size)
     runBlocking {
-      for (url in urls) {
+      for (url in urls.take(warm)) {
         loader.load(
           ImageRequest.builder().model(url).diskCachePolicy(CachePolicy.DISABLED).build(),
         ).first { it is ImageResult.Success }
@@ -529,6 +529,45 @@ class LandscapistImagePluginTest {
         colours.joinToString { it.toUInt().toString(16) },
     )
     assertEquals(pureBlue, colours.last(), "the replacing image never arrived")
+  }
+
+  @Test
+  fun `a crossfade does not blank the image it is replacing when the new one is not cached`() {
+    // The sibling test warms both urls, so the replacement is already in memory and arrives in the
+    // same composition. The real case is a url that has to be fetched, where the image on screen
+    // has to stay until it does.
+    val second = "https://example.com/second.png"
+    val loader = warmLoader(listOf(url, second), warm = 1)
+    var model by mutableStateOf(url)
+    val scene = ImageComposeScene(
+      width = sceneSize,
+      height = sceneSize,
+      density = Density(1f),
+      coroutineContext = Dispatchers.Unconfined,
+      content = {
+        LandscapistImage(
+          imageModel = { model },
+          landscapist = loader,
+          component = component(CrossfadePlugin(duration = 300)),
+          modifier = Modifier.size(sceneSize.dp),
+          requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+        )
+      },
+    )
+    val alphas = try {
+      scene.render(0L).close()
+      scene.render(1L).close()
+      model = second
+      Snapshot.sendApplyNotifications()
+      (1..8).map { frame -> readCentre(scene.render(frame * 20L * 1_000_000)) ushr 24 }
+    } finally {
+      scene.close()
+    }
+
+    assertTrue(
+      alphas.all { it == 0xFF },
+      "the image on screen was blanked while the replacement loaded, the alphas were $alphas",
+    )
   }
 
   @Test

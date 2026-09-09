@@ -454,7 +454,12 @@ private fun LandscapistImageInternal(
     null
   }
   // Called with or without a painter, so what it remembers survives the image leaving success.
-  val painter = rememberCrossfadePainter(loaded, containerFadeMs)
+  // A reload holds the image on screen; a failure does not.
+  val painter = rememberCrossfadePainter(
+    painter = loaded,
+    durationMs = containerFadeMs,
+    keepPreviousWhileAbsent = landscapistState !is LandscapistImageState.Failure,
+  )
   // Rebuilding the chain every composition allocates two modifier elements per image.
   val paintModifier = remember(painter, imageOptions) {
     if (painter != null) imageOptions.paintModifier(painter) else Modifier
