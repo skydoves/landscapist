@@ -32,6 +32,22 @@ android {
     versionName = Configuration.versionName
     multiDexEnabled = true
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    // The measurement classes are left out of a connected run that names nothing. Every one of
+    // them claims the process before it measures anything (DeviceMeasure.claimTheProcess): a
+    // second measurement in a process that has already measured one runs against a warmed loader
+    // rather than against the other library, so it refuses to run rather than report a number
+    // that flatters whichever went second. Running the whole suite in one invocation therefore
+    // failed every measurement after the first, and `./gradlew :app:connectedDebugAndroidTest`
+    // could not be green.
+    //
+    // Naming a class overrides this, which is how a measurement is meant to be run anyway, one
+    // per invocation so it gets its own process:
+    //
+    //   ./gradlew :app:connectedDebugAndroidTest \
+    //     -Pandroid.testInstrumentationRunnerArguments.class=com.github.skydoves.landscapistdemo.measure.ScrollComparisonTest#scrollCoil
+    //
+    // A package argument does not override it, so name the class rather than the package.
+    testInstrumentationRunnerArguments["notPackage"] = "com.github.skydoves.landscapistdemo.measure"
   }
 }
 
