@@ -18,14 +18,10 @@ package com.github.skydoves.landscapistdemo.web
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -183,11 +179,7 @@ internal fun PlaygroundScreen() {
     SizeMode.Unsized -> Modifier
   }
 
-  Column(
-    modifier = Modifier
-      .fillMaxWidth()
-      .verticalScroll(rememberScrollState()),
-  ) {
+  Column(modifier = Modifier.fillMaxWidth()) {
     SectionHeader("Subject")
 
     Box(
@@ -277,8 +269,6 @@ internal fun PlaygroundScreen() {
     )
 
     PlaygroundComparison(url = url, contentScale = scaleMode.contentScale)
-
-    Spacer(modifier = Modifier.height(32.dp))
   }
 }
 
