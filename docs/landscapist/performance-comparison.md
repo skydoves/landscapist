@@ -131,14 +131,17 @@ Each cell is the spread across the runs that were taken.
 | resident set above resting, 20 images | 59.4, 59.5 MiB | 45.5, 33.0 MiB |
 | decode 2000x1500 to 200x150, median of 8 | 34.0, 35.7, 36.5, 34.4 ms | 22.4, 24.9, 23.9, 23.1 ms |
 | the same decode, allocated | 5.45 MiB | 1.84 MiB |
-| scroll, 8 swipes over 240 rows, allocated | 44.9, 44.8, 45.3 MiB | 18.5, 18.6, 18.7 MiB |
+| scroll, 8 swipes over 240 rows, allocated | 44.4, 46.3, 46.3 MiB | 18.7, 18.4 MiB |
 
 The scroll row used to run 60 rows, where both caches held everything and it measured nothing. At
-240 the caches evict, and the harness counts how many rows the server actually answered during the
-measured pass, since a row that never loaded would have reported the allocation of scrolling empty
-rows. Those counts say something the allocation figures do not: over the same list with the same 32
-MiB cache, landscapist re-fetches 136 rows and Coil 78, repeating exactly across runs. Landscapist
-decodes 74 percent more images per pass, so do not read its 2.4x as a per row overhead.
+240 the caches evict. It counts what each arm loaded and what it fetched, off each library's own
+state callback, because a row that never loaded would otherwise report the allocation of scrolling
+an empty list and win on it.
+
+Those counts say something the allocation does not. Both arms put the same 154 of 240 rows on
+screen. Landscapist fetches and decodes 136 of them where Coil fetches 78, repeating across runs, so
+the two draw the same images and landscapist decodes nearly twice as many. Read its 2.4x as a memory
+cache hit rate rather than as a per row overhead.
 
 So: ahead on every JVM row above, behind on cold load, on decode and on resident memory here. The
 Android decode path is the same code it has been, so that row is not a regression, but it is the

@@ -102,12 +102,12 @@ Measured on an emulator, with a fresh process for each measured loader, because 
 | resident set above resting, 20 images | 59.4, 59.5 MiB | **45.5, 33.0 MiB** |
 | decode 2000x1500 to 200x150, median of 8 | 34.0, 35.7, 36.5, 34.4 ms | **22.4, 24.9, 23.9, 23.1 ms** |
 | the same decode, allocated | 5.45 MiB | **1.84 MiB** |
-| scroll, 8 swipes over 240 rows, allocated | 44.9, 44.8, 45.3 MiB | **18.5, 18.6, 18.7 MiB** |
+| scroll, 8 swipes over 240 rows, allocated | 44.4, 46.3, 46.3 MiB | **18.7, 18.4 MiB** |
 
-The scroll row counts the rows the server answered during the measured pass, and those counts say
-something the allocation does not: over the same list with the same 32 MiB cache, landscapist
-re-fetches 136 of 240 rows and Coil 78, repeating exactly across runs. It decodes 74 percent more
-images per pass, so its 2.4x is not a per row overhead.
+The scroll row counts what each arm loaded and what it fetched, separately. Both put the same 154 of
+240 rows on screen, and landscapist fetches and decodes 136 of them where Coil fetches 78, so the
+two draw the same images and landscapist decodes nearly twice as many. Its 2.4x is a memory cache
+hit rate rather than a per row overhead.
 
 So: ahead on every JVM row, behind on cold load, on decode and on resident memory on the device. The Android decode path is untouched by this work, so that row is not a regression, but it is the reverse of what the desktop numbers say and it is the platform that ships.
 
