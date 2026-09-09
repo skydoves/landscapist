@@ -48,11 +48,11 @@ public fun ImageComponent.ComposeLoadingStatePlugins(
   for (index in plugins.indices) {
     val plugin = plugins[index]
     if (plugin is ImagePlugin.LoadingStatePlugin) {
-      // Keyed on the plugin and on how many equal ones came before it. The plugin alone would let
-      // a component holding the same plugin twice hand both of them the same key, and neither
-      // would keep what it remembered; the position alone would move every plugin after one of
-      // another kind was added ahead of it.
-      key(plugin, seen++) {
+      // Keyed on the plugin's kind and on how many of that kind came before it. The instance
+      // itself would do, except that a plugin with no value equality is a new object on every
+      // composition, and keying on it would throw away whatever it remembered each time. The
+      // position alone would move every plugin after one of another kind was added ahead of it.
+      key(plugin::class, seen++) {
         plugin.compose(modifier = modifier, imageOptions = imageOptions, executor = executor)
       }
     }
@@ -73,7 +73,7 @@ public fun ImageComponent.ComposeSuccessStatePlugins(
   for (index in plugins.indices) {
     val plugin = plugins[index]
     if (plugin is ImagePlugin.SuccessStatePlugin) {
-      key(plugin, seen++) {
+      key(plugin::class, seen++) {
         plugin.compose(
           modifier = modifier,
           imageModel = imageModel,
@@ -98,11 +98,11 @@ public fun ImageComponent.ComposeFailureStatePlugins(
   for (index in plugins.indices) {
     val plugin = plugins[index]
     if (plugin is ImagePlugin.FailureStatePlugin) {
-      // Keyed on the plugin and on how many equal ones came before it. The plugin alone would let
-      // a component holding the same plugin twice hand both of them the same key, and neither
-      // would keep what it remembered; the position alone would move every plugin after one of
-      // another kind was added ahead of it.
-      key(plugin, seen++) {
+      // Keyed on the plugin's kind and on how many of that kind came before it. The instance
+      // itself would do, except that a plugin with no value equality is a new object on every
+      // composition, and keying on it would throw away whatever it remembered each time. The
+      // position alone would move every plugin after one of another kind was added ahead of it.
+      key(plugin::class, seen++) {
         plugin.compose(modifier = modifier, imageOptions = imageOptions, reason = reason)
       }
     }
@@ -134,10 +134,13 @@ public fun ImageComponent.ComposeWithComposablePlugins(
   if (composablePlugins == null) {
     content()
   } else {
-    // Wrap content with each plugin, innermost first
+    // Wrap content with each plugin, innermost first. Keyed the same way as the others: two
+    // wrappers of the same kind would otherwise share a key and neither would keep its state.
+    var wrapped = 0
     composablePlugins.fold(content) { acc, plugin ->
+      val ordinal = wrapped++
       {
-        key(plugin) { plugin.compose(content = acc) }
+        key(plugin::class, ordinal) { plugin.compose(content = acc) }
       }
     }.invoke()
   }

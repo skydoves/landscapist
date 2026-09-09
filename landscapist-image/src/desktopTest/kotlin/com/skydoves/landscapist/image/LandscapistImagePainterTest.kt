@@ -282,6 +282,10 @@ class LandscapistImagePainterTest {
       states.any { it is LandscapistImageState.Success },
       "the painter never loaded, it saw $states",
     )
+    // Unsized, and it has to be: a node measured to nothing high is never drawn, so the painter is
+    // never told the width its caller did bound. A caller in this layout sets a size themselves.
+    val asked = assertNotNull(requested.firstOrNull(), "the image was never fetched")
+    assertEquals(null to null, asked, "the painter should have fallen back to unsized")
   }
 
   @Test

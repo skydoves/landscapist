@@ -253,7 +253,7 @@ internal class LandscapistImageNode(
   }
 
   private fun publish(next: LandscapistImageState) {
-    if (next == state) return
+    if (next.isSameAs(state)) return
     // An image on screen holds until the resized request resolves, rather than blinking away.
     if (next is LandscapistImageState.Loading && state is LandscapistImageState.Success) return
     if (next is LandscapistImageState.Success) {
@@ -446,4 +446,23 @@ private fun Constraints.withoutZeroBounds(): Constraints = if (maxWidth > 0 && m
     minHeight = minHeight,
     maxHeight = if (maxHeight > 0) maxHeight else Constraints.Infinity,
   )
+}
+
+/**
+ * Whether these two states say the same thing, without comparing raw bytes.
+ *
+ * `LandscapistImageState.Success` compares its `rawData` by content, and this runs on the thread
+ * that draws, so a multi megabyte image would be walked byte by byte to answer a question the
+ * image's identity already answers.
+ */
+private fun LandscapistImageState.isSameAs(other: LandscapistImageState?): Boolean = when {
+  this === other -> true
+  other == null -> false
+  this is LandscapistImageState.Success && other is LandscapistImageState.Success ->
+    data === other.data &&
+      dataSource == other.dataSource &&
+      originalWidth == other.originalWidth &&
+      originalHeight == other.originalHeight &&
+      diskCachePath == other.diskCachePath
+  else -> this == other
 }

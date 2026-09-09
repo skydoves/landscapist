@@ -146,6 +146,42 @@ class SizeToleranceTest {
   }
 
   @Test
+  fun `a decoder that ignores the target size still gets its entry reused`() {
+    // What the Apple and wasm decoders do: they hand back the source whatever is asked for. An
+    // entry that is already the source cannot be made smaller by decoding again, so refusing it
+    // would throw away the hit and produce the same pixels.
+    var decodes = 0
+    val loader = Landscapist.builder().noDiskCache().fetcher(StubFetcher).decoder(
+      object : ImageDecoder {
+        override suspend fun decode(
+          data: ByteArray,
+          mimeType: String?,
+          targetWidth: Int?,
+          targetHeight: Int?,
+          config: LandscapistConfig,
+        ): DecodeResult {
+          decodes++
+          return DecodeResult.Success("source_4000x3000", 4000, 3000)
+        }
+      },
+    ).build()
+    fun load(width: Int, height: Int) = runBlocking {
+      val result = loader.load(
+        ImageRequest.builder()
+          .model(url)
+          .diskCachePolicy(CachePolicy.DISABLED)
+          .size(width, height)
+          .build(),
+      ).first { it is ImageResult.Success }
+      assertIs<ImageResult.Success>(result).data as String
+    }
+
+    assertEquals("source_4000x3000", load(1080, 1080))
+    assertEquals("source_4000x3000", load(360, 360))
+    assertEquals(1, decodes, "the entry was decoded again although it could not come back smaller")
+  }
+
+  @Test
   fun `an entry decoded for a box that fills it is not reused for a taller box`() {
     // An SVG renderer fills the box rather than fitting it, so boxes are compared, not pixels.
     val loader = Loader(sourceWidth = 100, sourceHeight = 100)

@@ -256,7 +256,7 @@ public class Landscapist private constructor(
     // A pixel of tolerance on each axis absorbs layouts that measure to fractional sizes.
     if (!axisCovered(targetWidth, cachedKey.width.asPixelBound())) return false
     if (!axisCovered(targetHeight, cachedKey.height.asPixelBound())) return false
-    return !isWastefullyLargerThan(targetWidth, targetHeight)
+    return !isWastefullyLargerThan(targetWidth, targetHeight, cachedKey)
   }
 
   /**
@@ -277,10 +277,29 @@ public class Landscapist private constructor(
    * Either, not both: a panorama cached for a wide slot is the right height and eight times the
    * width when a narrow slot asks for it.
    */
-  private fun CachedImage.isWastefullyLargerThan(targetWidth: Int?, targetHeight: Int?): Boolean {
+  private fun CachedImage.isWastefullyLargerThan(
+    targetWidth: Int?,
+    targetHeight: Int?,
+    cachedKey: CacheKey,
+  ): Boolean {
+    // Refusing an entry is only worth it when decoding again would produce something smaller. A
+    // decoder that ignores the target size hands back the source whatever is asked for, which the
+    // Apple and wasm ones do today, so refusing there throws away a hit and decodes the same
+    // pixels again. An entry larger than the box it was decoded for is how that shows.
+    if (!wasDecodedToFit(cachedKey)) return false
     val widthLimit = targetWidth?.let { it.toLong() * 2 } ?: Long.MAX_VALUE
     val heightLimit = targetHeight?.let { it.toLong() * 2 } ?: Long.MAX_VALUE
     return originalWidth > widthLimit || originalHeight > heightLimit
+  }
+
+  /** Whether this entry came back no larger than the box it was decoded for. */
+  private fun CachedImage.wasDecodedToFit(cachedKey: CacheKey): Boolean {
+    val decodedForWidth = cachedKey.width.asPixelBound()
+    val decodedForHeight = cachedKey.height.asPixelBound()
+    if (decodedForWidth == null && decodedForHeight == null) return false
+    if (decodedForWidth != null && originalWidth > decodedForWidth + 1) return false
+    if (decodedForHeight != null && originalHeight > decodedForHeight + 1) return false
+    return true
   }
 
   /**

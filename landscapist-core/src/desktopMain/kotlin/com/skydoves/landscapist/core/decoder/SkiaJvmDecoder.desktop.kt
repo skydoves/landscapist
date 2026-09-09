@@ -229,6 +229,9 @@ internal object SkiaJvmDecoder {
     try {
       val canvas = Canvas(target, surfaceProps)
       try {
+        // Marked immutable first: makeFromBitmap copies the whole raster from a mutable bitmap,
+        // which for a full size read is a second copy of the source.
+        source.setImmutable()
         val image = Image.makeFromBitmap(source)
         try {
           canvas.drawImageRect(

@@ -51,8 +51,12 @@ import kotlin.math.roundToInt
  * The painter keeps its identity across recompositions, and an image already in the memory cache is
  * drawn on the first frame.
  *
- * The size to decode at comes from the first draw and is then held. Set a size through
- * [requestBuilder] when the first draw is not the size the image ends up at.
+ * The size to decode at comes from the first draw and is then held. A painter learns nothing else
+ * about its bounds, so set a size through [requestBuilder] when the first draw is not the size the
+ * image ends up at, and whenever the caller bounds one axis and leaves the other to the image: a
+ * node measured to nothing on the open axis is never drawn, so the request goes out unsized and the
+ * image is decoded at its own size, capped by `maxBitmapSize`. [LandscapistImage] reads the
+ * constraints instead and has no such case.
  *
  * @param model The image model to load (URL, Uri, file path, byte array, and so on).
  * @param landscapist The Landscapist instance to load with. Defaults to the composition local.
@@ -123,7 +127,10 @@ private class LandscapistImagePainter(
     if (drawSize.value == IntSize.Zero) {
       val width = size.width.roundToInt()
       val height = size.height.roundToInt()
-      if (width > 0 && height > 0) drawSize.value = IntSize(width, height)
+      // Either axis is enough. A caller who bounds one and leaves the other to the image, which is
+      // fillMaxWidth in a column, measures to nothing high until there is an image, so waiting for
+      // both would fall through to the unsized request and decode at the source's own size.
+      if (width > 0 || height > 0) drawSize.value = IntSize(width, height)
     }
     delegate?.run { draw(size) }
   }
@@ -158,9 +165,11 @@ private class LandscapistImagePainter(
       if (size == IntSize.Zero) {
         request
       } else {
+        // An axis that was never drawn is left open rather than sent as zero, which the decoders
+        // read as a box of no size.
         request.copy(
-          targetWidth = size.width,
-          targetHeight = size.height,
+          targetWidth = if (size.width > 0) size.width else Int.MAX_VALUE,
+          targetHeight = if (size.height > 0) size.height else Int.MAX_VALUE,
         )
       }
     }
