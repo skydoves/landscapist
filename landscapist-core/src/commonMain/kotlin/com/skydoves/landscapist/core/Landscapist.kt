@@ -235,15 +235,28 @@ public class Landscapist private constructor(
     val cacheKey = request.cacheKey()
     val exact = memoryCache[cacheKey]
     if (exact != null) return exact.toSuccess()
+    val targetWidth = request.targetWidth.asPixelBound()
+    val targetHeight = request.targetHeight.asPixelBound()
+    // A caller that has not been measured yet has nothing to judge a variant against, and an
+    // already decoded image beats an empty frame. The right one replaces it when the load resolves.
+    if (targetWidth == null && targetHeight == null) {
+      return memoryCache.getIgnoringSize(cacheKey)?.toSuccess()
+    }
     // A caller that knows the box it is about to fill gets the same answer a load would give it.
     // Handing back any variant instead put a strip's 50 pixel thumbnail into the detail view above
     // it, stretched, until the real load replaced it a moment later.
-    if (request.targetWidth.asPixelBound() != null || request.targetHeight.asPixelBound() != null) {
-      return readMemoryCache(request, cacheKey)?.toSuccess()
-    }
-    // A caller that has not been measured yet has nothing to judge a variant against, and an
-    // already decoded image beats an empty frame. The right one replaces it when the load resolves.
-    return memoryCache.getIgnoringSize(cacheKey)?.toSuccess()
+    return memoryCache.getMatching(cacheKey) { cachedKey, cached ->
+      if (request.transformations.isEmpty()) {
+        cached.coversRequestedSize(cachedKey, request)
+      } else {
+        // A transformation makes the recorded size say nothing about the box it came from, so a
+        // load refuses every variant and decodes again. The boxes themselves still compare, which
+        // is enough to keep a thumbnail out of a large slot while the right one is decoded, and
+        // without it a transformed image blinks on every re-entry that measures a pixel wider.
+        axisCovered(targetWidth, cachedKey.width.asPixelBound()) &&
+          axisCovered(targetHeight, cachedKey.height.asPixelBound())
+      }
+    }?.toSuccess()
   }
 
   /**

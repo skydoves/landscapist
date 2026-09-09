@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 /**
@@ -91,6 +92,44 @@ class PeekVariantTest {
     runBlocking { loader.load(request(1080)).first { it is ImageResult.Success } }
 
     assertEquals("decoded_1080", loader.peekMemoryCache(request(1080))?.data)
+  }
+
+  /** Names itself for the cache key and hands the image back unchanged. */
+  private class Marker : com.skydoves.landscapist.core.transformation.Transformation {
+    override val key: String = "marker"
+    override suspend fun transform(input: Any): Any = input
+  }
+
+  private fun transformedRequest(side: Int) = ImageRequest.builder()
+    .model(url)
+    .diskCachePolicy(CachePolicy.DISABLED)
+    .size(side, side)
+    .transformations(listOf(Marker()))
+    .build()
+
+  @Test
+  fun `a transformed slot peeks a variant decoded for a box that covers it`() {
+    // A grid whose columns do not divide evenly asks for 359, 360 and 361. A transformation makes
+    // the recorded size say nothing about the box, so the load path refuses every variant and
+    // decodes again, but the peek can still compare the boxes and draw something meanwhile.
+    val loader = loader()
+    runBlocking { loader.load(transformedRequest(361)).first { it is ImageResult.Success } }
+
+    assertNotNull(
+      loader.peekMemoryCache(transformedRequest(360)),
+      "a transformed image blinks on re-entry where it used to draw at once",
+    )
+  }
+
+  @Test
+  fun `a transformed slot does not peek a thumbnail`() {
+    val loader = loader()
+    runBlocking { loader.load(transformedRequest(50)).first { it is ImageResult.Success } }
+
+    assertNull(
+      loader.peekMemoryCache(transformedRequest(1080)),
+      "a transformed thumbnail was handed to a slot twenty times its size",
+    )
   }
 
   @Test
