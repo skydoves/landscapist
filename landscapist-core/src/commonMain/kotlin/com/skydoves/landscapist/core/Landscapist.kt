@@ -287,32 +287,34 @@ public class Landscapist private constructor(
     targetHeight: Int?,
     cachedKey: CacheKey,
   ): Boolean {
-    // Refusing an entry is only worth it when decoding again would produce something smaller. A
-    // decoder that ignores the target size hands back the source whatever is asked for, which the
-    // Apple and wasm ones do today, so refusing there throws away a hit and decodes the same
-    // pixels again. An entry larger than the box it was decoded for is how that shows.
-    if (!wasDecodedToFit(cachedKey)) return false
+    // Refusing an entry is only worth it when decoding again would produce something smaller.
+    if (!couldDecodeSmaller(cachedKey)) return false
     val widthLimit = targetWidth?.let { it.toLong() * 2 } ?: Long.MAX_VALUE
     val heightLimit = targetHeight?.let { it.toLong() * 2 } ?: Long.MAX_VALUE
     return originalWidth > widthLimit || originalHeight > heightLimit
   }
 
   /**
-   * Whether the decoder took any notice of the box this entry was decoded for.
+   * Whether asking the decoder again, with a box this time, could come back with fewer pixels.
    *
-   * Within a factor of two, since Android halves until one axis would fall under the box and can
-   * stop anywhere in that range. Beyond it the box was most likely ignored, and asking again would
-   * hand back the same pixels.
+   * Nothing was asked for the first time means this entry is the source, at whatever the decoder's
+   * own cap allowed. A node measured to nothing on its first pass sends a request like that, which
+   * is a collapsed row or a lazy item laid out before its container has room, so an ordinary screen
+   * can leave a full sized entry behind. A request that does name a box can be answered with less.
    *
-   * A guess, and wrong in both directions. An image whose shape is far from the box's can be
-   * sampled and still land past the factor, and this reads that as ignored, so a large entry is
-   * kept for a small slot. A source already smaller than its box reads as fitted, which is right
-   * here but for the wrong reason. Neither costs correct pixels, only memory or a decode.
+   * A box that was asked for and came back far larger is the other way round: the decoder took no
+   * notice of it, which the Apple and wasm ones never do, and asking again returns the same pixels.
+   * Refusing there would throw away a hit and decode them twice.
+   *
+   * The factor of two is a guess, since Android halves until one axis would fall under the box and
+   * can stop anywhere in that range. An image whose shape is far from the box's can be sampled and
+   * still land past the factor, and this reads that as ignored, so a large entry is kept for a
+   * small slot. That costs memory, never correct pixels.
    */
-  private fun CachedImage.wasDecodedToFit(cachedKey: CacheKey): Boolean {
+  private fun CachedImage.couldDecodeSmaller(cachedKey: CacheKey): Boolean {
     val decodedForWidth = cachedKey.width.asPixelBound()
     val decodedForHeight = cachedKey.height.asPixelBound()
-    if (decodedForWidth == null && decodedForHeight == null) return false
+    if (decodedForWidth == null && decodedForHeight == null) return true
     if (decodedForWidth != null && originalWidth > decodedForWidth.toLong() * 2) return false
     if (decodedForHeight != null && originalHeight > decodedForHeight.toLong() * 2) return false
     return true

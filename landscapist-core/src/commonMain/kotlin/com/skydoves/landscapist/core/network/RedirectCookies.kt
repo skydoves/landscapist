@@ -87,7 +87,7 @@ internal class CookieJar {
         ?.trim()
         ?.removePrefix(".")
         ?.lowercase()
-        ?.takeIf { it.isNotEmpty() && host.matchesDomain(it) }
+        ?.takeIf { it.coversMoreThanOneSite() && host.matchesDomain(it) }
         ?: host.lowercase()
       val cookies = byDomain.getOrPut(domain) { linkedMapOf() }
       // An empty value is how a server clears a cookie, and the attribute that usually carries the
@@ -123,6 +123,16 @@ internal class CookieJar {
     val lowered = lowercase()
     return lowered == domain || lowered.endsWith(".$domain")
   }
+
+  /**
+   * Whether a `Domain` attribute names something narrower than a whole top level domain.
+   *
+   * `Domain=com` passes [matchesDomain] for every host that ends in it, which would put one site's
+   * cookie on every request this client makes to any of them. Two labels is the cheap half of the
+   * check. The other half, that the two are not themselves a public suffix such as `co.uk`, needs a
+   * list of them that this library does not carry, so a cookie scoped that widely is still honoured.
+   */
+  private fun String.coversMoreThanOneSite(): Boolean = contains('.') && !startsWith('.')
 
   /** Keeps a long lived client from accumulating a domain per host it has ever been sent to. */
   private fun evictIfNeeded() {

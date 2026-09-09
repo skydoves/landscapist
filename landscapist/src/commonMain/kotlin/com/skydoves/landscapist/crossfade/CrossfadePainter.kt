@@ -150,7 +150,10 @@ public fun rememberCrossfadePainter(
   // success state and coming back. Held in a holder rather than as state: they are read and written
   // only inside remember, which runs once per painter.
   val seen = remember { PainterHistory() }
-  val first = remember { painter }
+  if (!seen.started) {
+    seen.started = true
+    seen.first = painter
+  }
   if (painter == null) {
     // A reload has no painter yet. Holding the one on screen is what stops the image blanking
     // while the replacement is fetched, and it is what the composable this replaced did by keeping
@@ -162,12 +165,15 @@ public fun rememberCrossfadePainter(
     seen.previous = null
     return null
   }
-  if (painter === first) {
+  if (painter === seen.first) {
     // The painter this composable first had is what the viewer is already looking at, and fading it
     // in from nothing is the blink a crossfade exists to prevent.
     seen.previous = painter
     return painter
   }
+  // Past the painter this composable started with. Held any longer, that first bitmap stays
+  // reachable for as long as the composable lives, on top of the one being dissolved over.
+  seen.first = null
   val fading = remember(painter) {
     CrossfadePainter(painter, seen.previous).also { seen.previous = painter }
   }
@@ -193,4 +199,8 @@ public fun rememberCrossfadePainter(
 /** The painter this image showed last, so the next one has something to dissolve over. */
 private class PainterHistory {
   var previous: Painter? = null
+
+  /** The painter this composable was first given, dropped once it is no longer the current one. */
+  var first: Painter? = null
+  var started: Boolean = false
 }
