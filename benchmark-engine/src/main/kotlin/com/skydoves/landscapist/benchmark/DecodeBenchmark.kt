@@ -65,6 +65,32 @@ internal fun decodeComparison() {
   Metrics.record("decode.coil.ns", coil.p50)
   report("decode ${PHOTO_WIDTH}x$PHOTO_HEIGHT -> ${TARGET_WIDTH}x$TARGET_HEIGHT", landscapist, coil)
 
+  // Coil's decoder consumes its source, so neither the source nor the decoder can be lifted out of
+  // the loop the way landscapist's decoder can. That leaves an okio copy of the encoded bytes and
+  // two objects inside Coil's column and not inside landscapist's, which is a difference between
+  // the arms rather than between the decoders. Measured rather than left unremarked, so the row is
+  // read with it in hand.
+  val coilSetup = measure("coil source and decoder", warmups = 5, iterations = 25) {
+    val source = ImageSource(Buffer().write(photo), FileSystem.SYSTEM)
+    try {
+      SkiaImageDecoder(
+        source = source,
+        options = Options(
+          context = PlatformContext.INSTANCE,
+          size = CoilSize(TARGET_WIDTH, TARGET_HEIGHT),
+          scale = Scale.FIT,
+          precision = Precision.INEXACT,
+        ),
+      )
+    } finally {
+      source.close()
+    }
+  }
+  println(
+    "    Coil's column carries ${coilSetup.p50.formatNanos()} of source and decoder construction " +
+      "that landscapist's does not, because its decoder consumes the source and cannot be reused.",
+  )
+
   val landscapistBytes = allocatedBytes {
     runBlocking { decoder.decode(photo, "image/jpeg", TARGET_WIDTH, TARGET_HEIGHT, config) }
   }

@@ -193,11 +193,27 @@ class SizeToleranceTest {
 
   @Test
   fun `a thumbnail does not satisfy a request with an unbounded height`() {
-    // The bounded axis still has to be covered.
+    // The bounded axis is enough to refuse this one, so it says nothing about the open axis. The
+    // two below are the ones that reach that rule.
     val loader = photo()
     loader.load(15, 15)
 
     assertEquals("decoded_1080x810", loader.load(1080, Int.MAX_VALUE))
+  }
+
+  @Test
+  fun `a request that leaves its height open is not served an entry decoded for a short box`() {
+    // A feed row: fillMaxWidth in a scrolling column, which sends Int.MAX_VALUE on the axis it
+    // leaves to the image. The bounded axis matches exactly, so nothing but the open axis rule
+    // can refuse the short entry, and being handed it would draw a 200px image 810px tall.
+    val loader = photo()
+    assertEquals("decoded_266x200", loader.load(1080, 200))
+
+    assertEquals(
+      "decoded_1080x810",
+      loader.load(1080, Int.MAX_VALUE),
+      "the entry decoded for a 200px tall box was stretched over an open one",
+    )
   }
 
   @Test
@@ -206,6 +222,20 @@ class SizeToleranceTest {
     loader.load(15, 15)
 
     assertEquals("decoded_2560x1920", loader.load(Int.MAX_VALUE, 1920))
+  }
+
+  @Test
+  fun `a request that leaves its width open is not served an entry decoded for a narrow box`() {
+    val loader = photo()
+    // The exact name is the decoder's rounding and is not the point; that it decoded is.
+    loader.load(266, 200)
+    assertEquals(1, loader.decoder.decodes)
+
+    assertEquals(
+      "decoded_2560x1920",
+      loader.load(Int.MAX_VALUE, 1920),
+      "the entry decoded for a 266px wide box was stretched over an open one",
+    )
   }
 
   @Test

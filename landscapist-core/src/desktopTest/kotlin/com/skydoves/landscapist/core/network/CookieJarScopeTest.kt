@@ -36,6 +36,12 @@ class CookieJarScopeTest {
     jar.record("images.example.com", listOf("sid=abc; Domain=example.com"))
     assertEquals("sid=abc", jar.headerFor("cdn.example.com"))
     assertNull(jar.headerFor("example.org"), "the cookie reached an unrelated site")
+    // A suffix match without the separating dot: notexample.com ends with example.com and is a
+    // different site.
+    assertNull(
+      jar.headerFor("notexample.com"),
+      "the cookie reached a site that merely ends with the domain it was scoped to",
+    )
   }
 
   @Test

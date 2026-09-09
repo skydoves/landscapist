@@ -25,10 +25,14 @@ import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.skydoves.landscapist.InternalLandscapistApi
 import kotlinx.coroutines.Dispatchers
@@ -45,11 +49,15 @@ class CrossfadePainterTest {
   private val durationMs = 200
 
   /** A painter of one flat colour that records how many times it was asked to draw. */
-  private class CountingPainter(private val colour: Color, private val side: Float) : Painter() {
+  private class CountingPainter(
+    private val colour: Color,
+    private val width: Float,
+    private val height: Float = width,
+  ) : Painter() {
     var draws = 0
       private set
 
-    override val intrinsicSize: Size get() = Size(side, side)
+    override val intrinsicSize: Size get() = Size(width, height)
 
     override fun DrawScope.onDraw() {
       draws++
@@ -75,10 +83,13 @@ class CrossfadePainterTest {
       },
     )
 
-    private val centre = ((sceneSize / 2) * sceneSize + sceneSize / 2) * 4
+    private val side = sceneSize
 
     /** The centre pixel of the frame rendered at [nanos], as ARGB. */
-    fun render(nanos: Long): Int {
+    fun render(nanos: Long): Int = renderAt(nanos, side / 2, side / 2)
+
+    /** The pixel at [x], [y] of the frame rendered at [nanos], as ARGB. */
+    fun renderAt(nanos: Long, x: Int, y: Int): Int {
       val image = scene.render(nanos)
       try {
         val bytes = org.jetbrains.skia.Bitmap().use { bitmap ->
@@ -86,10 +97,11 @@ class CrossfadePainterTest {
           check(image.readPixels(bitmap, 0, 0)) { "could not read the frame back" }
           bitmap.readPixels() ?: error("no pixels")
         }
-        return (bytes[centre + 3].toInt() and 0xFF shl 24) or
-          (bytes[centre + 2].toInt() and 0xFF shl 16) or
-          (bytes[centre + 1].toInt() and 0xFF shl 8) or
-          (bytes[centre].toInt() and 0xFF)
+        val at = (y * side + x) * 4
+        return (bytes[at + 3].toInt() and 0xFF shl 24) or
+          (bytes[at + 2].toInt() and 0xFF shl 16) or
+          (bytes[at + 1].toInt() and 0xFF shl 8) or
+          (bytes[at].toInt() and 0xFF)
       } finally {
         image.close()
       }
@@ -109,6 +121,15 @@ class CrossfadePainterTest {
       body(harness)
     } finally {
       harness.close()
+    }
+  }
+
+  /** Draws [painter] once outside the scene, which will not repeat a draw nothing invalidated. */
+  private fun drawOnce(painter: Painter) {
+    val bitmap = ImageBitmap(sceneSize, sceneSize)
+    val size = Size(sceneSize.toFloat(), sceneSize.toFloat())
+    CanvasDrawScope().draw(Density(1f), LayoutDirection.Ltr, Canvas(bitmap), size) {
+      with(painter) { draw(size) }
     }
   }
 
@@ -155,20 +176,115 @@ class CrossfadePainterTest {
   fun `the replaced painter stops being drawn once the fade is over`() {
     // The field holding it is cleared on the same frame, so the replaced bitmap is released.
     val outgoing = red()
-    val settled = harness(outgoing) { harness ->
+    val (faded, afterFade) = harness(outgoing) { harness ->
       harness.render(0L)
       harness.switchTo(blue())
       repeat(12) { frame -> harness.render(frame * 40L * 1_000_000) }
-      val afterFade = outgoing.draws
-      repeat(4) { frame -> harness.render((20 + frame) * 40L * 1_000_000) }
-      afterFade to outgoing.draws
+      checkNotNull(harness.resolved) { "nothing was resolved to draw" } to outgoing.draws
+    }
+
+    // Asking the painter itself, not the scene. Once the animation ends nothing invalidates, so
+    // the scene will not run the draw again and the counter cannot move whatever the painter holds.
+    repeat(4) { drawOnce(faded) }
+
+    assertEquals(
+      afterFade,
+      outgoing.draws,
+      "the replaced painter was still being drawn after the fade finished",
+    )
+  }
+
+  @Test
+  fun `the arriving image is faded in rather than swapped in`() {
+    val frames = harness(red()) { harness ->
+      harness.render(0L)
+      harness.switchTo(blue())
+      (1..4).map { frame -> harness.render(frame * 10L * 1_000_000) }
+    }
+
+    // Early in the fade the viewer is still mostly looking at what was there. With no opacity
+    // ramp the arriving blue covers it on the first frame, and the only red left is what
+    // desaturating blue produces, which is a fraction of this.
+    assertTrue(
+      frames.first().red() > 0x80,
+      "the replacement appeared at once, the frames were " +
+        frames.joinToString { it.toUInt().toString(16) },
+    )
+  }
+
+  @Test
+  fun `the outgoing image covers the box the arriving one is measured for`() {
+    // A wide image being replaced by a square one. Scaled to fit it would band across the middle
+    // and leave the top and bottom of the box to the arriving image alone, which is barely there
+    // yet, so the fade would show through to nothing at the edges.
+    val outgoing = CountingPainter(Color.Red, sceneSize * 2f, sceneSize / 2f)
+    val corner = harness(outgoing) { harness ->
+      harness.render(0L)
+      harness.switchTo(blue())
+      harness.renderAt(10L * 1_000_000, 1, 1)
     }
 
     assertEquals(
-      settled.first,
-      settled.second,
-      "the replaced painter was still being drawn after the fade finished",
+      0xFF,
+      corner.alpha(),
+      "the top of the box was not covered while the replacement faded in, it was " +
+        corner.toUInt().toString(16),
     )
+    assertTrue(corner.red() > 0x80, "the corner was not the outgoing image")
+  }
+
+  @Test
+  fun `a duration of zero hands the painter back untouched`() {
+    // On a replacement, which is the only place a fade would otherwise be built. The painter an
+    // image enters with is handed back whatever the duration, so it proves nothing about this.
+    val replacement = blue()
+    var painter by mutableStateOf<Painter?>(red())
+    var resolved: Painter? = null
+    val scene = ImageComposeScene(
+      width = sceneSize,
+      height = sceneSize,
+      density = Density(1f),
+      coroutineContext = Dispatchers.Unconfined,
+      content = { resolved = rememberCrossfadePainter(painter, durationMs = 0) },
+    )
+    try {
+      scene.render(0L).close()
+      painter = replacement
+      Snapshot.sendApplyNotifications()
+      scene.render(10L * 1_000_000).close()
+    } finally {
+      scene.close()
+    }
+
+    assertSame(replacement, resolved, "a zero duration still wrapped the replacement")
+  }
+
+  @Test
+  fun `the replaced painter is released once the fade is over`() {
+    // The draw counter cannot see this: the settled branch returns before drawing the outgoing
+    // whether or not the field was cleared, so what is left to observe is reachability.
+    var outgoing: Painter? = red()
+    val weak = java.lang.ref.WeakReference(outgoing)
+    val faded = harness(outgoing) { harness ->
+      harness.render(0L)
+      harness.switchTo(blue())
+      repeat(12) { frame -> harness.render(frame * 40L * 1_000_000) }
+      checkNotNull(harness.resolved)
+    }
+    outgoing = null
+    // The settled branch drops the field on its next draw, so give it one outside the scene.
+    drawOnce(faded)
+
+    var collected = false
+    repeat(20) {
+      if (weak.get() == null) {
+        collected = true
+        return@repeat
+      }
+      System.gc()
+      Thread.sleep(20)
+    }
+    assertTrue(collected, "the replaced painter was still reachable after the fade finished")
   }
 
   @Test
