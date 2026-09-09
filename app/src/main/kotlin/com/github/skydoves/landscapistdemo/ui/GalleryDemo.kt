@@ -176,11 +176,10 @@ fun GalleryDemoScreen(paddingValues: PaddingValues) {
           modifier = Modifier.fillMaxSize(),
           state = viewerState,
           component = component,
-          // The same scale the grid uses. A shared element animates bounds, not framing, so a
-          // Crop cell opening into a Fit page redraws the picture two thirds the size on the
-          // frame the viewer takes over and then grows it back. Matching the two removes it.
-          // The page is zoomable, so what Crop leaves off the edges is a pinch away.
-          imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+          // Fit, because a viewer's job is to show the whole photo. It does not match the grid's
+          // Crop, so the picture is reframed on the frame the shared element hands over. See the
+          // note in docs/gallery.md: matching them removes that, at the cost of the edges.
+          imageOptions = ImageOptions(contentScale = ContentScale.Fit),
           onDismiss = { showViewer = false },
           onImageTap = { /* could toggle UI overlays */ },
           topBar = { currentPage, totalPages ->

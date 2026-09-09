@@ -371,10 +371,13 @@ ImageGallery(images = urls, imageOptions = ImageOptions(contentScale = scale), .
 ImageViewer(images = urls, imageOptions = ImageOptions(contentScale = scale), ...)
 ```
 
-`Crop` on both keeps the grid filled and the transition still. What it costs is the edges of the
-photo on the viewer, which a pinch brings back. `Fit` on both keeps the whole photo and letterboxes
-the grid cells instead. Which one to give up is yours to choose; giving up neither is what produces
-the flinch.
+`Crop` on both keeps the grid filled and the transition still, and costs the edges of the photo on
+the viewer. `Fit` on both keeps the whole photo and letterboxes the grid cells instead. Giving up
+neither is what produces the reframe.
+
+The sample in this repository keeps the mismatch on purpose: a grid reads better filled and a viewer
+is there to show the whole photo, so it takes the reframe rather than give up either. Match the two
+when the transition matters more than the framing.
 
 ### Custom key provider
 
