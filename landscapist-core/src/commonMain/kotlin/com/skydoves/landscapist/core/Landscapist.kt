@@ -430,6 +430,26 @@ public class Landscapist private constructor(
   }
 
   /**
+   * One download, and the disk write that goes with it.
+   *
+   * The write lives here rather than in each caller so that two sizes of one url do not open two
+   * editors on the same file. It follows the policy of the request that started the download,
+   * which is the same assumption the coalescing above already documents.
+   */
+  private suspend fun fetchAndStore(request: ImageRequest, cacheKey: CacheKey): FetchResult {
+    val result = fetcher.fetch(request)
+    if (result is FetchResult.Success &&
+      request.diskCachePolicy.writeEnabled &&
+      diskCache != null
+    ) {
+      val data = result.data
+      // Off the critical path, so the decode starts without waiting for the file.
+      scope.launch { runCatching { writeToDiskCache(cacheKey, data) } }
+    }
+    return result
+  }
+
+  /**
    * Fetches the bytes for [request], sharing one trip with everyone asking for the same url.
    *
    * Keyed on the disk key, so two sizes of one image share a download and decode separately. A
@@ -447,7 +467,7 @@ public class Landscapist private constructor(
         existing.waiters++
         existing
       } else {
-        val created = InFlightFetch(scope.async { fetcher.fetch(request) })
+        val created = InFlightFetch(scope.async { fetchAndStore(request, cacheKey) })
         created.waiters = 1
         inFlightFetches[key] = created
         created
@@ -529,11 +549,9 @@ public class Landscapist private constructor(
       // Network fetch, shared with anyone else asking for the same url at another size.
       return when (val fetchResult = dedupedFetch(request, cacheKey)) {
         is FetchResult.Success -> {
-          // Write to the disk cache off the critical path so the decode starts immediately. The
-          // disk path is deterministic, so it can be reported before the background write finishes.
+          // The write is done by the shared fetch, once per download. The path is deterministic,
+          // so it can be reported here before that write finishes.
           val diskPath = if (request.diskCachePolicy.writeEnabled && diskCache != null) {
-            val data = fetchResult.data
-            scope.launch { runCatching { writeToDiskCache(cacheKey, data) } }
             (diskCache.directory / cacheKey.diskKey).toString()
           } else {
             null
@@ -683,8 +701,8 @@ public class Landscapist private constructor(
       if (handled) return
     }
 
-    // Network fetch.
-    when (val fetchResult = fetcher.fetch(request)) {
+    // Network fetch, shared the same way the standard path shares it.
+    when (val fetchResult = dedupedFetch(request, cacheKey)) {
       is FetchResult.Success -> {
         var diskPath: String? = null
         if (request.diskCachePolicy.writeEnabled && diskCache != null) {

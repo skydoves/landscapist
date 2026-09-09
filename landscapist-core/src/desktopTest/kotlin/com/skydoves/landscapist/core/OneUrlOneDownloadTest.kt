@@ -15,6 +15,8 @@
  */
 package com.skydoves.landscapist.core
 
+import com.skydoves.landscapist.core.cache.CacheKey
+import com.skydoves.landscapist.core.cache.DiskCache
 import com.skydoves.landscapist.core.decoder.DecodeResult
 import com.skydoves.landscapist.core.decoder.ImageDecoder
 import com.skydoves.landscapist.core.model.CachePolicy
@@ -26,6 +28,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import okio.FileSystem
+import okio.Path
+import okio.Path.Companion.toPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -109,6 +114,51 @@ class OneUrlOneDownloadTest {
 
     assertEquals(1, fetcher.fetches.value)
     assertEquals(1, decoder.decodes.value, "one request was decoded twice")
+  }
+
+  @Test
+  fun `one download writes the disk cache once`() {
+    // Each caller used to launch its own write, so two sizes of one url opened two editors on the
+    // same file for the same bytes.
+    val fetcher = SlowFetcher()
+    val edits = atomic(0)
+    val loader = Landscapist.builder()
+      .diskCache(
+        object : DiskCache {
+          override val directory: Path = "/tmp".toPath()
+          override val maxSize: Long = Long.MAX_VALUE
+          override val size: Long = 0
+          override val fileSystem: FileSystem = FileSystem.SYSTEM
+          override suspend fun get(key: CacheKey): DiskCache.Snapshot? = null
+          override suspend fun edit(key: CacheKey): DiskCache.Editor? {
+            edits.incrementAndGet()
+            return null
+          }
+          override suspend fun remove(key: CacheKey): Boolean = false
+          override suspend fun clear() = Unit
+        },
+      )
+      .fetcher(fetcher)
+      .decoder(SizingDecoder())
+      .build()
+
+    runBlocking {
+      val thumbnail = async {
+        loader.load(ImageRequest.builder().model(url).size(50, 50).build())
+          .first { it is ImageResult.Success }
+      }
+      val poster = async {
+        loader.load(ImageRequest.builder().model(url).size(1080, 1080).build())
+          .first { it is ImageResult.Success }
+      }
+      thumbnail.await()
+      poster.await()
+      // The write is launched off the critical path, so give it a moment to land.
+      delay(200)
+    }
+
+    assertEquals(1, fetcher.fetches.value, "the same bytes were downloaded twice")
+    assertEquals(1, edits.value, "the same file was opened for writing twice")
   }
 
   @Test

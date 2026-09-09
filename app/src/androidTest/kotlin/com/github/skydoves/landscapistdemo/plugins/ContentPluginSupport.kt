@@ -32,6 +32,10 @@ import com.skydoves.landscapist.components.ImageComponent
 import com.skydoves.landscapist.components.ImagePluginComponent
 import com.skydoves.landscapist.core.ImageRequest
 import com.skydoves.landscapist.core.Landscapist
+import com.skydoves.landscapist.core.LandscapistConfig
+import com.skydoves.landscapist.core.decoder.DecodeResult
+import com.skydoves.landscapist.core.decoder.ImageDecoder
+import com.skydoves.landscapist.core.decoder.createPlatformDecoder
 import com.skydoves.landscapist.core.model.CachePolicy
 import com.skydoves.landscapist.core.network.FetchResult
 import com.skydoves.landscapist.core.network.ImageFetcher
@@ -64,6 +68,9 @@ internal fun contentPluginLoader(): Landscapist = Landscapist.builder().noDiskCa
 
 internal fun contentPluginLoader(fetcher: ImageFetcher): Landscapist =
   Landscapist.builder().noDiskCache().fetcher(fetcher).build()
+
+internal fun contentPluginLoader(fetcher: ImageFetcher, decoder: ImageDecoder): Landscapist =
+  Landscapist.builder().noDiskCache().fetcher(fetcher).decoder(decoder).build()
 
 internal fun contentImageModifier(tag: String = ContentImageTag): Modifier = Modifier
   .size(PluginImageSize)
@@ -112,6 +119,38 @@ internal class StateRecorder {
   }
 
   override fun toString(): String = seen.joinToString { it::class.simpleName ?: "?" }
+}
+
+/**
+ * Holds a decode wider than [holdLargerThan] until [release], and lets smaller ones through.
+ *
+ * A preview plugin asks for the same url at a small size, so the download is shared with the full
+ * image and there is no longer a second fetch to hold. What separates the two is the decode, which
+ * is what this holds and what the plugin actually buys.
+ */
+internal class HoldingDecoder(
+  private val holdLargerThan: Int,
+  private val delegate: ImageDecoder = createPlatformDecoder(),
+) : ImageDecoder {
+
+  private val released = CountDownLatch(1)
+
+  override suspend fun decode(
+    data: ByteArray,
+    mimeType: String?,
+    targetWidth: Int?,
+    targetHeight: Int?,
+    config: LandscapistConfig,
+  ): DecodeResult {
+    if ((targetWidth ?: 0) > holdLargerThan) {
+      withContext(Dispatchers.IO) { released.await(30, TimeUnit.SECONDS) }
+    }
+    return delegate.decode(data, mimeType, targetWidth, targetHeight, config)
+  }
+
+  fun release() {
+    released.countDown()
+  }
 }
 
 /** Records target sizes, and holds a request wider than [holdLargerThan] open until [release]. */

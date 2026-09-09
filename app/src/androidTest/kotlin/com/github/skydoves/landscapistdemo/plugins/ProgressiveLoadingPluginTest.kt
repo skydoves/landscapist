@@ -42,7 +42,8 @@ class ProgressiveLoadingPluginTest {
   private lateinit var server: LocalImageServer
 
   /** Anything larger than a preview is the full sized request. */
-  private val fetcher = RecordingFetcher(holdLargerThan = 64)
+  private val fetcher = RecordingFetcher()
+  private val decoder = HoldingDecoder(holdLargerThan = 64)
 
   @Before
   fun start() {
@@ -53,13 +54,13 @@ class ProgressiveLoadingPluginTest {
 
   @After
   fun stop() {
-    fetcher.release()
+    decoder.release()
     server.close()
   }
 
   @Test
   fun thePreviewIsOnScreenBeforeTheImageAndTheImageReplacesIt() {
-    val loader = contentPluginLoader(fetcher)
+    val loader = contentPluginLoader(fetcher, decoder)
     val state = StateRecorder()
     val url = server.url("/first.png")
     // Outside the composition: a plugin rebuilt each time would restart the preview load.
@@ -94,7 +95,7 @@ class ProgressiveLoadingPluginTest {
       fetcher.sizes.contains(IntSize(32, 32)),
     )
 
-    fetcher.release()
+    decoder.release()
     composeTestRule.awaitUntil("the image to arrive") { state.isSuccess }
     val fullDetail = composeTestRule.readContentPixels().localContrast()
 
@@ -107,9 +108,9 @@ class ProgressiveLoadingPluginTest {
 
   @Test
   fun theTunedFactoriesAskForTheSamePreviewAsTheDefaultOne() {
-    // Two URLs rather than one: two loads of the same image at the same size are coalesced into
-    // a single fetch, and only one would be seen.
-    val loader = contentPluginLoader(fetcher)
+    // Two URLs rather than one: two loads of one image are coalesced into a single fetch,
+    // whatever sizes they ask for, and only one would be seen.
+    val loader = contentPluginLoader(fetcher, decoder)
     val first = StateRecorder()
     val second = StateRecorder()
     val byDefault = pluginComponent(ProgressiveLoadingPlugin.default())
