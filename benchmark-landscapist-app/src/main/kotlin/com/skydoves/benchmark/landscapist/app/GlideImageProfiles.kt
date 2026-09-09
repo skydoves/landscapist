@@ -18,11 +18,16 @@ package com.skydoves.benchmark.landscapist.app
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.glide.GlideImageState
 
 /** landscapist-glide, which is this library's Compose layer over the Glide engine. */
 @Composable
 internal fun GlideWrapperImageList(urls: List<String>, tag: String, modifier: Modifier = Modifier) {
-  BenchmarkList(urls, tag, modifier) { url, itemModifier ->
-    GlideImage(imageModel = { url }, modifier = itemModifier)
+  BenchmarkList(urls, tag, modifier) { url, itemModifier, onLoaded ->
+    GlideImage(
+      imageModel = { url },
+      modifier = itemModifier,
+      onImageStateChanged = { if (it is GlideImageState.Success) onLoaded() },
+    )
   }
 }

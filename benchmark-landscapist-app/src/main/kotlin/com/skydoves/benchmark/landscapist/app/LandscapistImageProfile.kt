@@ -22,6 +22,7 @@ import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.image.LandscapistImage
+import com.skydoves.landscapist.image.LandscapistImageState
 import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
@@ -34,8 +35,12 @@ import com.skydoves.landscapist.zoomable.ZoomablePlugin
  */
 @Composable
 internal fun LandscapistImageList(urls: List<String>, tag: String, modifier: Modifier = Modifier) {
-  BenchmarkList(urls, tag, modifier) { url, itemModifier ->
-    LandscapistImage(imageModel = { url }, modifier = itemModifier)
+  BenchmarkList(urls, tag, modifier) { url, itemModifier, onLoaded ->
+    LandscapistImage(
+      imageModel = { url },
+      modifier = itemModifier,
+      onImageStateChanged = { if (it is LandscapistImageState.Success) onLoaded() },
+    )
   }
 }
 
@@ -60,7 +65,12 @@ internal fun LandscapistPluginImageList(
     +BlurTransformationPlugin()
     +PalettePlugin()
   }
-  BenchmarkList(urls, tag, modifier) { url, itemModifier ->
-    LandscapistImage(imageModel = { url }, component = component, modifier = itemModifier)
+  BenchmarkList(urls, tag, modifier) { url, itemModifier, onLoaded ->
+    LandscapistImage(
+      imageModel = { url },
+      component = component,
+      modifier = itemModifier,
+      onImageStateChanged = { if (it is LandscapistImageState.Success) onLoaded() },
+    )
   }
 }

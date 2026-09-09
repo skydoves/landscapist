@@ -105,6 +105,11 @@ class ImageLoadingBenchmark {
     check(device.wait(Until.hasObject(firstItem(tab)), CONTENT_TIMEOUT_MS)) {
       "the $tab tab never put its first image on screen within $CONTENT_TIMEOUT_MS ms"
     }
+    // An item tag says a row composed, which a variant loading nothing would also satisfy. The
+    // app publishes this one only once several rows have reported an image.
+    check(device.wait(Until.hasObject(loadedItems(tab)), CONTENT_TIMEOUT_MS)) {
+      "the $tab tab composed its rows but loaded no image within $CONTENT_TIMEOUT_MS ms"
+    }
   }
 
   /**
@@ -139,6 +144,9 @@ class ImageLoadingBenchmark {
   // By.res with one argument, because testTagsAsResourceId publishes the tag verbatim with no
   // package prefix. The two argument form builds "package:id/tag" and never matched.
   private fun firstItem(tab: String) = By.res("${tab}First")
+
+  /** Published by the app once enough rows have reported a loaded image. */
+  private fun loadedItems(tab: String) = By.res("${tab}Loaded")
 
   companion object {
     private const val PACKAGE_NAME = "com.skydoves.benchmark.landscapist.app"

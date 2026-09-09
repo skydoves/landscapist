@@ -147,6 +147,9 @@ class ScrollComparisonTest {
       "$label did not scroll during the warm up: still showing item $warmDepth of $items"
     }
     DeviceMeasure.settle()
+    // Counted from here, so what follows is what the measured pass itself asked for rather than
+    // anything the warm up left behind.
+    server.resetCounts()
 
     var depth = 0
     val allocated = DeviceMeasure.allocatedDuring {
@@ -160,10 +163,19 @@ class ScrollComparisonTest {
     check(depth < items - 1) {
       "$label reached the last item, so the later swipes had nothing left to scroll"
     }
+    // Nothing here checked that either arm ever loaded an image. An arm whose loads all failed
+    // would have reported the allocation of scrolling empty rows and won the row on that, so the
+    // number was not falsifiable in the direction that flatters it.
+    val rowsServed = (0 until items).count { server.hitCount("/row-$it.jpg") > 0 }
+    check(rowsServed >= MIN_ROWS_SERVED) {
+      "$label had only $rowsServed of $items rows served during the measured pass, fewer than " +
+        "the $MIN_ROWS_SERVED it takes to call this a scroll over images: the allocation is of a " +
+        "list that scrolled without loading anything"
+    }
 
     DeviceMeasure.report(
       "scroll ${MEASURED_ROUNDS * 2} swipes over $items rows, $label",
-      "allocated ${allocated.formatBytes()}",
+      "allocated ${allocated.formatBytes()}, $rowsServed of $items rows served",
     )
     check(allocated > 0) { "the allocation counter is not available on this device" }
   }
@@ -189,5 +201,13 @@ class ScrollComparisonTest {
   private companion object {
     const val WARM_ROUNDS = 3
     const val MEASURED_ROUNDS = 4
+
+    /**
+     * Distinct rows the measured pass has to have fetched for its allocation to mean anything.
+     *
+     * A quarter of the list. Both arms clear this by a wide margin because 240 rows of 360x270 do
+     * not fit in the memory cache either loader is given, so the pass re-fetches as it goes.
+     */
+    const val MIN_ROWS_SERVED = 60
   }
 }

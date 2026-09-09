@@ -301,37 +301,48 @@ class LibraryComparisonTest {
     server.serve("/large.jpg", photo)
     val landscapist = newLandscapist()
     val url = server.url("/large.jpg")
+    // Neither arm's memory cache takes part in this row. The label says decode, and this arm used
+    // to write the decoded image into the cache and then clear the entire cache inside the
+    // measured block, while Coil, built with memoryCache(null) and asked with the policy
+    // disabled, was charged for neither. The request is built once because Coil's is.
+    val request = ImageRequest.builder()
+      .model(url)
+      .memoryCachePolicy(CachePolicy.DISABLED)
+      .diskCachePolicy(CachePolicy.DISABLED)
+      .size(200, 150)
+      .build()
 
-    val timings = DeviceMeasure.timed(warmups = 2, iterations = 8) {
+    val timings = DeviceMeasure.timed(
+      warmups = DECODE_WARMUPS,
+      iterations = DECODE_ITERATIONS,
+    ) {
       runBlocking {
-        val result = landscapist.load(
-          ImageRequest.builder()
-            .model(url)
-            .diskCachePolicy(CachePolicy.DISABLED)
-            .size(200, 150)
-            .build(),
-        ).first { it is ImageResult.Success || it is ImageResult.Failure }
+        val result = landscapist.load(request)
+          .first { it is ImageResult.Success || it is ImageResult.Failure }
         check(result is ImageResult.Success) { "decode failed: $result" }
       }
-      landscapist.clearMemoryCache()
     }
 
     val allocated = DeviceMeasure.allocatedDuring {
       runBlocking {
-        landscapist.load(
-          ImageRequest.builder()
-            .model(url)
-            .diskCachePolicy(CachePolicy.DISABLED)
-            .size(200, 150)
-            .build(),
-        ).first { it is ImageResult.Success || it is ImageResult.Failure }
+        val result = landscapist.load(request)
+          .first { it is ImageResult.Success || it is ImageResult.Failure }
+        check(result is ImageResult.Success) { "decode failed: $result" }
       }
-      landscapist.clearMemoryCache()
+    }
+
+    // Every load has to reach the server, or something answered from a cache and the row timed a
+    // lookup rather than a decode. With the memory cache taking part this reads 1.
+    val fetched = server.hitCount("/large.jpg")
+    check(fetched >= DECODE_LOADS) {
+      "landscapist fetched the photo $fetched times for $DECODE_LOADS loads, so a cache served " +
+        "it instead of it being decoded"
     }
 
     DeviceMeasure.report(
       "decode 2000x1500 to 200x150, landscapist",
-      "median ${timings.median().formatNanos()}, allocated ${allocated.formatBytes()}",
+      "median ${timings.median().formatNanos()}, allocated ${allocated.formatBytes()}, " +
+        "$fetched fetches for $DECODE_LOADS loads",
     )
   }
 
@@ -352,21 +363,39 @@ class LibraryComparisonTest {
       .diskCachePolicy(coil3.request.CachePolicy.DISABLED)
       .build()
 
-    val timings = DeviceMeasure.timed(warmups = 2, iterations = 8) {
+    val timings = DeviceMeasure.timed(
+      warmups = DECODE_WARMUPS,
+      iterations = DECODE_ITERATIONS,
+    ) {
       val result = runBlocking { loader.execute(request) }
       check(result is coil3.request.SuccessResult) { "coil decode failed: $result" }
     }
     val allocated = DeviceMeasure.allocatedDuring {
-      runBlocking { loader.execute(request) }
+      val result = runBlocking { loader.execute(request) }
+      check(result is coil3.request.SuccessResult) { "coil decode failed: $result" }
+    }
+
+    // The same check the landscapist arm gets: a load that never reached the server decoded
+    // nothing.
+    val fetched = server.hitCount("/large-coil.jpg")
+    check(fetched >= DECODE_LOADS) {
+      "coil fetched the photo $fetched times for $DECODE_LOADS loads, so a cache served it " +
+        "instead of it being decoded"
     }
 
     DeviceMeasure.report(
       "decode 2000x1500 to 200x150, coil",
-      "median ${timings.median().formatNanos()}, allocated ${allocated.formatBytes()}",
+      "median ${timings.median().formatNanos()}, allocated ${allocated.formatBytes()}, " +
+        "$fetched fetches for $DECODE_LOADS loads",
     )
   }
 
   private companion object {
     const val TIMEOUT_MS = 30_000L
+    const val DECODE_WARMUPS = 2
+    const val DECODE_ITERATIONS = 8
+
+    /** Warm ups, timed iterations and the single allocation pass: every one a whole decode. */
+    const val DECODE_LOADS = DECODE_WARMUPS + DECODE_ITERATIONS + 1
   }
 }

@@ -18,7 +18,7 @@ The Compose layer and the loader underneath it were both rebuilt for what they c
 
 **An image usually exposes one node with its content description now, where it used to expose two.** An image was a container plus a child `Image` composed inside it, and both carried `ImageOptions.contentDescription`. The child is composed only when something actually has to go inside the container: a `loading`, `success` or `failure` slot, a state plugin or a `ComposablePlugin`. A plain image, an image with only a `CrossfadePlugin` and an image with only a `PainterPlugin` such as `BlurTransformationPlugin` are all drawn without one. A UI test that looked the image up by content description and expected two nodes, or that reached for the child of the container, needs updating.
 
-**`rememberImageComponent` follows a plugin set that changes.** It was a `remember` with no keys, so a plugin set computed from state was frozen at whatever it was on the first composition and a toggle never reached the image. It now updates the component's plugins in place while keeping the component's identity.
+**`rememberImageComponent` follows a plugin set that changes.** It was a `remember` with no keys, so a plugin set computed from state was frozen at whatever it was on the first composition and a toggle never reached the image. The remember is keyed on the plugins now, so the component keeps its identity while they are unchanged and is replaced when they are not. Updating it in place, which is what the first attempt did, kept the identity and so kept the change from ever reaching an image: images are skippable and take the component as a stable parameter.
 
 ---
 
@@ -65,7 +65,7 @@ Two things fell out of that work. Skia's eighths scaling never engaged, because 
 
 A layout rarely measures to the same pixel twice. A grid whose columns do not divide evenly asks for 359, 360 and 361 wide, and keying strictly on the target size made those three entries and three decodes of one image.
 
-A request with no entry of its own is now served by an already decoded variant of the same image, through `MemoryCache.getMatching`. The rule compares the box an entry was decoded for against the box being asked for, rather than pixel counts: most decoders fit an image inside its box and keep its shape, while an SVG renderer fills the box exactly, so comparing pixels is right about one and wrong about the other. A variant is accepted when it covers both axes to within a pixel and is no more than twice the request on either. That last part is a fix as well as a rule: an entry oversized on one axis alone used to be reused, so a 1080x135 panorama served a 360 wide slot.
+A request with no entry of its own is now served by an already decoded variant of the same image, through `MemoryCache.getMatching`. The rule compares the box an entry was decoded for against the box being asked for, rather than pixel counts: most decoders fit an image inside its box and keep its shape, while an SVG renderer fills the box exactly, so comparing pixels is right about one and wrong about the other. A variant is accepted when it covers both axes to within a pixel and is no more than twice the request on either. On Apple and wasm, where the decoder keeps the encoded bytes and lets Skia decode at draw size, the entry is the whole source and is accepted for any box. That last part is a fix as well as a rule: an entry oversized on one axis alone used to be reused, so a 1080x135 panorama served a 360 wide slot.
 
 ## The engine hot path, from #986
 

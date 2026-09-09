@@ -41,7 +41,9 @@ import androidx.compose.ui.unit.dp
  * Benchmark host. Selecting a tab shows a scrolling [androidx.compose.foundation.lazy.LazyColumn]
  * of distinct images for that variant, and the Macrobenchmark driver navigates by `By.text` and
  * scrolls `By.scrollable(true)` while recording frame timing. `testTagsAsResourceId` surfaces each
- * item's `testTag` as `By.res(packageName, "<Tab>Image")`, with item zero as `"<Tab>First"`.
+ * item's `testTag` as `By.res("<Tab>Image")`, with item zero as `"<Tab>First"` and a `"<Tab>Loaded"`
+ * marker that appears only once rows have reported an image. The tag is published with no package
+ * prefix, so the one argument `By.res` is the form that matches.
  *
  * Nothing is selected until a tab is clicked. Defaulting to the first tab meant that under
  * `StartupMode.WARM` the Landscapist list composed and fetched inside every measured block,

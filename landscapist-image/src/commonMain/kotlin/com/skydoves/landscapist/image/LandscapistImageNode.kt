@@ -315,6 +315,10 @@ internal class LandscapistImageNode(
     // image. Measuring against the intrinsic size instead degenerates, since the destination on
     // the open axis is then the number being computed: a crop measures the whole intrinsic height
     // and draws the image wider than the row, losing both edges.
+    //
+    // fitPrioritizingWidth rather than Constraints, which throws when the two axes together need
+    // more than 31 bits. A hairline tall image at 200 wide asks for a height of four million, and
+    // a layout that cannot hold it should clamp rather than bring the window down.
     if (intrinsic.hasFiniteWidth() && intrinsic.hasFiniteHeight() &&
       intrinsic.width > 0f && intrinsic.height > 0f
     ) {

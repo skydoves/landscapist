@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import com.skydoves.landscapist.coil3.CoilImage
+import com.skydoves.landscapist.coil3.CoilImageState
 
 /**
  * Coil's own composable, so the row labelled Coil is Coil. It used to be [CoilWrapperImageList],
@@ -30,12 +31,13 @@ import com.skydoves.landscapist.coil3.CoilImage
  */
 @Composable
 internal fun CoilAsyncImageList(urls: List<String>, tag: String, modifier: Modifier = Modifier) {
-  BenchmarkList(urls, tag, modifier) { url, itemModifier ->
+  BenchmarkList(urls, tag, modifier) { url, itemModifier, onLoaded ->
     AsyncImage(
       model = url,
       contentDescription = null,
       contentScale = ContentScale.Crop,
       modifier = itemModifier,
+      onSuccess = { onLoaded() },
     )
   }
 }
@@ -43,7 +45,11 @@ internal fun CoilAsyncImageList(urls: List<String>, tag: String, modifier: Modif
 /** landscapist-coil3, which is this library's Compose layer over the same Coil engine. */
 @Composable
 internal fun CoilWrapperImageList(urls: List<String>, tag: String, modifier: Modifier = Modifier) {
-  BenchmarkList(urls, tag, modifier) { url, itemModifier ->
-    CoilImage(imageModel = { url }, modifier = itemModifier)
+  BenchmarkList(urls, tag, modifier) { url, itemModifier, onLoaded ->
+    CoilImage(
+      imageModel = { url },
+      modifier = itemModifier,
+      onImageStateChanged = { if (it is CoilImageState.Success) onLoaded() },
+    )
   }
 }

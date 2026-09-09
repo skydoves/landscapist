@@ -126,7 +126,28 @@ gap and some of the resident set gap. That is the next thing worth working on.
 - [x] FIXED: the node asked the layout to run again from the loader's thread, so a screen of
       images failed with CalledFromWrongThreadException on Android. Snapshot state now.
       Costs 660 bytes an image on the first frame, which is Compose observing the reads.
-- [x] FIXED: `rememberImageComponent` froze its plugin set at the first composition
+- [x] FIXED: `rememberImageComponent` froze its plugin set at the first composition. The first
+      attempt copied later plugins into the component it already held, which kept the identity
+      and so kept the change from reaching an image: images are skippable and take the component
+      as a stable parameter. The remember is keyed on the plugins now, which holds the identity
+      while they are unchanged and replaces it when they are not. Four tests, three of which
+      failed before the second fix.
+- [x] FIXED: the default `MemoryCache.getMatching` handed the request's own key to the
+      acceptance test, so every size comparison compared a value with itself and a 100px
+      thumbnail was accepted for a 1000px request. Only a cache that does not override it was
+      affected, which is any cache written before this branch. It returns an exact match now,
+      which is what the two places documenting it already said.
+- [x] FIXED: an axis the parent left open was sized from the image's shape whatever the content
+      scale, so `ContentScale.None` in a feed row left 60 pixels of empty space under a 40 pixel
+      image. The scale is asked about the box the image would fill at its own shape, which the
+      aspect preserving scales answer with the box and the others with the image.
+- [x] FIXED: a hairline tall image in a feed row asked for a height of four million and threw
+      `IllegalArgumentException: Can't represent a width of 200 and height of 4000000` out of
+      measure. `Constraints.fitPrioritizingWidth` clamps instead of throwing.
+- [x] FIXED: variant reuse still never fired on Apple or wasm. Those decoders keep the encoded
+      bytes and let Skia decode at draw size, so the entry is the whole source, but it was
+      matched on sizes read from the header and refused for every box but its own. Such an entry
+      serves any request now.
 - [x] NOT A BUG: hardware bitmaps and pixel reading plugins. A JPEG does decode to
       Bitmap.Config.HARDWARE here, confirmed by probe, and both plugins that read pixels cope:
       the blur copies to ARGB_8888 itself, and kmpalette handles it. Pinned by a palette test

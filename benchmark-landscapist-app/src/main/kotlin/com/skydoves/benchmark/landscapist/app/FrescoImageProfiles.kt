@@ -18,6 +18,7 @@ package com.skydoves.benchmark.landscapist.app
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.skydoves.landscapist.fresco.FrescoImage
+import com.skydoves.landscapist.fresco.FrescoImageState
 
 /** landscapist-fresco, which is this library's Compose layer over the Fresco pipeline. */
 @Composable
@@ -26,7 +27,11 @@ internal fun FrescoWrapperImageList(
   tag: String,
   modifier: Modifier = Modifier,
 ) {
-  BenchmarkList(urls, tag, modifier) { url, itemModifier ->
-    FrescoImage(imageUrl = url, modifier = itemModifier)
+  BenchmarkList(urls, tag, modifier) { url, itemModifier, onLoaded ->
+    FrescoImage(
+      imageUrl = url,
+      modifier = itemModifier,
+      onImageStateChanged = { if (it is FrescoImageState.Success) onLoaded() },
+    )
   }
 }

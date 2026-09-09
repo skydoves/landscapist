@@ -126,7 +126,9 @@ reverse of what the desktop numbers say and it is the platform that ships.
 
 `:benchmark-landscapist` is an AndroidX Macrobenchmark that scrolls a `LazyColumn` of many images per library and records `FrameTimingMetric`. That is the right tool for scrolling-list jank and for memory pressure, which a single-image instrumentation test cannot measure reliably.
 
-The comparison the module currently sets up does not measure two libraries against each other, so do not read a run of it as one. Its Coil tab runs `CoilImage`, this library's own wrapper, rather than Coil's `AsyncImage`. Its Landscapist tab installs eight plugins, which is the path where an image is composed rather than drawn by a single node, so the cheap path is never in the measurement. And the app opens on the Landscapist tab, so that tab composes and fetches inside every measured block, Coil's included. Fixing the app is what has to happen before a frame timing figure can be published.
+The module used to compare landscapist to itself: its Coil tab ran `CoilImage`, this library's own wrapper; its Landscapist tab installed eight plugins, which is the composed path rather than the single node one; the app opened on the Landscapist tab, so that tab composed and fetched inside every measured block including Coil's; and the driver waited on `By.res(packageName, tag)` while `testTagsAsResourceId` publishes the tag with no package prefix, so the wait never matched anything. All of that is fixed, and the driver now also waits for a marker the app publishes only once rows have reported a loaded image, since a composed row is not a loaded one.
+
+What a fixed run says is that frame timing is a tie: medians within a tenth of a millisecond and upper percentiles that swing both ways between runs. Nothing is claimed from it in either direction.
 
 ```bash
 ./gradlew :benchmark-landscapist:pixel6api31BenchmarkAndroidTest

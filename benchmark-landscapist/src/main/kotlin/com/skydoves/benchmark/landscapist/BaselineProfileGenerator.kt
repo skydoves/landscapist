@@ -51,6 +51,10 @@ class BaselineProfileGenerator {
         check(device.wait(Until.hasObject(By.res("${tab}First")), contentTimeoutMs)) {
           "the $tab tab never put its first image on screen"
         }
+        // The decode path belongs in the profile too, and a composed row does not prove it ran.
+        check(device.wait(Until.hasObject(By.res("${tab}Loaded")), contentTimeoutMs)) {
+          "the $tab tab composed its rows but loaded no image"
+        }
 
         val list = device.findObject(By.scrollable(true))
         checkNotNull(list) { "the $tab tab has no scrollable list" }
