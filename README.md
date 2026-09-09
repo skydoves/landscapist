@@ -56,6 +56,180 @@ You can see the use cases of this library in the repositories below:
 - [skydoves/DisneyCompose](https://github.com/skydoves/disneycompose): 🧸 A demo Disney app using Jetpack Compose and Hilt based on modern Android tech-stacks and MVVM architecture.
 - [skydoves/MovieCompose](https://github.com/skydoves/MovieCompose): 🎞 A demo movie app using Jetpack Compose and Hilt based on modern Android tech stacks. <br>
 
+<div class="header">
+  <h1>Landscapist Image</h1>
+</div>
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)
+
+The `landscapist-image` module provides a Compose Multiplatform UI component built on top of `landscapist-core`. It integrates seamlessly with the Landscapist plugin ecosystem and works across all Compose Multiplatform targets (Android, iOS, Desktop, Web).
+
+### Setup
+
+Add the dependency below to your **module**'s `build.gradle` file:
+
+```gradle
+dependencies {
+    implementation("com.github.skydoves:landscapist-image:$version")
+}
+```
+
+> **Note**: This module depends on `landscapist-core`, which includes Ktor client automatically. No need to add Ktor dependencies separately.
+
+For Kotlin Multiplatform:
+
+```kotlin
+sourceSets {
+    commonMain.dependencies {
+        implementation("com.github.skydoves:landscapist-image:$version")
+    }
+}
+```
+
+### LandscapistImage
+
+Load images in Compose using `LandscapistImage`:
+
+```kotlin
+import com.skydoves.landscapist.image.LandscapistImage
+import com.skydoves.landscapist.ImageOptions
+
+LandscapistImage(
+    imageModel = { "https://example.com/image.jpg" },
+    modifier = Modifier.size(300.dp),
+    imageOptions = ImageOptions(
+        contentScale = ContentScale.Crop,
+        alignment = Alignment.Center
+    )
+)
+```
+
+### With Plugins
+
+`LandscapistImage` supports all Landscapist plugins:
+
+```kotlin
+import com.skydoves.landscapist.components.rememberImageComponent
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
+import com.skydoves.landscapist.transformation.blur.BlurTransformationPlugin
+
+LandscapistImage(
+    imageModel = { imageUrl },
+    modifier = Modifier.fillMaxWidth(),
+    component = rememberImageComponent {
+        +ShimmerPlugin(
+            baseColor = Color.Gray,
+            highlightColor = Color.LightGray
+        )
+        +CrossfadePlugin(duration = 550)
+        +BlurTransformationPlugin(radius = 10)
+    }
+)
+```
+
+### Custom Landscapist Instance
+
+Provide a custom `Landscapist` instance to your composition tree:
+
+```kotlin
+import com.skydoves.landscapist.core.Landscapist
+import com.skydoves.landscapist.image.LocalLandscapist
+import androidx.compose.runtime.CompositionLocalProvider
+
+// Create custom instance
+val customLandscapist = Landscapist.builder(context)
+    .config(
+        LandscapistConfig(
+            memoryCacheSize = 128 * 1024 * 1024L // 128MB
+        )
+    )
+    .build()
+
+// Provide to composition
+CompositionLocalProvider(LocalLandscapist provides customLandscapist) {
+    LandscapistImage(
+        imageModel = { imageUrl },
+        // Will use the custom instance
+    )
+}
+```
+
+### Loading States
+
+Handle loading, success, and failure states:
+
+```kotlin
+LandscapistImage(
+    imageModel = { imageUrl },
+    loading = {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+    },
+    success = { state, painter ->
+        Image(
+            painter = painter,
+            contentDescription = "Loaded image"
+        )
+    },
+    failure = {
+        Text("Failed to load image")
+    }
+)
+```
+
+### Image State Changes
+
+Monitor state changes with a callback:
+
+```kotlin
+var currentState by remember { mutableStateOf<LandscapistImageState>(LandscapistImageState.None) }
+
+LandscapistImage(
+    imageModel = { imageUrl },
+    onImageStateChanged = { state ->
+        currentState = state
+    }
+)
+
+when (currentState) {
+    is LandscapistImageState.Loading -> { /* loading */ }
+    is LandscapistImageState.Success -> { /* success */ }
+    is LandscapistImageState.Failure -> { /* failure */ }
+    else -> { /* none */ }
+}
+```
+
+### Drawing the image yourself
+
+A `LandscapistImage` with no slot and no plugin is a single layout node, which draws the image
+itself. Add a `loading`, `success` or `failure` slot or an `ImagePlugin` and it becomes a container,
+and it composes a child inside that container when something actually has to go there. A
+`CrossfadePlugin` does not, since the fade happens inside the painter, and neither does a
+`PainterPlugin` such as `BlurTransformationPlugin`, since the container draws through it.
+
+When all you want is the image, `rememberImagePainter` gives you the painter on its own
+and you keep the node:
+
+```kotlin
+import com.skydoves.landscapist.image.rememberImagePainter
+
+Image(
+    painter = rememberImagePainter(model = "https://example.com/image.jpg"),
+    contentDescription = null,
+    modifier = Modifier.size(120.dp)
+)
+```
+
+It reads the memory cache while it composes, so an already loaded image is drawn in the first frame,
+and it takes the size to decode at from the first draw. There are no loading or failure slots here,
+no `ImagePlugin` and no crossfade, since each of those needs something composed around the image.
+
+### Supported Image Sources
+
+`LandscapistImage` supports various image sources including network URLs, local files, drawable resources, and more. See the [Landscapist Image documentation](https://skydoves.github.io/landscapist/landscapist-image/#supported-image-sources) for a complete list of supported image sources per platform.
+
 ## Landscapist Core & Image
 
 Landscapist now provides two foundational modules designed for Kotlin Multiplatform and Compose Multiplatform from the scratch, giving you full control over image loading across all platforms:
@@ -250,182 +424,6 @@ val landscapist = Landscapist.builder(context)
 The disk cache is keyed by the URL, so one download answers every size an image is drawn at. Any
 headers the request carries scope both that key and the memory key, so two requests for one URL with
 different headers do not share an entry.
-
-<div class="header">
-  <h1>Landscapist Image</h1>
-</div>
-
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)
-
-The `landscapist-image` module provides a Compose Multiplatform UI component built on top of `landscapist-core`. It integrates seamlessly with the Landscapist plugin ecosystem and works across all Compose Multiplatform targets (Android, iOS, Desktop, Web).
-
-### Setup
-
-Add the dependency below to your **module**'s `build.gradle` file:
-
-```gradle
-dependencies {
-    implementation("com.github.skydoves:landscapist-image:$version")
-}
-```
-
-> **Note**: This module depends on `landscapist-core`, which includes Ktor client automatically. No need to add Ktor dependencies separately.
-
-For Kotlin Multiplatform:
-
-```kotlin
-sourceSets {
-    commonMain.dependencies {
-        implementation("com.github.skydoves:landscapist-image:$version")
-    }
-}
-```
-
-### LandscapistImage
-
-Load images in Compose using `LandscapistImage`:
-
-```kotlin
-import com.skydoves.landscapist.image.LandscapistImage
-import com.skydoves.landscapist.ImageOptions
-
-LandscapistImage(
-    imageModel = { "https://example.com/image.jpg" },
-    modifier = Modifier.size(300.dp),
-    imageOptions = ImageOptions(
-        contentScale = ContentScale.Crop,
-        alignment = Alignment.Center
-    )
-)
-```
-
-### With Plugins
-
-`LandscapistImage` supports all Landscapist plugins:
-
-```kotlin
-import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
-import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
-import com.skydoves.landscapist.transformation.blur.BlurTransformationPlugin
-
-LandscapistImage(
-    imageModel = { imageUrl },
-    modifier = Modifier.fillMaxWidth(),
-    component = rememberImageComponent {
-        +ShimmerPlugin(
-            baseColor = Color.Gray,
-            highlightColor = Color.LightGray
-        )
-        +CrossfadePlugin(duration = 550)
-        +BlurTransformationPlugin(radius = 10)
-    }
-)
-```
-
-### Custom Landscapist Instance
-
-Provide a custom `Landscapist` instance to your composition tree:
-
-```kotlin
-import com.skydoves.landscapist.core.Landscapist
-import com.skydoves.landscapist.image.LocalLandscapist
-import androidx.compose.runtime.CompositionLocalProvider
-
-// Create custom instance
-val customLandscapist = Landscapist.builder(context)
-    .config(
-        LandscapistConfig(
-            memoryCacheSize = 128 * 1024 * 1024L // 128MB
-        )
-    )
-    .build()
-
-// Provide to composition
-CompositionLocalProvider(LocalLandscapist provides customLandscapist) {
-    LandscapistImage(
-        imageModel = { imageUrl },
-        // Will use the custom instance
-    )
-}
-```
-
-### Loading States
-
-Handle loading, success, and failure states:
-
-```kotlin
-LandscapistImage(
-    imageModel = { imageUrl },
-    loading = {
-        Box(modifier = Modifier.fillMaxSize()) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-    },
-    success = { state, painter ->
-        Image(
-            painter = painter,
-            contentDescription = "Loaded image"
-        )
-    },
-    failure = {
-        Text("Failed to load image")
-    }
-)
-```
-
-### Image State Changes
-
-Monitor state changes with a callback:
-
-```kotlin
-var currentState by remember { mutableStateOf<LandscapistImageState>(LandscapistImageState.None) }
-
-LandscapistImage(
-    imageModel = { imageUrl },
-    onImageStateChanged = { state ->
-        currentState = state
-    }
-)
-
-when (currentState) {
-    is LandscapistImageState.Loading -> { /* loading */ }
-    is LandscapistImageState.Success -> { /* success */ }
-    is LandscapistImageState.Failure -> { /* failure */ }
-    else -> { /* none */ }
-}
-```
-
-### Drawing the image yourself
-
-A `LandscapistImage` with no slot and no plugin is a single layout node, which draws the image
-itself. Add a `loading`, `success` or `failure` slot or an `ImagePlugin` and it becomes a container,
-and it composes a child inside that container when something actually has to go there. A
-`CrossfadePlugin` does not, since the fade happens inside the painter, and neither does a
-`PainterPlugin` such as `BlurTransformationPlugin`, since the container draws through it.
-
-When all you want is the image, `rememberImagePainter` gives you the painter on its own
-and you keep the node:
-
-```kotlin
-import com.skydoves.landscapist.image.rememberImagePainter
-
-Image(
-    painter = rememberImagePainter(model = "https://example.com/image.jpg"),
-    contentDescription = null,
-    modifier = Modifier.size(120.dp)
-)
-```
-
-It reads the memory cache while it composes, so an already loaded image is drawn in the first frame,
-and it takes the size to decode at from the first draw. There are no loading or failure slots here,
-no `ImagePlugin` and no crossfade, since each of those needs something composed around the image.
-
-### Supported Image Sources
-
-`LandscapistImage` supports various image sources including network URLs, local files, drawable resources, and more. See the [Landscapist Image documentation](https://skydoves.github.io/landscapist/landscapist-image/#supported-image-sources) for a complete list of supported image sources per platform.
-
----
 
 <div class="header">
   <a href="https://github.com/bumptech/glide" target="_blank"> <img src="https://user-images.githubusercontent.com/24237865/95545537-1bc15200-0a39-11eb-883d-644f564da5d3.png" align="left" width="4%" alt="Glide" /></a>
