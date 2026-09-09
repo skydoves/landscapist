@@ -15,42 +15,41 @@
  */
 package com.github.skydoves.landscapistdemo.web
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.network.ktor3.KtorNetworkFetcherFactory
-import com.github.skydoves.landscapistdemo.web.theme.LandscapistDemoTheme
-import com.github.skydoves.landscapistdemo.web.theme.purple200
+import com.github.skydoves.landscapistdemo.web.design.DemoColors
+import com.github.skydoves.landscapistdemo.web.design.DemoType
+import com.github.skydoves.landscapistdemo.web.design.Divider
+import com.github.skydoves.landscapistdemo.web.design.Hint
+import com.github.skydoves.landscapistdemo.web.design.LinkText
+import com.github.skydoves.landscapistdemo.web.design.VSpace
 
 private const val REPOSITORY_URL: String = "https://github.com/skydoves/landscapist"
 private const val DOCUMENTATION_URL: String = "https://skydoves.github.io/landscapist/"
 
-/**
- * The whole demo. One screen, deliberately: the point is the controls, not navigation.
- */
+/** Wider than this and the preview sits beside the controls instead of above them. */
+private const val TwoColumnWidthDp = 900
+
 @Composable
 internal fun DemoApp() {
   // Coil has no network fetcher of its own on wasm, so the comparison column would report Error on
@@ -62,26 +61,43 @@ internal fun DemoApp() {
       .build()
   }
 
-  LandscapistDemoTheme {
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-      Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter,
+  val state = rememberPlaygroundState()
+
+  Column(modifier = Modifier.fillMaxSize().background(DemoColors.Background)) {
+    TopBar()
+    Divider()
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth().weight(1f)) {
+      val twoColumn = maxWidth >= TwoColumnWidthDp.dp
+      Column(
+        modifier = Modifier
+          .fillMaxSize()
+          .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
       ) {
-        // Capped, because the browser window can be far wider than any phone and a playground
-        // stretched across a desktop monitor puts every control a mouse journey apart.
-        //
-        // The scroll lives here rather than inside the playground so the header and the footer
-        // travel with it.
-        Column(
-          modifier = Modifier
-            .widthIn(max = 560.dp)
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState()),
-        ) {
-          DemoHeader()
-          PlaygroundScreen()
-          DemoFooter()
+        Column(modifier = Modifier.widthIn(max = 1120.dp).fillMaxWidth().padding(20.dp)) {
+          Masthead()
+          VSpace(20)
+          if (twoColumn) {
+            Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+              Column(modifier = Modifier.weight(1.15f)) {
+                PreviewPane(state)
+                VSpace(20)
+                CodePane(state)
+              }
+              ControlPane(state, modifier = Modifier.width(360.dp))
+            }
+          } else {
+            PreviewPane(state)
+            VSpace(12)
+            ControlPane(state)
+            VSpace(12)
+            CodePane(state)
+          }
+          VSpace(20)
+          PlaygroundComparison(url = state.url, contentScale = state.contentScale)
+          VSpace(28)
+          Footer()
+          VSpace(24)
         }
       }
     }
@@ -89,59 +105,77 @@ internal fun DemoApp() {
 }
 
 @Composable
-private fun DemoHeader() {
-  Text(
-    text = "Landscapist playground",
-    style = MaterialTheme.typography.h1,
-    fontSize = 22.sp,
-    modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 20.dp),
-  )
-  LinkRow(
-    links = listOf(
-      "GitHub" to REPOSITORY_URL,
-      "Documentation" to DOCUMENTATION_URL,
-    ),
-  )
-  HintText(
-    "Every control below drives one real load through landscapist-image, compiled to " +
-      "WebAssembly and running in this tab. The readout is what the loader reported.",
-  )
-}
-
-@Composable
-private fun DemoFooter() {
-  SectionHeader("Landscapist")
-  HintText(
-    "The source of this page is the :demo-web module. It is a port of the Android sample's " +
-      "playground, so the two read alike without being kept in step.",
-  )
-  LinkRow(
-    links = listOf(
-      "github.com/skydoves/landscapist" to REPOSITORY_URL,
-      "Documentation" to DOCUMENTATION_URL,
-    ),
-  )
-  Spacer(modifier = Modifier.height(32.dp))
-}
-
-/** Underlined text that opens a url in a new tab, which on web is what the platform does. */
-@Composable
-private fun LinkRow(links: List<Pair<String, String>>) {
+private fun TopBar() {
   val uriHandler = LocalUriHandler.current
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
-    horizontalArrangement = Arrangement.spacedBy(14.dp),
+  Box(
+    modifier = Modifier.fillMaxWidth().background(DemoColors.Surface),
+    contentAlignment = Alignment.Center,
   ) {
-    links.forEach { (label, url) ->
-      Text(
-        text = label,
-        color = purple200,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Bold,
-        textDecoration = TextDecoration.Underline,
-        modifier = Modifier.clickable { uriHandler.openUri(url) },
+    Row(
+      modifier = Modifier
+        .widthIn(max = 1120.dp)
+        .fillMaxWidth()
+        .padding(horizontal = 20.dp, vertical = 13.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(text = "Landscapist", style = DemoType.Wordmark, color = DemoColors.Text)
+        Text(
+          text = "  /  playground",
+          style = DemoType.Wordmark,
+          color = DemoColors.Accent,
+        )
+      }
+      Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        LinkText("Docs", onClick = { uriHandler.openUri(DOCUMENTATION_URL) })
+        LinkText(
+          label = "GitHub",
+          color = DemoColors.Accent,
+          onClick = { uriHandler.openUri(REPOSITORY_URL) },
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun Masthead() {
+  Text(
+    text = "Every option, on one page",
+    style = DemoType.Title,
+    color = DemoColors.Text,
+  )
+  VSpace(8)
+  Hint(
+    "This is landscapist-image compiled to WebAssembly and running in this tab. Change the size, " +
+      "the content scale, the plugins or where it loads from, and the panel under the image is " +
+      "what the loader reported back. The code for whatever you land on is below it.",
+    modifier = Modifier.widthIn(max = 680.dp),
+  )
+}
+
+@Composable
+private fun Footer() {
+  val uriHandler = LocalUriHandler.current
+  Divider()
+  VSpace(14)
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+      text = "Built from the :demo-web module, a port of the Android sample's playground.",
+      style = DemoType.Hint,
+      color = DemoColors.TextFaint,
+    )
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+      LinkText("Documentation", onClick = { uriHandler.openUri(DOCUMENTATION_URL) })
+      LinkText(
+        label = "github.com/skydoves/landscapist",
+        color = DemoColors.Accent,
+        onClick = { uriHandler.openUri(REPOSITORY_URL) },
       )
     }
   }
