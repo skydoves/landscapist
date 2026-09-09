@@ -160,6 +160,9 @@ internal class LandscapistImageNode(
     awaitingRequest = true
   }
 
+  /** What the last measure ran with, so a rebind can peek at the size it is about to draw at. */
+  private var lastConstraints: Constraints? = null
+
   /** Only if it is still running: `cancel` builds a `CancellationException` either way. */
   private fun cancelLoad() {
     val running = loadJob
@@ -207,7 +210,19 @@ internal class LandscapistImageNode(
 
   /** The synchronous cache read, so an image already in memory is drawn in the first frame. */
   private fun peek() {
-    val cached = landscapist.peekMemoryCache(request)
+    // Asked at the size this node was last measured at, when it has one. A node handed a new model
+    // has already laid out for the old one, so it knows the box it is about to fill and is given
+    // only an entry that fills it. Asking unsized put a strip's thumbnail into a detail slot,
+    // stretched, for the frames it took the real decode to arrive. A node that has never been
+    // measured has nothing to judge a variant against and takes what is there, which is what draws
+    // an already decoded image in the frame the node first appears in.
+    val bounds = lastConstraints
+    val asked = if (bounds == null) {
+      request
+    } else {
+      buildSizedRequest(request, imageOptions, bounds.withoutZeroBounds())
+    }
+    val cached = landscapist.peekMemoryCache(asked)
     // An image with nothing cached has nothing to show yet, and callers have always been told so
     // before the load starts.
     publish(cached?.toLandscapistImageState() ?: LandscapistImageState.Loading)
@@ -221,6 +236,7 @@ internal class LandscapistImageNode(
     // than recorded into composition. A probe that wrote them back as state invalidated the
     // composition that had just measured it, which is a second composition and a second layout pass
     // for every image on the first frame.
+    lastConstraints = constraints
     if (!started) {
       started = true
       startLoad(constraints)

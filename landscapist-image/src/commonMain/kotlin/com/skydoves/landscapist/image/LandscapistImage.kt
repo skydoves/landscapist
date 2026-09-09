@@ -194,12 +194,13 @@ public fun LandscapistImage(
     },
   ) { landscapistState ->
     // Wrap with CrossfadeWithEffect when CrossfadePlugin is present
+    // Off only when the container is actually doing the fading, not merely when it could.
+    val crossfadeEnabled = crossfadePlugin != null && !(fadesWhilePainting && canPaintOnContainer)
     CrossfadeWithEffect(
       targetState = landscapistState,
       durationMs = crossfadePlugin?.duration ?: 0,
-      contentKey = { it.crossfadeKey() },
-      // Off only when the container is actually doing the fading, not merely when it could.
-      enabled = crossfadePlugin != null && !(fadesWhilePainting && canPaintOnContainer),
+      contentKey = if (crossfadeEnabled) CrossfadeContentKey else ContentGroupKey,
+      enabled = crossfadeEnabled,
     ) { state ->
       when (state) {
         is LandscapistImageState.None,
@@ -360,15 +361,6 @@ private fun LandscapistImageInternal(
 ) {
   val loadingKey = imageOptions.loadingOptionsKey
 
-  // Read the memory cache during composition so an image that is already decoded is drawn in the
-  // very first frame. Waiting for the flow costs a frame of empty content even on a cache hit,
-  // which is what makes images blink when a composable enters, most visibly when a shared element
-  // transition animates the bounds of what is still an empty box.
-  var state by remember(request, loadingKey) {
-    val cached = landscapist.value.peekMemoryCache(request.value)
-    mutableStateOf(cached?.toImageLoadState() ?: ImageLoadState.None)
-  }
-
   // Packed into one state: both axes are written together, once, and locked afterwards so a later
   // constraint change does not restart the load.
   var incomingConstraints by remember { mutableLongStateOf(NOT_MEASURED) }
@@ -387,6 +379,21 @@ private fun LandscapistImageInternal(
       Constraints() // unbounded fallback (should rarely happen)
     }
     buildSizedRequest(request.value, imageOptions, constraints)
+  }
+
+  // Read the memory cache during composition so an image that is already decoded is drawn in the
+  // very first frame. Waiting for the flow costs a frame of empty content even on a cache hit,
+  // which is what makes images blink when a composable enters, most visibly when a shared element
+  // transition animates the bounds of what is still an empty box.
+  //
+  // Peeked with the sized request rather than the bare one. The bounds outlive a model change,
+  // since nothing re-keys them, so an image swapped into a slot that has already been measured
+  // knows the box it is about to fill and is handed only an entry that fills it. Asking with the
+  // bare request put a thumbnail cached by a strip of the same urls into the detail view above it,
+  // stretched, until the real load replaced it.
+  var state by remember(request, loadingKey) {
+    val cached = landscapist.value.peekMemoryCache(sizedRequest)
+    mutableStateOf(cached?.toImageLoadState() ?: ImageLoadState.None)
   }
 
   // Auto-calculate aspect ratio from loaded image dimensions for sub-sampling support.
@@ -701,15 +708,40 @@ private fun ImageResult.toImageLoadState(): ImageLoadState = when (this) {
 }
 
 /**
- * What identifies this state to the crossfade.
+ * What identifies this state while something is fading.
  *
  * Keying on the state itself means `key()` hashes it every composition, and a success state hashes
- * the encoded image with it. The decoded image is what the crossfade actually distinguishes.
+ * the encoded image with it. The decoded image is what a fade animates from and to, so it is what
+ * distinguishes one frame of the animation from another.
  */
 private fun LandscapistImageState.crossfadeKey(): Any = when (this) {
   is LandscapistImageState.Success -> data ?: this
   else -> this
 }
+
+/**
+ * What the content is grouped by when nothing fades.
+ *
+ * The key then decides only what gets rebuilt, and one image decoded twice is the same content: a
+ * resize, or a cached variant standing in until the right one arrives. Keying that on the decoded
+ * bitmap discarded everything composed inside on the second one, the plugin groups, a zoomable's
+ * decoder and sub-sampling state, and the reveal's animation, which starts again from nothing. That
+ * is the image appearing to load a second time. A genuinely different image arrives through a state
+ * reset, so it still lands in a new group.
+ */
+private fun LandscapistImageState.contentGroupKey(): Any = when (this) {
+  is LandscapistImageState.Success -> SuccessGroup
+  is LandscapistImageState.Failure -> FailureGroup
+  else -> LoadingGroup
+}
+
+private val SuccessGroup = Any()
+private val FailureGroup = Any()
+private val LoadingGroup = Any()
+
+// Hoisted, so choosing between them does not allocate a lambda per composition.
+private val CrossfadeContentKey: (LandscapistImageState) -> Any? = { it.crossfadeKey() }
+private val ContentGroupKey: (LandscapistImageState) -> Any? = { it.contentGroupKey() }
 
 // Enum.valueOf goes through a name lookup, and these conversions run on every composition. A when
 // is a table switch.

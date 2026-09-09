@@ -224,10 +224,17 @@ public class Landscapist private constructor(
   public fun peekMemoryCache(request: ImageRequest): ImageResult.Success? {
     if (request.model == null || !request.memoryCachePolicy.readEnabled) return null
     val cacheKey = request.cacheKey()
-    // The peek runs before layout, so there is usually no target size to satisfy and any decoded
-    // variant will do. The correctly sized one replaces it as soon as the real load resolves.
-    val cached = memoryCache[cacheKey] ?: memoryCache.getIgnoringSize(cacheKey) ?: return null
-    return cached.toSuccess()
+    val exact = memoryCache[cacheKey]
+    if (exact != null) return exact.toSuccess()
+    // A caller that knows the box it is about to fill gets the same answer a load would give it.
+    // Handing back any variant instead put a strip's 50 pixel thumbnail into the detail view above
+    // it, stretched, until the real load replaced it a moment later.
+    if (request.targetWidth.asPixelBound() != null || request.targetHeight.asPixelBound() != null) {
+      return readMemoryCache(request, cacheKey)?.toSuccess()
+    }
+    // A caller that has not been measured yet has nothing to judge a variant against, and an
+    // already decoded image beats an empty frame. The right one replaces it when the load resolves.
+    return memoryCache.getIgnoringSize(cacheKey)?.toSuccess()
   }
 
   /**
