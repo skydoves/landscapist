@@ -47,6 +47,7 @@ import com.skydoves.landscapist.core.network.ImageFetcher
 import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
@@ -66,14 +67,28 @@ class UnboundedAxisTest {
 
   private val url = "https://example.com/photo.png"
 
+  /** How long a fetch takes, so the helpers below are measuring a load that actually happened. */
+  private val FetchDelayMillis = 30L
+
+  /** Generous, because it only has to be longer than a fetch on a loaded CI machine. */
+  private val WaitTimeoutMillis = 10_000L
+
   private fun loaderFor(width: Int, height: Int): Landscapist {
     val loader = Landscapist.builder()
       .noDiskCache()
       .fetcher(
         object : ImageFetcher {
           override fun canHandle(model: Any?): Boolean = true
-          override suspend fun fetch(request: ImageRequest): FetchResult =
-            FetchResult.Success(data = byteArrayOf(1), mimeType = "image/png")
+          override suspend fun fetch(request: ImageRequest): FetchResult {
+            // A fetch that returns on the same continuation is not a fetch any caller will ever
+            // see, and it hides the case these tests are about: the peek only answers from the
+            // memory cache when decoding again could not come back smaller, so an image larger
+            // than the row it is going into is fetched asynchronously and the first layout
+            // happens without it. Without this delay the helpers below can read a size that only
+            // a warm cache would have produced, and they pass whether or not they wait.
+            delay(FetchDelayMillis)
+            return FetchResult.Success(data = byteArrayOf(1), mimeType = "image/png")
+          }
         },
       )
       .decoder(
@@ -105,6 +120,7 @@ class UnboundedAxisTest {
   ): IntSize {
     val loader = loaderFor(imageWidth, imageHeight)
     var size: IntSize? = null
+    var loaded = false
     runComposeUiTest {
       setContent {
         Column(Modifier.size(200.dp).verticalScroll(rememberScrollState())) {
@@ -114,9 +130,12 @@ class UnboundedAxisTest {
             modifier = Modifier.fillMaxWidth().onGloballyPositioned { size = it.size },
             imageOptions = ImageOptions(contentScale = scale),
             requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+            onImageStateChanged = { if (it is LandscapistImageState.Success) loaded = true },
           )
         }
       }
+      waitUntil(timeoutMillis = WaitTimeoutMillis) { loaded }
+      waitForIdle()
     }
     return assertNotNull(size, "the composable never laid out")
   }
@@ -162,6 +181,7 @@ class UnboundedAxisTest {
   ): IntSize {
     val loader = loaderFor(imageWidth, imageHeight)
     var size: IntSize? = null
+    var loaded = false
     runComposeUiTest {
       setContent {
         Column(Modifier.size(200.dp).verticalScroll(rememberScrollState())) {
@@ -172,9 +192,12 @@ class UnboundedAxisTest {
             imageOptions = ImageOptions(contentScale = scale),
             component = rememberImageComponent { +CrossfadePlugin(duration = 50) },
             requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+            onImageStateChanged = { if (it is LandscapistImageState.Success) loaded = true },
           )
         }
       }
+      waitUntil(timeoutMillis = WaitTimeoutMillis) { loaded }
+      waitForIdle()
     }
     return assertNotNull(size, "the composable never laid out")
   }
@@ -210,6 +233,7 @@ class UnboundedAxisTest {
   ): IntSize {
     val loader = loaderFor(imageWidth, imageHeight)
     var size: IntSize? = null
+    var loaded = false
     runComposeUiTest {
       setContent {
         Row(Modifier.size(200.dp).horizontalScroll(rememberScrollState())) {
@@ -224,9 +248,12 @@ class UnboundedAxisTest {
               rememberImageComponent {}
             },
             requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+            onImageStateChanged = { if (it is LandscapistImageState.Success) loaded = true },
           )
         }
       }
+      waitUntil(timeoutMillis = WaitTimeoutMillis) { loaded }
+      waitForIdle()
     }
     return assertNotNull(size, "the composable never laid out")
   }
@@ -293,6 +320,7 @@ class UnboundedAxisTest {
   ): IntSize {
     val loader = loaderFor(80, 40)
     var size: IntSize? = null
+    var loaded = false
     runComposeUiTest {
       setContent {
         scrolls {
@@ -305,9 +333,12 @@ class UnboundedAxisTest {
               +CrossfadePlugin(duration = 50)
             },
             requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+            onImageStateChanged = { if (it is LandscapistImageState.Success) loaded = true },
           )
         }
       }
+      waitUntil(timeoutMillis = WaitTimeoutMillis) { loaded }
+      waitForIdle()
     }
     return assertNotNull(size, "the composable never laid out")
   }
