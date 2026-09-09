@@ -2,6 +2,11 @@
 
 You can provide image options to your Landscapist composable functions by passing an `ImageOptions` instance, as demonstrated in the code below:
 
+!!! tip "Try it in a browser"
+
+    The [playground](https://skydoves.github.io/landscapist/demo/) puts every `ContentScale` on a checkerboard with the image's
+    box outlined, which is the quickest way to see what each one does.
+
 === "Glide"
 
     ```kotlin

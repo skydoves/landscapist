@@ -2,6 +2,12 @@
 
 **Compose Multiplatform from day one.** The `landscapist-image` module provides a powerful, production-ready Compose Multiplatform UI component for loading and displaying images using the `landscapist-core` engine. Unlike platform-specific solutions like GlideImage (Android-only) or FrescoImage (Android-only), LandscapistImage is built from the ground up for Kotlin Multiplatform and Compose Multiplatform, enabling you to write your image loading code once and deploy it across Android, iOS, Desktop, and Web platforms.
 
+!!! tip "Try it in a browser"
+
+    The [playground](https://skydoves.github.io/landscapist/demo/) is this composable compiled to WebAssembly. Change its size,
+    its content scale and its plugins, watch what the loader reports back, and copy the
+    Kotlin for whatever you land on.
+
 Built on top of the standalone `landscapist-core` image loading engine, LandscapistImage gives you complete control over the entire image loading pipeline, from network requests to caching strategies to image transformations, while maintaining seamless compatibility with all Landscapist plugins. This means you get the power and flexibility of a custom image loader combined with the convenience of a high-level Compose API.
 
 ## Installation

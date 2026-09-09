@@ -46,7 +46,7 @@ internal class PlaygroundState(
   private val scope: CoroutineScope,
 ) {
   var toggles: PluginToggles by mutableStateOf(PluginToggles())
-  var sizeMode: SizeMode by mutableStateOf(SizeMode.Fixed)
+  var sizeMode: SizeMode by mutableStateOf(SizeMode.AspectRatio)
   var scaleMode: ScaleMode by mutableStateOf(ScaleMode.Crop)
   var source: LoadSource by mutableStateOf(LoadSource.Memory)
   var urlIndex: Int by mutableIntStateOf(0)

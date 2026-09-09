@@ -10,10 +10,21 @@ Additionally, Landscapist offers the flexibility to configure and attach image-l
 
 ## Try it in a browser
 
-The [playground](https://skydoves.github.io/landscapist/demo/) runs `landscapist-image` compiled to
-WebAssembly. Every image size, content scale and plugin combination is a switch, and the readout
-next to the image is what the loader reported. It needs a browser with WebAssembly garbage
-collection: Chrome 119, Firefox 120, Safari 18.2 or newer.
+**[Open the playground](https://skydoves.github.io/landscapist/demo/)** to use Landscapist without
+installing anything. It is `landscapist-image` compiled to WebAssembly, running in the page.
+
+Every image size, content scale and plugin combination is a switch. The panel under the image is
+what the loader reported back, and the panel below that is the Kotlin for whatever you land on,
+with a button to copy it into your project.
+
+!!! note "What the browser does differently"
+
+    There is no disk cache on the web, the decoder hands the whole encoded image to Skia rather
+    than sampling it down, and the zoomable plugin cannot decode a region, so it pans and zooms
+    over the one decoded bitmap. The playground says so next to the control each one affects.
+
+    It needs a browser with WebAssembly garbage collection: Chrome 119, Firefox 120, Safari 18.2
+    or newer.
 
 ## Why Landscapist?
 

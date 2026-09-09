@@ -52,20 +52,6 @@ kotlin {
         implementation(compose.foundation)
         implementation(compose.material)
         implementation(compose.ui)
-
-        // Real Coil, not the landscapist wrapper: the comparison column is meant to be the other
-        // library rather than this library's binding to it.
-        implementation(libs.coil3)
-        implementation(libs.coil3.compose)
-        implementation(libs.coil3.network.ktor3)
-      }
-    }
-
-    wasmJsMain {
-      dependencies {
-        // Coil's Ktor fetcher picks its engine off the classpath. landscapist-core has its own
-        // copy but declares it as implementation, so it does not reach here.
-        implementation(libs.ktor.engine.js)
       }
     }
   }

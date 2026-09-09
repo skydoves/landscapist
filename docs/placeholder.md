@@ -2,6 +2,12 @@
 
 The `landscapist-placeholder` package offers a rich selection of image plugins for implementing placeholders, including loading and failure placeholder support, as well as shimmering animations.
 
+!!! tip "Try it in a browser"
+
+    Shimmer, BlurHash, ThumbHash, the thumbnail preview and the loading and failure
+    placeholders are all switches in the [playground](https://skydoves.github.io/landscapist/demo/). Pick its Network source to
+    make a load happen every time, so the loading placeholders actually show.
+
 To utilize these placeholder supports, simply add the following dependency:
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>
