@@ -31,7 +31,13 @@ import com.skydoves.landscapist.InternalLandscapistApi
  *
  * You can implement your own image plugin that will be composed with Image Composable functions
  * by implementing one of [ImagePlugin.PainterPlugin], [ImagePlugin.LoadingStatePlugin],
- * [ImagePlugin.SuccessStatePlugin], or [ImagePlugin.FailureStatePlugin]
+ * [ImagePlugin.SuccessStatePlugin], [ImagePlugin.FailureStatePlugin] or
+ * [ImagePlugin.ComposablePlugin].
+ *
+ * Give it value equality, as a data class or as `equals` and `hashCode` over whatever configures
+ * it. A plugin set is compared to decide whether the component an image was handed has changed,
+ * and an image is skippable, so a plugin the runtime cannot compare is a new value on every
+ * composition and costs every image carrying it its skipping.
  */
 @Immutable
 public sealed interface ImagePlugin {

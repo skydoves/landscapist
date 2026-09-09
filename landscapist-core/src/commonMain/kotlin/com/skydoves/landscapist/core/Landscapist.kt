@@ -342,21 +342,15 @@ public class Landscapist private constructor(
   )
 
   /**
-   * The model, scoped by any headers the request carries.
+   * The model, scoped by the headers the request carries.
    *
    * An Authorization or Cookie header makes it a different viewer's image, and content negotiation
    * makes it different bytes, so they must not share a cache entry or a file on disk. A request
    * with no headers keys exactly as it did before.
-   */
-  /**
-   * The model, scoped by the headers sent with it.
-   *
-   * Two viewers with different credentials ask for the same URL and must not be handed each
-   * other's images, so the headers are part of what identifies the entry.
    *
    * The whole header map counts, which means a rotating token re-keys every image behind it and
-   * the entries cached under the old one are left to be evicted. Send credentials that change on
-   * their own schedule through the network configuration rather than per request.
+   * leaves the entries under the old one to be evicted. Send a credential that changes on its own
+   * schedule through the network configuration rather than per request.
    */
   private fun ImageRequest.identityScopedModel(): Any? {
     if (headers.isEmpty()) return model

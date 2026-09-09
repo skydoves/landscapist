@@ -27,6 +27,11 @@ import androidx.compose.runtime.remember
  * stable parameter, so a component held across a plugin change is one the image never looks at
  * again, and a component rebuilt on every composition is one no image can ever skip.
  *
+ * Same means equal, so a plugin has to be comparable. Every plugin this library ships is. One that
+ * is not is a new value on each composition, which rebuilds the component around it and costs the
+ * image its skipping, so give a custom [com.skydoves.landscapist.plugins.ImagePlugin] value
+ * equality: a data class, or `equals` and `hashCode` over whatever configures it.
+ *
  * @param block The receiver of an instance of [ImagePluginComponent].
  */
 @Composable
