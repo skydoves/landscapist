@@ -46,6 +46,8 @@ kotlin {
         implementation(project(":landscapist-placeholder"))
         implementation(project(":landscapist-zoomable"))
 
+        implementation(libs.kotlinx.coroutines.core)
+
         implementation(compose.runtime)
         implementation(compose.foundation)
         implementation(compose.material)
