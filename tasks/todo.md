@@ -148,6 +148,20 @@ gap and some of the resident set gap. That is the next thing worth working on.
       bytes and let Skia decode at draw size, so the entry is the whole source, but it was
       matched on sizes read from the header and refused for every box but its own. Such an entry
       serves any request now.
+- [x] FIXED: keying `rememberImageComponent` on the plugins cost four of them their skipping.
+      `ThumbnailPlugin`, `BlurHashPlugin`, `ThumbHashPlugin` and `ProgressiveLoadingPlugin` were
+      plain classes, so each composition built a plugin unequal to the last, rebuilt the component,
+      and recomposed every image carrying one. They compare over their configuration now, and a
+      test walks every shipped plugin so the next one added cannot slip through.
+- [x] FIXED: an entry decoded with no target size answered every later request for that url. A node
+      measured to nothing on its first pass sends one, so a collapsed row could leave a 4000px
+      bitmap serving a 96px slot. "Nothing was asked for" and "a box was asked for and ignored" are
+      told apart now.
+- [x] FIXED: `RedirectCookies` honoured `Domain=com`, putting one site's cookie on every request
+      the shared client made to any host ending in it. Two labels are required. `Domain=co.uk` still
+      passes, which needs a public suffix list.
+- [x] FIXED: `rememberCrossfadePainter` held the painter it was first given for the life of the
+      composable, next to the one it dissolves over.
 - [x] NOT A BUG: hardware bitmaps and pixel reading plugins. A JPEG does decode to
       Bitmap.Config.HARDWARE here, confirmed by probe, and both plugins that read pixels cope:
       the blur copies to ARGB_8888 itself, and kmpalette handles it. Pinned by a palette test
