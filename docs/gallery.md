@@ -354,6 +354,28 @@ SharedTransitionLayout {
 
 The same pattern works with `NavHost`. Use the `AnimatedContentScope` from each `composable { ... }` destination as the `animatedContentScope`.
 
+### Give both sides the same content scale
+
+A shared element animates bounds. It does not animate framing, and `ContentScale` is framing.
+
+Give the grid `ContentScale.Crop` and the viewer `ContentScale.Fit` and the two screens draw the
+same photo at two different sizes inside the same bounds. On the frame the viewer takes over, the
+picture is redrawn at the smaller of the two and then grows back over the length of the animation.
+Measured on a 600x400 photo opening from a 353px square cell: 529px wide in the grid, 353px wide on
+the viewer's first frame, a third smaller in one frame. It reads as the image flinching.
+
+```kotlin
+val scale = ContentScale.Crop
+
+ImageGallery(images = urls, imageOptions = ImageOptions(contentScale = scale), ...)
+ImageViewer(images = urls, imageOptions = ImageOptions(contentScale = scale), ...)
+```
+
+`Crop` on both keeps the grid filled and the transition still. What it costs is the edges of the
+photo on the viewer, which a pinch brings back. `Fit` on both keeps the whole photo and letterboxes
+the grid cells instead. Which one to give up is yours to choose; giving up neither is what produces
+the flinch.
+
 ### Custom key provider
 
 By default, keys are `"landscapist-shared-$index-$imageModel"`. Override `keyProvider` when:

@@ -202,3 +202,10 @@ gap and some of the resident set gap. That is the next thing worth working on.
 - [ ] The tiles are drawn fitted inside the box while the content fills it, so the one handover
       still moves the picture. Making them agree means telling sub-sampling which content scale
       the caller asked for.
+- [ ] A gallery cell drawn `Crop` opening into a viewer drawn `Fit` redraws the picture two thirds
+      the size on the frame the viewer takes over, then grows it back over the animation. Measured:
+      a 600x400 photo is 529px wide in a 353px cell and 353px wide on the viewer's first frame. The
+      frames are pixel identical to `main`, so this is not new, and the layout never moves: only
+      the framing does. Removing it properly means interpolating the content scale across the
+      transition, which is what a photos app does and which `sharedBounds` cannot do for us. The
+      demo now matches the two scales instead, and `docs/gallery.md` says why.

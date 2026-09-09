@@ -487,7 +487,15 @@ private fun LandscapistImageInternal(
     Modifier
   } else {
     Modifier.layout { measurable, constraints ->
-      if (incomingConstraints == NOT_MEASURED) {
+      // A bounded axis that measured to nothing is not an answer, so the probe stays and waits for
+      // one. Locking it wrote a zero, which reads back as an open axis, and an open axis on both
+      // sides is a request with no target at all: a decode at the source's own size and a cache
+      // read with no box to judge a variant against. A lazy item laid out before its container has
+      // room, or a container that animates open from nothing, both start there. The node path has
+      // always refused a zero bound this way; this is the composed path agreeing with it.
+      val collapsed = (constraints.hasBoundedWidth && constraints.maxWidth == 0) ||
+        (constraints.hasBoundedHeight && constraints.maxHeight == 0)
+      if (incomingConstraints == NOT_MEASURED && !collapsed) {
         val width = if (constraints.hasBoundedWidth) constraints.maxWidth else 0
         val height = if (constraints.hasBoundedHeight) constraints.maxHeight else 0
         incomingConstraints = (width.toLong() shl 32) or (height.toLong() and 0xFFFFFFFFL)
