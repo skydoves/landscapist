@@ -105,9 +105,18 @@ public class Landscapist private constructor(
   private val inFlightFetchLock = SynchronizedObject()
   private val inFlightFetches = mutableMapOf<String, InFlightFetch>()
 
-  private class InFlightFetch(val deferred: Deferred<FetchResult>) {
+  private class InFlightFetch(val deferred: Deferred<FetchedBytes>) {
     var waiters: Int = 0
   }
+
+  /**
+   * A download and where it was stored.
+   *
+   * The path comes back with the bytes so every caller sharing one download says the same thing
+   * about the file. Computing it from each caller's own policy told a caller that had asked for a
+   * write about a file the download had not been allowed to make.
+   */
+  private class FetchedBytes(val result: FetchResult, val diskPath: String?)
 
   init {
     // Register default memory pressure listener
@@ -443,17 +452,17 @@ public class Landscapist private constructor(
    * editors on the same file. It follows the policy of the request that started the download,
    * which is the same assumption the coalescing above already documents.
    */
-  private suspend fun fetchAndStore(request: ImageRequest, cacheKey: CacheKey): FetchResult {
+  private suspend fun fetchAndStore(request: ImageRequest, cacheKey: CacheKey): FetchedBytes {
     val result = fetcher.fetch(request)
-    if (result is FetchResult.Success &&
-      request.diskCachePolicy.writeEnabled &&
-      diskCache != null
-    ) {
-      val data = result.data
-      // Off the critical path, so the decode starts without waiting for the file.
-      scope.launch { runCatching { writeToDiskCache(cacheKey, data) } }
+    val cache = diskCache
+    if (result !is FetchResult.Success || !request.diskCachePolicy.writeEnabled || cache == null) {
+      return FetchedBytes(result, null)
     }
-    return result
+    val data = result.data
+    // Off the critical path, so the decode starts without waiting for the file. The path is
+    // deterministic, so it can be reported before the write finishes.
+    scope.launch { runCatching { writeToDiskCache(cacheKey, data) } }
+    return FetchedBytes(result, (cache.directory / cacheKey.diskKey).toString())
   }
 
   /**
@@ -466,8 +475,16 @@ public class Landscapist private constructor(
    * The last caller to leave drops the entry, and cancels the work only if it has not finished,
    * which is how [dedupedStandardTerminal] handles the same problem.
    */
-  private suspend fun dedupedFetch(request: ImageRequest, cacheKey: CacheKey): FetchResult {
-    val key = cacheKey.diskKey
+  private suspend fun dedupedFetch(request: ImageRequest, cacheKey: CacheKey): FetchedBytes {
+    // The write policy is part of the key. Two requests for one url that disagree about whether it
+    // may be stored cannot share a download, because whichever ran first would decide for both and
+    // both are told where the file is.
+    val key = if (request.diskCachePolicy.writeEnabled) {
+      cacheKey.diskKey
+    } else {
+      // Marks a download nobody is allowed to store, so it never shares with one that is.
+      cacheKey.diskKey + "!"
+    }
     val entry = synchronized(inFlightFetchLock) {
       val existing = inFlightFetches[key]
       if (existing != null) {
@@ -554,15 +571,11 @@ public class Landscapist private constructor(
       }
 
       // Network fetch, shared with anyone else asking for the same url at another size.
-      return when (val fetchResult = dedupedFetch(request, cacheKey)) {
+      val fetched = dedupedFetch(request, cacheKey)
+      return when (val fetchResult = fetched.result) {
         is FetchResult.Success -> {
-          // The write is done by the shared fetch, once per download. The path is deterministic,
-          // so it can be reported here before that write finishes.
-          val diskPath = if (request.diskCachePolicy.writeEnabled && diskCache != null) {
-            (diskCache.directory / cacheKey.diskKey).toString()
-          } else {
-            null
-          }
+          // Where the shared download stored it, or null when it was not allowed to.
+          val diskPath = fetched.diskPath
           decodeAndCacheStandard(
             bytes = fetchResult.data,
             mimeType = fetchResult.mimeType,
@@ -708,19 +721,13 @@ public class Landscapist private constructor(
       if (handled) return
     }
 
-    // Network fetch, shared the same way the standard path shares it.
-    when (val fetchResult = dedupedFetch(request, cacheKey)) {
+    // Network fetch, shared the same way the standard path shares it, and stored by it. Writing
+    // again here raced the shared write for the same key, and whichever lost left this path with
+    // no file to report.
+    val fetched = dedupedFetch(request, cacheKey)
+    when (val fetchResult = fetched.result) {
       is FetchResult.Success -> {
-        var diskPath: String? = null
-        if (request.diskCachePolicy.writeEnabled && diskCache != null) {
-          diskCache.edit(cacheKey)?.use { editor ->
-            diskCache.fileSystem.sink(editor.dataPath).buffer().use { sink ->
-              sink.write(fetchResult.data)
-            }
-            editor.commit()
-            diskPath = (diskCache.directory / cacheKey.diskKey).toString()
-          }
-        }
+        val diskPath = fetched.diskPath
 
         if (supportsProgressiveDecode(fetchResult.data, fetchResult.mimeType)) {
           emitProgressiveDecode(

@@ -25,13 +25,14 @@ import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.layout.ScaleFactor
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.times
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
@@ -176,6 +177,10 @@ internal class LandscapistImageNode(
     started = false
     painter = null
     state = null
+    // The box belonged to the row this node is leaving. A lazy list reuses a node between rows of
+    // different heights, and keeping it would have a thumbnail slot's bounds decide what a full
+    // width slot is allowed to peek, which is the mistake the sized peek exists to avoid.
+    lastConstraints = null
   }
 
   fun update(
@@ -302,85 +307,12 @@ internal class LandscapistImageNode(
     painter = next
   }
 
-  /**
-   * The constraints the drawing is sized against.
-   *
-   * Takes every axis the parent bounded, which is what `fillMaxSize` does, and sizes an unbounded
-   * one from the image, which is what `Modifier.paint` does. Together they are what the child
-   * `Image` this replaces was measured with.
-   */
-  private fun resolveConstraints(constraints: Constraints): Constraints {
-    val filled = Constraints(
-      minWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else constraints.minWidth,
-      maxWidth = constraints.maxWidth,
-      minHeight = if (constraints.hasBoundedHeight) {
-        constraints.maxHeight
-      } else {
-        constraints.minHeight
-      },
-      maxHeight = constraints.maxHeight,
-    )
-    val painter = painter ?: return filled
-    if (filled.hasFixedWidth && filled.hasFixedHeight) return filled
-    val intrinsic = painter.intrinsicSize
-    // One axis bounded and one not is a feed row: fillMaxWidth in a scrolling column. The open axis
-    // is sized against the box the image would fill at its own shape, which is what the composable
-    // this replaced did by applying an aspect ratio before it painted. Asking the content scale
-    // about that box rather than about the intrinsic size is what keeps both ends right: a scale
-    // that fills the row answers with the box, and one that does not upscale answers with the
-    // image. Measuring against the intrinsic size instead degenerates, since the destination on
-    // the open axis is then the number being computed: a crop measures the whole intrinsic height
-    // and draws the image wider than the row, losing both edges.
-    //
-    // fitPrioritizingWidth rather than Constraints, which throws when the two axes together need
-    // more than 31 bits. A hairline tall image at 200 wide asks for a height of four million, and
-    // a layout that cannot hold it should clamp rather than bring the window down.
-    if (intrinsic.hasFiniteWidth() && intrinsic.hasFiniteHeight() &&
-      intrinsic.width > 0f && intrinsic.height > 0f
-    ) {
-      if (filled.hasFixedWidth && !filled.hasBoundedHeight) {
-        val shaped =
-          Size(filled.maxWidth.toFloat(), filled.maxWidth * intrinsic.height / intrinsic.width)
-        val height = (intrinsic.height * scaleFactor(intrinsic, shaped).scaleY).roundToInt()
-        return Constraints.fitPrioritizingWidth(
-          minWidth = filled.minWidth,
-          maxWidth = filled.maxWidth,
-          minHeight = filled.constrainHeight(height),
-          maxHeight = filled.maxHeight,
-        )
-      }
-      if (filled.hasFixedHeight && !filled.hasBoundedWidth) {
-        val shaped =
-          Size(filled.maxHeight * intrinsic.width / intrinsic.height, filled.maxHeight.toFloat())
-        val width = (intrinsic.width * scaleFactor(intrinsic, shaped).scaleX).roundToInt()
-        return Constraints.fitPrioritizingHeight(
-          minWidth = filled.constrainWidth(width),
-          maxWidth = filled.maxWidth,
-          minHeight = filled.minHeight,
-          maxHeight = filled.maxHeight,
-        )
-      }
-    }
-    val intrinsicWidth = if (intrinsic.hasFiniteWidth()) {
-      intrinsic.width.roundToInt()
-    } else {
-      filled.minWidth
-    }
-    val intrinsicHeight = if (intrinsic.hasFiniteHeight()) {
-      intrinsic.height.roundToInt()
-    } else {
-      filled.minHeight
-    }
-    val width = filled.constrainWidth(intrinsicWidth)
-    val height = filled.constrainHeight(intrinsicHeight)
-    val scaled = scaledSize(intrinsic, Size(width.toFloat(), height.toFloat()))
-    return Constraints.fitPrioritizingWidth(
-      minWidth = filled.constrainWidth(scaled.width.roundToInt()),
-      maxWidth = filled.maxWidth,
-      minHeight = filled.constrainHeight(scaled.height.roundToInt()),
-      maxHeight = filled.maxHeight,
-    )
-  }
+  /** The constraints the drawing is sized against, resolved from the painter it holds. */
+  private fun resolveConstraints(constraints: Constraints): Constraints = resolveImageConstraints(
+    constraints = constraints,
+    intrinsic = painter?.intrinsicSize ?: Size.Unspecified,
+    contentScale = imageOptions.contentScale,
+  )
 
   override fun ContentDrawScope.draw() {
     val painter = painter
@@ -388,7 +320,7 @@ internal class LandscapistImageNode(
       drawContent()
       return
     }
-    val scaled = scaledSize(painter.intrinsicSize, size)
+    val scaled = scaledImageSize(painter.intrinsicSize, size, imageOptions.contentScale)
     val position = imageOptions.alignment.align(
       IntSize(scaled.width.roundToInt(), scaled.height.roundToInt()),
       IntSize(size.width.roundToInt(), size.height.roundToInt()),
@@ -403,20 +335,6 @@ internal class LandscapistImageNode(
       }
     }
     drawContent()
-  }
-
-  /** What the content scale does to an image of [intrinsic] size drawn into [destination]. */
-  private fun scaleFactor(intrinsic: Size, destination: Size): ScaleFactor =
-    imageOptions.contentScale.computeScaleFactor(intrinsic, destination)
-
-  /** The size the image is drawn at inside a [destination] sized node. */
-  private fun scaledSize(intrinsic: Size, destination: Size): Size {
-    if (destination.width == 0f || destination.height == 0f) return Size.Zero
-    val source = Size(
-      width = if (intrinsic.hasFiniteWidth()) intrinsic.width else destination.width,
-      height = if (intrinsic.hasFiniteHeight()) intrinsic.height else destination.height,
-    )
-    return source * imageOptions.contentScale.computeScaleFactor(source, destination)
   }
 
   // The four below answer with the image's own size, the way Modifier.paint does, so an
@@ -453,6 +371,120 @@ internal class LandscapistImageNode(
     resolveConstraints(Constraints(maxWidth = width)).minHeight,
     measurable.maxIntrinsicHeight(width),
   )
+}
+
+/**
+ * Sizes an axis the parent left open from the image, the way [LandscapistImageNode] measures.
+ *
+ * The composed path has content inside it that answers with the image's own height, and on a
+ * bounded width that is the wrong number: a 400x300 image in a 200 wide row is 150 tall, not 300.
+ * A bare width over height ratio is wrong in the other direction, since it has no way to say that
+ * a content scale which does not upscale wants the height the image already has.
+ */
+internal fun Modifier.imageShape(intrinsic: Size, contentScale: ContentScale): Modifier =
+  layout { measurable, constraints ->
+    val resolved = resolveImageConstraints(constraints, intrinsic, contentScale)
+    val placeable = measurable.measure(Constraints.fixed(resolved.minWidth, resolved.minHeight))
+    layout(placeable.width, placeable.height) { placeable.placeRelative(0, 0) }
+  }
+
+/**
+ * The constraints an image of [intrinsic] size is measured against.
+ *
+ * Takes every axis the parent bounded, which is what `fillMaxSize` does, and sizes an unbounded
+ * one from the image, which is what `Modifier.paint` does. Together they are what the child
+ * `Image` this replaces was measured with. An unresolved image leaves the open axis alone.
+ */
+internal fun resolveImageConstraints(
+  constraints: Constraints,
+  intrinsic: Size,
+  contentScale: ContentScale,
+): Constraints {
+  val filled = Constraints(
+    minWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else constraints.minWidth,
+    maxWidth = constraints.maxWidth,
+    minHeight = if (constraints.hasBoundedHeight) {
+      constraints.maxHeight
+    } else {
+      constraints.minHeight
+    },
+    maxHeight = constraints.maxHeight,
+  )
+  if (intrinsic == Size.Unspecified) return filled
+  if (filled.hasFixedWidth && filled.hasFixedHeight) return filled
+  // One axis bounded and one not is a feed row: fillMaxWidth in a scrolling column. The open axis
+  // is sized against the box the image would fill at its own shape, which is what the composable
+  // this replaced did by applying an aspect ratio before it painted. Asking the content scale
+  // about that box rather than about the intrinsic size is what keeps both ends right: a scale
+  // that fills the row answers with the box, and one that does not upscale answers with the
+  // image. Measuring against the intrinsic size instead degenerates, since the destination on
+  // the open axis is then the number being computed: a crop measures the whole intrinsic height
+  // and draws the image wider than the row, losing both edges.
+  //
+  // fitPrioritizingWidth rather than Constraints, which throws when the two axes together need
+  // more than 31 bits. A hairline tall image at 200 wide asks for a height of four million, and
+  // a layout that cannot hold it should clamp rather than bring the window down.
+  if (intrinsic.hasFiniteWidth() && intrinsic.hasFiniteHeight() &&
+    intrinsic.width > 0f && intrinsic.height > 0f
+  ) {
+    if (filled.hasFixedWidth && !filled.hasBoundedHeight) {
+      val shaped =
+        Size(filled.maxWidth.toFloat(), filled.maxWidth * intrinsic.height / intrinsic.width)
+      val scale = contentScale.computeScaleFactor(intrinsic, shaped)
+      val height = (intrinsic.height * scale.scaleY).roundToInt()
+      return Constraints.fitPrioritizingWidth(
+        minWidth = filled.minWidth,
+        maxWidth = filled.maxWidth,
+        minHeight = filled.constrainHeight(height),
+        maxHeight = filled.maxHeight,
+      )
+    }
+    if (filled.hasFixedHeight && !filled.hasBoundedWidth) {
+      val shaped =
+        Size(filled.maxHeight * intrinsic.width / intrinsic.height, filled.maxHeight.toFloat())
+      val scale = contentScale.computeScaleFactor(intrinsic, shaped)
+      val width = (intrinsic.width * scale.scaleX).roundToInt()
+      return Constraints.fitPrioritizingHeight(
+        minWidth = filled.constrainWidth(width),
+        maxWidth = filled.maxWidth,
+        minHeight = filled.minHeight,
+        maxHeight = filled.maxHeight,
+      )
+    }
+  }
+  val intrinsicWidth = if (intrinsic.hasFiniteWidth()) {
+    intrinsic.width.roundToInt()
+  } else {
+    filled.minWidth
+  }
+  val intrinsicHeight = if (intrinsic.hasFiniteHeight()) {
+    intrinsic.height.roundToInt()
+  } else {
+    filled.minHeight
+  }
+  val width = filled.constrainWidth(intrinsicWidth)
+  val height = filled.constrainHeight(intrinsicHeight)
+  val scaled = scaledImageSize(intrinsic, Size(width.toFloat(), height.toFloat()), contentScale)
+  return Constraints.fitPrioritizingWidth(
+    minWidth = filled.constrainWidth(scaled.width.roundToInt()),
+    maxWidth = filled.maxWidth,
+    minHeight = filled.constrainHeight(scaled.height.roundToInt()),
+    maxHeight = filled.maxHeight,
+  )
+}
+
+/** The size an image of [intrinsic] size is drawn at inside a [destination] sized node. */
+private fun scaledImageSize(
+  intrinsic: Size,
+  destination: Size,
+  contentScale: ContentScale,
+): Size {
+  if (destination.width == 0f || destination.height == 0f) return Size.Zero
+  val source = Size(
+    width = if (intrinsic.hasFiniteWidth()) intrinsic.width else destination.width,
+    height = if (intrinsic.hasFiniteHeight()) intrinsic.height else destination.height,
+  )
+  return source * contentScale.computeScaleFactor(source, destination)
 }
 
 private fun Size.hasFiniteWidth(): Boolean =

@@ -22,6 +22,14 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
+ * The zoom at which the tiles start carrying more than the base tile already does.
+ *
+ * Below it the whole image is one sampled tile, so foreground tiles are not loaded and the caller's
+ * own content is the better picture. Both decisions read this, so they cannot drift apart.
+ */
+internal const val MinZoomForTiles: Float = 1.5f
+
+/**
  * Generates a grid of tiles for sub-sampling a large image.
  */
 public object TileGrid {

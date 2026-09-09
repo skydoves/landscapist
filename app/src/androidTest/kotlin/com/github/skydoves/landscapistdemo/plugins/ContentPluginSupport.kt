@@ -134,6 +134,10 @@ internal class HoldingDecoder(
 ) : ImageDecoder {
 
   private val released = CountDownLatch(1)
+  private val recorded = CopyOnWriteArrayList<IntSize>()
+
+  /** Every target size a decode was asked for, which is per request where a fetch is shared. */
+  val sizes: List<IntSize> get() = recorded
 
   override suspend fun decode(
     data: ByteArray,
@@ -142,6 +146,7 @@ internal class HoldingDecoder(
     targetHeight: Int?,
     config: LandscapistConfig,
   ): DecodeResult {
+    recorded += IntSize(targetWidth ?: 0, targetHeight ?: 0)
     if ((targetWidth ?: 0) > holdLargerThan) {
       withContext(Dispatchers.IO) { released.await(30, TimeUnit.SECONDS) }
     }

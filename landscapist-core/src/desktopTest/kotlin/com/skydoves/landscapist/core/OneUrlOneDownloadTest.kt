@@ -33,6 +33,8 @@ import okio.Path
 import okio.Path.Companion.toPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 /**
  * One trip to the network per url, whatever sizes are asking for it.
@@ -159,6 +161,76 @@ class OneUrlOneDownloadTest {
 
     assertEquals(1, fetcher.fetches.value, "the same bytes were downloaded twice")
     assertEquals(1, edits.value, "the same file was opened for writing twice")
+  }
+
+  /** Counts how many times anything opened the disk cache for writing. */
+  private class CountingDiskCache : DiskCache {
+    val edits = atomic(0)
+    override val directory: Path = "/tmp".toPath()
+    override val maxSize: Long = Long.MAX_VALUE
+    override val size: Long = 0
+    override val fileSystem: FileSystem = FileSystem.SYSTEM
+    override suspend fun get(key: CacheKey): DiskCache.Snapshot? = null
+    override suspend fun edit(key: CacheKey): DiskCache.Editor? {
+      edits.incrementAndGet()
+      return null
+    }
+    override suspend fun remove(key: CacheKey): Boolean = false
+    override suspend fun clear() = Unit
+  }
+
+  @Test
+  fun `a progressive load writes the disk cache once`() {
+    // The progressive path used to store the bytes itself as well, racing the shared download's
+    // write for the same key. Whichever lost left the entry with no file to point at.
+    val fetcher = SlowFetcher()
+    val disk = CountingDiskCache()
+    val loader = Landscapist.builder()
+      .diskCache(disk)
+      .fetcher(fetcher)
+      .decoder(SizingDecoder())
+      .build()
+
+    runBlocking {
+      loader.load(
+        ImageRequest.builder().model(url).size(400, 400).progressiveEnabled(true).build(),
+      ).first { it is ImageResult.Success || it is ImageResult.Failure }
+      delay(200)
+    }
+
+    assertEquals(1, fetcher.fetches.value)
+    assertEquals(1, disk.edits.value, "the same file was opened for writing more than once")
+  }
+
+  @Test
+  fun `a caller is never told about a file the download was not allowed to write`() {
+    // One url at two sizes, disagreeing about the disk. Sharing the download would have let
+    // whichever ran first decide for both, and told the other where a file it never wrote is.
+    val fetcher = SlowFetcher()
+    val disk = CountingDiskCache()
+    val loader = Landscapist.builder()
+      .diskCache(disk)
+      .fetcher(fetcher)
+      .decoder(SizingDecoder())
+      .build()
+
+    val paths = runBlocking {
+      val noDisk = async {
+        loader.load(
+          ImageRequest.builder().model(url).size(50, 50)
+            .diskCachePolicy(CachePolicy.DISABLED).build(),
+        ).first { it is ImageResult.Success } as ImageResult.Success
+      }
+      val withDisk = async {
+        loader.load(
+          ImageRequest.builder().model(url).size(1080, 1080).build(),
+        ).first { it is ImageResult.Success } as ImageResult.Success
+      }
+      listOf(noDisk.await().diskCachePath, withDisk.await().diskCachePath)
+    }
+
+    assertNull(paths[0], "a request that refused the disk was told where its file is")
+    assertNotNull(paths[1], "a request that asked for the disk was told there is no file")
   }
 
   @Test

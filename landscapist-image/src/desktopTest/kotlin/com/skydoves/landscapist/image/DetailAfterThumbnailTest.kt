@@ -185,6 +185,96 @@ class DetailAfterThumbnailTest {
   }
 
   @Test
+  fun `going back to a poster already cached still rebuilds what is composed inside`() {
+    // A model change into an image the cache already holds at a covering size arrives as Success
+    // straight after Success, with no loading state between them. Grouping every success together
+    // kept the whole subtree across it: the caller's slot, a zoomable's zoom and pan, and a reveal
+    // that then never ran again because its transition had already finished.
+    val landscapist = loader()
+    val counter = RebuildCounter()
+    runBlocking {
+      for (url in listOf(first, second)) {
+        landscapist.load(
+          ImageRequest.builder()
+            .model(url)
+            .diskCachePolicy(CachePolicy.DISABLED)
+            .size(400, 400)
+            .build(),
+        ).first { it is ImageResult.Success }
+      }
+    }
+
+    runComposeUiTest {
+      var model by mutableStateOf(first)
+      setContent {
+        LandscapistImage(
+          imageModel = { model },
+          landscapist = landscapist,
+          modifier = Modifier.size(400.dp),
+          component = rememberImageComponent { +counter },
+          requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+        )
+      }
+      waitForIdle()
+      model = second
+      waitForIdle()
+    }
+
+    assertEquals(
+      2,
+      counter.ids.size,
+      "the second image kept everything the first had composed inside it",
+    )
+  }
+
+  @Test
+  fun `a node reused from a small row does not judge a big one by the small one's box`() {
+    // A lazy list hands one node from row to row. The node remembers the box its last measure ran
+    // with so a rebind can peek at the size it is about to draw at, and that box belongs to the row
+    // it is leaving: keeping it let a thumbnail slot's bounds decide what a full width slot was
+    // allowed to take, which is the mistake the sized peek exists to avoid.
+    val landscapist = loader()
+    landscapist.cacheThumbnail(second)
+    runBlocking {
+      landscapist.load(
+        ImageRequest.builder()
+          .model(second)
+          .diskCachePolicy(CachePolicy.DISABLED)
+          .size(400, 400)
+          .build(),
+      ).first { it is ImageResult.Success }
+    }
+
+    val afterReuse = mutableListOf<LandscapistImageState>()
+    runComposeUiTest {
+      var slot by mutableStateOf(0)
+      setContent {
+        // What a lazy list does between rows: the content is reused and its state reset.
+        androidx.compose.runtime.ReusableContent(slot) {
+          LandscapistImage(
+            imageModel = { second },
+            landscapist = landscapist,
+            modifier = Modifier.size(if (slot == 0) 50.dp else 400.dp),
+            component = rememberImageComponent {},
+            requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+            onImageStateChanged = { if (slot == 1) afterReuse += it },
+          )
+        }
+      }
+      waitForIdle()
+      slot = 1
+      waitForIdle()
+    }
+
+    val first = afterReuse.filterIsInstance<LandscapistImageState.Success>().firstOrNull()
+    assertEquals(
+      400,
+      (first?.data as? ImageBitmap)?.width,
+      "the reused node was handed the 50 pixel entry for a 400 pixel row, it took $first",
+    )
+  }
+
+  @Test
   fun `a composable that has never been measured still takes what the cache has`() {
     // The limit of a sized peek, pinned rather than hidden. A composable entering for the first
     // time has not been measured, so it has nothing to compare a variant against, and an already

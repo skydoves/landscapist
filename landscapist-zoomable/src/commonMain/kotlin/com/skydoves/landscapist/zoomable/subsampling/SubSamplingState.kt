@@ -149,9 +149,9 @@ public class SubSamplingState internal constructor(
     // The effective scale includes both the user's zoom and the fit scale
     val effectiveScale = transformation.scaleValue * fitScale
 
-    // Only load foreground tiles when zoomed beyond 1.5x
+    // Only load foreground tiles when zoomed past [MinZoomForTiles]
     // At lower zoom levels, the base tile is sufficient
-    if (transformation.scaleValue < 1.5f) {
+    if (transformation.scaleValue < MinZoomForTiles) {
       visibleTiles = emptyList()
       // Cancel any pending loads
       loadingJobs.values.forEach { it.cancel() }

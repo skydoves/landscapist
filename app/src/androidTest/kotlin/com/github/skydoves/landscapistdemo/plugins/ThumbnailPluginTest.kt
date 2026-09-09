@@ -42,7 +42,8 @@ class ThumbnailPluginTest {
   private lateinit var server: LocalImageServer
 
   /** Anything larger than a thumbnail is the full sized request. */
-  private val fetcher = RecordingFetcher(holdLargerThan = 64)
+  private val fetcher = RecordingFetcher()
+  private val decoder = HoldingDecoder(holdLargerThan = 64)
 
   @Before
   fun start() {
@@ -52,13 +53,13 @@ class ThumbnailPluginTest {
 
   @After
   fun stop() {
-    fetcher.release()
+    decoder.release()
     server.close()
   }
 
   @Test
   fun theThumbnailIsOnScreenBeforeTheFullImageAndIsAskedForAtItsOwnSize() {
-    val loader = contentPluginLoader(fetcher)
+    val loader = contentPluginLoader(fetcher, decoder)
     val state = StateRecorder()
     val url = server.url("/detail.png")
     // Outside the composition: a plugin rebuilt each time would restart the thumbnail load.
@@ -88,15 +89,15 @@ class ThumbnailPluginTest {
       state.isSuccess,
     )
     assertTrue(
-      "the thumbnail was not asked for at its own size, the sizes asked for were ${fetcher.sizes}",
-      fetcher.sizes.contains(IntSize(15, 15)),
+      "the thumbnail was not asked for at its own size, the sizes asked for were ${decoder.sizes}",
+      decoder.sizes.contains(IntSize(15, 15)),
     )
     assertTrue(
-      "only the thumbnail size was ever asked for: ${fetcher.sizes}",
-      fetcher.sizes.any { it.width > 15 },
+      "only the thumbnail size was ever asked for: ${decoder.sizes}",
+      decoder.sizes.any { it.width > 15 },
     )
 
-    fetcher.release()
+    decoder.release()
     composeTestRule.awaitUntil("the full image to arrive") { state.isSuccess }
     val fullDetail = composeTestRule.readContentPixels().localContrast()
 
@@ -112,7 +113,7 @@ class ThumbnailPluginTest {
   fun withoutThePluginNothingIsOnScreenWhileTheImageLoads() {
     // The control: this plugin composes on the same state and draws nothing, so the image takes
     // the same drawing path with nothing to show.
-    val loader = contentPluginLoader(fetcher)
+    val loader = contentPluginLoader(fetcher, decoder)
     val state = StateRecorder()
     val url = server.url("/detail.png")
     val component = pluginComponent(PlaceholderPlugin.Loading(null))

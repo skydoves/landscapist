@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -199,7 +200,11 @@ public fun LandscapistImage(
     CrossfadeWithEffect(
       targetState = landscapistState,
       durationMs = crossfadePlugin?.duration ?: 0,
-      contentKey = if (crossfadeEnabled) CrossfadeContentKey else ContentGroupKey,
+      contentKey = if (crossfadeEnabled) {
+        CrossfadeContentKey
+      } else {
+        { it.contentGroupKey(request.model) }
+      },
       enabled = crossfadeEnabled,
     ) { state ->
       when (state) {
@@ -396,28 +401,31 @@ private fun LandscapistImageInternal(
     mutableStateOf(cached?.toImageLoadState() ?: ImageLoadState.None)
   }
 
-  // Auto-calculate aspect ratio from loaded image dimensions for sub-sampling support.
-  // Priority: explicit placeholderAspectRatio > auto from loaded image > none
-  val autoAspectRatio = remember(state) {
+  // The size the image resolved at, so an axis the parent left open can be sized from its shape,
+  // which is what sub-sampling needs and what stops a scrolling column measuring the image twice.
+  // Priority: an explicit placeholderAspectRatio > the image's own size > none.
+  val loadedSize = remember(state) {
     val successData = (state as? ImageLoadState.Success)?.data as? LandscapistSuccessData
     if (successData != null && successData.originalWidth > 0 && successData.originalHeight > 0) {
-      successData.originalWidth.toFloat() / successData.originalHeight.toFloat()
+      Size(successData.originalWidth.toFloat(), successData.originalHeight.toFloat())
     } else {
       null
     }
   }
-  // Only apply auto aspect ratio when incoming height is unbounded (e.g., scrollable Column).
-  // In bounded contexts (e.g., .size(50.dp)), the parent already provides proper constraints.
-  val needsAutoAspectRatio = hasMeasured && incomingMaxHeight == 0
-  val effectiveAspectRatio = imageOptions.placeholderAspectRatio
-    ?: if (needsAutoAspectRatio) autoAspectRatio else null
+  // Only on an axis the parent left open, a scrolling column or row being the case that matters.
+  // A bounded axis already has its answer and the caller asked for it.
+  val hasOpenAxis = hasMeasured && (incomingMaxWidth == 0 || incomingMaxHeight == 0)
+  val placeholderRatio = imageOptions.placeholderAspectRatio
+  val autoSize = if (placeholderRatio == null && hasOpenAxis) loadedSize else null
 
-  // Apply aspect ratio modifier if available to reserve space / ensure bounded height
-  val baseModifier = remember(modifier, effectiveAspectRatio) {
-    if (effectiveAspectRatio != null && effectiveAspectRatio > 0f) {
-      modifier.aspectRatio(effectiveAspectRatio)
-    } else {
-      modifier
+  // Sized the way the node sizes an open axis rather than as a bare width over height, so
+  // installing a plugin does not change the size the same image takes: a content scale that does
+  // not upscale asks for the height the image already has, not the height its shape would fill.
+  val baseModifier = remember(modifier, placeholderRatio, autoSize, imageOptions.contentScale) {
+    when {
+      placeholderRatio != null && placeholderRatio > 0f -> modifier.aspectRatio(placeholderRatio)
+      autoSize != null -> modifier.imageShape(autoSize, imageOptions.contentScale)
+      else -> modifier
     }
   }
 
@@ -729,8 +737,12 @@ private fun LandscapistImageState.crossfadeKey(): Any = when (this) {
  * is the image appearing to load a second time. A genuinely different image arrives through a state
  * reset, so it still lands in a new group.
  */
-private fun LandscapistImageState.contentGroupKey(): Any = when (this) {
-  is LandscapistImageState.Success -> SuccessGroup
+private fun LandscapistImageState.contentGroupKey(model: Any?): Any = when (this) {
+  // The model, so one image is one group however many times it is decoded, and a different image
+  // is a different group even when it arrives without a loading state in between. Collapsing every
+  // success onto one key kept the whole subtree across a model change into an already cached
+  // image: the caller's slot, a zoomable's zoom and pan, and a reveal that then never ran.
+  is LandscapistImageState.Success -> model ?: SuccessGroup
   is LandscapistImageState.Failure -> FailureGroup
   else -> LoadingGroup
 }
@@ -739,9 +751,8 @@ private val SuccessGroup = Any()
 private val FailureGroup = Any()
 private val LoadingGroup = Any()
 
-// Hoisted, so choosing between them does not allocate a lambda per composition.
+// Hoisted, since it needs nothing from the call site.
 private val CrossfadeContentKey: (LandscapistImageState) -> Any? = { it.crossfadeKey() }
-private val ContentGroupKey: (LandscapistImageState) -> Any? = { it.contentGroupKey() }
 
 // Enum.valueOf goes through a name lookup, and these conversions run on every composition. A when
 // is a table switch.
