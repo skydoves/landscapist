@@ -149,7 +149,9 @@ internal class LandscapistImageNode(
   private var awaitingRequest = false
 
   override fun onAttach() {
-    if (!awaitingRequest) peek()
+    // No cache read here. A node that has not been measured cannot say whether what the cache
+    // holds fits the box it is about to fill, and taking whatever is there is how a strip's
+    // thumbnail ended up stretched across a detail view. The first measure does it.
   }
 
   override fun onDetach() {
@@ -160,9 +162,6 @@ internal class LandscapistImageNode(
     clear()
     awaitingRequest = true
   }
-
-  /** What the last measure ran with, so a rebind can peek at the size it is about to draw at. */
-  private var lastConstraints: Constraints? = null
 
   /** Only if it is still running: `cancel` builds a `CancellationException` either way. */
   private fun cancelLoad() {
@@ -177,10 +176,6 @@ internal class LandscapistImageNode(
     started = false
     painter = null
     state = null
-    // The box belonged to the row this node is leaving. A lazy list reuses a node between rows of
-    // different heights, and keeping it would have a thumbnail slot's bounds decide what a full
-    // width slot is allowed to peek, which is the mistake the sized peek exists to avoid.
-    lastConstraints = null
   }
 
   fun update(
@@ -209,25 +204,20 @@ internal class LandscapistImageNode(
       state = null
       // Takes the old image down in the same pass, rather than leaving it until the load returns.
       showPainter(null)
-      peek()
     }
   }
 
   /** The synchronous cache read, so an image already in memory is drawn in the first frame. */
-  private fun peek() {
-    // Asked at the size this node was last measured at, when it has one. A node handed a new model
-    // has already laid out for the old one, so it knows the box it is about to fill and is given
-    // only an entry that fills it. Asking unsized put a strip's thumbnail into a detail slot,
-    // stretched, for the frames it took the real decode to arrive. A node that has never been
-    // measured has nothing to judge a variant against and takes what is there, which is what draws
-    // an already decoded image in the frame the node first appears in.
-    val bounds = lastConstraints
-    val asked = if (bounds == null) {
-      request
-    } else {
-      buildSizedRequest(request, imageOptions, bounds.withoutZeroBounds())
-    }
-    val cached = landscapist.peekMemoryCache(asked)
+  /**
+   * The synchronous cache read, so an image already in memory is drawn in the first frame.
+   *
+   * Asked with the request the load is about to make, which carries the box this node was just
+   * measured with, so the cache answers about the slot rather than about the url. Read at the bind
+   * instead, it had no box to ask with and took any variant, which is how a strip's thumbnail ended
+   * up stretched across the detail view above it until the real decode arrived.
+   */
+  private fun peek(sized: ImageRequest) {
+    val cached = landscapist.peekMemoryCache(sized)
     // An image with nothing cached has nothing to show yet, and callers have always been told so
     // before the load starts.
     publish(cached?.toLandscapistImageState() ?: LandscapistImageState.Loading)
@@ -241,7 +231,6 @@ internal class LandscapistImageNode(
     // than recorded into composition. A probe that wrote them back as state invalidated the
     // composition that had just measured it, which is a second composition and a second layout pass
     // for every image on the first frame.
-    lastConstraints = constraints
     if (!started) {
       started = true
       startLoad(constraints)
@@ -253,6 +242,7 @@ internal class LandscapistImageNode(
 
   private fun startLoad(constraints: Constraints) {
     val sized = buildSizedRequest(request, imageOptions, constraints.withoutZeroBounds())
+    peek(sized)
     cancelLoad()
     loadJob = coroutineScope.launch {
       // The UI dispatcher, captured because the collector does not stay on it: a flow's collector

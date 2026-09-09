@@ -128,7 +128,7 @@ Each cell is the spread across the runs that were taken.
 |---|---|---|
 | first image on screen, 20 composed at once | 138, 124 ms | 99, 98 ms |
 | until all 20 report success | 241, 246 ms | 166, 174 ms |
-| resident set above resting, 20 images | 59.4, 59.5 MiB | 45.5, 33.0 MiB |
+| proportional set above resting, 20 images | 59.4, 59.5 MiB | 45.5, 33.0 MiB |
 | decode 2000x1500 to 200x150, median of 8 | 34.0, 35.7, 36.5, 34.4 ms | 22.4, 24.9, 23.9, 23.1 ms |
 | the same decode, allocated | 5.45 MiB | 1.84 MiB |
 | scroll, 8 swipes over 240 rows, allocated | 44.4, 46.3, 46.3 MiB | 18.7, 18.4 MiB |

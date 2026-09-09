@@ -114,7 +114,11 @@ class DetailAfterThumbnailTest {
       states.clear()
       // The tap.
       model = second
-      waitForIdle()
+      // Waited for rather than assumed: idle can be reached before a second load resolves, and
+      // then the assertion below is measuring how busy the machine is.
+      waitUntil(timeoutMillis = 10_000) {
+        states.filterIsInstance<LandscapistImageState.Success>().size >= 1
+      }
     }
 
     val sizes = states.filterIsInstance<LandscapistImageState.Success>()
@@ -167,7 +171,11 @@ class DetailAfterThumbnailTest {
           onImageStateChanged = { states += it },
         )
       }
-      waitForIdle()
+      // Waited for rather than assumed: idle can be reached before a second load resolves, and
+      // then the assertion below is measuring how busy the machine is.
+      waitUntil(timeoutMillis = 10_000) {
+        states.filterIsInstance<LandscapistImageState.Success>().size >= 2
+      }
     }
 
     val sizes = states.filterIsInstance<LandscapistImageState.Success>()
@@ -234,7 +242,9 @@ class DetailAfterThumbnailTest {
     // it is leaving: keeping it let a thumbnail slot's bounds decide what a full width slot was
     // allowed to take, which is the mistake the sized peek exists to avoid.
     val landscapist = loader()
-    landscapist.cacheThumbnail(second)
+    // The full entry first and the thumbnail last, which is what a strip that keeps scrolling
+    // leaves behind. An unsized peek returns the most recently cached variant, so this order is
+    // the one that catches a peek asking without a box.
     runBlocking {
       landscapist.load(
         ImageRequest.builder()
@@ -244,6 +254,7 @@ class DetailAfterThumbnailTest {
           .build(),
       ).first { it is ImageResult.Success }
     }
+    landscapist.cacheThumbnail(second)
 
     val afterReuse = mutableListOf<LandscapistImageState>()
     runComposeUiTest {
@@ -296,7 +307,11 @@ class DetailAfterThumbnailTest {
           onImageStateChanged = { states += it },
         )
       }
-      waitForIdle()
+      // Waited for rather than assumed: idle can be reached before a second load resolves, and
+      // then the assertion below is measuring how busy the machine is.
+      waitUntil(timeoutMillis = 10_000) {
+        states.filterIsInstance<LandscapistImageState.Success>().size >= 2
+      }
     }
 
     val sizes = states.filterIsInstance<LandscapistImageState.Success>()

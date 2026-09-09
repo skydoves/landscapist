@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -38,6 +39,7 @@ import com.skydoves.landscapist.zoomable.subsampling.MinZoomForTiles
 import com.skydoves.landscapist.zoomable.subsampling.SubSamplingImage
 import com.skydoves.landscapist.zoomable.subsampling.rememberSubSamplingState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 /**
@@ -148,8 +150,19 @@ private fun SubSamplingImageWithPlaceholder(
   onTap: ((Offset) -> Unit)?,
   content: @Composable () -> Unit,
 ) {
-  val tilesInUse = subSamplingState.isBaseLoaded &&
-    zoomableState.transformation.scaleValue >= MinZoomForTiles
+  // Latched, not tracked. The tiles are drawn fitted inside the box while the content fills it,
+  // so the two do not frame the image the same way and every crossing of the threshold would move
+  // the picture. Handing over once, on the first deliberate zoom, is one re-frame where the user
+  // is already changing the framing, instead of one per pinch.
+  val handedOver = remember(subSamplingState) { mutableStateOf(false) }
+  LaunchedEffect(subSamplingState, zoomableState) {
+    snapshotFlow {
+      subSamplingState.isBaseLoaded &&
+        zoomableState.transformation.scaleValue >= MinZoomForTiles
+    }.first { it }
+    handedOver.value = true
+  }
+  val tilesInUse = handedOver.value
 
   Box(modifier = Modifier.clipToBounds()) {
     // Composed at every zoom, so it sizes the grid, loads the base tile and owns the gestures.

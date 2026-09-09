@@ -48,8 +48,8 @@ You can create and remember a `ZoomableState` with `rememberZoomableState` to cu
 val zoomableState = rememberZoomableState(
   config = ZoomableConfig(
     minZoom = 1f,           // Minimum zoom scale (default: 1f)
-    maxZoom = 4f,           // Maximum zoom scale (default: 4f)
-    doubleTapZoom = 2f,     // Zoom scale on double-tap (default: 2f)
+    maxZoom = 4f,           // Maximum zoom scale (default: 5f)
+    doubleTapZoom = 2f,     // Zoom scale on double-tap (default: 2.5f)
     enableDoubleTapZoom = true,  // Enable double-tap to zoom (default: true)
   )
 )
@@ -84,8 +84,8 @@ GlideImage(
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `minZoom` | Float | 1f | The minimum zoom scale |
-| `maxZoom` | Float | 4f | The maximum zoom scale |
-| `doubleTapZoom` | Float | 2f | The zoom scale to apply when double-tapping |
+| `maxZoom` | Float | 5f | The maximum zoom scale |
+| `doubleTapZoom` | Float | 2.5f | The zoom scale to apply when double-tapping |
 | `enableDoubleTapZoom` | Boolean | true | Whether double-tap to zoom gesture is enabled |
 | `enableSubSampling` | Boolean | false | Whether sub-sampling for large images is enabled |
 | `subSamplingConfig` | SubSamplingConfig | SubSamplingConfig() | Configuration for sub-sampling behavior |
@@ -100,7 +100,9 @@ The `ZoomablePlugin` supports the following gestures:
 
 ## Sub-Sampling
 
-For very large images, Landscapist supports sub-sampling to efficiently display high-resolution images without running out of memory. This feature loads only the visible tiles at the appropriate resolution.
+For very large images, Landscapist supports sub-sampling to efficiently display high-resolution images without running out of memory. Once the image is zoomed in, it draws only the visible tiles at the resolution the zoom calls for, instead of holding the whole picture at full size.
+
+At rest, and until the image is zoomed past 1.5x, what is on screen is the ordinary decode, with whatever `ImagePlugin`s the caller installed painted onto it. The tiles are prepared underneath and take over above that zoom. Nothing is added to or removed from the composition when they do, so an animation running on the image is not restarted by a pinch.
 
 ### Enabling Sub-Sampling
 
@@ -109,8 +111,8 @@ val zoomableState = rememberZoomableState(
   config = ZoomableConfig(
     enableSubSampling = true,
     subSamplingConfig = SubSamplingConfig(
-      tileSize = 512.dp,     // Size of each tile (default: 512.dp)
-      threshold = 2000.dp,   // Minimum image dimension to enable sub-sampling
+      tileSize = 512.dp,     // Size of each tile (default: 256.dp)
+      threshold = 2000.dp,   // Minimum image dimension to enable it (default: 1024.dp)
     )
   )
 )
@@ -127,8 +129,8 @@ GlideImage(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `tileSize` | Dp | 512.dp | The size of each tile. Larger tiles mean fewer tiles but more memory per tile |
-| `threshold` | Dp | 2000.dp | The minimum image dimension to enable sub-sampling. Images smaller than this will be rendered normally |
+| `tileSize` | Dp | 256.dp | The size of each tile. Larger tiles mean fewer tiles but more memory per tile |
+| `threshold` | Dp | 1024.dp | The minimum image dimension to enable sub-sampling. Images smaller than this will be rendered normally |
 
 ### Sub-Sampling Support by Image Loader
 

@@ -1,7 +1,7 @@
 # 2.13.0
 
 > Draft. The version is a placeholder: `buildSrc/.../Configuration.kt` still says 2.12.1, so bump it
-> before tagging. Everything below covers #986 and #988, which are the two PRs between 2.12.1 and
+> before tagging. Everything below covers #986 and #988, which carry the work between 2.12.1 and
 > this tag.
 
 ---
@@ -12,19 +12,21 @@ The Compose layer and the loader underneath it were both rebuilt for what they c
 
 **Every image is downloaded once more on the first launch after upgrading.** The disk cache key used to be the URL, and then the target size and the transformation keys folded in on top when a request had either. It is the URL alone now, so one download answers every size an image is drawn at instead of one file per size. An image loaded through a composable is always sized, so its old entry sat under a key nothing looks for any more: the first launch refetches it, and the file 2.12.1 wrote stays on disk until the cache passes its size limit and evicts it. There is no migration, the entries are orphaned rather than renamed. Call `landscapist.clearDiskCache()`, which suspends, once on upgrade if you would rather reclaim the space immediately than wait for eviction. `config.diskCache` is not it: that is the cache a caller supplied, and it is null for a loader that built its own. A request that carried no target size and no transformations keys as it did before, and its entry is still found.
 
-**Requests that carry headers now key separately from requests that do not.** An `Authorization` or `Cookie` header makes it a different viewer's image and content negotiation makes it different bytes, so headers are folded into both the memory key and the disk key. Two requests for one URL with different headers no longer share an entry, which is the point, but an app that sets a per-request header and expected to share a cache entry with an unauthenticated request will see one fetch per distinct header set. A request with no headers keys exactly as it did in 2.12.1.
+**Requests that carry headers now key separately from requests that do not.** An `Authorization` or `Cookie` header makes it a different viewer's image and content negotiation makes it different bytes, so headers are folded into both the memory key and the disk key. Two requests for one URL with different headers no longer share an entry, which is the point, but an app that sets a per-request header and expected to share a cache entry with an unauthenticated request will see one fetch per distinct header set. A request with no headers keys exactly as it did in 2.12.1. The whole header map counts, so a credential that rotates on its own schedule re-keys every image behind it and leaves the entries under the old one to be evicted. Send one through the network configuration rather than per request.
 
 **A `MemoryCache` you wrote yourself keeps working, but decodes more than it needs to.** The loader now asks the cache for an already decoded variant through the new `MemoryCache.getMatching`. The default implementation falls back to an exact `get`, so a custom cache that does not override it is correct but loses the reuse: a layout that measures to 359, 360 and 361 decodes the same image three times. `LruMemoryCache` and `TwoTierMemoryCache` both implement it.
 
 **An image usually exposes one node with its content description now, where it used to expose two.** An image was a container plus a child `Image` composed inside it, and both carried `ImageOptions.contentDescription`. The child is composed only when something has to go inside the container while the image is on screen: a `success` slot, a `SuccessStatePlugin`, or a `ComposablePlugin` such as `ZoomablePlugin`. A plain image, an image with only a `CrossfadePlugin`, one with only a `PainterPlugin` such as `BlurTransformationPlugin`, and one with only a `loading` or `failure` slot or a `LoadingStatePlugin` are all drawn without a child once loaded, since nothing of theirs is on screen then. A UI test that looked the image up by content description and expected two nodes, or that reached for the child of the container, needs updating.
 
-**A detail view is no longer handed the thumbnail a strip above it cached.** Reading the memory cache during composition, which is what draws an already decoded image in the frame a composable appears in, took any variant of that url whatever size it was decoded for. A screen showing a row of thumbnails over the picture they select therefore drew the 50dp thumbnail stretched across the detail slot for the few frames the real decode took, then replaced it. A caller that has been measured now gets the same answer a load would give it, and one that has not still takes what is there, since it has nothing to judge a variant against.
+**A zoomable image shows its sub-sampled tiles only once it is zoomed.** They used to take the screen the moment the first tile decoded, which is a frame or two after the image arrives. Everything the caller composed went with it, so a `CircularRevealPlugin` on a `ZoomablePlugin(enableSubSampling = true)` image ran its whole animation against a subtree nobody could see, and what replaced it was one low colour sample of the picture standing in for a full decode. The tiles take over above the same zoom threshold that decides whether they load at all. Both are composed at every zoom and exactly one draws, so pinching does not restart an animation.
 
-**A second decode of one image no longer rebuilds what is composed inside it.** Where nothing fades, the content was keyed on the decoded bitmap, so a resize or a cached variant standing in discarded the plugin groups, a zoomable's decoder and sub-sampling state, and a circular reveal's animation, which then ran again from nothing. It is keyed on the kind of state now. A crossfade still keys on the image, which is what it animates between.
+**A detail view is no longer handed the thumbnail a strip above it cached.** Reading the memory cache during composition, which is what draws an already decoded image in the frame a composable appears in, took any variant of that url whatever size it was decoded for. A screen showing a row of thumbnails over the picture they select therefore drew the 50dp thumbnail stretched across the detail slot for the few frames the real decode took, then replaced it. A caller that has been measured is now handed only an entry that covers the box it is about to fill, and one that has not still takes what is there, since it has nothing to judge a variant against. A request carrying transformations is judged on the boxes alone, because the size recorded for an entry is the decoder's output rather than what the transformation left behind, and a load refuses every variant on that ground: the peek would otherwise have no first frame at all for a transformed image.
+
+**A second decode of one image no longer rebuilds what is composed inside it.** Where nothing fades, the content was keyed on the decoded bitmap, so a resize or a cached variant standing in discarded the plugin groups, a zoomable's decoder and sub-sampling state, and a circular reveal's animation, which then ran again from nothing. It is keyed on the model now, so one image is one group however many times it is decoded, and a different image is a different group even when it arrives with no loading state in between. A crossfade still keys on the decoded image, which is what it animates between.
 
 **One url is downloaded once, whatever sizes ask for it.** A screen that shows an image as a thumbnail and again at full size is two requests that want the same bytes, and the in-flight coalescing keyed on the memory key, which carries the size the memory cache needs and the network does not. Both downloaded. The download is coalesced on the disk key now, which is the url alone, and each size still decodes for itself. The disk write goes with the download rather than with each caller, so one file is opened once. Requests carrying different headers key apart on their own and never share.
 
-One consequence worth knowing: `ThumbnailPlugin` and `ProgressiveLoadingPlugin` ask for the same url at a small size to paint something early, and that request now shares the download with the full image rather than racing it. The preview still appears first, because a small decode finishes before a large one, but it covers the decode rather than the download. In exchange the image itself arrives in about half the time, since the bytes are fetched once.
+One consequence worth knowing: `ThumbnailPlugin` and `ProgressiveLoadingPlugin` ask for the same url at a small size to paint something early, and that request now shares the download with the full image rather than racing it. The preview still appears first, because a small decode finishes before a large one, but it covers the decode rather than the download. In exchange the bytes are fetched once instead of twice, which is the whole of what that costs.
 
 **Four plugins gained value equality.** `ThumbnailPlugin`, `BlurHashPlugin`, `ThumbHashPlugin` and `ProgressiveLoadingPlugin` were plain classes and now compare over what configures them, because a plugin set is compared to decide whether the component an image was handed has changed and an image is skippable. One consequence to know about: `ImagePluginComponent.remove(plugin)` now drops the first equal plugin rather than that exact instance, which is the same thing unless you were holding two equal ones and meant a particular one. A custom `ImagePlugin` should have value equality too; one that does not costs every image carrying it its skipping.
 
@@ -42,14 +44,14 @@ Twenty images, medians, allocation above an empty scene, from `./gradlew :benchm
 |---|---|---|---|
 | first frame | 353.5 | **77.0** | 109.5 |
 | resize frame | 34.7 | **5.5** | 5.8 |
-| first frame, crossfade | 402.6 | **126.5** | 109.5 |
-| first frame, success slot | 335.7 | **262.5** | 147.8 painter, 548.7 subcompose |
+| first frame, crossfade | 402.6 | 126.5 | **109.5** |
+| first frame, success slot | 335.7 | 262.5 | **147.8** painter, 548.7 subcompose |
 | first frame, painter | new | **118.2** | 147.8 |
 | resize frame, painter | new | **13.8** | 72.2 |
 
 Two rows here are not comparisons. `resize frame, painter` is one: the Coil arm keys its request on a size that changes every frame, so it rebuilds the request and restarts the load each time, which the benchmark itself prints as "the row's cost, not the painter's". `AsyncImage` does not work that way. The other is the crossfade row, and it is not a fade against a fade. Both sides are warm, and Coil declines to fade when the result came from the memory cache, on this platform and on Android alike, so its column is what it costs to decide not to fade. Landscapist reads the cache while it composes and has no loading state to fade out of either. The row is what each library pays to have a crossfade installed that neither runs.
 
-Frame timing is a tie: medians within a tenth of a millisecond over five iterations and three runs, with upper percentiles swinging both ways between them. Nothing is claimed from it in either direction. The benchmark app it comes from used to compare this library to itself, and its driver waited on a selector that never matched; that is fixed, and the driver now also waits for a marker the app publishes only once rows report a loaded image.
+Frame timing is a tie: medians within two tenths of a millisecond over five iterations and three runs, with upper percentiles swinging both ways between them. Nothing is claimed from it in either direction. The benchmark app it comes from used to compare this library to itself, and its driver waited on a selector that never matched; that is fixed, and the driver now also waits for a marker the app publishes only once rows report a loaded image.
 
 ## `rememberImagePainter`
 
@@ -85,9 +87,12 @@ A request with no entry of its own is now served by an already decoded variant o
 
 | | 2.12.1 | after #986 | coil 3.6.2 |
 |---|---|---|---|
-| memory cache hit p50 | 14.0 us | **1.6 us** | 833 ns |
-| cold load p50 | 39.8 us | **22.1 us** | 17.3 us |
 | allocation per hit | 2.7 KiB | **1.1 KiB** | 1.6 KiB |
+
+No timing row. The dispatcher round trip is gone and the allocation row shows it, but the
+microsecond figures do not reproduce closely enough across JVM invocations to publish: a later run
+of the same benchmark put a memory cache hit at 875 ns and called cold load a tie. What can be said
+about cold load is that it loses, and by how much is not quoted for the same reason.
 
 After the further work in #988 a memory cache hit allocates 804 B, against Coil's 1.6 KiB. Thirty two concurrent loads of one image reach the network once, where Coil reaches it 32 times.
 
@@ -107,7 +112,7 @@ Measured on an emulator, with a fresh process for each measured loader, because 
 |---|---|---|
 | first image on screen, 20 composed at once | 138, 124 ms | **99, 98 ms** |
 | until all 20 report success | 241, 246 ms | **166, 174 ms** |
-| resident set above resting, 20 images | 59.4, 59.5 MiB | **45.5, 33.0 MiB** |
+| proportional set above resting, 20 images | 59.4, 59.5 MiB | **45.5, 33.0 MiB** |
 | decode 2000x1500 to 200x150, median of 8 | 34.0, 35.7, 36.5, 34.4 ms | **22.4, 24.9, 23.9, 23.1 ms** |
 | the same decode, allocated | 5.45 MiB | **1.84 MiB** |
 | scroll, 8 swipes over 240 rows, allocated | 44.4, 46.3, 46.3 MiB | **18.7, 18.4 MiB** |
@@ -117,10 +122,12 @@ The scroll row counts what each arm loaded and what it fetched, separately. Both
 two draw the same images and landscapist decodes nearly twice as many. Its 2.4x is a memory cache
 hit rate rather than a per row overhead.
 
-So: ahead on every JVM row, behind on cold load, on decode and on resident memory on the device. The Android decode path is untouched by this work, so that row is not a regression, but it is the reverse of what the desktop numbers say and it is the platform that ships.
+So: ahead on the Compose layer rows this work is about, behind on a memory cache hit, on a first frame that installs a crossfade or a caller slot, and on the device on cold load, on decode and on resident memory. The Android decode path is untouched by this work, so that row is not a regression, but it is the reverse of what the desktop numbers say and it is the platform that ships.
 
 ## Fixes
 
+* `CircularRevealPlugin` called `onFinishListener` once per recomposition and once per frame, more than twenty times for one reveal, because it reported from inside the lambda that supplies the radius for a state. It reports once, when the transition settles.
+* A circular reveal was never visible on a `ZoomablePlugin(enableSubSampling = true)` image: the tiles took the screen a frame or two after the image arrived and everything the caller composed went with them.
 * A screen of images failed with `CalledFromWrongThreadException`. The node held the painter and asked the layout to run again when it changed, which happens on whatever dispatcher the loader finished on, and asking a layout node to measure again reaches `View.requestLayout` on Android, which throws off the main thread. The painter is snapshot state now, so Compose invalidates on the thread it chooses. It costs about 660 bytes an image on the first frame, which is Compose observing the reads, and that is in the first frame row above.
 * `BlurTransformationPlugin(radius = 24)` threw. The blur splits a radius into passes of at most 25 and ran the remainder pass unconditionally at `(radius + 1) % 25`, which is zero for 24, 49 and 74.
 * A load left behind by a list rebind published over the image that replaced it, and a reused node published the previous row's image.
@@ -132,13 +139,15 @@ So: ahead on every JVM row, behind on cold load, on decode and on resident memor
 
 ## Known and not fixed
 
+* A cookie a redirect hands over can still be scoped to a two label public suffix such as `co.uk`, which reaches every site under it. Refusing that needs a public suffix list this library does not carry.
+
 * The Android decoder halves only while both axes still cover the target. That is right for a content scale that crops and decodes up to twice the pixels needed for one that fits. Telling the decoder which would add a field to `ImageRequest`, a public data class, which changes its constructor and `copy` signatures. It needs a release that takes a binary break.
 * `GlobalBitmapPool` is never filled by the library, so `inBitmap` reuse does not happen. Deleting it breaks the ABI, and filling it safely means knowing when a bitmap has stopped being drawn. Documented on the class so nobody assumes pooling is happening.
 * `LandscapistImageTest.testImageWithFixedSize` fails on an emulator here. It goes to the internet with a ten second timeout, and it fails the same way on `main`.
 
 ## API
 
-Additive. Seven new declarations, nothing removed or changed.
+Additive. Fifteen new declarations, nothing removed or changed: the seven below, plus `equals` and `hashCode` on the four placeholder plugins that gained value equality.
 
 * `rememberImagePainter` in `landscapist-image`.
 * `Landscapist.Builder.noDiskCache`, for a loader that writes nothing to disk. Leaving the disk cache unset falls through to the default one, so there was no way to say you wanted none.

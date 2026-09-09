@@ -89,6 +89,7 @@ kotlin {
         // The real plugins, so the paths LandscapistImage picks per plugin kind are covered by
         // what users actually install rather than by stand-ins written next to the test.
         implementation(project(":landscapist-animation"))
+        implementation(project(":landscapist-palette"))
         implementation(project(":landscapist-placeholder"))
         implementation(project(":landscapist-zoomable"))
         // Skiko native runtime for the host OS, required to render off-screen during the

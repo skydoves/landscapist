@@ -329,11 +329,15 @@ exactly produce different pixels for the same request. An entry that a variant i
 not marked as recently used, so a lookup that finds nothing usable does not disturb the eviction
 order.
 
-Three things are never answered from a variant. A request carrying transformations, since the size
-recorded for an entry is the decoder's output rather than what the transformation left behind. A
-request that names no size at all, since the layout has not measured yet and the variant on hand
-could be a thumbnail. And on Apple and wasm the opposite holds: those decoders keep the encoded
-bytes and let Skia decode at draw size, so the entry is the whole source and serves any box.
+Two things are never answered from a variant by a load. A request carrying transformations, since
+the size recorded for an entry is the decoder's output rather than what the transformation left
+behind. And a request that names no size at all, since the layout has not measured yet and the
+variant on hand could be a thumbnail. On Apple and wasm the opposite holds: those decoders keep the
+encoded bytes and let Skia decode at draw size, so the entry is the whole source and serves any box.
+
+`peekMemoryCache` differs on the first of those. A load can afford to decode again; a peek is
+choosing between drawing something and drawing nothing, so a transformed request is judged on the
+boxes alone, which is enough to keep a thumbnail out of a slot many times its size.
 
 Both caches that ship, `LruMemoryCache` and `TwoTierMemoryCache`, implement it. A custom
 `MemoryCache` that does not override it still works: the default returns an exact `get`, and the
@@ -352,9 +356,11 @@ val cached: ImageResult.Success? = landscapist.peekMemoryCache(url)
 ```
 
 `LandscapistImage` already does this for you; call it directly only when you drive the loading state
-yourself. The exact target size is matched first, and when nothing is cached for it, any already
-decoded size of the same image is returned, since a composable that has not been measured yet has no
-target size to ask for.
+yourself. The exact target size is matched first. When nothing is cached for it, a caller that has been
+measured is offered only a variant that covers the box it is about to fill, the same rule a load
+uses, so a strip's thumbnail is never stretched across a detail view while the real decode arrives.
+A caller that has not been measured has no box to judge a variant against and takes any already
+decoded size, since an image already in memory beats an empty frame.
 
 This is about an image that is **already in memory**. Nothing about it helps a cold cache: a
 composable cannot size its request until a layout pass has told it the bounds, so a first load
