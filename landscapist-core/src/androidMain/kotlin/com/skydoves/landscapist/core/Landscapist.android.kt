@@ -64,19 +64,34 @@ public class AndroidBuilder(private val context: Context) {
     AndroidContextProvider.initialize(context)
   }
 
+  private var diskCacheEnabled: Boolean = true
+
   /** Sets the configuration. */
   public fun config(config: LandscapistConfig): AndroidBuilder = apply {
     this.config = config
   }
 
+  /**
+   * Builds a loader that never writes to disk.
+   *
+   * For images that must not outlive the process, and for a caller who wants the memory cache
+   * without a directory of files behind it.
+   */
+  public fun noDiskCache(): AndroidBuilder = apply {
+    this.diskCacheEnabled = false
+  }
+
   /** Builds the [Landscapist] instance. */
   public fun build(): Landscapist {
-    val cacheDir = File(context.cacheDir, "landscapist_cache")
-    val diskCache = DiskLruCache.create(
-      directory = cacheDir.toOkioPath(),
-      maxSize = config.diskCacheSize,
-      fileSystem = FileSystem.SYSTEM,
-    )
+    val diskCache = if (diskCacheEnabled) {
+      DiskLruCache.create(
+        directory = File(context.cacheDir, "landscapist_cache").toOkioPath(),
+        maxSize = config.diskCacheSize,
+        fileSystem = FileSystem.SYSTEM,
+      )
+    } else {
+      null
+    }
 
     // Create Android-specific fetcher with all supported model types
     val fetcher = AndroidFetchers.createDefault(config.networkConfig)
@@ -94,7 +109,7 @@ public class AndroidBuilder(private val context: Context) {
 
     return Landscapist.builder()
       .config(effectiveConfig)
-      .diskCache(diskCache)
+      .apply { if (diskCache != null) diskCache(diskCache) else noDiskCache() }
       .fetcher(fetcher)
       .build()
   }

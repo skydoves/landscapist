@@ -2,6 +2,7 @@ public final class com/skydoves/landscapist/core/AndroidBuilder {
 	public fun <init> (Landroid/content/Context;)V
 	public final fun build ()Lcom/skydoves/landscapist/core/Landscapist;
 	public final fun config (Lcom/skydoves/landscapist/core/LandscapistConfig;)Lcom/skydoves/landscapist/core/AndroidBuilder;
+	public final fun noDiskCache ()Lcom/skydoves/landscapist/core/AndroidBuilder;
 }
 
 public final class com/skydoves/landscapist/core/BitmapConfig {
