@@ -8,6 +8,13 @@ This library supports tracing image loading states, enabling you to compose cust
 
 Additionally, Landscapist offers the flexibility to configure and attach image-loading behaviors effortlessly using image plugins, allowing for swift and efficient customization. 
 
+## Try it in a browser
+
+The [playground](https://skydoves.github.io/landscapist/demo/) runs `landscapist-image` compiled to
+WebAssembly. Every image size, content scale and plugin combination is a switch, and the readout
+next to the image is what the loader reported. It needs a browser with WebAssembly garbage
+collection: Chrome 119, Firefox 120, Safari 18.2 or newer.
+
 ## Why Landscapist?
 
 Landscapist is a thoughtfully designed solution, meticulously crafted to optimize image loading performance in Jetpack Compose. The majority of its composable functions are marked as **Restartable** and **Skippable**, signifying significant improvements in recomposition performance, as measured by the Compose compiler metrics. Additionally, the library's performance has been enhanced further through the implementation of [Baseline Profiles](https://android-developers.googleblog.com/2022/01/improving-app-performance-with-baseline.html).

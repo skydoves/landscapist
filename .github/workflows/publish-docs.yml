@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: write
-  
+
 jobs:
   deploy:
     runs-on: macos-latest
@@ -15,12 +15,44 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: 3.x
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
+
+      # The wasm playground is built into the site rather than published to gh-pages on its own.
+      # `mkdocs gh-deploy --force` replaces that branch with a commit whose tree is exactly `site/`,
+      # so anything a second job pushed there would be gone on the next push to main.
+      - name: Set up JDK
+        uses: actions/setup-java@v6.0.1
+        with:
+          distribution: 'zulu'
+          java-version: 21
+      - name: Cache Gradle and wrapper
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Build the web demo
+        run: |
+          chmod +x ./gradlew
+          # --no-configure-on-demand because gradle.properties turns it on, and with it a build
+          # that names only this task configures only this module. The wasm yarn lockfile is
+          # resolved from every configured project's package.json, so a narrow build resolves a
+          # narrower lock than the committed one and kotlinWasmStoreYarnLock fails on the
+          # difference. Configuring everything makes the resolved lock the committed one.
+          ./gradlew :demo-web:wasmJsBrowserDistribution --no-configure-on-demand --stacktrace
+      - name: Copy the web demo into the docs
+        run: |
+          mkdir -p docs/demo
+          cp -R demo-web/build/dist/wasmJs/productionExecutable/. docs/demo/
+
+      - run: echo "cache_id=$(date -u '+%V')" >> $GITHUB_ENV
       - uses: actions/cache@v6
         with:
           key: mkdocs-material-${{ env.cache_id }}
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: pip install mkdocs-material 
+      - run: pip install mkdocs-material
       - run: mkdocs gh-deploy --force

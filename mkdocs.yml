@@ -10,6 +10,9 @@ docs_dir: docs
 # Navigation
 nav:
   - 'Overview': index.md
+  # An absolute url rather than a path into docs/demo, which only exists after CI has built
+  # the wasm bundle into it. A path would break `mkdocs build` everywhere else.
+  - 'Web Demo': https://skydoves.github.io/landscapist/demo/
   - 'Landscapist (KMP)':
     - 'Landscapist Core': landscapist/landscapist-core.md
     - 'Landscapist Image': landscapist/landscapist-image.md  
