@@ -63,13 +63,15 @@ public interface MemoryCache {
    * @param isAcceptable Whether the variant cached under the given key can serve this request.
    * The key carries the target size that variant was decoded for.
    * @return The exact entry, the first accepted variant, or null. An implementation that does not
-   * override this falls back to [getIgnoringSize], so a cache written before this existed keeps
-   * whatever variant lookup it had.
+   * override this offers no variants, and every request that misses is decoded: only the cache
+   * knows the size each variant was decoded for, and without that [isAcceptable] has nothing to
+   * judge. Override this to reuse variants, or [getIgnoringSize] to keep the cheaper lookup that
+   * ignores size entirely.
    */
   public fun getMatching(
     key: CacheKey,
     isAcceptable: (CacheKey, CachedImage) -> Boolean,
-  ): CachedImage? = get(key) ?: getIgnoringSize(key)?.takeIf { isAcceptable(key, it) }
+  ): CachedImage? = get(key)
 
   /**
    * Stores an image in the cache.

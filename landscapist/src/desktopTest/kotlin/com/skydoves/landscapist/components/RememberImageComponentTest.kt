@@ -82,18 +82,19 @@ class RememberImageComponentTest {
   }
 
   @Test
-  fun `the component keeps its identity while its plugins change`() {
-    // A caller may key state on the component, so a new one per composition would rebuild it.
+  fun `the component keeps its identity while its plugins stay the same`() {
+    // What lets an image skip. A caller may also key state on the component, and rebuilding that
+    // for a recomposition the plugins had no part in would be wasted work.
     val seen = mutableListOf<ImageComponent>()
 
     runComposeUiTest {
-      var enabled by mutableStateOf(false)
+      var tick by mutableStateOf(0)
       setContent {
-        val on = enabled
-        seen += rememberImageComponent { if (on) +CrossfadePlugin(duration = 300) }
+        val unrelated = tick
+        seen += rememberImageComponent { +CrossfadePlugin(duration = 300 + unrelated * 0) }
       }
       waitForIdle()
-      enabled = true
+      tick = 1
       waitForIdle()
     }
 

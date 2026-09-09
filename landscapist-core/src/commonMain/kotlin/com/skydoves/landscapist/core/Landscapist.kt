@@ -26,6 +26,7 @@ import com.skydoves.landscapist.core.decoder.AnimatedImageDetector
 import com.skydoves.landscapist.core.decoder.DecodeResult
 import com.skydoves.landscapist.core.decoder.ImageDecoder
 import com.skydoves.landscapist.core.decoder.ProgressiveDecodeResult
+import com.skydoves.landscapist.core.decoder.RawImageData
 import com.skydoves.landscapist.core.decoder.createPlatformDecoder
 import com.skydoves.landscapist.core.decoder.createProgressiveDecoder
 import com.skydoves.landscapist.core.decoder.isSvg
@@ -246,13 +247,17 @@ public class Landscapist private constructor(
     cachedKey: CacheKey,
     request: ImageRequest,
   ): Boolean {
+    // The recorded size is what the decoder produced, not what the transformation left behind.
+    if (request.transformations.isNotEmpty()) return false
+    // Apple and wasm keep the encoded bytes and let Skia decode them at draw size, so the entry is
+    // the whole source and no box can ask for more. Sizes say nothing here: they are the source's,
+    // read from the header, and comparing them to a box would refuse every request but the widest.
+    if (data is RawImageData) return true
     val targetWidth = request.targetWidth.asPixelBound()
     val targetHeight = request.targetHeight.asPixelBound()
     // Nothing to check against, and the variant could be a thumbnail. Only an exact match is used.
     if (targetWidth == null && targetHeight == null) return false
     if (originalWidth <= 0 || originalHeight <= 0) return false
-    // The recorded size is what the decoder produced, not what the transformation left behind.
-    if (request.transformations.isNotEmpty()) return false
     // A pixel of tolerance on each axis absorbs layouts that measure to fractional sizes.
     if (!axisCovered(targetWidth, cachedKey.width.asPixelBound())) return false
     if (!axisCovered(targetHeight, cachedKey.height.asPixelBound())) return false
@@ -295,10 +300,14 @@ public class Landscapist private constructor(
   /**
    * Whether the decoder took any notice of the box this entry was decoded for.
    *
-   * Within a factor of two, because Android samples by powers of two and lands anywhere in that
-   * range. Further out than that means the target was ignored, and asking again will produce the
-   * same pixels: an image whose shape does not divide evenly, or a decoder that does not resize at
-   * all, which is what the Apple and wasm ones do.
+   * Within a factor of two, since Android halves until one axis would fall under the box and can
+   * stop anywhere in that range. Beyond it the box was most likely ignored, and asking again would
+   * hand back the same pixels.
+   *
+   * A guess, and wrong in both directions. An image whose shape is far from the box's can be
+   * sampled and still land past the factor, and this reads that as ignored, so a large entry is
+   * kept for a small slot. A source already smaller than its box reads as fitted, which is right
+   * here but for the wrong reason. Neither costs correct pixels, only memory or a decode.
    */
   private fun CachedImage.wasDecodedToFit(cachedKey: CacheKey): Boolean {
     val decodedForWidth = cachedKey.width.asPixelBound()
@@ -338,6 +347,16 @@ public class Landscapist private constructor(
    * An Authorization or Cookie header makes it a different viewer's image, and content negotiation
    * makes it different bytes, so they must not share a cache entry or a file on disk. A request
    * with no headers keys exactly as it did before.
+   */
+  /**
+   * The model, scoped by the headers sent with it.
+   *
+   * Two viewers with different credentials ask for the same URL and must not be handed each
+   * other's images, so the headers are part of what identifies the entry.
+   *
+   * The whole header map counts, which means a rotating token re-keys every image behind it and
+   * the entries cached under the old one are left to be evicted. Send credentials that change on
+   * their own schedule through the network configuration rather than per request.
    */
   private fun ImageRequest.identityScopedModel(): Any? {
     if (headers.isEmpty()) return model

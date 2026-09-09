@@ -48,10 +48,11 @@ public fun ImageComponent.ComposeLoadingStatePlugins(
   for (index in plugins.indices) {
     val plugin = plugins[index]
     if (plugin is ImagePlugin.LoadingStatePlugin) {
-      // Keyed on the plugin's kind and on how many of that kind came before it. The instance
-      // itself would do, except that a plugin with no value equality is a new object on every
-      // composition, and keying on it would throw away whatever it remembered each time. The
-      // position alone would move every plugin after one of another kind was added ahead of it.
+      // Keyed on the plugin's kind and on how many plugins ran before it. The instance itself
+      // would do, except that a plugin with no value equality is a new object on every composition
+      // and keying on it would throw away whatever it remembered each time. Drop one of two
+      // plugins of the same kind and the other takes over its group, and with it whatever it had
+      // remembered, which is the price of a key that does not follow the instance.
       key(plugin::class, seen++) {
         plugin.compose(modifier = modifier, imageOptions = imageOptions, executor = executor)
       }
@@ -98,10 +99,7 @@ public fun ImageComponent.ComposeFailureStatePlugins(
   for (index in plugins.indices) {
     val plugin = plugins[index]
     if (plugin is ImagePlugin.FailureStatePlugin) {
-      // Keyed on the plugin's kind and on how many of that kind came before it. The instance
-      // itself would do, except that a plugin with no value equality is a new object on every
-      // composition, and keying on it would throw away whatever it remembered each time. The
-      // position alone would move every plugin after one of another kind was added ahead of it.
+      // Keyed the same way as the loading plugins, with the same limit on two of a kind.
       key(plugin::class, seen++) {
         plugin.compose(modifier = modifier, imageOptions = imageOptions, reason = reason)
       }
