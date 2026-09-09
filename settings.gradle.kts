@@ -19,6 +19,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "LandscapistDemo"
 include(":app")
+include(":demo-web")
 include(":bom")
 include(":landscapist")
 include(":landscapist-animation")

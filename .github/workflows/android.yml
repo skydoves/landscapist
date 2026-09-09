@@ -66,6 +66,17 @@ jobs:
               assemble -x :benchmark-landscapist:pixel6api31Setup -x :benchmark-landscapist:pixel6api31NonMinifiedReleaseAndroidTest -x :benchmark-landscapist:collectNonMinifiedReleaseBaselineProfile \
               -x prepareReleaseArtProfile
 
+      # Not part of `assemble`, deliberately, so the Android build does not pay for webpack. It is
+      # named here because the publish-docs workflow deploys whatever this produces, and without a
+      # pull request check a broken demo would first show up as a broken page on the site.
+      # --no-configure-on-demand for the reason spelled out in publish-docs.yml: the wasm yarn
+      # lockfile is resolved from every configured project, so a narrow build resolves a narrower
+      # lock than the one committed.
+      - name: Build the web demo
+        run: |
+          ./gradlew --scan --stacktrace --no-configure-on-demand \
+              :demo-web:wasmJsBrowserDistribution
+
       # desktopTest covers landscapist-core, landscapist-image, the crossfade and the SVG decoder,
       # none of which have an Android unit test. Without it those run nowhere.
       - name: Run unit tests

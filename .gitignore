@@ -60,6 +60,9 @@ google-services.json
 
 # Temporary API docs
 docs/api
+
+# The wasm demo, built into the docs site by .github/workflows/publish-docs.yml
+docs/demo
 .hotswan/
 
 # Agent worktrees
