@@ -41,7 +41,7 @@ nav:
   - 'Zoomable': zoomable.md
   - 'Image Gallery': gallery.md
   - 'Image Component and Plugin': image-component-and-plugin.md
-  - 'BOM': bom.md
+  - 'BOM and Version Catalog': bom.md
   - 'Snapshots With Paparazzi': snapshots-with-paparazzi.md
   - 'Version Map': version-map.md
   - 'Sponsor 🩷': sponsor.md

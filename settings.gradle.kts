@@ -21,6 +21,7 @@ rootProject.name = "LandscapistDemo"
 include(":app")
 include(":demo-web")
 include(":bom")
+include(":version-catalog")
 include(":landscapist")
 include(":landscapist-animation")
 include(":landscapist-palette")
