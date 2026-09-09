@@ -48,7 +48,7 @@ class BaselineProfileGenerator {
         checkNotNull(button) { "no tab labelled $tab is on screen" }
         button.click()
         device.waitForIdle()
-        check(device.wait(Until.hasObject(By.res(packageName, "${tab}First")), contentTimeoutMs)) {
+        check(device.wait(Until.hasObject(By.res("${tab}First")), contentTimeoutMs)) {
           "the $tab tab never put its first image on screen"
         }
 
@@ -58,7 +58,7 @@ class BaselineProfileGenerator {
           list.scroll(Direction.DOWN, scrollFraction)
           device.waitForIdle()
         }
-        check(!device.hasObject(By.res(packageName, "${tab}First"))) {
+        check(!device.hasObject(By.res("${tab}First"))) {
           "$tab did not scroll, so its scrolling code path is not in the profile"
         }
       }

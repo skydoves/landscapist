@@ -57,6 +57,8 @@ dependencies {
   implementation(project(":coil3"))
   // Coil's own Compose API, so the row labelled Coil is Coil and not a landscapist wrapper.
   implementation(libs.coil3.compose)
+  // Coil 3 has no network fetcher of its own, so without this its AsyncImage cannot load a url.
+  implementation(libs.coil3.network.okhttp)
   implementation(project(":fresco"))
   implementation(project(":fresco-websupport"))
 

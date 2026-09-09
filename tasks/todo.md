@@ -54,37 +54,72 @@ This replaces that with verification that runs the real path on a real device.
 - [x] Re-verify: 649 unit tests, 79 device tests
 - [x] Update PR #988
 
-## Device measurement, emulator
+## Measurements, retaken after the harnesses were fixed
 
-A fresh process per measured loader. Two rows had to be measured that way and were wrong
-before it: whichever loader ran second in a process read as faster by more than the
-difference being measured, and warming both stacks first did not fix it, because the
-sockets, the thread pools and the JIT of everything under Compose are shared too. The
-comparison now refuses to measure a second loader in a process that has already measured
-one. The decode and scroll rows were checked against fresh processes and did not move.
+Every harness that was found to measure something other than its label has been repaired, so
+none of the earlier numbers carry over. The JVM rows are one process with the two libraries
+alternating which goes first; the device rows are one fresh process per measured loader,
+enforced; the frame timing comes from the macrobenchmark with a real Coil `AsyncImage`, a
+landscapist variant that actually takes the node path, no tab selected at startup, images from
+a socket inside the app, and full compilation so neither column is left interpreted.
+
+### JVM, allocation above an empty scene, 20 images
+
+| KiB per frame | before | after | coil 3.6.2 |
+|---|---|---|---|
+| first frame | 353.5 | **76.2** | 109.5 |
+| resize frame | 34.7 | **5.5** | 5.7 |
+| first frame, crossfade | 402.6 | 126.5 | **109.5** |
+| first frame, success slot | 335.7 | 262.2 | **147.8** painter, 549.7 subcompose |
+| first frame, painter | new | **119.1** | 147.8 |
+| resize frame, painter | new | **13.7** | 72.2 |
+
+A memory cache hit allocates 804 B against 1.6 KiB. 32 concurrent loads of one image reach the
+network once, against 32. Decoding a 4000x3000 JPEG to 400x300 takes 39.3 ms against Coil's own
+decoder at 47.6 ms, and the Java heap for one decode went from 344.85 MiB to 953.7 KiB.
+
+### JVM, timing, three runs, sides alternating
+
+| p50 | landscapist | coil 3.6.2 |
+|---|---|---|
+| cold load | 110.8, 119.1, 94.2 us | 114.6, 119.9, 93.8 us |
+| memory cache hit | 958, 834, 875 ns | **750, 709, 708 ns** |
+
+Cold load is a tie. The memory hit is consistently about 18 percent slower, which is the row an
+earlier revision quoted the other way round before the sides were paired.
+
+### Device, emulator, one fresh process per measurement, two runs
 
 | | landscapist | coil 3.6.2 |
 |---|---|---|
-| first image on screen, 20 composed at once | 197, 218, 365 ms | 154, 182, 267 ms |
-| until all 20 report success | 243, 265, 403 ms | 214, 219, 333 ms |
-| resident set above resting, 20 images | 51, 52, 60 MiB | 45.2, 45.2, 45.3 MiB |
-| decode 2000x1500 to 200x150, median of 8 | 34, 35 ms | 24, 25 ms |
-| the same decode, allocated | 5.4 MiB | 1.9 MiB |
-| scroll, 8 swipes over 60 rows, allocated | 2.8, 3.3 MiB | 2.7, 2.8 MiB |
+| first image on screen, 20 composed at once | 138, 124 ms | **99, 98 ms** |
+| until all 20 report success | 241, 246 ms | **166, 174 ms** |
+| resident set above resting, 20 images | 59.4, 59.5 MiB | **45.5, 33.0 MiB** |
+| decode 2000x1500 to 200x150 | 34.1, 34.8 ms | **23.6, 23.8 ms** |
+| the same decode, allocated | 5.45 MiB | **1.82 MiB** |
+| scroll, 8 swipes over 240 rows, allocated | 45.1, 41.2 MiB | **18.7, 18.6 MiB** |
 
-Frame timing comes from the repository's own macrobenchmark, five iterations each, scrolling
-thirty images. Emulator, so the absolute values mean little; the two columns were taken the
-same way.
+The scroll row is new: it used to run 60 rows, where both caches held everything and the row
+measured nothing. At 240 rows the caches evict and the gap is 2.4x, which tracks the 3x gap in
+what one decode allocates.
 
-| frame, ms | landscapist | coil 3.6.2 |
+### Frame timing, macrobenchmark, five iterations, three runs
+
+| p50 / p90 / p95 / p99, ms | landscapist | coil 3.6.2 |
 |---|---|---|
-| duration P50 / P90 / P95 / P99 | 4.6 / 15.0 / 17.7 / 29.0 | 6.0 / 18.0 / 19.9 / 38.0 |
-| overrun P50 / P90 / P95 / P99 | -10.7 / 1.3 / 1.8 / 35.6 | -9.6 / 2.7 / 6.7 / 27.4 |
+| duration, run 1 | 3.4 / 5.8 / 6.5 / 11.0 | 3.5 / 5.8 / 6.7 / 19.8 |
+| duration, run 2 | 3.5 / 7.4 / 18.0 / 21.8 | 3.3 / 6.1 / 7.0 / 10.1 |
+| duration, run 3 | 3.6 / 6.8 / 7.6 / 10.2 | 3.4 / 6.4 / 7.1 / 9.8 |
 
-So: ahead on frame time while scrolling, behind on cold load, on decode and on resident
-memory. The decode path is untouched by this branch. The cold load and memory rows are not
-what the JVM benchmark says about desktop, and the JVM benchmark is not measuring the
-platform decoder.
+A tie. The medians are within a tenth of a millisecond and the upper percentiles swing both ways
+between runs, so nothing is claimed from this row in either direction.
+
+### What the picture says
+
+The Compose layer, which is what this branch changed, is ahead on every allocation row on the
+JVM. The device rows it is behind on are the decode and what follows from it, and that path is
+untouched here: one decode allocates three times what Coil's does, which is most of the scroll
+gap and some of the resident set gap. That is the next thing worth working on.
 
 ## Found so far
 

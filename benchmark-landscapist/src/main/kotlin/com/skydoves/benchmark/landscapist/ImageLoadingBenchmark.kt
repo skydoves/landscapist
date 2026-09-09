@@ -44,7 +44,8 @@ import org.junit.Test
  * Every navigation and every scroll is checked. A run that found no tab, or scrolled nothing, used
  * to report a low P50 and no error.
  *
- * Regenerate the baseline profile before quoting a row. [CompilationMode.Partial] compiles what the
+ * Compiled fully rather than from a profile, so no column is left interpreted. [CompilationMode.Full]
+ * replaces what [CompilationMode.Partial] would have compiled from the
  * profile covers, so a profile taken before a variant existed leaves that variant interpreted while
  * the others are compiled, which is a gap in the numbers and not in the libraries.
  */
@@ -84,7 +85,11 @@ class ImageLoadingBenchmark {
     metrics = listOf(FrameTimingMetric()),
     iterations = 5,
     startupMode = StartupMode.WARM,
-    compilationMode = CompilationMode.Partial(),
+    // Full rather than Partial. Partial compiles what the checked in baseline profile covers, and
+    // a profile written before a variant existed leaves that variant interpreted while the others
+    // run compiled, which is a difference between the columns that has nothing to do with the
+    // libraries. Full is not what ships, but it is the same for every column.
+    compilationMode = CompilationMode.Full(),
   ) {
     pressHome()
     startActivityAndWait()
@@ -131,7 +136,9 @@ class ImageLoadingBenchmark {
     }
   }
 
-  private fun firstItem(tab: String) = By.res(PACKAGE_NAME, "${tab}First")
+  // By.res with one argument, because testTagsAsResourceId publishes the tag verbatim with no
+  // package prefix. The two argument form builds "package:id/tag" and never matched.
+  private fun firstItem(tab: String) = By.res("${tab}First")
 
   companion object {
     private const val PACKAGE_NAME = "com.skydoves.benchmark.landscapist.app"
