@@ -31,11 +31,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-/**
- * Covers the paths that keep an image that is already in memory from blinking: [Landscapist.load]
- * must not announce a loading state for it, and [Landscapist.peekMemoryCache] must hand it back
- * without suspending so a composable can draw it in its first frame.
- */
+/** A memory hit emits no loading state, and peekMemoryCache answers without suspending. */
 class MemoryCacheFastPathTest {
 
   private val url = "https://example.com/image.jpg"
@@ -58,7 +54,7 @@ class MemoryCacheFastPathTest {
   }
 
   private fun newLoader(): Landscapist =
-    Landscapist.builder().fetcher(StubFetcher).decoder(StubDecoder).build()
+    Landscapist.builder().noDiskCache().fetcher(StubFetcher).decoder(StubDecoder).build()
 
   private fun request(width: Int? = null, height: Int? = null): ImageRequest =
     ImageRequest.builder()

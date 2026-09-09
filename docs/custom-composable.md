@@ -135,7 +135,7 @@ A common source of confusion is that the `modifier` you pass to `GlideImage`, `C
 
 ### How the outer `modifier` is applied
 
-Internally, every Landscapist image composable wraps its content in a `BoxWithConstraints` and applies your `modifier` to that root container only:
+Internally, `GlideImage`, `CoilImage` and `FrescoImage` wrap their content in a `BoxWithConstraints` and apply your `modifier` to that root container only:
 
 ```kotlin
 // landscapist/.../ImageLoad.kt (simplified)
@@ -147,7 +147,9 @@ BoxWithConstraints(
 }
 ```
 
-This means your `Modifier.size(...)`, `Modifier.fillMaxWidth()`, `Modifier.aspectRatio(...)`, etc. **establish the layout box** for the image. State slots are invoked **inside** that box as `BoxScope` lambdas, so they have access to the parent's size — but only if you opt-in via a child modifier such as `Modifier.matchParentSize()` or `Modifier.fillMaxSize()`.
+`LandscapistImage` gets to the same place by a different route. It uses a plain `Box` with a `Modifier.layout` that reads the constraints its parent offered, and it drops the container entirely when there is no slot and no plugin to compose inside it, drawing the image from the container node itself. Your `modifier` still establishes the layout box and the slots are still `BoxScope` lambdas, so everything below applies to it too.
+
+This means your `Modifier.size(...)`, `Modifier.fillMaxWidth()`, `Modifier.aspectRatio(...)`, etc. **establish the layout box** for the image. State slots are invoked **inside** that box as `BoxScope` lambdas, so they have access to the parent's size, but only if you opt in via a child modifier such as `Modifier.matchParentSize()` or `Modifier.fillMaxSize()`.
 
 ### The problem: custom slots that ignore parent size
 
@@ -166,7 +168,7 @@ GlideImage(
 )
 ```
 
-The same applies to `success` when you provide your own composable: if you draw an `Image` without a size modifier, it falls back to the painter's intrinsic size — which is especially noticeable for **small SVGs** placed inside a larger requested box.
+The same applies to `success` when you provide your own composable: if you draw an `Image` without a size modifier, it falls back to the painter's intrinsic size, which is especially noticeable for **small SVGs** placed inside a larger requested box.
 
 ### The fix: opt-in to the parent size with `matchParentSize()`
 
@@ -296,4 +298,4 @@ success = { state, painter ->
 - ✅ The outer `modifier` defines the **box**; state slots run **inside** it as `BoxScope`.
 - ✅ Use `Modifier.matchParentSize()` (preferred) or `Modifier.fillMaxSize()` inside slots to inherit the requested size.
 - ✅ For SVGs or small bitmaps drawn inside a larger box, switch `ImageOptions.contentScale` from the default `Crop` to `Fit` (or wrap with a `Box` + `align(Alignment.Center)` for intrinsic sizing).
-- ❌ Don't assume the outer `Modifier.size(...)` is automatically applied to your custom `success` / `failure` content — it isn't.
+- ❌ Don't assume the outer `Modifier.size(...)` is automatically applied to your custom `success` / `failure` content. It isn't.

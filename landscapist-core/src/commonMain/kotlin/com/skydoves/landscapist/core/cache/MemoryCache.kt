@@ -42,15 +42,36 @@ public interface MemoryCache {
   /**
    * Gets a cached image for the same model and transformations as [key], at any target size.
    *
-   * A composable knows its image model before it knows the size it will be measured at, so an exact
-   * [get] misses on the first frame even when the image is in memory. This lookup lets the already
-   * decoded variant render immediately while the correctly sized request resolves.
+   * A composable knows its model before its measured size, so an exact [get] misses on the first
+   * frame even when the image is in memory.
    *
    * @param key The cache key. Only its [CacheKey.baseKey] is matched; the target size is ignored.
    * @return A cached image for any size of this key, or null if nothing is cached. Implementations
    * that cannot answer this cheaply return null.
    */
   public fun getIgnoringSize(key: CacheKey): CachedImage? = null
+
+  /**
+   * Gets the image cached for [key], or an already decoded variant of the same image and
+   * transformations that [isAcceptable] approves.
+   *
+   * A lookup marks what it returns as recently used, which can promote it out of a weak tier and
+   * evict others, so a variant [isAcceptable] turns down must not be marked.
+   *
+   * @param key The cache key. The exact size is preferred; other sizes are offered to
+   * [isAcceptable] from the most recently cached to the least.
+   * @param isAcceptable Whether the variant cached under the given key can serve this request.
+   * The key carries the target size that variant was decoded for.
+   * @return The exact entry, the first accepted variant, or null. An implementation that does not
+   * override this offers no variants, and every request that misses is decoded: only the cache
+   * knows the size each variant was decoded for, and without that [isAcceptable] has nothing to
+   * judge. Override this to reuse variants, or [getIgnoringSize] to keep the cheaper lookup that
+   * ignores size entirely.
+   */
+  public fun getMatching(
+    key: CacheKey,
+    isAcceptable: (CacheKey, CachedImage) -> Boolean,
+  ): CachedImage? = get(key)
 
   /**
    * Stores an image in the cache.

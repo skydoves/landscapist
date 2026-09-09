@@ -44,11 +44,11 @@ import androidx.test.filters.LargeTest
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.image.LandscapistImage
 import com.skydoves.landscapist.image.LandscapistImageState
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
 /**
@@ -106,8 +106,12 @@ class MainPostersLayoutTest {
       }
     }
 
-    val loaded = latch.await(5, TimeUnit.SECONDS)
-    assert(loaded) { "Image failed to load. Final state: ${imageState::class.simpleName}" }
+    val loaded = runCatching {
+      // waitUntil pumps the clock. Blocking this thread on the latch stops the compose
+      // rule producing frames, so the load it is waiting for can never finish.
+      composeTestRule.waitUntil(timeoutMillis = 5000L) { latch.count == 0L }
+    }.isSuccess
+    assertTrue("Image failed to load. Final state: ${imageState::class.simpleName}", loaded)
 
     composeTestRule.onNodeWithTag(TAG_POSTER_ITEM)
       .assertIsDisplayed()
@@ -118,17 +122,20 @@ class MainPostersLayoutTest {
     val bounds = composeTestRule.onNodeWithTag(TAG_POSTER_ITEM).getBoundsInRoot()
     val widthDp = bounds.right - bounds.left
     val heightDp = bounds.bottom - bounds.top
-    assert(widthDp.value >= 49f && widthDp.value <= 51f) {
-      "Expected width ~50dp but got $widthDp"
-    }
-    assert(heightDp.value >= 49f && heightDp.value <= 51f) {
-      "Expected height ~50dp but got $heightDp"
-    }
+    assertTrue(
+      "Expected width ~50dp but got $widthDp",
+      widthDp.value >= 49f && widthDp.value <= 51f,
+    )
+    assertTrue(
+      "Expected height ~50dp but got $heightDp",
+      heightDp.value >= 49f && heightDp.value <= 51f,
+    )
 
     composeTestRule.runOnIdle {
-      assert(imageState is LandscapistImageState.Success) {
-        "Expected Success but got ${imageState::class.simpleName}"
-      }
+      assertTrue(
+        "Expected Success but got ${imageState::class.simpleName}",
+        imageState is LandscapistImageState.Success,
+      )
     }
   }
 
@@ -166,8 +173,12 @@ class MainPostersLayoutTest {
       }
     }
 
-    val loaded = latch.await(5, TimeUnit.SECONDS)
-    assert(loaded) { "Image failed to load. Final state: ${imageState::class.simpleName}" }
+    val loaded = runCatching {
+      // waitUntil pumps the clock. Blocking this thread on the latch stops the compose
+      // rule producing frames, so the load it is waiting for can never finish.
+      composeTestRule.waitUntil(timeoutMillis = 5000L) { latch.count == 0L }
+    }.isSuccess
+    assertTrue("Image failed to load. Final state: ${imageState::class.simpleName}", loaded)
 
     composeTestRule.onNodeWithTag(TAG_SELECTED_POSTER)
       .assertIsDisplayed()
@@ -179,14 +190,16 @@ class MainPostersLayoutTest {
     val actualRatio = widthDp.value / heightDp.value
     val expectedRatio = 0.75f
 
-    assert(abs(actualRatio - expectedRatio) < 0.05f) {
-      "Expected aspect ratio ~0.75 but got $actualRatio (width=$widthDp, height=$heightDp)"
-    }
+    assertTrue(
+      "Expected aspect ratio ~0.75 but got $actualRatio (width=$widthDp, height=$heightDp)",
+      abs(actualRatio - expectedRatio) < 0.05f,
+    )
 
     composeTestRule.runOnIdle {
-      assert(imageState is LandscapistImageState.Success) {
-        "Expected Success but got ${imageState::class.simpleName}"
-      }
+      assertTrue(
+        "Expected Success but got ${imageState::class.simpleName}",
+        imageState is LandscapistImageState.Success,
+      )
     }
   }
 
@@ -226,8 +239,12 @@ class MainPostersLayoutTest {
       }
     }
 
-    val loaded = latch.await(5, TimeUnit.SECONDS)
-    assert(loaded) { "Image failed to load. Final state: ${imageState::class.simpleName}" }
+    val loaded = runCatching {
+      // waitUntil pumps the clock. Blocking this thread on the latch stops the compose
+      // rule producing frames, so the load it is waiting for can never finish.
+      composeTestRule.waitUntil(timeoutMillis = 5000L) { latch.count == 0L }
+    }.isSuccess
+    assertTrue("Image failed to load. Final state: ${imageState::class.simpleName}", loaded)
 
     composeTestRule.onNodeWithTag(TAG_GIF_IMAGE)
       .assertIsDisplayed()
@@ -238,14 +255,16 @@ class MainPostersLayoutTest {
     val expectedWidthValue = (screenWidthDp - 16.dp).value // 8.dp padding on each side
 
     // Allow some tolerance for density conversion
-    assert(widthDp.value >= expectedWidthValue - 2f) {
-      "Expected width ~${screenWidthDp - 16.dp} but got $widthDp"
-    }
+    assertTrue(
+      "Expected width ~${screenWidthDp - 16.dp} but got $widthDp",
+      widthDp.value >= expectedWidthValue - 2f,
+    )
 
     composeTestRule.runOnIdle {
-      assert(imageState is LandscapistImageState.Success) {
-        "Expected Success but got ${imageState::class.simpleName}"
-      }
+      assertTrue(
+        "Expected Success but got ${imageState::class.simpleName}",
+        imageState is LandscapistImageState.Success,
+      )
     }
   }
 
@@ -318,13 +337,18 @@ class MainPostersLayoutTest {
       }
     }
 
-    val loaded = latch.await(10, TimeUnit.SECONDS)
-    assert(loaded) {
+    val loaded = runCatching {
+      // waitUntil pumps the clock. Blocking this thread on the latch stops the compose
+      // rule producing frames, so the load it is waiting for can never finish.
+      composeTestRule.waitUntil(timeoutMillis = 10000L) { latch.count == 0L }
+    }.isSuccess
+    assertTrue(
       "Not all images loaded. States: " +
         "posterItem=${posterItemState::class.simpleName}, " +
         "selectedPoster=${selectedPosterState::class.simpleName}, " +
-        "gif=${gifState::class.simpleName}"
-    }
+        "gif=${gifState::class.simpleName}",
+      loaded,
+    )
 
     // Verify all images are displayed
     composeTestRule.onNodeWithTag(TAG_POSTER_ITEM).assertIsDisplayed()
@@ -334,36 +358,42 @@ class MainPostersLayoutTest {
     // Verify Pattern 1: Fixed size
     val posterBounds = composeTestRule.onNodeWithTag(TAG_POSTER_ITEM).getBoundsInRoot()
     val posterWidth = posterBounds.right - posterBounds.left
-    assert(posterWidth.value >= 49f && posterWidth.value <= 51f) {
-      "PosterItem: Expected width ~50dp but got $posterWidth"
-    }
+    assertTrue(
+      "PosterItem: Expected width ~50dp but got $posterWidth",
+      posterWidth.value >= 49f && posterWidth.value <= 51f,
+    )
 
     // Verify Pattern 2: Aspect ratio
     val selectedBounds = composeTestRule.onNodeWithTag(TAG_SELECTED_POSTER).getBoundsInRoot()
     val selectedWidth = selectedBounds.right - selectedBounds.left
     val selectedHeight = selectedBounds.bottom - selectedBounds.top
     val aspectRatio = selectedWidth.value / selectedHeight.value
-    assert(abs(aspectRatio - 0.75f) < 0.05f) {
-      "SelectedPoster: Expected aspect ratio ~0.75 but got $aspectRatio"
-    }
+    assertTrue(
+      "SelectedPoster: Expected aspect ratio ~0.75 but got $aspectRatio",
+      abs(aspectRatio - 0.75f) < 0.05f,
+    )
 
     // Verify Pattern 3: Fill width (should be wider than PosterItem)
     val gifBounds = composeTestRule.onNodeWithTag(TAG_GIF_IMAGE).getBoundsInRoot()
     val gifWidth = gifBounds.right - gifBounds.left
-    assert(gifWidth.value > 100f) {
-      "GIF: Expected wide image but got $gifWidth"
-    }
+    assertTrue(
+      "GIF: Expected wide image but got $gifWidth",
+      gifWidth.value > 100f,
+    )
 
     composeTestRule.runOnIdle {
-      assert(posterItemState is LandscapistImageState.Success) {
-        "PosterItem should be Success but got ${posterItemState::class.simpleName}"
-      }
-      assert(selectedPosterState is LandscapistImageState.Success) {
-        "SelectedPoster should be Success but got ${selectedPosterState::class.simpleName}"
-      }
-      assert(gifState is LandscapistImageState.Success) {
-        "GIF should be Success but got ${gifState::class.simpleName}"
-      }
+      assertTrue(
+        "PosterItem should be Success but got ${posterItemState::class.simpleName}",
+        posterItemState is LandscapistImageState.Success,
+      )
+      assertTrue(
+        "SelectedPoster should be Success but got ${selectedPosterState::class.simpleName}",
+        selectedPosterState is LandscapistImageState.Success,
+      )
+      assertTrue(
+        "GIF should be Success but got ${gifState::class.simpleName}",
+        gifState is LandscapistImageState.Success,
+      )
     }
   }
 }

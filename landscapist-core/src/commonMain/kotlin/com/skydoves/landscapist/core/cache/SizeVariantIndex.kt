@@ -26,7 +26,7 @@ package com.skydoves.landscapist.core.cache
  */
 internal class SizeVariantIndex {
 
-  private val variantsByBase = mutableMapOf<String, MutableList<String>>()
+  private val variantsByBase = mutableMapOf<String, MutableList<CacheKey>>()
   private val baseByVariant = mutableMapOf<String, String>()
 
   /** Records [key], keeping the most recently added variant last. */
@@ -34,21 +34,26 @@ internal class SizeVariantIndex {
     val memoryKey = key.memoryKey
     remove(memoryKey)
     baseByVariant[memoryKey] = key.baseKey
-    variantsByBase.getOrPut(key.baseKey) { mutableListOf() }.add(memoryKey)
+    variantsByBase.getOrPut(key.baseKey) { mutableListOf() }.add(key)
   }
 
   /** Forgets [memoryKey]. Called for every eviction and removal so the index cannot outlive it. */
   fun remove(memoryKey: String) {
     val baseKey = baseByVariant.remove(memoryKey) ?: return
     val variants = variantsByBase[baseKey] ?: return
-    variants.remove(memoryKey)
+    variants.removeAll { it.memoryKey == memoryKey }
     if (variants.isEmpty()) {
       variantsByBase.remove(baseKey)
     }
   }
 
-  /** The memory keys cached for [baseKey], most recently added first. */
-  fun variantsOf(baseKey: String): List<String> =
+  /**
+   * The keys cached for [baseKey], most recently added first.
+   *
+   * Keys rather than memory keys, because a key carries the target size its entry was decoded for,
+   * which is what decides whether that entry can serve a differently sized request.
+   */
+  fun variantsOf(baseKey: String): List<CacheKey> =
     variantsByBase[baseKey]?.asReversed() ?: emptyList()
 
   fun clear() {

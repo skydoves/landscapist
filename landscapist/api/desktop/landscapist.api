@@ -70,6 +70,7 @@ public final class com/skydoves/landscapist/ImageLoadState$Success : com/skydove
 
 public final class com/skydoves/landscapist/ImageOptions {
 	public static final field $stable I
+	public static final field Companion Lcom/skydoves/landscapist/ImageOptions$Companion;
 	public static final field DEFAULT_IMAGE_SIZE I
 	public synthetic fun <init> (Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJLjava/lang/String;Ljava/lang/Float;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun <init> (Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJLjava/lang/String;Ljava/lang/Float;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -96,6 +97,10 @@ public final class com/skydoves/landscapist/ImageOptions {
 	public fun hashCode ()I
 	public final fun isValidSize ()Z
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/skydoves/landscapist/ImageOptions$Companion {
+	public final fun getDefault ()Lcom/skydoves/landscapist/ImageOptions;
 }
 
 public abstract interface class com/skydoves/landscapist/ImageState {
@@ -187,6 +192,10 @@ public abstract interface class com/skydoves/landscapist/constraints/Constrainab
 public final class com/skydoves/landscapist/constraints/ConstraintsExtensionsKt {
 	public static final fun constraint (Landroidx/compose/ui/Modifier;Landroidx/compose/foundation/layout/BoxWithConstraintsScope;)Landroidx/compose/ui/Modifier;
 	public static final fun constraint-0kLqBqw (Landroidx/compose/ui/Modifier;J)Landroidx/compose/ui/Modifier;
+}
+
+public final class com/skydoves/landscapist/crossfade/CrossfadePainterKt {
+	public static final fun rememberCrossfadePainter (Landroidx/compose/ui/graphics/painter/Painter;IZLandroidx/compose/runtime/Composer;II)Landroidx/compose/ui/graphics/painter/Painter;
 }
 
 public final class com/skydoves/landscapist/crossfade/CrossfadePlugin : com/skydoves/landscapist/plugins/ImagePlugin$PainterPlugin {

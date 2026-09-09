@@ -80,6 +80,22 @@ public class BlurHashPlugin(
       )
     }
   }
+
+  override fun equals(other: Any?): Boolean = this === other || (
+    other is BlurHashPlugin &&
+      blurHash == other.blurHash &&
+      width == other.width &&
+      height == other.height &&
+      punch == other.punch
+    )
+
+  override fun hashCode(): Int {
+    var result = blurHash.hashCode()
+    result = 31 * result + width
+    result = 31 * result + height
+    result = 31 * result + punch.hashCode()
+    return result
+  }
 }
 
 /**

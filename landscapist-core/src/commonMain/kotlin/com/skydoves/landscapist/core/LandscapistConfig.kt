@@ -35,6 +35,9 @@ import kotlin.time.Duration.Companion.seconds
  * @property bitmapConfig Configuration for bitmap decoding.
  * @property weakReferencesEnabled Whether to use weak references for evicted cache entries.
  * @property eventListenerFactory Factory for creating event listeners.
+ * @property memoryCache A memory cache to use instead of the built in one. A cache that does not
+ *   override [MemoryCache.getMatching] still works, but loses the reuse of an already decoded
+ *   variant at a different size.
  * @property interceptors List of interceptors for request/response modification.
  */
 public data class LandscapistConfig(

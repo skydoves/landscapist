@@ -34,10 +34,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-/**
- * Verifies in-flight request coalescing: concurrent loads that share a memory-cache key are fetched
- * and decoded once, while distinct models are not coalesced.
- */
+/** Concurrent loads that share a memory-cache key are fetched and decoded once. */
 class RequestDeduplicationTest {
 
   private class CountingFetcher(private val delayMs: Long) : ImageFetcher {
@@ -66,7 +63,7 @@ class RequestDeduplicationTest {
   }
 
   private fun newLoader(fetcher: ImageFetcher, decoder: ImageDecoder): Landscapist =
-    Landscapist.builder().fetcher(fetcher).decoder(decoder).build()
+    Landscapist.builder().noDiskCache().fetcher(fetcher).decoder(decoder).build()
 
   private suspend fun Landscapist.awaitTerminal(model: String): ImageResult {
     val request = ImageRequest.builder()
@@ -115,8 +112,7 @@ class RequestDeduplicationTest {
     val decoder = CountingDecoder()
     val loader = newLoader(fetcher, decoder)
 
-    // Memory cache disabled so the second load cannot be served from cache and the coalescing entry
-    // is already gone, proving the in-flight map is cleaned up after completion.
+    // Memory cache disabled, so a second fetch is what proves the in-flight entry was cleaned up.
     val request = ImageRequest.builder()
       .model("https://example.com/sequential.png")
       .diskCachePolicy(CachePolicy.DISABLED)
@@ -139,7 +135,7 @@ class RequestDeduplicationTest {
     val survivorResult = coroutineScope {
       val leaving = launch(Dispatchers.Default) { loader.awaitTerminal(model) }
       val survivor = async(Dispatchers.Default) { loader.awaitTerminal(model) }
-      delay(100) // both have joined the in-flight load while the fetch is still running
+      delay(100) // both callers have joined the in-flight load
       leaving.cancel()
       survivor.await()
     }
@@ -157,10 +153,10 @@ class RequestDeduplicationTest {
     val model = "https://example.com/abandon.png"
 
     val job = launch(Dispatchers.Default) { loader.awaitTerminal(model) }
-    delay(120) // the fetch has started (count incremented before its delay)
+    delay(120) // the fetch has started
     job.cancel()
     job.join()
-    delay(150) // give any leaked work time to (wrongly) reach the decode step
+    delay(150) // time for any leaked work to reach the decode step
 
     assertEquals(1, fetcher.count.value, "the fetch started once")
     assertEquals(0, decoder.count.value, "decode must not run after the sole caller cancels")

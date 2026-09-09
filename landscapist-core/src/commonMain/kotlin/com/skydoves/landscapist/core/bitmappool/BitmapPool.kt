@@ -149,6 +149,11 @@ public expect fun createBitmapPool(maxSize: Long = 0): BitmapPool
 /**
  * Global bitmap pool instance for shared use.
  * Lazily initialized with default size (1/8 of max memory).
+ *
+ * Nothing in the library puts a bitmap into it. The decoders ask it for a reusable bitmap and it is
+ * always empty, so `inBitmap` reuse does not happen unless a caller fills the pool with [put]
+ * themselves. Reusing a bitmap that is still being drawn corrupts what is on screen, so the library
+ * does not decide on its own when one is finished with.
  */
 public object GlobalBitmapPool {
   private var pool: BitmapPool? = null

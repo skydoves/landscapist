@@ -37,4 +37,9 @@ public class ThumbnailPlugin(
   ): ImagePlugin = apply {
     executor.invoke(requestSize)
   }
+
+  override fun equals(other: Any?): Boolean =
+    this === other || (other is ThumbnailPlugin && requestSize == other.requestSize)
+
+  override fun hashCode(): Int = requestSize.hashCode()
 }

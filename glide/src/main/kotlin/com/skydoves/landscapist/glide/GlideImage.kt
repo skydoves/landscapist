@@ -114,7 +114,7 @@ public fun GlideImage(
   },
   requestListener: (() -> RequestListener<Any>)? = null,
   component: ImageComponent = rememberImageComponent {},
-  imageOptions: ImageOptions = ImageOptions(),
+  imageOptions: ImageOptions = ImageOptions.Default,
   clearTarget: Boolean = false,
   onImageStateChanged: (GlideImageState) -> Unit = {},
   previewPlaceholder: Painter? = null,
@@ -156,7 +156,19 @@ public fun GlideImage(
     modifier = modifier,
   ) ImageRequest@{ imageState ->
 
-    val crossfadePlugin = component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+    // Scanned on every composition rather than remembered on the component. An ImagePluginComponent
+    // is mutable and has no equality, so a remembered lookup would keep a plugin a caller has since
+    // removed, and the crossfade would keep animating with a duration nobody asked for. The scan
+    // allocates nothing, which is what made remembering it look worthwhile.
+    val plugins = component.imagePlugins
+    var crossfadePlugin: CrossfadePlugin? = null
+    for (index in plugins.indices) {
+      val plugin = plugins[index]
+      if (plugin is CrossfadePlugin) {
+        crossfadePlugin = plugin
+        break
+      }
+    }
 
     CrossfadeWithEffect(
       targetState = imageState,

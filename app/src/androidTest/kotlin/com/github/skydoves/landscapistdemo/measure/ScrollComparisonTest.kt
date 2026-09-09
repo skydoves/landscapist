@@ -1,0 +1,251 @@
+/*
+ * Designed and developed by 2020-2023 skydoves (Jaewoong Eum)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.github.skydoves.landscapistdemo.measure
+
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
+import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
+import coil3.ImageLoader
+import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.memory.MemoryCache
+import com.github.skydoves.landscapistdemo.harness.ImageFixtures
+import com.github.skydoves.landscapistdemo.harness.LocalImageServer
+import com.github.skydoves.landscapistdemo.measure.DeviceMeasure.formatBytes
+import com.skydoves.landscapist.core.Landscapist
+import com.skydoves.landscapist.core.LandscapistConfig
+import com.skydoves.landscapist.core.model.CachePolicy
+import com.skydoves.landscapist.image.LandscapistImage
+import com.skydoves.landscapist.image.LandscapistImageState
+import org.junit.After
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
+import coil3.request.ImageRequest as CoilRequest
+
+/**
+ * Allocation while a list scrolls, one loader per process.
+ *
+ * This class had no process guard at all while running both loaders in one process, which is the
+ * ordering problem [DeviceMeasure.claimTheProcess] exists for. It also gave landscapist a 64 MiB
+ * memory cache and Coil 32 MiB, and reported a number without ever checking that the list moved.
+ */
+@LargeTest
+@RunWith(AndroidJUnit4::class)
+class ScrollComparisonTest {
+
+  @get:Rule
+  val compose = createComposeRule()
+
+  private lateinit var server: LocalImageServer
+
+  // Long enough that the measured swipes cannot reach the end of it. A list that bottoms out
+  // stops doing work, and the swipes after that are measuring an idle list.
+  private val items = 240
+  private val rowHeight = 90
+
+  @Before
+  fun start() {
+    server = LocalImageServer()
+    // One encoding, served at [items] paths: the fixture is deterministic, so distinct bytes were
+    // never distinct, and distinct urls are what keep the caches from sharing an entry.
+    val body = ImageFixtures.photo(360, 270)
+    repeat(items) { server.serve("/row-$it.jpg", body) }
+  }
+
+  @After
+  fun stop() = server.close()
+
+  private fun urls() = List(items) { server.url("/row-$it.jpg") }
+
+  @Test
+  fun scrollLandscapist() {
+    DeviceMeasure.claimTheProcess("landscapist scroll")
+    val loader = Landscapist.builder()
+      .config(LandscapistConfig(memoryCacheSize = DeviceMeasure.MEMORY_CACHE_BYTES))
+      .noDiskCache()
+      .build()
+    val state = LazyListState(0, 0)
+    measureScroll("landscapist", state) { url, loaded, failed ->
+      LandscapistImage(
+        imageModel = { url },
+        landscapist = loader,
+        modifier = Modifier.fillMaxWidth().height(rowHeight.dp),
+        requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
+        onImageStateChanged = { imageState ->
+          when (imageState) {
+            is LandscapistImageState.Success -> loaded()
+            is LandscapistImageState.Failure -> failed()
+            else -> Unit
+          }
+        },
+      )
+    }
+  }
+
+  @Test
+  fun scrollCoil() {
+    DeviceMeasure.claimTheProcess("coil scroll")
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val loader = ImageLoader.Builder(context)
+      .memoryCache {
+        MemoryCache.Builder().maxSizeBytes(DeviceMeasure.MEMORY_CACHE_BYTES).build()
+      }
+      .diskCache(null)
+      .build()
+    val state = LazyListState(0, 0)
+    measureScroll("coil", state) { url, loaded, failed ->
+      AsyncImage(
+        model = CoilRequest.Builder(context).data(url).build(),
+        imageLoader = loader,
+        contentDescription = null,
+        modifier = Modifier.fillMaxWidth().height(rowHeight.dp),
+        onState = { imageState ->
+          when (imageState) {
+            is AsyncImagePainter.State.Success -> loaded()
+            is AsyncImagePainter.State.Error -> failed()
+            else -> Unit
+          }
+        },
+      )
+    }
+  }
+
+  /**
+   * Scrolled first to fill the caches, so the measured pass is over images already held.
+   *
+   * [row] is one row of the list: the url to show, and the two callbacks the loader's own state
+   * reports through. The list around it is built here so both arms scroll the same one.
+   */
+  private fun measureScroll(
+    label: String,
+    state: LazyListState,
+    row: @Composable (url: String, loaded: () -> Unit, failed: () -> Unit) -> Unit,
+  ) {
+    val urls = urls()
+    // The urls that reached a decoded image, and how many loads reported a failure. Both are fed
+    // by the loader that is being measured, so they say what it did rather than what was asked of
+    // the server.
+    val rowsLoaded = ConcurrentHashMap.newKeySet<String>()
+    val loadsFailed = AtomicInteger()
+    compose.setContent {
+      LazyColumn(state = state) {
+        items(urls) { url ->
+          row(url, { rowsLoaded += url }, { loadsFailed.incrementAndGet() })
+        }
+      }
+    }
+    compose.waitForIdle()
+    val resting = compose.runOnIdle { lastVisibleIndex(state) }
+
+    val warmDepth = swipeThereAndBack(state, WARM_ROUNDS)
+    check(warmDepth > resting) {
+      "$label did not scroll during the warm up: still showing item $warmDepth of $items"
+    }
+    DeviceMeasure.settle()
+    // Counted from here, so what follows is what the measured pass itself asked for and loaded
+    // rather than anything the warm up left behind.
+    server.resetCounts()
+    rowsLoaded.clear()
+    loadsFailed.set(0)
+
+    var depth = 0
+    val allocated = DeviceMeasure.allocatedDuring {
+      depth = swipeThereAndBack(state, MEASURED_ROUNDS)
+    }
+
+    check(depth > resting) {
+      "$label did not scroll during the measured pass: still showing item $depth of $items"
+    }
+    // A swipe that runs out of list stops doing work, so the row would be measuring an idle list.
+    check(depth < items - 1) {
+      "$label reached the last item, so the later swipes had nothing left to scroll"
+    }
+    // Nothing here checked that either arm ever loaded an image. An arm whose loads all failed
+    // would have reported the allocation of scrolling empty rows and won the row on that, so the
+    // number was not falsifiable in the direction that flatters it. Counting the rows the server
+    // saw a request for did not close that: the server counts a request whether it answers with an
+    // image or a 404, so an arm that loaded nothing still cleared the bar. These two come off the
+    // loader's own state instead, the way LibraryComparisonTest counts its failures, so only an
+    // image that reached the screen counts towards them.
+    val failures = loadsFailed.get()
+    check(failures == 0) {
+      "$label images did not load: $failures of the loads during the measured pass failed, so " +
+        "the allocation is of a list scrolling rows that hold no image"
+    }
+    val loaded = rowsLoaded.size
+    check(loaded >= MIN_ROWS_LOADED) {
+      "$label images did not load: only $loaded of $items rows reported a loaded image during " +
+        "the measured pass, fewer than the $MIN_ROWS_LOADED it takes to call this a scroll over " +
+        "images"
+    }
+    val served = (0 until items).count { server.hitCount("/row-$it.jpg") > 0 }
+
+    DeviceMeasure.report(
+      "scroll ${MEASURED_ROUNDS * 2} swipes over $items rows, $label",
+      "allocated ${allocated.formatBytes()}, $loaded of $items rows loaded, $served fetched",
+    )
+    check(allocated > 0) { "the allocation counter is not available on this device" }
+  }
+
+  /** Swipes down the list and back up, returning the deepest item index it reached. */
+  private fun swipeThereAndBack(state: LazyListState, rounds: Int): Int {
+    var deepest = 0
+    repeat(rounds) {
+      compose.onRoot().performTouchInput { swipeUp() }
+      compose.waitForIdle()
+      deepest = maxOf(deepest, compose.runOnIdle { lastVisibleIndex(state) })
+    }
+    repeat(rounds) {
+      compose.onRoot().performTouchInput { swipeDown() }
+      compose.waitForIdle()
+    }
+    return deepest
+  }
+
+  private fun lastVisibleIndex(state: LazyListState): Int =
+    state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+
+  private companion object {
+    const val WARM_ROUNDS = 3
+    const val MEASURED_ROUNDS = 4
+
+    /**
+     * Distinct rows the measured pass has to have shown an image in for its allocation to mean
+     * anything.
+     *
+     * A quarter of the list. Both arms clear this by a wide margin because 240 rows of 360x270 do
+     * not fit in the memory cache either loader is given, so the pass re-fetches as it goes.
+     */
+    const val MIN_ROWS_LOADED = 60
+  }
+}

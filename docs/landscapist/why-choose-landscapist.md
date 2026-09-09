@@ -8,10 +8,10 @@ Landscapist Core is **exceptionally lightweight** compared to other image loadin
 
 | Library | Module | Release AAR | vs landscapist-core |
 |---------|--------|-------------|---------------------|
-| **landscapist-core** | `landscapist-core` | **313 KiB** | baseline |
-| Coil3 | `coil-core` 3.5.0 | 468 KiB | +50% |
-| Glide | `glide` 5.0.7 | 693 KiB | +121% |
-| Fresco | core pipeline artifacts | ~1.0 MiB | roughly 3.3x |
+| **landscapist-core** | `landscapist-core` | **371 KiB** | baseline |
+| Coil3 | `coil-core` 3.6.2 | 469 KiB | +26% |
+| Glide | `glide` 5.0.9 | 701 KiB | +89% |
+| Fresco | core pipeline artifacts | 1.11 MiB | 3.06x |
 
 Reproduce with `./gradlew :landscapist-core:assembleRelease`. This measures a single module's AAR, not the full transitive footprint (landscapist-core also pulls in Ktor, Okio, coroutines, and atomicfu). What ends up in your APK depends on R8 shrinking and the features you use.
 
@@ -28,7 +28,7 @@ Write your image loading code once and deploy it everywhere. `LandscapistImage` 
 
 ## 3. Full Control Over the Pipeline
 
-Unlike wrapper libraries that hide implementation details, `LandscapistImage` exposes the entire image loading pipeline. Configure network timeouts, cache policies, image transformations, and loading priorities at both the global and per-request levels. You're not locked into preset behaviors—customize everything to match your app's specific needs.
+Unlike wrapper libraries that hide implementation details, `LandscapistImage` exposes the entire image loading pipeline. Configure network timeouts, cache policies, image transformations, and loading priorities at both the global and per-request levels. You're not locked into preset behaviors: customize everything to match your app's specific needs.
 
 ## 4. Performance Optimized
 

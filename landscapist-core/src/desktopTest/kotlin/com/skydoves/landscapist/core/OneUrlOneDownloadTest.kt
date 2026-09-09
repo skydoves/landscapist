@@ -1,0 +1,249 @@
+/*
+ * Designed and developed by 2020-2023 skydoves (Jaewoong Eum)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.skydoves.landscapist.core
+
+import com.skydoves.landscapist.core.cache.CacheKey
+import com.skydoves.landscapist.core.cache.DiskCache
+import com.skydoves.landscapist.core.decoder.DecodeResult
+import com.skydoves.landscapist.core.decoder.ImageDecoder
+import com.skydoves.landscapist.core.model.CachePolicy
+import com.skydoves.landscapist.core.model.ImageResult
+import com.skydoves.landscapist.core.network.FetchResult
+import com.skydoves.landscapist.core.network.ImageFetcher
+import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import okio.FileSystem
+import okio.Path
+import okio.Path.Companion.toPath
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+
+/**
+ * One trip to the network per url, whatever sizes are asking for it.
+ *
+ * A screen showing one image twice is ordinary: a strip of thumbnails over the picture they select,
+ * a grid item that opens into a detail view. Those are two requests for one url at two sizes, and
+ * they need two decodes but one download.
+ */
+class OneUrlOneDownloadTest {
+
+  private val url = "https://example.com/poster.jpg"
+
+  private class SlowFetcher : ImageFetcher {
+    val fetches = atomic(0)
+    override fun canHandle(model: Any?): Boolean = true
+    override suspend fun fetch(request: ImageRequest): FetchResult {
+      fetches.incrementAndGet()
+      // Long enough that a second request starts while this one is still out.
+      delay(50)
+      return FetchResult.Success(byteArrayOf(1, 2, 3), mimeType = "image/jpeg")
+    }
+  }
+
+  private class SizingDecoder : ImageDecoder {
+    val decodes = atomic(0)
+    override suspend fun decode(
+      data: ByteArray,
+      mimeType: String?,
+      targetWidth: Int?,
+      targetHeight: Int?,
+      config: LandscapistConfig,
+    ): DecodeResult {
+      decodes.incrementAndGet()
+      val side = targetWidth ?: 4000
+      return DecodeResult.Success("decoded_$side", side, side)
+    }
+  }
+
+  private fun loaderWith(fetcher: SlowFetcher, decoder: SizingDecoder): Landscapist =
+    Landscapist.builder().noDiskCache().fetcher(fetcher).decoder(decoder).build()
+
+  private fun Landscapist.loadAt(side: Int) = load(
+    ImageRequest.builder()
+      .model(url)
+      .diskCachePolicy(CachePolicy.DISABLED)
+      .size(side, side)
+      .build(),
+  )
+
+  @Test
+  fun `one url asked for at two sizes at once is downloaded once`() {
+    val fetcher = SlowFetcher()
+    val decoder = SizingDecoder()
+    val loader = loaderWith(fetcher, decoder)
+
+    runBlocking {
+      val thumbnail = async { loader.loadAt(50).first { it is ImageResult.Success } }
+      val poster = async { loader.loadAt(1080).first { it is ImageResult.Success } }
+      thumbnail.await()
+      poster.await()
+    }
+
+    assertEquals(1, fetcher.fetches.value, "the same bytes were downloaded once per size")
+    assertEquals(2, decoder.decodes.value, "each size still needs its own decode")
+  }
+
+  @Test
+  fun `the same size twice at once is still one download and one decode`() {
+    val fetcher = SlowFetcher()
+    val decoder = SizingDecoder()
+    val loader = loaderWith(fetcher, decoder)
+
+    runBlocking {
+      val a = async { loader.loadAt(240).first { it is ImageResult.Success } }
+      val b = async { loader.loadAt(240).first { it is ImageResult.Success } }
+      a.await()
+      b.await()
+    }
+
+    assertEquals(1, fetcher.fetches.value)
+    assertEquals(1, decoder.decodes.value, "one request was decoded twice")
+  }
+
+  @Test
+  fun `one download writes the disk cache once`() {
+    // Each caller used to launch its own write, so two sizes of one url opened two editors on the
+    // same file for the same bytes.
+    val fetcher = SlowFetcher()
+    val edits = atomic(0)
+    val loader = Landscapist.builder()
+      .diskCache(
+        object : DiskCache {
+          override val directory: Path = "/tmp".toPath()
+          override val maxSize: Long = Long.MAX_VALUE
+          override val size: Long = 0
+          override val fileSystem: FileSystem = FileSystem.SYSTEM
+          override suspend fun get(key: CacheKey): DiskCache.Snapshot? = null
+          override suspend fun edit(key: CacheKey): DiskCache.Editor? {
+            edits.incrementAndGet()
+            return null
+          }
+          override suspend fun remove(key: CacheKey): Boolean = false
+          override suspend fun clear() = Unit
+        },
+      )
+      .fetcher(fetcher)
+      .decoder(SizingDecoder())
+      .build()
+
+    runBlocking {
+      val thumbnail = async {
+        loader.load(ImageRequest.builder().model(url).size(50, 50).build())
+          .first { it is ImageResult.Success }
+      }
+      val poster = async {
+        loader.load(ImageRequest.builder().model(url).size(1080, 1080).build())
+          .first { it is ImageResult.Success }
+      }
+      thumbnail.await()
+      poster.await()
+      // The write is launched off the critical path, so give it a moment to land.
+      delay(200)
+    }
+
+    assertEquals(1, fetcher.fetches.value, "the same bytes were downloaded twice")
+    assertEquals(1, edits.value, "the same file was opened for writing twice")
+  }
+
+  /** Counts how many times anything opened the disk cache for writing. */
+  private class CountingDiskCache : DiskCache {
+    val edits = atomic(0)
+    override val directory: Path = "/tmp".toPath()
+    override val maxSize: Long = Long.MAX_VALUE
+    override val size: Long = 0
+    override val fileSystem: FileSystem = FileSystem.SYSTEM
+    override suspend fun get(key: CacheKey): DiskCache.Snapshot? = null
+    override suspend fun edit(key: CacheKey): DiskCache.Editor? {
+      edits.incrementAndGet()
+      return null
+    }
+    override suspend fun remove(key: CacheKey): Boolean = false
+    override suspend fun clear() = Unit
+  }
+
+  @Test
+  fun `a progressive load writes the disk cache once`() {
+    // The progressive path used to store the bytes itself as well, racing the shared download's
+    // write for the same key. Whichever lost left the entry with no file to point at.
+    val fetcher = SlowFetcher()
+    val disk = CountingDiskCache()
+    val loader = Landscapist.builder()
+      .diskCache(disk)
+      .fetcher(fetcher)
+      .decoder(SizingDecoder())
+      .build()
+
+    runBlocking {
+      loader.load(
+        ImageRequest.builder().model(url).size(400, 400).progressiveEnabled(true).build(),
+      ).first { it is ImageResult.Success || it is ImageResult.Failure }
+      delay(200)
+    }
+
+    assertEquals(1, fetcher.fetches.value)
+    assertEquals(1, disk.edits.value, "the same file was opened for writing more than once")
+  }
+
+  @Test
+  fun `a caller is never told about a file the download was not allowed to write`() {
+    // One url at two sizes, disagreeing about the disk. Sharing the download would have let
+    // whichever ran first decide for both, and told the other where a file it never wrote is.
+    val fetcher = SlowFetcher()
+    val disk = CountingDiskCache()
+    val loader = Landscapist.builder()
+      .diskCache(disk)
+      .fetcher(fetcher)
+      .decoder(SizingDecoder())
+      .build()
+
+    val paths = runBlocking {
+      val noDisk = async {
+        loader.load(
+          ImageRequest.builder().model(url).size(50, 50)
+            .diskCachePolicy(CachePolicy.DISABLED).build(),
+        ).first { it is ImageResult.Success } as ImageResult.Success
+      }
+      val withDisk = async {
+        loader.load(
+          ImageRequest.builder().model(url).size(1080, 1080).build(),
+        ).first { it is ImageResult.Success } as ImageResult.Success
+      }
+      listOf(noDisk.await().diskCachePath, withDisk.await().diskCachePath)
+    }
+
+    assertNull(paths[0], "a request that refused the disk was told where its file is")
+    assertNotNull(paths[1], "a request that asked for the disk was told there is no file")
+  }
+
+  @Test
+  fun `each size gets the pixels it asked for`() {
+    val fetcher = SlowFetcher()
+    val loader = loaderWith(fetcher, SizingDecoder())
+
+    val results = runBlocking {
+      val thumbnail = async { loader.loadAt(50).first { it is ImageResult.Success } }
+      val poster = async { loader.loadAt(1080).first { it is ImageResult.Success } }
+      listOf(thumbnail.await(), poster.await()).map { (it as ImageResult.Success).data }
+    }
+
+    assertEquals(listOf("decoded_50", "decoded_1080"), results)
+  }
+}

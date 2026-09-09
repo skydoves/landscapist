@@ -45,6 +45,7 @@ import com.github.skydoves.landscapistdemo.model.MockUtil
 import com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme
 import com.github.skydoves.landscapistdemo.theme.background
 import com.github.skydoves.landscapistdemo.theme.purple200
+import com.github.skydoves.landscapistdemo.ui.playground.PlaygroundScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -56,7 +57,7 @@ class MainActivity : ComponentActivity() {
     setContent {
       DisneyComposeTheme {
         var selectedTab by remember { mutableIntStateOf(0) }
-        val tabs = listOf("Posters", "Gallery")
+        val tabs = listOf("Posters", "Gallery", "Playground")
 
         Scaffold(
           backgroundColor = if (isSystemInDarkTheme()) {
@@ -101,6 +102,9 @@ class MainActivity : ComponentActivity() {
             }
             1 -> {
               GalleryDemoScreen(paddingValues = paddingValues)
+            }
+            2 -> {
+              PlaygroundScreen(paddingValues = paddingValues)
             }
           }
         }

@@ -22,6 +22,17 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
+ * The zoom at which the tiles start carrying more than the base tile already does.
+ *
+ * Below it the whole image is one sampled tile, so foreground tiles are not loaded and the caller's
+ * own content is the better picture. Both decisions read this, so they cannot drift apart.
+ */
+/** Past this the image is sampled to a single pixel, so there is nothing further to halve. */
+private const val MaxSampleSize = 1 shl 16
+
+internal const val MinZoomForTiles: Float = 1.5f
+
+/**
  * Generates a grid of tiles for sub-sampling a large image.
  */
 public object TileGrid {
@@ -79,15 +90,28 @@ public object TileGrid {
    * Calculates the base sample size for the lowest resolution layer.
    */
   private fun calculateBaseSampleSize(imageSize: IntSize, viewportSize: IntSize): Int {
+    // An axis measured to nothing divides to infinity, and doubling towards infinity never stops:
+    // the counter climbs to 2^30, overflows to Int.MIN_VALUE, then to zero, and stays there with
+    // the loop still running. A viewport with no width or height has no sample size to compute.
+    if (viewportSize.width <= 0 || viewportSize.height <= 0) return 1
     val scaleX = imageSize.width.toFloat() / viewportSize.width
     val scaleY = imageSize.height.toFloat() / viewportSize.height
-    val scale = max(scaleX, scaleY)
+    return sampleSizeFor(max(scaleX, scaleY))
+  }
 
+  /**
+   * The largest power of two that still fits in [scale], and at least one.
+   *
+   * Bounded rather than doubling until it does not fit: the input comes from a division that can
+   * be infinite or not a number, and either walks the counter into overflow.
+   */
+  private fun sampleSizeFor(scale: Float): Int {
+    if (!scale.isFinite() || scale < 2f) return 1
     var sampleSize = 1
-    while (sampleSize * 2 <= scale) {
+    while (sampleSize * 2 <= scale && sampleSize < MaxSampleSize) {
       sampleSize *= 2
     }
-    return max(1, sampleSize)
+    return sampleSize
   }
 
   /**
@@ -133,13 +157,7 @@ public object TileGrid {
    * @param zoom The current zoom level (1.0 = no zoom).
    * @return The sample size to use (power of 2).
    */
-  public fun calculateSampleSizeForZoom(zoom: Float): Int {
-    var sampleSize = 1
-    while (sampleSize * 2 <= (1 / zoom)) {
-      sampleSize *= 2
-    }
-    return max(1, sampleSize)
-  }
+  public fun calculateSampleSizeForZoom(zoom: Float): Int = sampleSizeFor(1 / zoom)
 
   /**
    * Filters tiles to only those visible in the current viewport.

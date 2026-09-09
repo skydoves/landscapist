@@ -40,23 +40,48 @@ class BaselineProfileGenerator {
       startActivityAndWait()
       device.waitForIdle()
 
-      // Critical journey: visit each library tab and scroll its image list so the profile
-      // covers the navigation, list, and image-loading code paths for every library.
+      // Critical journey: visit every tab and scroll its image list, so the profile covers the
+      // navigation, the list and the image loading code paths of each variant. A tab that never
+      // opened would silently leave its classes out of the profile, so every step is checked.
       tabs.forEach { tab ->
-        device.findObject(By.text(tab))?.click()
+        val button = device.findObject(By.text(tab))
+        checkNotNull(button) { "no tab labelled $tab is on screen" }
+        button.click()
         device.waitForIdle()
-        device.wait(Until.hasObject(By.res(packageName, "${tab}Image")), 3_000)
+        check(device.wait(Until.hasObject(By.res("${tab}First")), contentTimeoutMs)) {
+          "the $tab tab never put its first image on screen"
+        }
+        // The decode path belongs in the profile too, and a composed row does not prove it ran.
+        check(device.wait(Until.hasObject(By.res("${tab}Loaded")), contentTimeoutMs)) {
+          "the $tab tab composed its rows but loaded no image"
+        }
 
-        device.findObject(By.scrollable(true))?.let { list ->
-          repeat(2) {
-            list.scroll(Direction.DOWN, 0.8f)
-            device.waitForIdle()
-          }
+        val list = device.findObject(By.scrollable(true))
+        checkNotNull(list) { "the $tab tab has no scrollable list" }
+        repeat(scrolls) {
+          list.scroll(Direction.DOWN, scrollFraction)
+          device.waitForIdle()
+        }
+        check(!device.hasObject(By.res("${tab}First"))) {
+          "$tab did not scroll, so its scrolling code path is not in the profile"
         }
       }
     }
 }
 
-private val tabs = listOf("Landscapist", "Coil", "Glide", "Fresco")
+private val tabs = listOf(
+  "Landscapist",
+  "Coil",
+  "Plugins",
+  "CoilWrapper",
+  "GlideWrapper",
+  "FrescoWrapper",
+)
 
 private const val packageName = "com.skydoves.benchmark.landscapist.app"
+
+private const val contentTimeoutMs = 10_000L
+
+private const val scrolls = 2
+
+private const val scrollFraction = 0.8f

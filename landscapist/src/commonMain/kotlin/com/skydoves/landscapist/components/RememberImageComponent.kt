@@ -22,6 +22,16 @@ import androidx.compose.runtime.remember
  * Create and remember a new instance of [ImageComponent] that implements [ImagePluginComponent]
  * on the memory.
  *
+ * The component keeps its identity for as long as [block] produces the same plugins, and is
+ * replaced when it does not. Both halves matter: images are skippable and take the component as a
+ * stable parameter, so a component held across a plugin change is one the image never looks at
+ * again, and a component rebuilt on every composition is one no image can ever skip.
+ *
+ * Same means equal, so a plugin has to be comparable. Every plugin this library ships is. One that
+ * is not is a new value on each composition, which rebuilds the component around it and costs the
+ * image its skipping, so give a custom [com.skydoves.landscapist.plugins.ImagePlugin] value
+ * equality: a data class, or `equals` and `hashCode` over whatever configures it.
+ *
  * @param block The receiver of an instance of [ImagePluginComponent].
  */
 @Composable
@@ -29,6 +39,8 @@ import androidx.compose.runtime.remember
 public fun rememberImageComponent(
   block: @Composable ImagePluginComponent.() -> Unit,
 ): ImagePluginComponent {
-  val imageComponent = imageComponent(block)
-  return remember { imageComponent }
+  val built = imageComponent(block)
+  // Keyed on the plugins rather than on nothing. Mutating the remembered component in place kept
+  // its identity and so kept the change from ever reaching an image.
+  return remember(built.plugins) { built }
 }

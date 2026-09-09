@@ -32,19 +32,24 @@ import org.jetbrains.skia.Image
  */
 @Composable
 public actual fun rememberLandscapistPainter(data: Any?): Painter {
-  return remember(data) {
-    when (data) {
-      is Bitmap -> BitmapPainter(data.asComposeImageBitmap())
-      is RawImageData -> {
-        try {
-          val skiaImage = Image.makeFromEncoded(data.data)
-          BitmapPainter(skiaImage.toComposeImageBitmap())
-        } catch (e: Exception) {
-          EmptyPainter
-        }
-      }
-      is ImageBitmap -> BitmapPainter(data)
-      else -> platformImageBitmapOrNull(data)?.let { BitmapPainter(it) } ?: EmptyPainter
+  return remember(data) { landscapistPainterOrNull(data) ?: EmptyPainter }
+}
+
+/** Every decoded type this source set knows about is a still bitmap, so none of them need a
+ * composed painter. */
+internal actual fun landscapistPainterOrNull(data: Any?): Painter? = when (data) {
+  is Bitmap -> BitmapPainter(data.asComposeImageBitmap())
+  is RawImageData -> {
+    try {
+      BitmapPainter(Image.makeFromEncoded(data.data).toComposeImageBitmap())
+    } catch (e: Exception) {
+      EmptyPainter
     }
   }
+  is ImageBitmap -> BitmapPainter(data)
+  // Anything else is a type no decoder here produces, which draws nothing, exactly as it did
+  // through rememberLandscapistPainter. It is not a reason to go back to a composed painter.
+  else -> platformImageBitmapOrNull(data)?.let { BitmapPainter(it) } ?: EmptyPainter
 }
+
+internal actual val ComposedPainterEverNeeded: Boolean = false

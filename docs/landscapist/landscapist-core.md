@@ -301,6 +301,49 @@ val size = memoryCache.size
 val maxSize = memoryCache.maxSize
 ```
 
+An entry is keyed by the model, the transformations and the target size the request asked for, so
+the same image asked for at two sizes has two keys. Any headers the request carries are folded into
+that key as well: an `Authorization` or a `Cookie` header makes it a different viewer's image, and
+content negotiation makes it different bytes, so two requests for one URL with different headers no
+longer share an entry. A request with no headers keys exactly as it did before.
+
+#### Reusing a differently sized entry
+
+A layout rarely measures to the same pixel twice. A grid whose columns do not divide evenly asks for
+359, 360 and 361 wide, and keying strictly on the size would make those three entries and three
+decodes of one image. `MemoryCache.getMatching` is how the loader avoids that: it looks for the
+exact size first, then offers the other decoded sizes of the same image, most recently cached first,
+to a predicate that decides whether one will do.
+
+```kotlin
+public fun getMatching(
+  key: CacheKey,
+  isAcceptable: (CacheKey, CachedImage) -> Boolean,
+): CachedImage? = get(key)
+```
+
+The loader accepts a variant that was decoded for a box no smaller than the one being asked for, to
+within a pixel on each axis, and no more than twice it on either axis. Boxes are compared rather
+than pixel counts, because a decoder that fits an image inside its box and one that fills the box
+exactly produce different pixels for the same request. An entry that a variant is turned down for is
+not marked as recently used, so a lookup that finds nothing usable does not disturb the eviction
+order.
+
+Two things are never answered from a variant by a load. A request carrying transformations, since
+the size recorded for an entry is the decoder's output rather than what the transformation left
+behind. And a request that names no size at all, since the layout has not measured yet and the
+variant on hand could be a thumbnail. On Apple and wasm the opposite holds: those decoders keep the
+encoded bytes and let Skia decode at draw size, so the entry is the whole source and serves any box.
+
+`peekMemoryCache` differs on the first of those. A load can afford to decode again; a peek is
+choosing between drawing something and drawing nothing, so a transformed request is judged on the
+boxes alone, which is enough to keep a thumbnail out of a slot many times its size.
+
+Both caches that ship, `LruMemoryCache` and `TwoTierMemoryCache`, implement it. A custom
+`MemoryCache` that does not override it still works: the default returns an exact `get`, and the
+loader decodes the same image once per distinct size. The default cannot do better, because only the
+cache knows the box each variant it holds was decoded for.
+
 #### Reading the cache without suspending
 
 `load` resolves a memory hit through a flow and a dispatcher hop, which costs a frame or two of
@@ -313,13 +356,24 @@ val cached: ImageResult.Success? = landscapist.peekMemoryCache(url)
 ```
 
 `LandscapistImage` already does this for you; call it directly only when you drive the loading state
-yourself. The exact target size is matched first, and when nothing is cached for it, any already
-decoded size of the same image is returned, since a composable that has not been measured yet has no
-target size to ask for.
+yourself. The exact target size is matched first. When nothing is cached for it, a caller that has been
+measured is offered only a variant that covers the box it is about to fill, the same rule a load
+uses, so a strip's thumbnail is never stretched across a detail view while the real decode arrives.
+A caller that has not been measured has no box to judge a variant against and takes any already
+decoded size, since an image already in memory beats an empty frame.
+
+This is about an image that is **already in memory**. Nothing about it helps a cold cache: a
+composable cannot size its request until a layout pass has told it the bounds, so a first load
+starts a frame later than one whose size was known up front, and the image arrives a frame or two
+behind Coil, which suspends inside a request it has already issued. What `peekMemoryCache` buys is
+the second time an image is shown, which in a list is most of the time.
 
 ### Disk Cache
 
-Persistent disk cache for offline access:
+Persistent disk cache for offline access. The key is the URL alone, so one download answers every
+size the image is drawn at: the cache holds the encoded bytes, and every size is decoded from the
+same ones. Headers scope it the same way they scope the memory key, so a request that carries an
+`Authorization` header does not read or write the file a request without one uses.
 
 ```kotlin
 // Disk cache is managed automatically
@@ -329,6 +383,21 @@ Persistent disk cache for offline access:
 val diskCache = landscapist.config.diskCache
 diskCache?.clear()
 ```
+
+#### Building a loader with no disk cache
+
+Leaving the disk cache unset falls through to the default one on disk, so a loader always ends up
+owning one. `noDiskCache()` is how you say you want none: nothing is written to disk and nothing is
+read back from it, which is what you want for images that must not be persisted, or when you have
+your own caching in front of the fetcher.
+
+```kotlin
+val landscapist = Landscapist.builder(context)
+    .noDiskCache()
+    .build()
+```
+
+`Landscapist.builder(context)` returns an `AndroidBuilder`, whose surface is `config`, `noDiskCache` and `build`. To supply a disk cache of your own, build the configuration and pass it through `config(...)`.
 
 ### Cache Policies
 
@@ -534,7 +603,9 @@ landscapist.load(request).collect { result ->
 ### Desktop
 - Supports file paths and network URLs
 - Configure disk cache path manually
-- Uses Skia for image decoding
+- Decodes through Skia when skiko is on the classpath, which scales a JPEG while it decodes it, and
+  falls back to ImageIO subsampling otherwise. A Compose desktop application already has skiko, so
+  it takes the Skia path without adding anything
 
 ### Web (Wasm)
 - Network URLs only

@@ -40,7 +40,7 @@ public object ZoomableDefaults {
   /**
    * Default tile size for sub-sampling.
    * Larger tiles mean fewer decode operations but more memory per tile.
-   * 512dp provides a good balance for modern devices.
+   * 256dp provides a good balance for modern devices.
    */
   public val TileSize: Dp = 256.dp
 

@@ -35,8 +35,10 @@ application {
 }
 
 dependencies {
+  implementation(project(":landscapist"))
   implementation(project(":landscapist-core"))
   implementation(project(":landscapist-image"))
+  implementation(project(":landscapist-placeholder"))
   implementation(libs.coil3)
   implementation("io.coil-kt.coil3:coil-compose:${libs.versions.coil3.get()}")
   implementation(compose.desktop.currentOs)
@@ -63,6 +65,27 @@ fun skikoHostTarget(): String {
 // CI time and trips over duplicate jars in the Compose dependency graph. `run` is the entry point.
 tasks.named("distTar") { enabled = false }
 tasks.named("distZip") { enabled = false }
+
+// Allocation profiling for one Compose variant at a time, which is how the numbers above were
+// tracked down: `./gradlew :benchmark-engine:run -Pjfr=/path/rec.jfr -Pprofile=landscapist-resize`.
+// Without -Pjfr the benchmark runs normally.
+tasks.named<JavaExec>("run") {
+  // `-Pspread=5` re-runs the whole benchmark in five more JVMs and prints the spread, so a number
+  // can be told apart from the machine it was measured on, and says which gaps are inside it. The
+  // child used to run only the rows it recorded, so the spread bounded a different measurement from
+  // the published one. Off by default: each run is a full benchmark, child JVMs and all.
+  providers.gradleProperty("spread").orNull?.let { environment("LANDSCAPIST_SPREAD_RUNS", it) }
+  val recording = providers.gradleProperty("jfr").orNull
+  if (recording != null) {
+    jvmArgs(
+      // One option, because each -XX:StartFlightRecording starts a recording of its own: the
+      // throttle in a second option applied to a second recording that nothing ever read.
+      "-XX:StartFlightRecording=settings=profile,filename=$recording,dumponexit=true," +
+        "jdk.ObjectAllocationSample#throttle=6000/s",
+    )
+    environment("LANDSCAPIST_PROFILE", providers.gradleProperty("profile").getOrElse("landscapist"))
+  }
+}
 
 tasks.withType<KotlinJvmCompile>().configureEach {
   compilerOptions {

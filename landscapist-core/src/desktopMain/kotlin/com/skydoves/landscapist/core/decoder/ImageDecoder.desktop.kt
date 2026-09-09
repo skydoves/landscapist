@@ -29,7 +29,10 @@ import javax.imageio.ImageIO
 public actual fun createPlatformDecoder(): ImageDecoder = DesktopImageDecoder()
 
 /**
- * Desktop implementation of [ImageDecoder] using Java ImageIO.
+ * Desktop implementation of [ImageDecoder].
+ *
+ * Skia reads whenever skiko is on the classpath, because ImageIO's JPEG reader cannot scale while
+ * it decodes. ImageIO remains the fallback and produces the same [BufferedImage].
  */
 internal class DesktopImageDecoder : ImageDecoder {
 
@@ -41,7 +44,12 @@ internal class DesktopImageDecoder : ImageDecoder {
     config: LandscapistConfig,
   ): DecodeResult = withContext(Dispatchers.IO) {
     try {
-      decodeSubsampled(data, targetWidth, targetHeight, config)
+      val throughSkia = if (skiaAvailable) {
+        SkiaJvmDecoder.decode(data, targetWidth, targetHeight, config.maxBitmapSize)
+      } else {
+        null
+      }
+      throughSkia ?: decodeSubsampled(data, targetWidth, targetHeight, config)
     } catch (e: Exception) {
       DecodeResult.Error(e)
     }
@@ -51,9 +59,8 @@ internal class DesktopImageDecoder : ImageDecoder {
    * Reads the header, decodes at the nearest power of two above the requested size, then scales the
    * remainder.
    *
-   * Decoding the whole image and shrinking it afterwards means a 4000x3000 photo materialises 48 MB
-   * of pixels to produce a thumbnail. ImageIO can skip pixels while it reads, so the full size
-   * raster never exists.
+   * ImageIO can skip pixels while it reads, so the full size raster never exists. It cannot skip
+   * the work of decoding them, which is why Skia is preferred when it is there.
    */
   private fun decodeSubsampled(
     data: ByteArray,
@@ -72,7 +79,7 @@ internal class DesktopImageDecoder : ImageDecoder {
         val originalWidth = reader.getWidth(0)
         val originalHeight = reader.getHeight(0)
 
-        val (finalWidth, finalHeight) = calculateTargetSize(
+        val (finalWidth, finalHeight) = fitInside(
           originalWidth = originalWidth,
           originalHeight = originalHeight,
           targetWidth = targetWidth,
@@ -104,28 +111,6 @@ internal class DesktopImageDecoder : ImageDecoder {
     }
   }
 
-  private fun calculateTargetSize(
-    originalWidth: Int,
-    originalHeight: Int,
-    targetWidth: Int?,
-    targetHeight: Int?,
-    maxSize: Int,
-  ): Pair<Int, Int> {
-    val maxW = minOf(targetWidth ?: originalWidth, maxSize)
-    val maxH = minOf(targetHeight ?: originalHeight, maxSize)
-
-    if (originalWidth <= maxW && originalHeight <= maxH) {
-      return originalWidth to originalHeight
-    }
-
-    val widthRatio = maxW.toFloat() / originalWidth
-    val heightRatio = maxH.toFloat() / originalHeight
-    val ratio = minOf(widthRatio, heightRatio)
-
-    return (originalWidth * ratio).toInt().coerceAtLeast(1) to
-      (originalHeight * ratio).toInt().coerceAtLeast(1)
-  }
-
   /**
    * The largest power of two the reader can skip by while still producing at least [finalWidth] by
    * [finalHeight] pixels, so the remaining scale is never an upscale.
@@ -148,9 +133,8 @@ internal class DesktopImageDecoder : ImageDecoder {
   }
 
   /**
-   * Bilinear rather than [java.awt.Image.SCALE_SMOOTH], which runs an area averaging pipeline that
-   * is roughly an order of magnitude slower. Subsampling has already brought the image to within a
-   * factor of two, so a single bilinear pass loses nothing visible.
+   * Bilinear rather than [java.awt.Image.SCALE_SMOOTH], which is far slower. Subsampling has
+   * already brought the image within a factor of two, so one pass loses nothing visible.
    */
   private fun scaleImage(
     image: BufferedImage,
@@ -168,4 +152,45 @@ internal class DesktopImageDecoder : ImageDecoder {
     graphics.dispose()
     return scaledImage
   }
+}
+
+/**
+ * Whether the Skia reader can be used at all, decided once for the process.
+ *
+ * Out here rather than inside [SkiaJvmDecoder]: without skiko, naming that object throws
+ * `NoClassDefFoundError` as it loads, which is an `Error` and would pass the decoder's own catch.
+ * `runCatching` takes any `Throwable`, and the first mention of the object is inside it.
+ *
+ * Internal rather than private so a test can load this class with skiko off the classpath.
+ */
+internal val skiaAvailable: Boolean by lazy {
+  runCatching { SkiaJvmDecoder.isUsable() }.getOrDefault(false)
+}
+
+/**
+ * The size an image of [originalWidth] by [originalHeight] takes when it is fitted inside the
+ * requested box, keeping its shape and never growing.
+ *
+ * Shared by both desktop paths, so the Skia reader and the ImageIO fallback agree on the size.
+ */
+internal fun fitInside(
+  originalWidth: Int,
+  originalHeight: Int,
+  targetWidth: Int?,
+  targetHeight: Int?,
+  maxSize: Int,
+): Pair<Int, Int> {
+  val maxW = minOf(targetWidth ?: originalWidth, maxSize)
+  val maxH = minOf(targetHeight ?: originalHeight, maxSize)
+
+  if (originalWidth <= maxW && originalHeight <= maxH) {
+    return originalWidth to originalHeight
+  }
+
+  val widthRatio = maxW.toFloat() / originalWidth
+  val heightRatio = maxH.toFloat() / originalHeight
+  val ratio = minOf(widthRatio, heightRatio)
+
+  return (originalWidth * ratio).toInt().coerceAtLeast(1) to
+    (originalHeight * ratio).toInt().coerceAtLeast(1)
 }

@@ -53,3 +53,23 @@ internal fun DefaultSuccessContent(
     colorFilter = imageOptions.colorFilter,
   )
 }
+
+/**
+ * A [Painter] for already decoded pixels, built without composition.
+ *
+ * The container node has no composition to remember a painter in, so it builds one from whatever
+ * the loader returns. Null for anything that needs composition, such as an Android
+ * [android.graphics.drawable.Drawable], which the node hands back to the composed path.
+ *
+ * @param data The loaded image data (platform-specific bitmap type).
+ * @return A painter for [data], or null when [data] needs a composed painter.
+ */
+internal expect fun landscapistPainterOrNull(data: Any?): Painter?
+
+/**
+ * Whether [landscapistPainterOrNull] can ever answer null on this platform.
+ *
+ * Only Android's decoder produces one, an animated drawable. Elsewhere the node can always paint
+ * what it is handed, so the composable holds no state to hear otherwise and subscribes to nothing.
+ */
+internal expect val ComposedPainterEverNeeded: Boolean

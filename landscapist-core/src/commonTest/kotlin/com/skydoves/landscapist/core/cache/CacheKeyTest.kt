@@ -39,27 +39,34 @@ class CacheKeyTest {
   }
 
   @Test
-  fun `diskKey includes size suffix when dimensions provided`() {
-    val keyWithoutSize = CacheKey(url = "https://example.com/image.jpg")
-    val keyWithSize = CacheKey(
-      url = "https://example.com/image.jpg",
-      width = 100,
-      height = 200,
-    )
+  fun `diskKey ignores the target size`() {
+    // The disk cache holds the downloaded bytes, and every size is decoded from those same bytes.
+    val plain = CacheKey(url = "https://example.com/image.jpg")
+    val sized = CacheKey(url = "https://example.com/image.jpg", width = 100, height = 200)
+    val otherSize = CacheKey(url = "https://example.com/image.jpg", width = 400, height = 800)
 
-    assertNotEquals(keyWithoutSize.diskKey, keyWithSize.diskKey)
-    assertTrue(keyWithSize.diskKey.contains("_"))
+    assertEquals(plain.diskKey, sized.diskKey)
+    assertEquals(plain.diskKey, otherSize.diskKey)
   }
 
   @Test
-  fun `diskKey includes transformation suffix when transformations provided`() {
-    val keyWithoutTransform = CacheKey(url = "https://example.com/image.jpg")
-    val keyWithTransform = CacheKey(
+  fun `diskKey ignores transformations`() {
+    // Transformations run on the decoded image, so they change nothing about the bytes on disk.
+    val plain = CacheKey(url = "https://example.com/image.jpg")
+    val transformed = CacheKey(
       url = "https://example.com/image.jpg",
       transformationKeys = listOf("blur", "grayscale"),
     )
 
-    assertNotEquals(keyWithoutTransform.diskKey, keyWithTransform.diskKey)
+    assertEquals(plain.diskKey, transformed.diskKey)
+  }
+
+  @Test
+  fun `diskKey still separates different images`() {
+    val one = CacheKey(url = "https://example.com/one.jpg")
+    val two = CacheKey(url = "https://example.com/two.jpg")
+
+    assertNotEquals(one.diskKey, two.diskKey)
   }
 
   @Test

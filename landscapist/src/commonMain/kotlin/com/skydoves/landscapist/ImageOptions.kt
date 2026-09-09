@@ -58,13 +58,25 @@ public data class ImageOptions(
    * Returns a key that represents only the loading-related properties.
    * This key should be used for image loading decisions to prevent unnecessary reloads
    * when only rendering properties (colorFilter, alpha, alignment, contentScale, contentDescription) change.
+   *
+   * Held rather than computed, because every composition of an image reads it once and a getter
+   * would allocate a key each time to describe an instance that cannot change.
    */
   @InternalLandscapistApi
-  public val loadingOptionsKey: Any
-    get() = LoadingOptionsKey(requestSize = requestSize, tag = tag)
+  public val loadingOptionsKey: Any = LoadingOptionsKey(requestSize = requestSize, tag = tag)
 
-  private companion object {
-    const val DEFAULT_IMAGE_SIZE: Int = -1
+  public companion object {
+    /** The size a request carries until a layout has measured one. Kept public, because it has
+     * always been part of this class's binary surface. */
+    public const val DEFAULT_IMAGE_SIZE: Int = -1
+
+    /**
+     * The options every image composable falls back to when the caller passes none.
+     *
+     * Shared, because `ImageOptions()` as a default argument is re-evaluated on every composition,
+     * which allocates one per image per frame for a value that is always the same.
+     */
+    public val Default: ImageOptions = ImageOptions()
   }
 }
 

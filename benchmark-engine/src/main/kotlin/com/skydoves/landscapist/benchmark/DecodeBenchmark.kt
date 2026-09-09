@@ -15,76 +15,124 @@
  */
 package com.skydoves.landscapist.benchmark
 
+import coil3.PlatformContext
+import coil3.decode.ImageSource
+import coil3.decode.SkiaImageDecoder
+import coil3.request.Options
+import coil3.size.Precision
+import coil3.size.Scale
 import com.skydoves.landscapist.core.LandscapistConfig
 import com.skydoves.landscapist.core.decoder.DecodeResult
 import com.skydoves.landscapist.core.decoder.createPlatformDecoder
 import kotlinx.coroutines.runBlocking
-import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
+import okio.Buffer
+import okio.FileSystem
+import coil3.size.Size as CoilSize
 
 /**
- * Each library's real decoder against the same bytes.
+ * Each library's real decoder against the same bytes. Coil's row runs [SkiaImageDecoder], which is
+ * the decoder its JVM `ImageLoader` installs; the row used to be a hand written Skia snippet
+ * labelled "coil (skia)" that Coil itself never executed.
  *
- * This is the one comparison where the two are genuinely doing different work: Coil decodes through
- * Skia, landscapist-core through ImageIO. It is reported separately from the engine numbers for
- * exactly that reason, and it says as much about the two imaging stacks as about the loaders.
+ * Reported apart from the engine numbers because Coil decodes through Skia and landscapist-core
+ * through ImageIO.
  */
 internal fun decodeComparison() {
-  val photo = syntheticPhoto(4000, 3000)
-  println("decode a ${4000}x${3000} JPEG (${photo.size.toLong().formatBytes()}) down to 400x300")
+  val photo = jpegBytes(PHOTO_WIDTH, PHOTO_HEIGHT)
+  println(
+    "decode a ${PHOTO_WIDTH}x$PHOTO_HEIGHT JPEG (${photo.size.toLong().formatBytes()}) down to " +
+      "${TARGET_WIDTH}x$TARGET_HEIGHT",
+  )
 
-  val landscapistDecoder = createPlatformDecoder()
+  val decoder = createPlatformDecoder()
   val config = LandscapistConfig()
 
-  val landscapist = measure("landscapist", warmups = 5, iterations = 25) {
-    runBlocking {
-      val result = landscapistDecoder.decode(photo, "image/jpeg", 400, 300, config)
-      check(result is DecodeResult.Success) { "decode failed: $result" }
+  val (landscapist, coil) = measurePaired(
+    firstLabel = "landscapist",
+    secondLabel = "coil decoder",
+    warmups = 5,
+    iterations = 25,
+    first = {
+      runBlocking {
+        val result = decoder.decode(photo, "image/jpeg", TARGET_WIDTH, TARGET_HEIGHT, config)
+        check(result is DecodeResult.Success) { "decode failed: $result" }
+      }
+    },
+    second = { coilDecode(photo) },
+  )
+
+  Metrics.record("decode.landscapist.ns", landscapist.p50)
+  Metrics.record("decode.coil.ns", coil.p50)
+  report("decode ${PHOTO_WIDTH}x$PHOTO_HEIGHT -> ${TARGET_WIDTH}x$TARGET_HEIGHT", landscapist, coil)
+
+  // Coil's decoder consumes its source, so neither the source nor the decoder can be lifted out of
+  // the loop the way landscapist's decoder can. That leaves an okio copy of the encoded bytes and
+  // two objects inside Coil's column and not inside landscapist's, which is a difference between
+  // the arms rather than between the decoders. Measured rather than left unremarked, so the row is
+  // read with it in hand.
+  val coilSetup = measure("coil source and decoder", warmups = 5, iterations = 25) {
+    val source = ImageSource(Buffer().write(photo), FileSystem.SYSTEM)
+    try {
+      SkiaImageDecoder(
+        source = source,
+        options = Options(
+          context = PlatformContext.INSTANCE,
+          size = CoilSize(TARGET_WIDTH, TARGET_HEIGHT),
+          scale = Scale.FIT,
+          precision = Precision.INEXACT,
+        ),
+      )
+    } finally {
+      source.close()
     }
   }
-  settle()
+  println(
+    "    Coil's column carries ${coilSetup.p50.formatNanos()} of source and decoder construction " +
+      "that landscapist's does not, because its decoder consumes the source and cannot be reused.",
+  )
 
-  val coil = measure("coil (skia)", warmups = 5, iterations = 25) {
-    // What SkiaImageDecoder does: full decode, then a raster to scale into.
-    val image = org.jetbrains.skia.Image.makeFromEncoded(photo)
-    val bitmap = org.jetbrains.skia.Bitmap()
-    bitmap.allocN32Pixels(400, 300)
-    org.jetbrains.skia.Canvas(bitmap).drawImageRect(
-      image,
-      org.jetbrains.skia.Rect.makeWH(image.width.toFloat(), image.height.toFloat()),
-      org.jetbrains.skia.Rect.makeWH(400f, 300f),
-    )
-    bitmap.setImmutable()
-    image.close()
+  val landscapistBytes = allocatedBytes {
+    runBlocking { decoder.decode(photo, "image/jpeg", TARGET_WIDTH, TARGET_HEIGHT, config) }
   }
-
-  report("decode 4000x3000 -> 400x300", landscapist, coil)
-
-  val peakLandscapist = allocatedBytes {
-    runBlocking { landscapistDecoder.decode(photo, "image/jpeg", 400, 300, config) }
-  }
-  println("  allocation for one decode")
-  println("    landscapist    ${peakLandscapist.formatBytes()}")
+  val coilBytes = allocatedBytes { coilDecode(photo) }
+  // Measured rather than asserted: this row used to state a hardcoded 48 MB for the raster
+  // landscapist no longer materialises, as if that number had come from a measurement.
+  val fullRasterBytes = allocatedBytes { fullDecodeThenScale(photo) }
+  println("  Java heap allocated for one decode")
+  println("    landscapist                 ${landscapistBytes.formatBytes()}")
+  println("    coil decoder                ${coilBytes.formatBytes()}")
+  println("    landscapist, no subsampling ${fullRasterBytes.formatBytes()}")
+  println(
+    "    The first two rows are not like for like. Skia decodes into native memory, which the " +
+      "Java heap cannot see, so Coil's row is only its JVM side while landscapist's is the whole " +
+      "thing. The third row is the same ImageIO stack without subsampling, which is the raster " +
+      "landscapist does not materialise.",
+  )
   println()
 }
 
-/** A JPEG with enough detail that the encoder cannot collapse it to nothing. */
-private fun syntheticPhoto(width: Int, height: Int): ByteArray {
-  val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-  var seed = 0x9E3779B9.toInt()
-  for (y in 0 until height step 2) {
-    for (x in 0 until width step 2) {
-      seed = seed * 1_664_525 + 1_013_904_223
-      val rgb = seed and 0xFFFFFF
-      image.setRGB(x, y, rgb)
-      if (x + 1 < width) image.setRGB(x + 1, y, rgb)
-      if (y + 1 < height) image.setRGB(x, y + 1, rgb)
-      if (x + 1 < width && y + 1 < height) image.setRGB(x + 1, y + 1, rgb)
-    }
-  }
-  return ByteArrayOutputStream().use { out ->
-    ImageIO.write(image, "jpg", out)
-    out.toByteArray()
+/** One decode through the decoder Coil's JVM `ImageLoader` installs by default. */
+internal fun coilDecode(photo: ByteArray) {
+  val source = ImageSource(Buffer().write(photo), FileSystem.SYSTEM)
+  try {
+    val decoder = SkiaImageDecoder(
+      source = source,
+      options = Options(
+        context = PlatformContext.INSTANCE,
+        size = CoilSize(TARGET_WIDTH, TARGET_HEIGHT),
+        scale = Scale.FIT,
+        // AsyncImagePainter forces INEXACT when precision is undefined, so this is what users run.
+        precision = Precision.INEXACT,
+      ),
+    )
+    val result = runBlocking { decoder.decode() }
+    check(result.image.height > 0) { "coil decoded nothing" }
+  } finally {
+    source.close()
   }
 }
+
+internal const val PHOTO_WIDTH = 4000
+internal const val PHOTO_HEIGHT = 3000
+internal const val TARGET_WIDTH = 400
+internal const val TARGET_HEIGHT = 300

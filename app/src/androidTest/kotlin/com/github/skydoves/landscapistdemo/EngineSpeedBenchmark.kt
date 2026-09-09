@@ -31,6 +31,7 @@ import com.skydoves.landscapist.core.model.CachePolicy
 import com.skydoves.landscapist.core.model.ImageResult
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.Locale
@@ -66,13 +67,15 @@ class EngineSpeedBenchmark {
     "$baseUrl/seed/${runId}_${engine}_$index/$size/$size"
 
   /** Runs [block] WARMUP times unmeasured, then MEASURED times, returning per-iteration nanos. */
-  private fun measure(block: (index: Int) -> Boolean): List<Long> {
-    repeat(WARMUP) { i -> check(block(-1 - i)) { "warmup load failed" } }
+  private fun measure(engine: String, block: (index: Int) -> Boolean): List<Long> {
+    repeat(WARMUP) { i ->
+      assertTrue("$engine failed a warm up load, so it has nothing to measure", block(-1 - i))
+    }
     val samples = ArrayList<Long>(MEASURED)
     for (i in 0 until MEASURED) {
       var ok = false
       val ns = measureNanoTime { ok = block(i) }
-      check(ok) { "measured load failed at $i" }
+      assertTrue("$engine failed the measured load at $i, so its timings mean nothing", ok)
       samples.add(ns)
     }
     return samples
@@ -85,7 +88,7 @@ class EngineSpeedBenchmark {
     results["Coil3"] = measureCoil("coil", allowHardware = true)
     results["Coil3-ARGB"] = measureCoil("coilargb", allowHardware = false)
 
-    results["Glide"] = measure { i ->
+    results["Glide"] = measure("Glide") { i ->
       val target = Glide.with(context)
         .asBitmap()
         .load(url("glide", i, SIZE))
@@ -103,9 +106,17 @@ class EngineSpeedBenchmark {
     results["Landscapist-565"] = measureLandscapist(landscapist565, "ls565")
 
     report(results)
+
+    // The table above is the point, and it is only readable if every engine ran every round.
+    val short = results.filterValues { it.size != MEASURED }
+    assertTrue(
+      "these engines did not produce $MEASURED measurements each: " +
+        short.map { (engine, samples) -> "$engine: ${samples.size}" },
+      short.isEmpty(),
+    )
   }
 
-  private fun measureCoil(tag: String, allowHardware: Boolean): List<Long> = measure { i ->
+  private fun measureCoil(tag: String, allowHardware: Boolean): List<Long> = measure(tag) { i ->
     runBlocking {
       val request = coil3.request.ImageRequest.Builder(context)
         .data(url(tag, i, SIZE))
@@ -122,7 +133,7 @@ class EngineSpeedBenchmark {
     loader: Landscapist,
     tag: String,
     disk: Boolean = false,
-  ): List<Long> = measure { i ->
+  ): List<Long> = measure(tag) { i ->
     runBlocking {
       val request = ImageRequest.builder()
         .model(url(tag, i, SIZE))

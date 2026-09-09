@@ -17,6 +17,7 @@ package com.skydoves.landscapist.plugins
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
@@ -30,7 +31,13 @@ import com.skydoves.landscapist.InternalLandscapistApi
  *
  * You can implement your own image plugin that will be composed with Image Composable functions
  * by implementing one of [ImagePlugin.PainterPlugin], [ImagePlugin.LoadingStatePlugin],
- * [ImagePlugin.SuccessStatePlugin], or [ImagePlugin.FailureStatePlugin]
+ * [ImagePlugin.SuccessStatePlugin], [ImagePlugin.FailureStatePlugin] or
+ * [ImagePlugin.ComposablePlugin].
+ *
+ * Give it value equality, as a data class or as `equals` and `hashCode` over whatever configures
+ * it. A plugin set is compared to decide whether the component an image was handed has changed,
+ * and an image is skippable, so a plugin the runtime cannot compare is a new value on every
+ * composition and costs every image carrying it its skipping.
  */
 @Immutable
 public sealed interface ImagePlugin {
@@ -112,13 +119,26 @@ public fun Painter.composePainterPlugins(
   imagePlugins: List<ImagePlugin>,
   imageBitmap: @Composable () -> ImageBitmap,
 ): Painter {
-  val painterPlugins = imagePlugins.filterIsInstance<ImagePlugin.PainterPlugin>()
-  if (painterPlugins.isEmpty()) return this
+  var hasPainterPlugin = false
+  for (index in imagePlugins.indices) {
+    if (imagePlugins[index] is ImagePlugin.PainterPlugin) {
+      hasPainterPlugin = true
+      break
+    }
+  }
+  if (!hasPainterPlugin) return this
 
   val bitmap = imageBitmap()
   var painter: Painter = this
-  painterPlugins.forEach { bitmapImagePlugin ->
-    painter = bitmapImagePlugin.compose(imageBitmap = bitmap, painter = painter)
+  var seen = 0
+  for (index in imagePlugins.indices) {
+    val plugin = imagePlugins[index]
+    if (plugin is ImagePlugin.PainterPlugin) {
+      // Keyed on the plugin and on how many equal ones came before it, so an animating painter
+      // keeps what it remembered when another kind of plugin is added ahead of it, and a component
+      // holding the same plugin twice does not hand both of them the same key.
+      painter = key(plugin, seen++) { plugin.compose(imageBitmap = bitmap, painter = painter) }
+    }
   }
   return painter
 }

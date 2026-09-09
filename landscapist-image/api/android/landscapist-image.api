@@ -16,6 +16,10 @@ public final class com/skydoves/landscapist/image/LandscapistImageKt {
 	public static final fun LandscapistImage (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/core/Landscapist;Lkotlin/jvm/functions/Function1;Lcom/skydoves/landscapist/components/ImageComponent;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Landroidx/compose/runtime/Composer;II)V
 }
 
+public final class com/skydoves/landscapist/image/LandscapistImagePainterKt {
+	public static final fun rememberImagePainter (Ljava/lang/Object;Lcom/skydoves/landscapist/core/Landscapist;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)Landroidx/compose/ui/graphics/painter/Painter;
+}
+
 public abstract class com/skydoves/landscapist/image/LandscapistImageState : com/skydoves/landscapist/ImageState {
 	public static final field $stable I
 }

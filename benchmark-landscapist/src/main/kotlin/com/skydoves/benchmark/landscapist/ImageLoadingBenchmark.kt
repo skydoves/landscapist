@@ -29,14 +29,25 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Benchmark for comparing image loading performance across different image libraries.
+ * Frame timing while a list of images scrolls, one row per variant.
  *
- * This benchmark measures:
- * - Frame timing during image loading
- * - Scrolling performance with multiple images
- * - Memory pressure during bulk image loads
+ * [landscapistImageLoading] and [coilImageLoading] are the pair to quote: the first is
+ * `landscapist-image` with no plugins, which is the only shape that takes the node path, and the
+ * second is Coil's own `AsyncImage`. The Coil row used to render `landscapist-coil3`'s `CoilImage`,
+ * so it compared this library to itself; that comparison is now [coilWrapperImageLoading], which is
+ * a different question and labelled as one.
  *
- * Run this benchmark to compare GlideImage, CoilImage, LandscapistImage, and FrescoImage.
+ * [pluginImageLoading] keeps the eight plugin configuration as a row of its own. Plugins force the
+ * composed path, so folding them into the landscapist row would have meant the node path was never
+ * measured at all, which is what used to happen.
+ *
+ * Every navigation and every scroll is checked. A run that found no tab, or scrolled nothing, used
+ * to report a low P50 and no error.
+ *
+ * Compiled fully rather than from a profile, so no column is left interpreted. [CompilationMode.Full]
+ * replaces what [CompilationMode.Partial] would have compiled from the
+ * profile covers, so a profile taken before a variant existed leaves that variant interpreted while
+ * the others are compiled, which is a gap in the numbers and not in the libraries.
  */
 @RequiresApi(Build.VERSION_CODES.P)
 class ImageLoadingBenchmark {
@@ -44,116 +55,104 @@ class ImageLoadingBenchmark {
   @get:Rule
   val benchmarkRule = MacrobenchmarkRule()
 
-  /**
-   * Benchmarks GlideImage loading performance.
-   * Measures frame timing and jank during image loads.
-   */
+  /** landscapist-image with no plugins: the node path this branch adds. */
   @Test
-  fun glideImageLoading() = benchmarkRule.measureRepeated(
+  fun landscapistImageLoading() = measureTab("Landscapist")
+
+  /** Coil's own `AsyncImage`. */
+  @Test
+  fun coilImageLoading() = measureTab("Coil")
+
+  /** landscapist-image with eight plugins, which is the composed path. */
+  @Test
+  fun pluginImageLoading() = measureTab("Plugins")
+
+  /** landscapist-coil3, this library's Compose layer over the Coil engine. */
+  @Test
+  fun coilWrapperImageLoading() = measureTab("CoilWrapper")
+
+  /** landscapist-glide, this library's Compose layer over the Glide engine. */
+  @Test
+  fun glideWrapperImageLoading() = measureTab("GlideWrapper")
+
+  /** landscapist-fresco, this library's Compose layer over the Fresco pipeline. */
+  @Test
+  fun frescoWrapperImageLoading() = measureTab("FrescoWrapper")
+
+  /** Every tab is measured the same way, from a screen on which no list has yet composed. */
+  private fun measureTab(tab: String) = benchmarkRule.measureRepeated(
     packageName = PACKAGE_NAME,
     metrics = listOf(FrameTimingMetric()),
     iterations = 5,
     startupMode = StartupMode.WARM,
-    compilationMode = CompilationMode.Partial(),
+    // Full rather than Partial. Partial compiles what the checked in baseline profile covers, and
+    // a profile written before a variant existed leaves that variant interpreted while the others
+    // run compiled, which is a difference between the columns that has nothing to do with the
+    // libraries. Full is not what ships, but it is the same for every column.
+    compilationMode = CompilationMode.Full(),
   ) {
     pressHome()
     startActivityAndWait()
-
-    // Navigate to Glide tab and load images
-    navigateToTab("Glide")
-    scrollAndLoadImages()
+    navigateToTab(tab)
+    scrollAndLoadImages(tab)
   }
 
-  /**
-   * Benchmarks CoilImage loading performance.
-   * Measures frame timing and jank during image loads.
-   */
-  @Test
-  fun coilImageLoading() = benchmarkRule.measureRepeated(
-    packageName = PACKAGE_NAME,
-    metrics = listOf(FrameTimingMetric()),
-    iterations = 5,
-    startupMode = StartupMode.WARM,
-    compilationMode = CompilationMode.Partial(),
-  ) {
-    pressHome()
-    startActivityAndWait()
-
-    // Navigate to Coil tab and load images
-    navigateToTab("Coil")
-    scrollAndLoadImages()
-  }
-
-  /**
-   * Benchmarks LandscapistImage loading performance.
-   * Measures frame timing and jank during image loads.
-   */
-  @Test
-  fun landscapistImageLoading() = benchmarkRule.measureRepeated(
-    packageName = PACKAGE_NAME,
-    metrics = listOf(FrameTimingMetric()),
-    iterations = 5,
-    startupMode = StartupMode.WARM,
-    compilationMode = CompilationMode.Partial(),
-  ) {
-    pressHome()
-    startActivityAndWait()
-
-    // Navigate to Landscapist tab and load images
-    navigateToTab("Landscapist")
-    scrollAndLoadImages()
-  }
-
-  /**
-   * Benchmarks FrescoImage loading performance.
-   * Measures frame timing and jank during image loads.
-   */
-  @Test
-  fun frescoImageLoading() = benchmarkRule.measureRepeated(
-    packageName = PACKAGE_NAME,
-    metrics = listOf(FrameTimingMetric()),
-    iterations = 5,
-    startupMode = StartupMode.WARM,
-    compilationMode = CompilationMode.Partial(),
-  ) {
-    pressHome()
-    startActivityAndWait()
-
-    // Navigate to Fresco tab and load images
-    navigateToTab("Fresco")
-    scrollAndLoadImages()
-  }
-
-  private fun MacrobenchmarkScope.navigateToTab(tabName: String) {
-    val tab = device.findObject(By.text(tabName))
-    tab?.click()
+  private fun MacrobenchmarkScope.navigateToTab(tab: String) {
+    val button = device.findObject(By.text(tab))
+    checkNotNull(button) { "no tab labelled $tab is on screen, so nothing was measured" }
+    button.click()
     device.waitForIdle()
-
-    // Wait for content to load
-    device.wait(Until.hasObject(By.res(PACKAGE_NAME, "${tabName}Image")), 2_000)
-  }
-
-  private fun MacrobenchmarkScope.scrollAndLoadImages() {
-    device.waitForIdle()
-
-    // Find scrollable content
-    val scrollable = device.findObject(By.scrollable(true))
-    scrollable?.let {
-      // Scroll down to trigger image loading
-      repeat(3) {
-        scrollable.scroll(Direction.DOWN, 0.8f)
-        device.waitForIdle(1000)
-      }
-
-      // Scroll back up
-      repeat(3) {
-        scrollable.scroll(Direction.UP, 0.8f)
-        device.waitForIdle(1000)
-      }
+    check(device.wait(Until.hasObject(firstItem(tab)), CONTENT_TIMEOUT_MS)) {
+      "the $tab tab never put its first image on screen within $CONTENT_TIMEOUT_MS ms"
+    }
+    // An item tag says a row composed, which a variant loading nothing would also satisfy. The
+    // app publishes this one only once several rows have reported an image.
+    check(device.wait(Until.hasObject(loadedItems(tab)), CONTENT_TIMEOUT_MS)) {
+      "the $tab tab composed its rows but loaded no image within $CONTENT_TIMEOUT_MS ms"
     }
   }
 
+  /**
+   * Scrolls down and back, checking both. Item zero leaving the screen and coming back is the same
+   * shape the engine harness uses, and it is the only thing that separates a scrolled list from a
+   * list that ignored every gesture.
+   */
+  private fun MacrobenchmarkScope.scrollAndLoadImages(tab: String) {
+    device.waitForIdle()
+    val list = device.findObject(By.scrollable(true))
+    checkNotNull(list) { "the $tab tab has no scrollable list, so nothing was scrolled" }
+
+    repeat(SCROLLS) {
+      list.scroll(Direction.DOWN, SCROLL_FRACTION)
+      device.waitForIdle(SETTLE_MS)
+    }
+    check(!device.hasObject(firstItem(tab))) {
+      "$tab did not scroll: its first image is still on screen after $SCROLLS scrolls down"
+    }
+
+    // One more up than down, because a scroll can carry further than it was asked to and the top
+    // clamps, while an undershoot would leave the list somewhere it was never measured from.
+    repeat(SCROLLS + 1) {
+      list.scroll(Direction.UP, SCROLL_FRACTION)
+      device.waitForIdle(SETTLE_MS)
+    }
+    check(device.hasObject(firstItem(tab))) {
+      "$tab did not scroll back: its first image is not on screen after ${SCROLLS + 1} scrolls up"
+    }
+  }
+
+  // By.res with one argument, because testTagsAsResourceId publishes the tag verbatim with no
+  // package prefix. The two argument form builds "package:id/tag" and never matched.
+  private fun firstItem(tab: String) = By.res("${tab}First")
+
+  /** Published by the app once enough rows have reported a loaded image. */
+  private fun loadedItems(tab: String) = By.res("${tab}Loaded")
+
   companion object {
     private const val PACKAGE_NAME = "com.skydoves.benchmark.landscapist.app"
+    private const val CONTENT_TIMEOUT_MS = 10_000L
+    private const val SETTLE_MS = 1_000L
+    private const val SCROLLS = 3
+    private const val SCROLL_FRACTION = 0.8f
   }
 }

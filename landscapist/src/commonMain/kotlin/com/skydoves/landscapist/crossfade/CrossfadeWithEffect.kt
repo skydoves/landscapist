@@ -38,7 +38,10 @@ import kotlinx.coroutines.delay
  *
  * @param T The type of the state object.
  * @param targetState The state that drives the content to be displayed.
- * @param modifier Modifier to be applied to the container.
+ * @param modifier Modifier to be applied to the container. With the animation off and no modifier
+ * given, no container is emitted at all and the content is composed where the caller put it, which
+ * is one layout node per image rather than two. So do not alternate between [Modifier] and a real
+ * one: that moves the content between two composition groups and rebuilds it every time.
  * @param durationMs The duration of the fade-in and fade-out animations.
  * @param enabled A boolean to enable or disable the animation. If false, the content
  * will switch instantly. Defaults to true.
@@ -56,21 +59,30 @@ public fun <T> CrossfadeWithEffect(
   contentKey: (T) -> Any? = { it },
   content: @Composable (T) -> Unit,
 ) {
-  // Nothing is tracked when the animation is off, which is the default: no crossfade plugin means
-  // no fade out to keep alive, and a snapshot state list per image is not free.
   if (!enabled) {
-    Box(modifier = modifier, propagateMinConstraints = true) {
+    // With nothing to animate there is nothing to stack, so the wrapper would be a layout node per
+    // image that only forwards its constraints. The parent it would have sat in is a Box with the
+    // same measure policy, alignment and constraint propagation, so removing it cannot move
+    // anything. It is still needed to carry a modifier if one was given.
+    if (modifier === Modifier) {
       key(contentKey(targetState)) {
         content(targetState)
+      }
+    } else {
+      Box(modifier = modifier, propagateMinConstraints = true) {
+        key(contentKey(targetState)) {
+          content(targetState)
+        }
       }
     }
     return
   }
 
-  // Seeded with the state this composable entered composition with, for two reasons. Waiting for
-  // the effect below to add it leaves the first frame empty, and content that was already resolved
-  // when the composable appeared (an image read straight from the memory cache, say) has nothing to
-  // fade in from. Only content that arrives later animates.
+  // Seeded with the entry state, so the first frame is not empty and content already resolved when
+  // the composable appeared has nothing to fade in from. Only later arrivals animate.
+  //
+  // Inside this branch on purpose: a crossfade enabled later must start from what is on screen, not
+  // from the state the composable first entered with.
   val currentlyVisibleItems = remember { mutableStateListOf(targetState) }
   val initialContentKey = remember { contentKey(targetState) }
   // Once something else has been the target, the initial state has stopped being the one that was

@@ -15,32 +15,19 @@
  */
 package com.skydoves.benchmark.landscapist.app
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.components.LocalImageComponent
 import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.glide.GlideImageState
 
+/** landscapist-glide, which is this library's Compose layer over the Glide engine. */
 @Composable
-fun GlideImageList(urls: List<String>, modifier: Modifier = Modifier) {
-  LazyColumn(modifier = modifier.fillMaxSize()) {
-    items(urls) { url ->
-      GlideImage(
-        modifier = Modifier
-          .fillMaxWidth()
-          .height(BenchmarkImages.ITEM_HEIGHT_DP.dp)
-          .testTag("GlideImage"),
-        imageModel = { url },
-        component = LocalImageComponent.current,
-        imageOptions = ImageOptions(tag = "GlideImage"),
-      )
-    }
+internal fun GlideWrapperImageList(urls: List<String>, tag: String, modifier: Modifier = Modifier) {
+  BenchmarkList(urls, tag, modifier) { url, itemModifier, onLoaded ->
+    GlideImage(
+      imageModel = { url },
+      modifier = itemModifier,
+      onImageStateChanged = { if (it is GlideImageState.Success) onLoaded() },
+    )
   }
 }

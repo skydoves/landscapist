@@ -61,3 +61,6 @@ google-services.json
 # Temporary API docs
 docs/api
 .hotswan/
+
+# Agent worktrees
+.claude/worktrees/

@@ -91,7 +91,7 @@ public fun FrescoImage(
     LocalFrescoProvider.getFrescoImageRequest(imageUrl)
   },
   component: ImageComponent = rememberImageComponent {},
-  imageOptions: ImageOptions = ImageOptions(),
+  imageOptions: ImageOptions = ImageOptions.Default,
   onImageStateChanged: (FrescoImageState) -> Unit = {},
   previewPlaceholder: Painter? = null,
   loading: @Composable (BoxScope.(imageState: FrescoImageState.Loading) -> Unit)? = null,
@@ -125,7 +125,19 @@ public fun FrescoImage(
     modifier = modifier,
   ) ImageRequest@{ imageState ->
 
-    val crossfadePlugin = component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+    // Scanned on every composition rather than remembered on the component. An ImagePluginComponent
+    // is mutable and has no equality, so a remembered lookup would keep a plugin a caller has since
+    // removed, and the crossfade would keep animating with a duration nobody asked for. The scan
+    // allocates nothing, which is what made remembering it look worthwhile.
+    val plugins = component.imagePlugins
+    var crossfadePlugin: CrossfadePlugin? = null
+    for (index in plugins.indices) {
+      val plugin = plugins[index]
+      if (plugin is CrossfadePlugin) {
+        crossfadePlugin = plugin
+        break
+      }
+    }
 
     CrossfadeWithEffect(
       targetState = imageState,

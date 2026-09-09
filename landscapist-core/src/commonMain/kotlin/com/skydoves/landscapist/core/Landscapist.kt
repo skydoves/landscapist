@@ -26,6 +26,7 @@ import com.skydoves.landscapist.core.decoder.AnimatedImageDetector
 import com.skydoves.landscapist.core.decoder.DecodeResult
 import com.skydoves.landscapist.core.decoder.ImageDecoder
 import com.skydoves.landscapist.core.decoder.ProgressiveDecodeResult
+import com.skydoves.landscapist.core.decoder.RawImageData
 import com.skydoves.landscapist.core.decoder.createPlatformDecoder
 import com.skydoves.landscapist.core.decoder.createProgressiveDecoder
 import com.skydoves.landscapist.core.decoder.isSvg
@@ -56,6 +57,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okio.ByteString.Companion.encodeUtf8
 import okio.buffer
 import okio.use
 
@@ -95,6 +97,26 @@ public class Landscapist private constructor(
   private class InFlightLoad(val deferred: Deferred<ImageResult>) {
     var waiters: Int = 0
   }
+
+  // Coalesces the download alone, on the key the disk cache uses, which is the url and nothing
+  // else. The map above keys on the memory key, and that carries the size the memory cache needs
+  // and the network does not, so a screen showing one image as a thumbnail and again at full width
+  // downloaded it twice. The bytes are the same at every size; only the decode is not.
+  private val inFlightFetchLock = SynchronizedObject()
+  private val inFlightFetches = mutableMapOf<String, InFlightFetch>()
+
+  private class InFlightFetch(val deferred: Deferred<FetchedBytes>) {
+    var waiters: Int = 0
+  }
+
+  /**
+   * A download and where it was stored.
+   *
+   * The path comes back with the bytes so every caller sharing one download says the same thing
+   * about the file. Computing it from each caller's own policy told a caller that had asked for a
+   * write about a file the download had not been allowed to make.
+   */
+  private class FetchedBytes(val result: FetchResult, val diskPath: String?)
 
   init {
     // Register default memory pressure listener
@@ -140,13 +162,27 @@ public class Landscapist private constructor(
    * @param request The image request.
    * @return A flow emitting [ImageResult] states.
    */
-  public fun load(request: ImageRequest): Flow<ImageResult> {
-    val flow = flow { emitLoad(request) }
+  public fun load(request: ImageRequest): Flow<ImageResult> =
     // Progressive streams its previews straight from that body, doing disk and network work inline,
     // so it needs a dispatcher of its own. The standard path does its fetching and decoding on this
     // loader's scope already, so imposing a dispatcher on it only added a round trip to every call,
     // memory cache hits included, and those are most of what a scrolling list does.
-    return if (request.progressiveEnabled) flow.flowOn(dispatcher) else flow
+    if (request.progressiveEnabled) {
+      flow { emitLoad(request) }.flowOn(dispatcher)
+    } else {
+      LoadFlow(request)
+    }
+
+  /**
+   * The standard load, as a flow of its own rather than one the `flow { }` builder wraps.
+   *
+   * The builder exists to hand every collector a `SafeCollector`, which is not needed here: every
+   * emission happens in the collector's own context, and progressive goes through `flowOn`. On a
+   * memory cache hit the builder is most of what the load costs.
+   */
+  private inner class LoadFlow(private val request: ImageRequest) : Flow<ImageResult> {
+    override suspend fun collect(collector: FlowCollector<ImageResult>): Unit =
+      collector.emitLoad(request)
   }
 
   private suspend fun FlowCollector<ImageResult>.emitLoad(request: ImageRequest) {
@@ -197,10 +233,30 @@ public class Landscapist private constructor(
   public fun peekMemoryCache(request: ImageRequest): ImageResult.Success? {
     if (request.model == null || !request.memoryCachePolicy.readEnabled) return null
     val cacheKey = request.cacheKey()
-    // The peek runs before layout, so there is usually no target size to satisfy and any decoded
-    // variant will do. The correctly sized one replaces it as soon as the real load resolves.
-    val cached = memoryCache[cacheKey] ?: memoryCache.getIgnoringSize(cacheKey) ?: return null
-    return cached.toSuccess()
+    val exact = memoryCache[cacheKey]
+    if (exact != null) return exact.toSuccess()
+    val targetWidth = request.targetWidth.asPixelBound()
+    val targetHeight = request.targetHeight.asPixelBound()
+    // A caller that has not been measured yet has nothing to judge a variant against, and an
+    // already decoded image beats an empty frame. The right one replaces it when the load resolves.
+    if (targetWidth == null && targetHeight == null) {
+      return memoryCache.getIgnoringSize(cacheKey)?.toSuccess()
+    }
+    // A caller that knows the box it is about to fill gets the same answer a load would give it.
+    // Handing back any variant instead put a strip's 50 pixel thumbnail into the detail view above
+    // it, stretched, until the real load replaced it a moment later.
+    return memoryCache.getMatching(cacheKey) { cachedKey, cached ->
+      if (request.transformations.isEmpty()) {
+        cached.coversRequestedSize(cachedKey, request)
+      } else {
+        // A transformation makes the recorded size say nothing about the box it came from, so a
+        // load refuses every variant and decodes again. The boxes themselves still compare, which
+        // is enough to keep a thumbnail out of a large slot while the right one is decoded, and
+        // without it a transformed image blinks on every re-entry that measures a pixel wider.
+        axisCovered(targetWidth, cachedKey.width.asPixelBound()) &&
+          axisCovered(targetHeight, cachedKey.height.asPixelBound())
+      }
+    }?.toSuccess()
   }
 
   /**
@@ -212,24 +268,96 @@ public class Landscapist private constructor(
    * separate entries and three separate decodes of one image. Accepting an entry that is already at
    * least as large costs nothing in quality, since it is only ever scaled down to draw.
    */
-  private fun readMemoryCache(request: ImageRequest, cacheKey: CacheKey): CachedImage? {
-    memoryCache[cacheKey]?.let { return it }
-    val candidate = memoryCache.getIgnoringSize(cacheKey) ?: return null
-    return candidate.takeIf { it.coversRequestedSize(request) }
+  private fun readMemoryCache(request: ImageRequest, cacheKey: CacheKey): CachedImage? =
+    memoryCache.getMatching(cacheKey) { cachedKey, cached ->
+      cached.coversRequestedSize(cachedKey, request)
+    }
+
+  /**
+   * Whether decoding [request] again could produce anything this entry does not already hold.
+   *
+   * Boxes are compared, not pixel counts: a decoder that fits an image inside the box and one that
+   * fills it produce different pixels for the same request, and a box no larger than the one
+   * already decoded for cannot yield more either way.
+   *
+   * An entry far larger than the request is refused even so, since drawing it costs bandwidth on
+   * every frame and a painter plugin pays for every source pixel.
+   */
+  private fun CachedImage.coversRequestedSize(
+    cachedKey: CacheKey,
+    request: ImageRequest,
+  ): Boolean {
+    // The recorded size is what the decoder produced, not what the transformation left behind.
+    if (request.transformations.isNotEmpty()) return false
+    // Apple and wasm keep the encoded bytes and let Skia decode them at draw size, so the entry is
+    // the whole source and no box can ask for more. Sizes say nothing here: they are the source's,
+    // read from the header, and comparing them to a box would refuse every request but the widest.
+    if (data is RawImageData) return true
+    val targetWidth = request.targetWidth.asPixelBound()
+    val targetHeight = request.targetHeight.asPixelBound()
+    // Nothing to check against, and the variant could be a thumbnail. Only an exact match is used.
+    if (targetWidth == null && targetHeight == null) return false
+    if (originalWidth <= 0 || originalHeight <= 0) return false
+    // A pixel of tolerance on each axis absorbs layouts that measure to fractional sizes.
+    if (!axisCovered(targetWidth, cachedKey.width.asPixelBound())) return false
+    if (!axisCovered(targetHeight, cachedKey.height.asPixelBound())) return false
+    return !isWastefullyLargerThan(targetWidth, targetHeight, cachedKey)
   }
 
   /**
-   * Whether this entry's decoded pixels are at least as many as [request] asked for.
+   * Whether an entry decoded for [decodedFor] on one axis can serve a request for [requested].
    *
-   * A pixel of tolerance on each axis absorbs layouts that measure to fractional sizes. An entry
-   * smaller than the request is refused, because scaling it up would be visibly worse than decoding
-   * again.
+   * Null is an open axis, the largest a request can be: it covers any bound and is covered by
+   * nothing narrower.
    */
-  private fun CachedImage.coversRequestedSize(request: ImageRequest): Boolean {
-    val targetWidth = request.targetWidth.asPixelBound() ?: return true
-    val targetHeight = request.targetHeight.asPixelBound() ?: return true
-    if (originalWidth <= 0 || originalHeight <= 0) return false
-    return originalWidth + 1 >= targetWidth && originalHeight + 1 >= targetHeight
+  private fun axisCovered(requested: Int?, decodedFor: Int?): Boolean = when {
+    decodedFor == null -> true
+    requested == null -> false
+    else -> requested <= decodedFor + 1
+  }
+
+  /**
+   * Whether this entry holds more than twice what the request can draw, on either axis.
+   *
+   * Either, not both: a panorama cached for a wide slot is the right height and eight times the
+   * width when a narrow slot asks for it.
+   */
+  private fun CachedImage.isWastefullyLargerThan(
+    targetWidth: Int?,
+    targetHeight: Int?,
+    cachedKey: CacheKey,
+  ): Boolean {
+    // Refusing an entry is only worth it when decoding again would produce something smaller.
+    if (!couldDecodeSmaller(cachedKey)) return false
+    val widthLimit = targetWidth?.let { it.toLong() * 2 } ?: Long.MAX_VALUE
+    val heightLimit = targetHeight?.let { it.toLong() * 2 } ?: Long.MAX_VALUE
+    return originalWidth > widthLimit || originalHeight > heightLimit
+  }
+
+  /**
+   * Whether asking the decoder again, with a box this time, could come back with fewer pixels.
+   *
+   * Nothing was asked for the first time means this entry is the source, at whatever the decoder's
+   * own cap allowed. A node measured to nothing on its first pass sends a request like that, which
+   * is a collapsed row or a lazy item laid out before its container has room, so an ordinary screen
+   * can leave a full sized entry behind. A request that does name a box can be answered with less.
+   *
+   * A box that was asked for and came back far larger is the other way round: the decoder took no
+   * notice of it, which the Apple and wasm ones never do, and asking again returns the same pixels.
+   * Refusing there would throw away a hit and decode them twice.
+   *
+   * The factor of two is a guess, since Android halves until one axis would fall under the box and
+   * can stop anywhere in that range. An image whose shape is far from the box's can be sampled and
+   * still land past the factor, and this reads that as ignored, so a large entry is kept for a
+   * small slot. That costs memory, never correct pixels.
+   */
+  private fun CachedImage.couldDecodeSmaller(cachedKey: CacheKey): Boolean {
+    val decodedForWidth = cachedKey.width.asPixelBound()
+    val decodedForHeight = cachedKey.height.asPixelBound()
+    if (decodedForWidth == null && decodedForHeight == null) return true
+    if (decodedForWidth != null && originalWidth > decodedForWidth.toLong() * 2) return false
+    if (decodedForHeight != null && originalHeight > decodedForHeight.toLong() * 2) return false
+    return true
   }
 
   /**
@@ -244,7 +372,7 @@ public class Landscapist private constructor(
   private fun Int?.asPixelBound(): Int? = this?.takeIf { it > 0 && it != Int.MAX_VALUE }
 
   private fun ImageRequest.cacheKey(): CacheKey = CacheKey.create(
-    model = model,
+    model = identityScopedModel(),
     // Most requests carry no transformations, and map() would allocate a list to say so.
     transformationKeys = if (transformations.isEmpty()) {
       emptyList()
@@ -254,6 +382,25 @@ public class Landscapist private constructor(
     width = targetWidth,
     height = targetHeight,
   )
+
+  /**
+   * The model, scoped by the headers the request carries.
+   *
+   * An Authorization or Cookie header makes it a different viewer's image, and content negotiation
+   * makes it different bytes, so they must not share a cache entry or a file on disk. A request
+   * with no headers keys exactly as it did before.
+   *
+   * The whole header map counts, which means a rotating token re-keys every image behind it and
+   * leaves the entries under the old one to be evicted. Send a credential that changes on its own
+   * schedule through the network configuration rather than per request.
+   */
+  private fun ImageRequest.identityScopedModel(): Any? {
+    if (headers.isEmpty()) return model
+    val scope = headers.entries
+      .sortedBy { it.key }
+      .joinToString(separator = "\n") { "${it.key}: ${it.value}" }
+    return "$model#${scope.encodeUtf8().sha256().hex()}"
+  }
 
   private fun CachedImage.toSuccess(): ImageResult.Success = ImageResult.Success(
     data = data,
@@ -277,43 +424,105 @@ public class Landscapist private constructor(
     request: ImageRequest,
     cacheKey: CacheKey,
   ): ImageResult {
-    val (entry, owner) = synchronized(inFlightLock) {
+    val entry = synchronized(inFlightLock) {
       val existing = inFlightRequests[memoryKey]
       if (existing != null) {
         existing.waiters++
-        existing to false
+        existing
       } else {
         val created = InFlightLoad(scope.async { computeStandardTerminal(request, cacheKey) })
         created.waiters = 1
         inFlightRequests[memoryKey] = created
-        created to true
-      }
-    }
-
-    if (owner) {
-      // Registered outside inFlightLock on purpose: the handler re-enters the lock and atomicfu's
-      // synchronized is not reentrant on native. It removes the entry once the work finishes so a
-      // later load (after a cache eviction) starts fresh.
-      entry.deferred.invokeOnCompletion {
-        synchronized(inFlightLock) {
-          if (inFlightRequests[memoryKey] === entry) inFlightRequests.remove(memoryKey)
-        }
+        created
       }
     }
 
     try {
       return entry.deferred.await()
     } finally {
+      // The entry lives exactly as long as someone is waiting on it. It used to be dropped by a
+      // completion handler instead, which cost an allocation and a second trip through this lock,
+      // on the loading thread, for every load. The last caller to leave drops it here whether the
+      // work finished or not, and cancels it only if it did not: an entry left behind after the
+      // work is done would hand a later load a result the memory cache may since have evicted.
       val abandoned = synchronized(inFlightLock) {
         entry.waiters--
-        if (entry.waiters == 0 && !entry.deferred.isCompleted) {
+        if (entry.waiters == 0) {
           if (inFlightRequests[memoryKey] === entry) inFlightRequests.remove(memoryKey)
-          entry.deferred
+          entry.deferred.takeIf { !it.isCompleted }
         } else {
           null
         }
       }
-      // Cancel outside the lock; the completion handler re-enters inFlightLock.
+      abandoned?.cancel()
+    }
+  }
+
+  /**
+   * One download, and the disk write that goes with it.
+   *
+   * The write lives here rather than in each caller so that two sizes of one url do not open two
+   * editors on the same file. It follows the policy of the request that started the download,
+   * which is the same assumption the coalescing above already documents.
+   */
+  private suspend fun fetchAndStore(request: ImageRequest, cacheKey: CacheKey): FetchedBytes {
+    val result = fetcher.fetch(request)
+    val cache = diskCache
+    if (result !is FetchResult.Success || !request.diskCachePolicy.writeEnabled || cache == null) {
+      return FetchedBytes(result, null)
+    }
+    val data = result.data
+    // Off the critical path, so the decode starts without waiting for the file. The path is
+    // deterministic, so it can be reported before the write finishes.
+    scope.launch { runCatching { writeToDiskCache(cacheKey, data) } }
+    return FetchedBytes(result, (cache.directory / cacheKey.diskKey).toString())
+  }
+
+  /**
+   * Fetches the bytes for [request], sharing one trip with everyone asking for the same url.
+   *
+   * Keyed on the disk key, so two sizes of one image share a download and decode separately. A
+   * differing header set already keys apart, since headers are folded into the model the key is
+   * built from, so one viewer's bytes are never handed to another's request.
+   *
+   * The last caller to leave drops the entry, and cancels the work only if it has not finished,
+   * which is how [dedupedStandardTerminal] handles the same problem.
+   */
+  private suspend fun dedupedFetch(request: ImageRequest, cacheKey: CacheKey): FetchedBytes {
+    // The write policy is part of the key. Two requests for one url that disagree about whether it
+    // may be stored cannot share a download, because whichever ran first would decide for both and
+    // both are told where the file is.
+    val key = if (request.diskCachePolicy.writeEnabled) {
+      cacheKey.diskKey
+    } else {
+      // Marks a download nobody is allowed to store, so it never shares with one that is.
+      cacheKey.diskKey + "!"
+    }
+    val entry = synchronized(inFlightFetchLock) {
+      val existing = inFlightFetches[key]
+      if (existing != null) {
+        existing.waiters++
+        existing
+      } else {
+        val created = InFlightFetch(scope.async { fetchAndStore(request, cacheKey) })
+        created.waiters = 1
+        inFlightFetches[key] = created
+        created
+      }
+    }
+
+    try {
+      return entry.deferred.await()
+    } finally {
+      val abandoned = synchronized(inFlightFetchLock) {
+        entry.waiters--
+        if (entry.waiters == 0) {
+          if (inFlightFetches[key] === entry) inFlightFetches.remove(key)
+          entry.deferred.takeIf { !it.isCompleted }
+        } else {
+          null
+        }
+      }
       abandoned?.cancel()
     }
   }
@@ -374,18 +583,12 @@ public class Landscapist private constructor(
         if (diskResult != null) return diskResult
       }
 
-      // Network fetch.
-      return when (val fetchResult = fetcher.fetch(request)) {
+      // Network fetch, shared with anyone else asking for the same url at another size.
+      val fetched = dedupedFetch(request, cacheKey)
+      return when (val fetchResult = fetched.result) {
         is FetchResult.Success -> {
-          // Write to the disk cache off the critical path so the decode starts immediately. The
-          // disk path is deterministic, so it can be reported before the background write finishes.
-          val diskPath = if (request.diskCachePolicy.writeEnabled && diskCache != null) {
-            val data = fetchResult.data
-            scope.launch { runCatching { writeToDiskCache(cacheKey, data) } }
-            (diskCache.directory / cacheKey.diskKey).toString()
-          } else {
-            null
-          }
+          // Where the shared download stored it, or null when it was not allowed to.
+          val diskPath = fetched.diskPath
           decodeAndCacheStandard(
             bytes = fetchResult.data,
             mimeType = fetchResult.mimeType,
@@ -531,19 +734,13 @@ public class Landscapist private constructor(
       if (handled) return
     }
 
-    // Network fetch.
-    when (val fetchResult = fetcher.fetch(request)) {
+    // Network fetch, shared the same way the standard path shares it, and stored by it. Writing
+    // again here raced the shared write for the same key, and whichever lost left this path with
+    // no file to report.
+    val fetched = dedupedFetch(request, cacheKey)
+    when (val fetchResult = fetched.result) {
       is FetchResult.Success -> {
-        var diskPath: String? = null
-        if (request.diskCachePolicy.writeEnabled && diskCache != null) {
-          diskCache.edit(cacheKey)?.use { editor ->
-            diskCache.fileSystem.sink(editor.dataPath).buffer().use { sink ->
-              sink.write(fetchResult.data)
-            }
-            editor.commit()
-            diskPath = (diskCache.directory / cacheKey.diskKey).toString()
-          }
-        }
+        val diskPath = fetched.diskPath
 
         if (supportsProgressiveDecode(fetchResult.data, fetchResult.mimeType)) {
           emitProgressiveDecode(
@@ -833,6 +1030,7 @@ public class Landscapist private constructor(
    */
   public class Builder {
     private var config: LandscapistConfig = LandscapistConfig()
+    private var diskCacheDisabled: Boolean = false
     private var memoryCache: MemoryCache? = null
     private var diskCache: DiskCache? = null
     private var fetcher: ImageFetcher? = null
@@ -844,7 +1042,13 @@ public class Landscapist private constructor(
       this.config = config
     }
 
-    /** Sets a custom memory cache. */
+    /**
+     * Sets the memory cache.
+     *
+     * A cache that does not override [MemoryCache.getMatching] still works, but loses the reuse of
+     * an already decoded variant at a different size, so a layout that measures to 359, 360 and 361
+     * decodes the same image three times.
+     */
     public fun memoryCache(cache: MemoryCache): Builder = apply {
       this.memoryCache = cache
     }
@@ -852,6 +1056,19 @@ public class Landscapist private constructor(
     /** Sets a custom disk cache. */
     public fun diskCache(cache: DiskCache): Builder = apply {
       this.diskCache = cache
+      this.diskCacheDisabled = false
+    }
+
+    /**
+     * Builds a loader with no disk cache at all.
+     *
+     * Without this a loader always ends up owning one, because leaving it unset falls through to
+     * the default on disk. A caller who does not want anything written to disk, or who has their
+     * own caching in front of the fetcher, had no way to say so.
+     */
+    public fun noDiskCache(): Builder = apply {
+      this.diskCache = null
+      this.diskCacheDisabled = true
     }
 
     /** Sets a custom network fetcher. */
@@ -884,9 +1101,11 @@ public class Landscapist private constructor(
           LruMemoryCache(config.memoryCacheSize)
         }
 
-      val finalDiskCache = diskCache
-        ?: config.diskCache
-        ?: createDefaultDiskCache(config.diskCacheSize)
+      val finalDiskCache = if (diskCacheDisabled) {
+        null
+      } else {
+        diskCache ?: config.diskCache ?: createDefaultDiskCache(config.diskCacheSize)
+      }
 
       val finalFetcher = fetcher
         ?: KtorImageFetcher.create(config.networkConfig)

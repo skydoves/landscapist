@@ -32,6 +32,9 @@ class App : Application(), SingletonImageLoader.Factory {
   override fun onCreate() {
     super.onCreate()
 
+    // Serves every benchmark image from this process, so no measured block leaves the device.
+    BenchmarkImages.start()
+
     // initializes an image pipeline for Fresco only.
     val pipelineConfig =
       OkHttpImagePipelineConfigFactory

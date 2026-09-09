@@ -20,14 +20,21 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -52,6 +59,8 @@ import com.skydoves.landscapist.core.Landscapist
 import com.skydoves.landscapist.core.model.ImageResult
 import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.crossfade.CrossfadeWithEffect
+import com.skydoves.landscapist.crossfade.rememberCrossfadePainter
+import com.skydoves.landscapist.plugins.ImagePlugin
 import com.skydoves.landscapist.plugins.composePainterPlugins
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -82,7 +91,7 @@ public fun LandscapistImage(
   landscapist: Landscapist = getLandscapist(),
   requestBuilder: (ImageRequest.Builder.() -> Unit)? = null,
   component: ImageComponent = rememberImageComponent {},
-  imageOptions: ImageOptions = ImageOptions(),
+  imageOptions: ImageOptions = ImageOptions.Default,
   onImageStateChanged: ((LandscapistImageState) -> Unit)? = null,
   loading: @Composable (BoxScope.(LandscapistImageState.Loading) -> Unit)? = null,
   success: @Composable (BoxScope.(LandscapistImageState.Success, Painter) -> Unit)? = null,
@@ -110,10 +119,62 @@ public fun LandscapistImage(
     }.build()
   }
 
-  // Scanning the plugin list allocates, and the plugins do not change between compositions.
-  val crossfadePlugin = remember(component) {
-    component.imagePlugins.filterIsInstance<CrossfadePlugin>().firstOrNull()
+  // Scanned every composition rather than remembered: an ImagePluginComponent is mutable and has
+  // no equality, so remembering it would freeze a plugin set the caller can still add to.
+  val plugins = component.imagePlugins
+  // Nothing to compose inside: one layout node measures, draws and runs its own load, so the size
+  // to decode at is read while measuring rather than written back as state, and a resolved image
+  // invalidates one node's draw rather than recomposing. A DrawableResource is excluded because
+  // painterResource is composable.
+  val canOwnNode = success == null && loading == null && failure == null &&
+    plugins.isEmpty() && model !is DrawableResource
+  if (canOwnNode) {
+    // Set by the node when the data needs a composed painter, an animated drawable being the case
+    // that matters, so this hands it back to the composed path. Only Android can produce one.
+    val composedPainter = if (ComposedPainterEverNeeded) {
+      remember(request) { mutableStateOf(false) }
+    } else {
+      null
+    }
+    if (composedPainter?.value != true) {
+      val ratio = imageOptions.placeholderAspectRatio
+      Layout(
+        modifier = (if (ratio != null && ratio > 0f) modifier.aspectRatio(ratio) else modifier)
+          .imageSemantics(imageOptions)
+          .landscapistImageNode(
+            landscapist = landscapist,
+            request = request,
+            imageOptions = imageOptions,
+            onState = onImageStateChanged,
+            unpaintable = composedPainter,
+          ),
+        measurePolicy = LandscapistImageMeasurePolicy,
+      )
+      return
+    }
   }
+
+  val crossfadePlugin = plugins.firstInstanceOrNull<CrossfadePlugin>()
+  // Only a SuccessStatePlugin is handed the decoded pixels; a painter plugin gets a function to
+  // call instead, since it usually ignores them.
+  val needsImageBitmap = plugins.anyIs<ImagePlugin.SuccessStatePlugin>()
+  // Only content composed inside success can read the source locals, so providing them otherwise
+  // costs a composition local per image. Decided from the plugin set rather than from the source
+  // itself, so the success subtree never moves between groups when a disk path appears.
+  val hasComposablePlugin = plugins.anyIs<ImagePlugin.ComposablePlugin>()
+  val providesImageSource = success != null || hasComposablePlugin
+  // The container can fade the painter itself when there was no loading or failure content to fade
+  // out from. Anything that has some still stacks the two states in CrossfadeWithEffect.
+  val fadesWhilePainting = crossfadePlugin != null &&
+    loading == null &&
+    failure == null &&
+    !plugins.anyIs<ImagePlugin.LoadingStatePlugin>() &&
+    !plugins.anyIs<ImagePlugin.FailureStatePlugin>()
+  // The container can draw the image itself only when nothing else claims the inside of it.
+  val canPaintOnContainer = success == null &&
+    (crossfadePlugin == null || fadesWhilePainting) &&
+    !hasComposablePlugin &&
+    !plugins.anyIs<ImagePlugin.SuccessStatePlugin>()
   val requestHolder = remember(request) { StableHolder(request) }
   val landscapistHolder = remember(landscapist) { StableHolder(landscapist) }
 
@@ -123,16 +184,28 @@ public fun LandscapistImage(
     modifier = modifier,
     component = component,
     imageOptions = imageOptions,
-  ) { imageResult ->
-    val landscapistState = imageResult.toLandscapistImageState()
-    onImageStateChanged?.invoke(landscapistState)
-
+    onState = { onImageStateChanged?.invoke(it) },
+    // Anything that has to be composed inside needs a real child.
+    paintOnContainer = canPaintOnContainer,
+    needsImageBitmap = needsImageBitmap,
+    containerFadeMs = if (fadesWhilePainting && canPaintOnContainer) {
+      crossfadePlugin?.duration ?: 0
+    } else {
+      0
+    },
+  ) { landscapistState ->
     // Wrap with CrossfadeWithEffect when CrossfadePlugin is present
+    // Off only when the container is actually doing the fading, not merely when it could.
+    val crossfadeEnabled = crossfadePlugin != null && !(fadesWhilePainting && canPaintOnContainer)
     CrossfadeWithEffect(
       targetState = landscapistState,
       durationMs = crossfadePlugin?.duration ?: 0,
-      contentKey = { it.crossfadeKey() },
-      enabled = crossfadePlugin != null,
+      contentKey = if (crossfadeEnabled) {
+        CrossfadeContentKey
+      } else {
+        { it.contentGroupKey(request.model) }
+      },
+      enabled = crossfadeEnabled,
     ) { state ->
       when (state) {
         is LandscapistImageState.None,
@@ -154,48 +227,37 @@ public fun LandscapistImage(
         }
 
         is LandscapistImageState.Success -> {
-          val basePainter = if (state.data is DrawableResource) {
-            painterResource(state.data)
-          } else {
-            rememberLandscapistPainter(state.data)
-          }
-          val imageBitmap = remember(state.data) {
-            state.data?.let { convertToImageBitmap(it) }
-          }
+          val imageBitmap = pluginImageBitmap(state, needsImageBitmap)
+          val painter = rememberSuccessPainter(state, component, imageBitmap)
 
-          // Apply PainterPlugins (like CircularRevealPlugin) to the painter
-          val painter = if (imageBitmap != null) {
-            basePainter.composePainterPlugins(
-              imagePlugins = component.imagePlugins,
-              imageBitmap = { imageBitmap },
+          if (needsImageBitmap) {
+            component.ComposeSuccessStatePlugins(
+              modifier = Modifier,
+              imageModel = model,
+              imageOptions = imageOptions,
+              imageBitmap = imageBitmap,
             )
-          } else {
-            basePainter
           }
 
-          component.ComposeSuccessStatePlugins(
-            modifier = Modifier,
-            imageModel = model,
-            imageOptions = imageOptions,
-            imageBitmap = imageBitmap,
-          )
-
-          // Provide source data for sub-sampling support (zoomable plugin)
-          ProvideImageSource(
-            diskCachePath = state.diskCachePath,
-            rawData = state.rawData,
-          ) {
-            component.ComposeWithComposablePlugins {
-              if (success != null) {
-                success.invoke(this, state, painter)
+          if (providesImageSource) {
+            // One provider rather than nested composables: each is a composition group per image.
+            CompositionLocalProvider(
+              imageSourceProvidedValue(
+                diskCachePath = state.diskCachePath,
+                rawData = state.rawData,
+              ),
+            ) {
+              // With nothing to wrap it would be one more composition group per image.
+              if (hasComposablePlugin) {
+                component.ComposeWithComposablePlugins {
+                  successContent(success, state, painter, imageOptions)
+                }
               } else {
-                DefaultSuccessContent(
-                  modifier = Modifier.fillMaxSize(),
-                  painter = painter,
-                  imageOptions = imageOptions,
-                )
+                successContent(success, state, painter, imageOptions)
               }
             }
+          } else {
+            successContent(success, state, painter, imageOptions)
           }
         }
 
@@ -296,54 +358,23 @@ private fun LandscapistImageInternal(
   modifier: Modifier,
   component: ImageComponent,
   imageOptions: ImageOptions,
-  content: @Composable BoxScope.(imageResult: ImageResult) -> Unit,
+  onState: (LandscapistImageState) -> Unit,
+  paintOnContainer: Boolean,
+  needsImageBitmap: Boolean,
+  containerFadeMs: Int,
+  content: @Composable BoxScope.(state: LandscapistImageState) -> Unit,
 ) {
   val loadingKey = imageOptions.loadingOptionsKey
 
-  // Read the memory cache during composition so an image that is already decoded is drawn in the
-  // very first frame. Waiting for the flow costs a frame of empty content even on a cache hit,
-  // which is what makes images blink when a composable enters, most visibly when a shared element
-  // transition animates the bounds of what is still an empty box.
-  var state by remember(request, loadingKey) {
-    val cached = landscapist.value.peekMemoryCache(request.value)
-    mutableStateOf(cached?.toImageLoadState() ?: ImageLoadState.None)
-  }
+  // Packed into one state: both axes are written together, once, and locked afterwards so a later
+  // constraint change does not restart the load.
+  var incomingConstraints by remember { mutableLongStateOf(NOT_MEASURED) }
+  val hasMeasured = incomingConstraints != NOT_MEASURED
+  val incomingMaxWidth = (incomingConstraints ushr 32).toInt()
+  val incomingMaxHeight = (incomingConstraints and 0xFFFFFFFFL).toInt()
 
-  // Capture incoming parent constraints for downsampling. Initialized to -1 meaning "not yet measured".
-  // Once measured, the value is locked to prevent LaunchedEffect restarts.
-  var incomingMaxWidth by remember { mutableIntStateOf(-1) }
-  var incomingMaxHeight by remember { mutableIntStateOf(-1) }
-  val hasMeasured = incomingMaxWidth >= 0
-
-  // Auto-calculate aspect ratio from loaded image dimensions for sub-sampling support.
-  // Priority: explicit placeholderAspectRatio > auto from loaded image > none
-  val autoAspectRatio = remember(state) {
-    val successData = (state as? ImageLoadState.Success)?.data as? LandscapistSuccessData
-    if (successData != null && successData.originalWidth > 0 && successData.originalHeight > 0) {
-      successData.originalWidth.toFloat() / successData.originalHeight.toFloat()
-    } else {
-      null
-    }
-  }
-  // Only apply auto aspect ratio when incoming height is unbounded (e.g., scrollable Column).
-  // In bounded contexts (e.g., .size(50.dp)), the parent already provides proper constraints.
-  val needsAutoAspectRatio = hasMeasured && incomingMaxHeight == 0
-  val effectiveAspectRatio = imageOptions.placeholderAspectRatio
-    ?: if (needsAutoAspectRatio) autoAspectRatio else null
-
-  // Apply aspect ratio modifier if available to reserve space / ensure bounded height
-  val baseModifier = remember(modifier, effectiveAspectRatio) {
-    if (effectiveAspectRatio != null && effectiveAspectRatio > 0f) {
-      modifier.aspectRatio(effectiveAspectRatio)
-    } else {
-      modifier
-    }
-  }
-
-  // Build request with target size from captured layout dimensions.
-  // The remember keys include incomingMaxWidth/incomingMaxHeight so the request is built
-  // once the first measurement happens. After that, size changes won't rebuild.
-  val sizedRequest = remember(request.value, imageOptions, incomingMaxWidth, incomingMaxHeight) {
+  // Keyed on the measured bounds so the request is built once the first measurement lands.
+  val sizedRequest = remember(request.value, imageOptions, incomingConstraints) {
     val constraints = if (hasMeasured) {
       Constraints(
         maxWidth = if (incomingMaxWidth > 0) incomingMaxWidth else Constraints.Infinity,
@@ -353,6 +384,49 @@ private fun LandscapistImageInternal(
       Constraints() // unbounded fallback (should rarely happen)
     }
     buildSizedRequest(request.value, imageOptions, constraints)
+  }
+
+  // Read the memory cache during composition so an image that is already decoded is drawn in the
+  // very first frame. Waiting for the flow costs a frame of empty content even on a cache hit,
+  // which is what makes images blink when a composable enters, most visibly when a shared element
+  // transition animates the bounds of what is still an empty box.
+  //
+  // Peeked with the sized request rather than the bare one. The bounds outlive a model change,
+  // since nothing re-keys them, so an image swapped into a slot that has already been measured
+  // knows the box it is about to fill and is handed only an entry that fills it. Asking with the
+  // bare request put a thumbnail cached by a strip of the same urls into the detail view above it,
+  // stretched, until the real load replaced it.
+  var state by remember(request, loadingKey) {
+    val cached = landscapist.value.peekMemoryCache(sizedRequest)
+    mutableStateOf(cached?.toImageLoadState() ?: ImageLoadState.None)
+  }
+
+  // The size the image resolved at, so an axis the parent left open can be sized from its shape,
+  // which is what sub-sampling needs and what stops a scrolling column measuring the image twice.
+  // Priority: an explicit placeholderAspectRatio > the image's own size > none.
+  val loadedSize = remember(state) {
+    val successData = (state as? ImageLoadState.Success)?.data as? LandscapistSuccessData
+    if (successData != null && successData.originalWidth > 0 && successData.originalHeight > 0) {
+      Size(successData.originalWidth.toFloat(), successData.originalHeight.toFloat())
+    } else {
+      null
+    }
+  }
+  // Only on an axis the parent left open, a scrolling column or row being the case that matters.
+  // A bounded axis already has its answer and the caller asked for it.
+  val hasOpenAxis = hasMeasured && (incomingMaxWidth == 0 || incomingMaxHeight == 0)
+  val placeholderRatio = imageOptions.placeholderAspectRatio
+  val autoSize = if (placeholderRatio == null && hasOpenAxis) loadedSize else null
+
+  // Sized the way the node sizes an open axis rather than as a bare width over height, so
+  // installing a plugin does not change the size the same image takes: a content scale that does
+  // not upscale asks for the height the image already has, not the height its shape would fill.
+  val baseModifier = remember(modifier, placeholderRatio, autoSize, imageOptions.contentScale) {
+    when {
+      placeholderRatio != null && placeholderRatio > 0f -> modifier.aspectRatio(placeholderRatio)
+      autoSize != null -> modifier.imageShape(autoSize, imageOptions.contentScale)
+      else -> modifier
+    }
   }
 
   // Start loading once we have a sized request and measurement is done (or request has size already).
@@ -373,27 +447,79 @@ private fun LandscapistImageInternal(
     }
   }
 
-  // Use Box with propagateMinConstraints + Modifier.layout to capture incoming parent constraints.
-  // Unlike onSizeChanged (which reports actual rendered size), Modifier.layout reads the
-  // incoming constraints from the parent, giving us bounded width even when content is empty.
-  // This is critical for sub-sampling/zoomable plugins in unbounded contexts (e.g., scrollable Column).
+  // Converting allocates, and the loader's state only changes when the flow emits.
+  val landscapistState = state.toLandscapistImageState()
+  // After the composition and only on a change, so a caller that writes state from it does not
+  // recompose this image into calling it again. A SideEffect, since no coroutine is needed.
+  val dispatched = remember { arrayOfNulls<LandscapistImageState>(1) }
+  SideEffect {
+    if (dispatched[0] != landscapistState) {
+      dispatched[0] = landscapistState
+      onState(landscapistState)
+    }
+  }
+  // Drawn by this node rather than a child, which is one layout node per image rather than two.
+  val loaded = if (paintOnContainer && landscapistState is LandscapistImageState.Success) {
+    rememberSuccessPainter(
+      landscapistState,
+      component,
+      pluginImageBitmap(landscapistState, needsImageBitmap),
+    )
+  } else {
+    null
+  }
+  // Called with or without a painter, so what it remembers survives the image leaving success.
+  // A reload holds the image on screen; a failure does not.
+  val painter = rememberCrossfadePainter(
+    painter = loaded,
+    durationMs = containerFadeMs,
+    keepPreviousWhileAbsent = landscapistState !is LandscapistImageState.Failure,
+  )
+  // Rebuilding the chain every composition allocates two modifier elements per image.
+  val paintModifier = remember(painter, imageOptions) {
+    if (painter != null) imageOptions.paintModifier(painter) else Modifier
+  }
+
+  // Modifier.layout reads what the parent offered, unlike onSizeChanged which reports what was
+  // rendered, so a bounded width is known while the content is still empty. Dropped once the value
+  // is locked, since a node that stayed would measure every frame to compute nothing.
+  val constraintProbe = if (hasMeasured) {
+    Modifier
+  } else {
+    Modifier.layout { measurable, constraints ->
+      // A bounded axis that measured to nothing is not an answer, so the probe stays and waits for
+      // one. Locking it wrote a zero, which reads back as an open axis, and an open axis on both
+      // sides is a request with no target at all: a decode at the source's own size and a cache
+      // read with no box to judge a variant against. A lazy item laid out before its container has
+      // room, or a container that animates open from nothing, both start there. The node path has
+      // always refused a zero bound this way; this is the composed path agreeing with it.
+      val collapsed = (constraints.hasBoundedWidth && constraints.maxWidth == 0) ||
+        (constraints.hasBoundedHeight && constraints.maxHeight == 0)
+      if (incomingConstraints == NOT_MEASURED && !collapsed) {
+        val width = if (constraints.hasBoundedWidth) constraints.maxWidth else 0
+        val height = if (constraints.hasBoundedHeight) constraints.maxHeight else 0
+        incomingConstraints = (width.toLong() shl 32) or (height.toLong() and 0xFFFFFFFFL)
+      }
+      val placeable = measurable.measure(constraints)
+      layout(placeable.width, placeable.height) {
+        placeable.placeRelative(0, 0)
+      }
+    }
+  }
+
   Box(
     modifier = baseModifier
       .imageSemantics(imageOptions)
-      .layout { measurable, constraints ->
-        if (incomingMaxWidth < 0) {
-          incomingMaxWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else 0
-          incomingMaxHeight = if (constraints.hasBoundedHeight) constraints.maxHeight else 0
-        }
-        val placeable = measurable.measure(constraints)
-        layout(placeable.width, placeable.height) {
-          placeable.placeRelative(0, 0)
-        }
-      },
+      // The probe reads what the parent offered, so it has to sit outside the fill and the paint:
+      // those hand their own constraints down, and the decode target size would follow them
+      // instead of the layout.
+      .then(constraintProbe)
+      .then(paintModifier),
     propagateMinConstraints = true,
   ) {
-    val imageResult = state.toImageResult()
-    content(imageResult)
+    if (painter == null) {
+      content(landscapistState)
+    }
   }
 }
 
@@ -401,7 +527,7 @@ private fun LandscapistImageInternal(
  * Builds an ImageRequest with appropriate target size based on constraints.
  * Uses constraints to downsample large images and prevent memory issues.
  */
-private fun buildSizedRequest(
+internal fun buildSizedRequest(
   originalRequest: ImageRequest,
   imageOptions: ImageOptions,
   constraints: Constraints,
@@ -467,6 +593,115 @@ private fun executeImageLoading(
 }.distinctUntilChanged()
 
 /**
+ * The decoded pixels, but only when a plugin actually reads them.
+ *
+ * Materialising this can mean a second full decode on the skia targets, so the common case of no
+ * such plugin never pays for it.
+ */
+@Composable
+private inline fun pluginImageBitmap(
+  state: LandscapistImageState.Success,
+  needsImageBitmap: Boolean,
+): ImageBitmap? = remember(state.data, needsImageBitmap) {
+  if (needsImageBitmap) state.data?.let { convertToImageBitmap(it) } else null
+}
+
+/**
+ * The painter for a loaded image, with any painter plugins already applied.
+ *
+ * [decoded] is the bitmap a success state plugin was already given, or null when none asked for
+ * one. Either way the pixels are only materialised if a painter plugin turns out to want them:
+ * composePainterPlugins returns before it calls for them when there is no painter plugin at all,
+ * and converting is a full pixel copy on the platforms where the decoder does not hand back
+ * something the painter can draw directly.
+ */
+@Composable
+private fun rememberSuccessPainter(
+  state: LandscapistImageState.Success,
+  component: ImageComponent,
+  decoded: ImageBitmap?,
+): Painter {
+  val basePainter = if (state.data is DrawableResource) {
+    painterResource(state.data)
+  } else {
+    rememberLandscapistPainter(state.data)
+  }
+  // Composing plugins onto the painter is a composable call, so with none installed it is a
+  // composition group per image that hands back the painter it was given.
+  if (!component.imagePlugins.anyIs<ImagePlugin.PainterPlugin>()) return basePainter
+  return basePainter.composePainterPlugins(
+    imagePlugins = component.imagePlugins,
+    imageBitmap = {
+      decoded ?: pluginImageBitmap(state, needsImageBitmap = true) ?: EmptyImageBitmap
+    },
+  )
+}
+
+/**
+ * The first plugin of type [T], scanned by index.
+ *
+ * These run on every composition of every image, and `filterIsInstance` and `firstOrNull` each
+ * allocate a list to answer a question about a list that usually holds nothing.
+ */
+private inline fun <reified T> List<ImagePlugin>.firstInstanceOrNull(): T? {
+  for (index in indices) {
+    val plugin = this[index]
+    if (plugin is T) return plugin
+  }
+  return null
+}
+
+/** Whether any plugin is a [T]. */
+private inline fun <reified T> List<ImagePlugin>.anyIs(): Boolean {
+  for (index in indices) {
+    if (this[index] is T) return true
+  }
+  return false
+}
+
+/** Stands in for a plugin that was handed pixels it never reads. */
+private val EmptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
+
+/**
+ * Converts the loader's state straight to the state the caller sees.
+ *
+ * Going through [ImageResult] on the way allocated a second object on every composition of every
+ * image, and nothing in between needed it. [ImageLoadState.None] still surfaces as
+ * [LandscapistImageState.Loading]: they render the same, and callers have never seen None here.
+ */
+private fun ImageLoadState.toLandscapistImageState(): LandscapistImageState = when (this) {
+  is ImageLoadState.None, is ImageLoadState.Loading -> LandscapistImageState.Loading
+  is ImageLoadState.Success -> {
+    val successData = data as? LandscapistSuccessData
+    LandscapistImageState.Success(
+      data = successData?.bitmap ?: data ?: Unit,
+      dataSource = dataSource.toCoreDataSource(),
+      originalWidth = successData?.originalWidth ?: 0,
+      originalHeight = successData?.originalHeight ?: 0,
+      rawData = successData?.rawData,
+      diskCachePath = successData?.diskCachePath,
+    )
+  }
+  is ImageLoadState.Failure -> LandscapistImageState.Failure(reason = reason)
+}
+
+/**
+ * Draws [painter] on the node this modifies, the same way [androidx.compose.foundation.Image] does.
+ */
+private fun ImageOptions.paintModifier(painter: Painter): Modifier = Modifier
+  // The fill comes first, because Modifier.paint sizes the node to the painter unless given fixed
+  // constraints, and without it a caller with no size modifier shrinks to the decoded image.
+  // Anything but a plain bitmap painter may animate as it draws and needs a layer of its own.
+  .fillAndClip(ownLayer = painter !is BitmapPainter)
+  .paint(
+    painter = painter,
+    alignment = alignment,
+    contentScale = contentScale,
+    alpha = alpha,
+    colorFilter = colorFilter,
+  )
+
+/**
  * Converts [ImageResult] to [ImageLoadState].
  * Note: We wrap the data to preserve additional fields for ImageLoad compatibility.
  */
@@ -489,37 +724,43 @@ private fun ImageResult.toImageLoadState(): ImageLoadState = when (this) {
 }
 
 /**
- * Converts [ImageLoadState] back to [ImageResult].
- */
-private fun ImageLoadState.toImageResult(): ImageResult = when (this) {
-  is ImageLoadState.None -> ImageResult.Loading
-  is ImageLoadState.Loading -> ImageResult.Loading
-  is ImageLoadState.Success -> {
-    val successData = data as? LandscapistSuccessData
-    ImageResult.Success(
-      data = successData?.bitmap ?: data ?: Unit,
-      dataSource = dataSource.toCoreDataSource(),
-      originalWidth = successData?.originalWidth ?: 0,
-      originalHeight = successData?.originalHeight ?: 0,
-      rawData = successData?.rawData,
-      diskCachePath = successData?.diskCachePath,
-    )
-  }
-  is ImageLoadState.Failure -> ImageResult.Failure(
-    throwable = reason,
-  )
-}
-
-/**
- * What identifies this state to the crossfade.
+ * What identifies this state while something is fading.
  *
  * Keying on the state itself means `key()` hashes it every composition, and a success state hashes
- * the encoded image with it. The decoded image is what the crossfade actually distinguishes.
+ * the encoded image with it. The decoded image is what a fade animates from and to, so it is what
+ * distinguishes one frame of the animation from another.
  */
 private fun LandscapistImageState.crossfadeKey(): Any = when (this) {
   is LandscapistImageState.Success -> data ?: this
   else -> this
 }
+
+/**
+ * What the content is grouped by when nothing fades.
+ *
+ * The key then decides only what gets rebuilt, and one image decoded twice is the same content: a
+ * resize, or a cached variant standing in until the right one arrives. Keying that on the decoded
+ * bitmap discarded everything composed inside on the second one, the plugin groups, a zoomable's
+ * decoder and sub-sampling state, and the reveal's animation, which starts again from nothing. That
+ * is the image appearing to load a second time. A genuinely different image arrives through a state
+ * reset, so it still lands in a new group.
+ */
+private fun LandscapistImageState.contentGroupKey(model: Any?): Any = when (this) {
+  // The model, so one image is one group however many times it is decoded, and a different image
+  // is a different group even when it arrives without a loading state in between. Collapsing every
+  // success onto one key kept the whole subtree across a model change into an already cached
+  // image: the caller's slot, a zoomable's zoom and pan, and a reveal that then never ran.
+  is LandscapistImageState.Success -> model ?: SuccessGroup
+  is LandscapistImageState.Failure -> FailureGroup
+  else -> LoadingGroup
+}
+
+private val SuccessGroup = Any()
+private val FailureGroup = Any()
+private val LoadingGroup = Any()
+
+// Hoisted, since it needs nothing from the call site.
+private val CrossfadeContentKey: (LandscapistImageState) -> Any? = { it.crossfadeKey() }
 
 // Enum.valueOf goes through a name lookup, and these conversions run on every composition. A when
 // is a table switch.
@@ -618,8 +859,11 @@ private fun LandscapistThumbnail(
     modifier = Modifier,
     component = rememberImageComponent {},
     imageOptions = imageOptions.copy(requestSize = requestSize),
-  ) { imageResult ->
-    val state = imageResult.toLandscapistImageState()
+    onState = {},
+    paintOnContainer = false,
+    needsImageBitmap = false,
+    containerFadeMs = 0,
+  ) { state ->
     if (state is LandscapistImageState.Success) {
       val data = state.data ?: return@LandscapistImageInternal
       val painter = rememberLandscapistPainter(data)
@@ -630,3 +874,29 @@ private fun LandscapistThumbnail(
     }
   }
 }
+
+/**
+ * The caller's success slot, or the image drawn as it would be with no slot at all.
+ *
+ * Inline, so the slot is composed in the group the image already has rather than in one of its own.
+ */
+@Composable
+private inline fun BoxScope.successContent(
+  noinline success: @Composable (BoxScope.(LandscapistImageState.Success, Painter) -> Unit)?,
+  state: LandscapistImageState.Success,
+  painter: Painter,
+  imageOptions: ImageOptions,
+) {
+  if (success != null) {
+    success.invoke(this, state, painter)
+  } else {
+    DefaultSuccessContent(
+      modifier = Modifier.fillMaxSize(),
+      painter = painter,
+      imageOptions = imageOptions,
+    )
+  }
+}
+
+/** The packed constraints before any layout pass has run. Neither axis can be negative once set. */
+private const val NOT_MEASURED = -1L

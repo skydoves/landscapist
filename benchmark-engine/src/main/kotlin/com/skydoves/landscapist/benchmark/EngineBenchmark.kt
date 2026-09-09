@@ -25,19 +25,31 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 /**
- * A device free head to head between the landscapist-core engine and the real Coil engine.
- *
- * Run with `./gradlew :benchmark-engine:run`.
- *
- * Both loaders are handed the same already decoded image by their fetcher, so what is timed is the
- * loader itself: key building, cache lookup, the coroutine machinery, and coalescing. Decode is
- * deliberately excluded, because on the JVM Coil decodes through Skia and landscapist-core through
- * ImageIO, and an end to end number would be comparing decoders instead.
- *
- * These are single process JVM numbers on one machine. They are useful for comparing the two
- * engines against each other, not as absolute figures for any device.
+ * A device free head to head between the landscapist-core engine and the real Coil engine, run
+ * with `./gradlew :benchmark-engine:run`. Both fetchers hand back an already decoded image, so
+ * what is timed is the loader and not the platform's decoder. Single process JVM numbers.
  */
 fun main() {
+  // A child forked to have its resident set watched while it decodes once. Checked before the
+  // profile branch, because a child inherits this process's environment.
+  System.getenv("LANDSCAPIST_DECODE_PATH")?.let {
+    runDecodeChild(it, System.getenv("LANDSCAPIST_DECODE_PHOTO"))
+    return
+  }
+  // Renders one list repeatedly under a profiler. Not part of the reported numbers.
+  System.getenv("LANDSCAPIST_PROFILE")?.let {
+    profileComposeOnly(it)
+    return
+  }
+  // A child of a spread run reports its recorded metrics after running the whole sequence. It
+  // used to skip the rows above the ones it recorded, so the spread was not a bound on what was
+  // published: memory cache hit ran first in the child and second in the parent.
+  if (Metrics.collecting) {
+    everyScenario()
+    Metrics.emit()
+    return
+  }
+
   println("Engine benchmark: landscapist-core vs Coil ${coilVersion()}")
   println("JVM ${System.getProperty("java.version")} on ${System.getProperty("os.arch")}")
   println("Fetcher returns a pre-decoded image for both, so decoding is out of the measurement.")
@@ -45,25 +57,46 @@ fun main() {
   println("=".repeat(96))
   println()
 
+  everyScenario()
+
+  System.getenv("LANDSCAPIST_SPREAD_RUNS")?.toIntOrNull()?.let { runSpread(it) }
+
+  println("=".repeat(96))
+  println("Percentiles over the reported iteration count. Lower is better.")
+  println("The ratio on each second row is Coil measured against landscapist.")
+  println(
+    "Every allocation row counts Java heap only. Pixels live in Skia's native memory on both " +
+      "sides, so no allocation row here includes a single byte of any bitmap. The peak memory " +
+      "rows are the only ones that see native memory at all.",
+  )
+  if (AllocationSnapshot.threadsLost > 0) {
+    println(
+      "WARNING: ${AllocationSnapshot.threadsLost} threads exited part way through a measured " +
+        "block. A thread takes its allocation counter with it, so whatever it had allocated " +
+        "since that block started is missing: those rows are lower bounds.",
+    )
+  }
+}
+
+/** Every published row, in the order they are taken. A spread child runs exactly this. */
+private fun everyScenario() {
   coldLoad()
   memoryCacheHit()
   allocations()
   coalescing()
   nearIdenticalSizes()
+  occupancyComparison()
+  diskKeyComparison()
   decodeComparison()
+  peakMemoryComparison()
   composeComparison()
-
-  println("=".repeat(96))
-  println("Percentiles over the reported iteration count. Lower is better.")
-  println("The ratio on each second row is Coil measured against landscapist.")
+  scrollComparison()
+  firstFrameComparison()
 }
 
 private fun coilVersion(): String = "3.6.2"
 
-/**
- * Every load misses the cache, so this is the cost of driving one request end to end through the
- * engine with the fetch itself made free.
- */
+/** Every load misses the cache: one request end to end with the fetch itself made free. */
 private fun coldLoad() {
   val landscapistCounter = FetchCounter()
   val coilCounter = FetchCounter()
@@ -73,26 +106,31 @@ private fun coldLoad() {
   val iterations = 2_000
   val warmups = 500
 
-  val landscapistSamples = measure("landscapist", warmups, iterations) { i ->
-    runBlocking {
-      landscapist.load(landscapistRequest("https://example.com/cold-$i.jpg"))
-        .first { it is ImageResult.Success }
-    }
-  }
-  settle()
-  val coilSamples = measure("coil", warmups, iterations) { i ->
-    runBlocking {
-      val result = coil.execute(coilRequest("https://example.com/cold-$i.jpg"))
-      check(result is SuccessResult) { "coil failed: $result" }
-    }
-  }
+  val (landscapistSamples, coilSamples) = measurePaired(
+    firstLabel = "landscapist",
+    secondLabel = "coil",
+    warmups = warmups,
+    iterations = iterations,
+    first = { i ->
+      runBlocking {
+        landscapist.load(landscapistRequest("https://example.com/cold-$i.jpg"))
+          .first { it is ImageResult.Success }
+      }
+    },
+    second = { i ->
+      runBlocking {
+        val result = coil.execute(coilRequest("https://example.com/cold-$i.jpg"))
+        check(result is SuccessResult) { "coil failed: $result" }
+      }
+    },
+  )
 
+  Metrics.record("engine.cold-load.landscapist.ns", landscapistSamples.p50)
+  Metrics.record("engine.cold-load.coil.ns", coilSamples.p50)
   report("cold load (unique model)", landscapistSamples, coilSamples)
 }
 
-/**
- * The same model over and over, which is what a scrolling list mostly does once it has warmed up.
- */
+/** The same model over and over, which is what a warmed up scrolling list mostly does. */
 private fun memoryCacheHit() {
   val landscapist = newLandscapist(FetchCounter())
   val coil = newCoil(FetchCounter())
@@ -106,26 +144,36 @@ private fun memoryCacheHit() {
   val iterations = 20_000
   val warmups = 5_000
 
-  val landscapistSamples = measure("landscapist", warmups, iterations) {
-    runBlocking {
-      val result = landscapist.load(landscapistRequest(model)).first { it is ImageResult.Success }
-      check((result as ImageResult.Success).dataSource == DataSource.MEMORY)
-    }
-  }
-  settle()
-  val coilSamples = measure("coil", warmups, iterations) {
-    runBlocking {
-      val result = coil.execute(coilRequest(model))
-      check(result is SuccessResult && result.dataSource == coil3.decode.DataSource.MEMORY_CACHE)
-    }
-  }
+  val (landscapistSamples, coilSamples) = measurePaired(
+    firstLabel = "landscapist",
+    secondLabel = "coil",
+    warmups = warmups,
+    iterations = iterations,
+    first = {
+      runBlocking {
+        val result = landscapist.load(landscapistRequest(model))
+          .first { it is ImageResult.Success }
+        check((result as ImageResult.Success).dataSource == DataSource.MEMORY)
+      }
+    },
+    second = {
+      runBlocking {
+        val result = coil.execute(coilRequest(model))
+        check(result is SuccessResult && result.dataSource == coil3.decode.DataSource.MEMORY_CACHE)
+      }
+    },
+  )
 
-  report("memory cache hit", landscapistSamples, coilSamples)
+  Metrics.record("engine.memory-hit.landscapist.ns", landscapistSamples.p50)
+  Metrics.record("engine.memory-hit.coil.ns", coilSamples.p50)
 
   // The synchronous probe landscapist-image uses on the first frame, with no coroutine at all.
   val peek = measure("landscapist peek", warmups, iterations) {
     check(landscapist.peekMemoryCache(landscapistRequest(model)) != null)
   }
+  Metrics.record("engine.peek.landscapist.ns", peek.p50)
+
+  report("memory cache hit", landscapistSamples, coilSamples)
   println(
     String.format(
       java.util.Locale.ROOT,
@@ -173,6 +221,9 @@ private fun allocations() {
     }
   }
 
+  Metrics.record("engine.memory-hit.landscapist.bytes", landscapistBytes / rounds)
+  Metrics.record("engine.memory-hit.coil.bytes", coilBytes / rounds)
+
   println("allocation per memory cache hit")
   println("  landscapist    ${(landscapistBytes / rounds).formatBytes()}")
   println("  coil           ${(coilBytes / rounds).formatBytes()}")
@@ -180,34 +231,43 @@ private fun allocations() {
 }
 
 /**
- * The same image asked for at sizes that differ by a pixel or two, which is what a grid produces
- * when its columns do not divide evenly. Counts how many times each engine went back to the fetcher
- * rather than reusing the bitmap it already had.
+ * The same image asked for at sizes that differ by a pixel or two, counting how many times each
+ * engine went back to the fetcher rather than reusing the bitmap it had.
  */
 private fun nearIdenticalSizes() {
-  val landscapistCounter = FetchCounter()
-  val coilCounter = FetchCounter()
-  val landscapist = newLandscapist(landscapistCounter)
-  val coil = newCoil(coilCounter)
-  val model = "https://example.com/grid-item.jpg"
-  val widths = listOf(360, 359, 361, 360, 358, 360)
-
-  runBlocking {
-    for (width in widths) {
-      landscapist.load(landscapistRequest(model, width)).first { it is ImageResult.Success }
-      coil.execute(coilRequest(model, width))
+  // More than one sequence, because only some of them flatter either side. A shrinking sequence
+  // is where they part: Coil reuses the large entry however far it scales down, landscapist
+  // refuses anything more than twice the size it is drawing into.
+  val sequences = listOf(
+    "a grid jittering by a pixel" to listOf(360, 359, 361, 360, 358, 360),
+    "the same grid, ascending" to listOf(358, 359, 360, 361, 362, 363),
+    "an image growing into a transition" to listOf(120, 200, 320, 480, 640, 800),
+    "the same transition, shrinking" to listOf(800, 640, 480, 320, 200, 120),
+  )
+  println("fetches for one image asked for at six sizes in a row")
+  for ((name, widths) in sequences) {
+    val landscapistCounter = FetchCounter()
+    val coilCounter = FetchCounter()
+    val landscapist = newLandscapist(landscapistCounter)
+    val coil = newCoil(coilCounter)
+    val model = "https://example.com/grid-item.jpg"
+    runBlocking {
+      for (width in widths) {
+        landscapist.load(landscapistRequest(model, width)).first { it is ImageResult.Success }
+        coil.execute(coilRequest(model, width))
+      }
     }
+    println(
+      "  ${name.padEnd(36)}landscapist ${landscapistCounter.count.get()}, " +
+        "coil ${coilCounter.count.get()}   $widths",
+    )
   }
-
-  println("same image at ${widths.size} near identical sizes $widths")
-  println("  landscapist    ${landscapistCounter.count.get()} fetch(es)")
-  println("  coil           ${coilCounter.count.get()} fetch(es)")
   println()
 }
 
 /**
- * Many callers asking for the same image at once, which is what a list does when several items show
- * the same avatar. Counts how many times each engine actually reached the fetcher.
+ * Many callers asking for the same image at once, counting how many times each engine actually
+ * reached the fetcher.
  */
 private fun coalescing() {
   val concurrency = 32

@@ -53,11 +53,36 @@ public class LruMemoryCache(
   }
 
   override fun getIgnoringSize(key: CacheKey): CachedImage? = synchronized(lock) {
-    val memoryKey = variantIndex.variantsOf(key.baseKey).firstOrNull { cache.containsKey(it) }
+    val memoryKey = variantIndex.variantsOf(key.baseKey)
+      .firstOrNull { cache.containsKey(it.memoryKey) }?.memoryKey
       ?: return@synchronized null
     // Re-insert to update access order: an entry reached this way is about to be drawn, so it
     // should not keep ageing toward eviction.
     cache.remove(memoryKey)?.also { image -> cache[memoryKey] = image }
+  }
+
+  override fun getMatching(
+    key: CacheKey,
+    isAcceptable: (CacheKey, CachedImage) -> Boolean,
+  ): CachedImage? = synchronized(lock) {
+    val exact = key.memoryKey
+    cache[exact]?.let { image ->
+      cache.remove(exact)
+      cache[exact] = image
+      return@synchronized image
+    }
+    // Every variant is offered, not just the newest: a thumbnail cached a moment ago must not hide
+    // the full sized entry behind it. Only the accepted one is re-inserted, so a rejected variant
+    // keeps ageing exactly as it was.
+    for (variant in variantIndex.variantsOf(key.baseKey)) {
+      val memoryKey = variant.memoryKey
+      val image = cache[memoryKey] ?: continue
+      if (!isAcceptable(variant, image)) continue
+      cache.remove(memoryKey)
+      cache[memoryKey] = image
+      return@synchronized image
+    }
+    null
   }
 
   override fun set(key: CacheKey, image: CachedImage): Unit = synchronized(lock) {

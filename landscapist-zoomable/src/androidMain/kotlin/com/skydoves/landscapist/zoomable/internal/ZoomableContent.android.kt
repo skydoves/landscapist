@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -34,9 +35,11 @@ import com.skydoves.landscapist.zoomable.LocalImageRegionDecoder
 import com.skydoves.landscapist.zoomable.ZoomableConfig
 import com.skydoves.landscapist.zoomable.ZoomableState
 import com.skydoves.landscapist.zoomable.subsampling.ImageRegionDecoder
+import com.skydoves.landscapist.zoomable.subsampling.MinZoomForTiles
 import com.skydoves.landscapist.zoomable.subsampling.SubSamplingImage
 import com.skydoves.landscapist.zoomable.subsampling.rememberSubSamplingState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 /**
@@ -104,8 +107,7 @@ internal actual fun ZoomableContent(
       config = config.subSamplingConfig,
     )
 
-    // Show SubSamplingImage with the original content as placeholder
-    // The original content is shown until the base tile is loaded
+    // The caller's content and the tiles, with the tiles taking over once the image is zoomed
     SubSamplingImageWithPlaceholder(
       subSamplingState = subSamplingState,
       zoomableState = zoomableState,
@@ -127,7 +129,17 @@ internal actual fun ZoomableContent(
 }
 
 /**
- * SubSamplingImage with placeholder content shown until the base tile is loaded.
+ * The tiled image and the caller's own content, with one of the two on screen at a time.
+ *
+ * The tiles take over only once the image is zoomed past [MinZoomForTiles], which is the zoom the
+ * state starts loading foreground tiles at. Below it the tiles are one RGB_565 sample of the whole
+ * image while the content is a full decode of the same picture, drawn with whatever the caller's
+ * plugins put on it, so handing the node to the tiles as soon as a base tile arrived lost quality
+ * and cut every painter plugin short. A circular reveal ran its animation to the end against a
+ * subtree that had already been taken off the screen, which is why it looked like it never ran.
+ *
+ * Both stay composed either way. Removing one and putting it back when the zoom crosses the
+ * threshold would rebuild it, and a rebuilt reveal starts again from nothing.
  */
 @Composable
 private fun SubSamplingImageWithPlaceholder(
@@ -138,11 +150,24 @@ private fun SubSamplingImageWithPlaceholder(
   onTap: ((Offset) -> Unit)?,
   content: @Composable () -> Unit,
 ) {
-  val isBaseLoaded = subSamplingState.isBaseLoaded
+  // Latched, not tracked. The tiles are drawn fitted inside the box while the content fills it,
+  // so the two do not frame the image the same way and every crossing of the threshold would move
+  // the picture. Handing over once, on the first deliberate zoom, is one re-frame where the user
+  // is already changing the framing, instead of one per pinch.
+  val handedOver = remember(subSamplingState) { mutableStateOf(false) }
+  LaunchedEffect(subSamplingState, zoomableState) {
+    snapshotFlow {
+      subSamplingState.isBaseLoaded &&
+        zoomableState.transformation.scaleValue >= MinZoomForTiles
+    }.first { it }
+    handedOver.value = true
+  }
+  val tilesInUse = handedOver.value
 
   Box(modifier = Modifier.clipToBounds()) {
-    // Always render SubSamplingImage so it can initialize and load tiles
+    // Composed at every zoom, so it sizes the grid, loads the base tile and owns the gestures.
     SubSamplingImage(
+      modifier = if (tilesInUse) Modifier else Modifier.notDrawn(),
       subSamplingState = subSamplingState,
       zoomableState = zoomableState,
       config = config,
@@ -150,15 +175,13 @@ private fun SubSamplingImageWithPlaceholder(
       onTap = onTap,
     )
 
-    // Show original content as placeholder on top until base tile is loaded
-    if (!isBaseLoaded) {
-      StandardZoomableContent(
-        zoomableState = zoomableState,
-        config = config,
-        enabled = false, // Disable gestures on placeholder
-        content = content,
-      )
-    }
+    StandardZoomableContent(
+      modifier = if (tilesInUse) Modifier.notDrawn() else Modifier,
+      zoomableState = zoomableState,
+      config = config,
+      enabled = false, // The tiled image below owns the gestures.
+      content = content,
+    )
   }
 }
 
@@ -170,13 +193,14 @@ internal fun StandardZoomableContent(
   zoomableState: ZoomableState,
   config: ZoomableConfig,
   enabled: Boolean,
+  modifier: Modifier = Modifier,
   onTap: ((Offset) -> Unit)? = null,
   content: @Composable () -> Unit,
 ) {
   val transformation = zoomableState.transformation
 
   Box(
-    modifier = Modifier
+    modifier = modifier
       .clipToBounds()
       .onSizeChanged { size ->
         zoomableState.setLayoutSize(size)

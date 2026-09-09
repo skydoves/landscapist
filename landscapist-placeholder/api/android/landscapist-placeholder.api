@@ -11,6 +11,8 @@ public final class com/skydoves/landscapist/placeholder/blurhash/BlurHashPlugin 
 	public fun <init> (Ljava/lang/String;IIF)V
 	public synthetic fun <init> (Ljava/lang/String;IIFILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
 }
 
 public abstract class com/skydoves/landscapist/placeholder/placeholder/PlaceholderPlugin {
@@ -60,6 +62,8 @@ public final class com/skydoves/landscapist/placeholder/progressive/ProgressiveL
 	public fun <init> (FI)V
 	public synthetic fun <init> (FIILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
 }
 
 public final class com/skydoves/landscapist/placeholder/progressive/ProgressiveLoadingPlugin$Companion {
@@ -199,6 +203,8 @@ public final class com/skydoves/landscapist/placeholder/thumbhash/ThumbHashPlugi
 	public static final field Companion Lcom/skydoves/landscapist/placeholder/thumbhash/ThumbHashPlugin$Companion;
 	public fun <init> ([B)V
 	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
 }
 
 public final class com/skydoves/landscapist/placeholder/thumbhash/ThumbHashPlugin$Companion {
@@ -210,5 +216,7 @@ public final class com/skydoves/landscapist/placeholder/thumbnail/ThumbnailPlugi
 	public synthetic fun <init> (JILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun <init> (JLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun compose (Landroidx/compose/ui/Modifier;Lcom/skydoves/landscapist/ImageOptions;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)Lcom/skydoves/landscapist/plugins/ImagePlugin;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
 }
 

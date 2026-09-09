@@ -176,6 +176,9 @@ fun GalleryDemoScreen(paddingValues: PaddingValues) {
           modifier = Modifier.fillMaxSize(),
           state = viewerState,
           component = component,
+          // Fit, because a viewer's job is to show the whole photo. It does not match the grid's
+          // Crop, so the picture is reframed on the frame the shared element hands over. See the
+          // note in docs/gallery.md: matching them removes that, at the cost of the edges.
           imageOptions = ImageOptions(contentScale = ContentScale.Fit),
           onDismiss = { showViewer = false },
           onImageTap = { /* could toggle UI overlays */ },

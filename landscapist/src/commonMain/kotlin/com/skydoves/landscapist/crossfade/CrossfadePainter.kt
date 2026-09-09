@@ -1,0 +1,206 @@
+/*
+ * Designed and developed by 2020-2023 skydoves (Jaewoong Eum)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.skydoves.landscapist.crossfade
+
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.isUnspecified
+import androidx.compose.ui.geometry.toRect
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.withSaveLayer
+import com.skydoves.landscapist.InternalLandscapistApi
+import kotlinx.coroutines.launch
+
+/**
+ * Fades [painter] in, in the drawing rather than in the composition.
+ *
+ * The same effect as the crossfade modifiers: opacity over half the duration, brightness over three
+ * quarters of it, saturation over all of it. Doing it in the drawing is what lets a crossfaded image
+ * keep the path where the container draws it and nothing is composed inside.
+ *
+ * An image replacing one on screen dissolves over it, so the composite never dips through
+ * transparent. Loading and failure content is not a painter, so an image with any still goes
+ * through [CrossfadeWithEffect].
+ */
+internal class CrossfadePainter(
+  private val painter: Painter,
+  outgoing: Painter?,
+) : Painter() {
+
+  /**
+   * What is being replaced, dropped the moment the fade no longer needs it.
+   *
+   * A var rather than a constructor val: this painter outlives the animation, and a val would keep
+   * the previous bitmap reachable for as long as this one is on screen.
+   */
+  private var outgoing: Painter? = outgoing
+
+  var alpha: Float by mutableFloatStateOf(0f)
+  var brightness: Float by mutableFloatStateOf(INITIAL_BRIGHTNESS)
+  var saturation: Float by mutableFloatStateOf(0f)
+
+  // Held rather than allocated per draw: onDraw runs on every frame of the animation.
+  private val colorMatrix = ColorMatrix()
+  private val paint = Paint()
+
+  override fun DrawScope.onDraw() {
+    val alphaValue = alpha
+    val brightnessValue = brightness
+    val saturationValue = saturation
+    if (alphaValue >= 1f && brightnessValue >= 1f && saturationValue >= 1f) {
+      outgoing = null
+      with(painter) { draw(size) }
+      return
+    }
+    // Underneath at full strength, so the composite never dips through transparent. Null on a
+    // first load, where nothing was on screen to begin with.
+    outgoing?.let { drawOutgoing(it) }
+    colorMatrix.apply {
+      updateBrightness(brightnessValue)
+      updateSaturation(saturationValue)
+    }
+    paint.colorFilter = ColorFilter.colorMatrix(colorMatrix)
+    paint.alpha = alphaValue
+    drawIntoCanvas { canvas ->
+      canvas.withSaveLayer(size.toRect(), paint) {
+        with(painter) { draw(size) }
+      }
+    }
+  }
+
+  /**
+   * The outgoing painter, covering the box the incoming one is drawn into.
+   *
+   * The layout was measured against the arriving image, so drawing the outgoing one straight into
+   * that box would stretch it whenever the two are shaped differently.
+   */
+  private fun DrawScope.drawOutgoing(outgoing: Painter) {
+    val intrinsic = outgoing.intrinsicSize
+    if (intrinsic.isUnspecified || intrinsic.width <= 0f || intrinsic.height <= 0f) {
+      with(outgoing) { draw(size) }
+      return
+    }
+    val scale = maxOf(size.width / intrinsic.width, size.height / intrinsic.height)
+    val covered = Size(intrinsic.width * scale, intrinsic.height * scale)
+    if (covered == size) {
+      with(outgoing) { draw(size) }
+      return
+    }
+    clipRect {
+      translate((size.width - covered.width) / 2f, (size.height - covered.height) / 2f) {
+        with(outgoing) { draw(covered) }
+      }
+    }
+  }
+
+  override val intrinsicSize: Size get() = painter.intrinsicSize
+
+  private companion object {
+    const val INITIAL_BRIGHTNESS = 0.8f
+  }
+}
+
+/**
+ * Fades this painter in over [durationMs], restarting whenever the painter itself changes.
+ *
+ * The first painter seen is not faded: an image read from the memory cache is already on screen.
+ * Every painter after it replaces something the viewer can see, so it dissolves over it.
+ *
+ * @param durationMs How long the fade takes from start to finish. Zero returns this painter as it
+ * is.
+ * @param keepPreviousWhileAbsent Whether a null [painter] keeps what is on screen rather than
+ * blanking it. True while an image is reloading, false once it has failed or been cleared.
+ */
+@Composable
+@InternalLandscapistApi
+public fun rememberCrossfadePainter(
+  painter: Painter?,
+  durationMs: Int,
+  keepPreviousWhileAbsent: Boolean = false,
+): Painter? {
+  if (durationMs <= 0) return painter
+  // Remembered whether there is a painter yet or not, so these survive the image leaving its
+  // success state and coming back. Held in a holder rather than as state: they are read and written
+  // only inside remember, which runs once per painter.
+  val seen = remember { PainterHistory() }
+  if (!seen.started) {
+    seen.started = true
+    seen.first = painter
+  }
+  if (painter == null) {
+    // A reload has no painter yet. Holding the one on screen is what stops the image blanking
+    // while the replacement is fetched, and it is what the composable this replaced did by keeping
+    // the outgoing state until the incoming one arrived.
+    if (keepPreviousWhileAbsent) return seen.previous
+    // Otherwise the image has left its success state for good. Keeping it as the thing to dissolve
+    // over would bring it back underneath the next one, which reads as the replaced image flashing
+    // in again after the gap.
+    seen.previous = null
+    return null
+  }
+  if (painter === seen.first) {
+    // The painter this composable first had is what the viewer is already looking at, and fading it
+    // in from nothing is the blink a crossfade exists to prevent.
+    seen.previous = painter
+    return painter
+  }
+  // Past the painter this composable started with. Held any longer, that first bitmap stays
+  // reachable for as long as the composable lives, on top of the one being dissolved over.
+  seen.first = null
+  val fading = remember(painter) {
+    CrossfadePainter(painter, seen.previous).also { seen.previous = painter }
+  }
+  LaunchedEffect(fading) {
+    val alpha = Animatable(0f)
+    val brightness = Animatable(0.8f)
+    val saturation = Animatable(0f)
+    launch {
+      alpha.animateTo(1f, tween(durationMillis = durationMs / 2)) { fading.alpha = value }
+    }
+    launch {
+      brightness.animateTo(1f, tween(durationMillis = durationMs * 3 / 4)) {
+        fading.brightness = value
+      }
+    }
+    launch {
+      saturation.animateTo(1f, tween(durationMillis = durationMs)) { fading.saturation = value }
+    }
+  }
+  return fading
+}
+
+/** The painter this image showed last, so the next one has something to dissolve over. */
+private class PainterHistory {
+  var previous: Painter? = null
+
+  /** The painter this composable was first given, dropped once it is no longer the current one. */
+  var first: Painter? = null
+  var started: Boolean = false
+}

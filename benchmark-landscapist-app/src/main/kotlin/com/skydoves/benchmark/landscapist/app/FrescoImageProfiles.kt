@@ -15,32 +15,23 @@
  */
 package com.skydoves.benchmark.landscapist.app
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.components.LocalImageComponent
 import com.skydoves.landscapist.fresco.FrescoImage
+import com.skydoves.landscapist.fresco.FrescoImageState
 
+/** landscapist-fresco, which is this library's Compose layer over the Fresco pipeline. */
 @Composable
-fun FrescoImageList(urls: List<String>, modifier: Modifier = Modifier) {
-  LazyColumn(modifier = modifier.fillMaxSize()) {
-    items(urls) { url ->
-      FrescoImage(
-        modifier = Modifier
-          .fillMaxWidth()
-          .height(BenchmarkImages.ITEM_HEIGHT_DP.dp)
-          .testTag("FrescoImage"),
-        imageUrl = url,
-        component = LocalImageComponent.current,
-        imageOptions = ImageOptions(tag = "FrescoImage"),
-      )
-    }
+internal fun FrescoWrapperImageList(
+  urls: List<String>,
+  tag: String,
+  modifier: Modifier = Modifier,
+) {
+  BenchmarkList(urls, tag, modifier) { url, itemModifier, onLoaded ->
+    FrescoImage(
+      imageUrl = url,
+      modifier = itemModifier,
+      onImageStateChanged = { if (it is FrescoImageState.Success) onLoaded() },
+    )
   }
 }

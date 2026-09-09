@@ -97,6 +97,14 @@ public class ProgressiveLoadingPlugin(
       transitionDuration = 500,
     )
   }
+
+  override fun equals(other: Any?): Boolean = this === other || (
+    other is ProgressiveLoadingPlugin &&
+      initialBlurRadius == other.initialBlurRadius &&
+      transitionDuration == other.transitionDuration
+    )
+
+  override fun hashCode(): Int = 31 * initialBlurRadius.hashCode() + transitionDuration
 }
 
 /**

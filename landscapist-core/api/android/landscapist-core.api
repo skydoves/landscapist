@@ -2,6 +2,7 @@ public final class com/skydoves/landscapist/core/AndroidBuilder {
 	public fun <init> (Landroid/content/Context;)V
 	public final fun build ()Lcom/skydoves/landscapist/core/Landscapist;
 	public final fun config (Lcom/skydoves/landscapist/core/LandscapistConfig;)Lcom/skydoves/landscapist/core/AndroidBuilder;
+	public final fun noDiskCache ()Lcom/skydoves/landscapist/core/AndroidBuilder;
 }
 
 public final class com/skydoves/landscapist/core/BitmapConfig {
@@ -116,6 +117,7 @@ public final class com/skydoves/landscapist/core/Landscapist$Builder {
 	public final fun dispatcher (Lkotlinx/coroutines/CoroutineDispatcher;)Lcom/skydoves/landscapist/core/Landscapist$Builder;
 	public final fun fetcher (Lcom/skydoves/landscapist/core/network/ImageFetcher;)Lcom/skydoves/landscapist/core/Landscapist$Builder;
 	public final fun memoryCache (Lcom/skydoves/landscapist/core/cache/MemoryCache;)Lcom/skydoves/landscapist/core/Landscapist$Builder;
+	public final fun noDiskCache ()Lcom/skydoves/landscapist/core/Landscapist$Builder;
 }
 
 public final class com/skydoves/landscapist/core/Landscapist$Companion {
@@ -345,6 +347,7 @@ public final class com/skydoves/landscapist/core/cache/LruMemoryCache : com/skyd
 	public fun get (Lcom/skydoves/landscapist/core/cache/CacheKey;)Lcom/skydoves/landscapist/core/cache/CachedImage;
 	public fun getCount ()I
 	public fun getIgnoringSize (Lcom/skydoves/landscapist/core/cache/CacheKey;)Lcom/skydoves/landscapist/core/cache/CachedImage;
+	public fun getMatching (Lcom/skydoves/landscapist/core/cache/CacheKey;Lkotlin/jvm/functions/Function2;)Lcom/skydoves/landscapist/core/cache/CachedImage;
 	public fun getMaxSize ()J
 	public fun getSize ()J
 	public fun remove (Lcom/skydoves/landscapist/core/cache/CacheKey;)Z
@@ -358,6 +361,7 @@ public abstract interface class com/skydoves/landscapist/core/cache/MemoryCache 
 	public abstract fun get (Lcom/skydoves/landscapist/core/cache/CacheKey;)Lcom/skydoves/landscapist/core/cache/CachedImage;
 	public fun getCount ()I
 	public fun getIgnoringSize (Lcom/skydoves/landscapist/core/cache/CacheKey;)Lcom/skydoves/landscapist/core/cache/CachedImage;
+	public fun getMatching (Lcom/skydoves/landscapist/core/cache/CacheKey;Lkotlin/jvm/functions/Function2;)Lcom/skydoves/landscapist/core/cache/CachedImage;
 	public abstract fun getMaxSize ()J
 	public abstract fun getSize ()J
 	public abstract fun remove (Lcom/skydoves/landscapist/core/cache/CacheKey;)Z
@@ -369,6 +373,7 @@ public abstract interface class com/skydoves/landscapist/core/cache/MemoryCache 
 public final class com/skydoves/landscapist/core/cache/MemoryCache$DefaultImpls {
 	public static fun getCount (Lcom/skydoves/landscapist/core/cache/MemoryCache;)I
 	public static fun getIgnoringSize (Lcom/skydoves/landscapist/core/cache/MemoryCache;Lcom/skydoves/landscapist/core/cache/CacheKey;)Lcom/skydoves/landscapist/core/cache/CachedImage;
+	public static fun getMatching (Lcom/skydoves/landscapist/core/cache/MemoryCache;Lcom/skydoves/landscapist/core/cache/CacheKey;Lkotlin/jvm/functions/Function2;)Lcom/skydoves/landscapist/core/cache/CachedImage;
 	public static fun resize (Lcom/skydoves/landscapist/core/cache/MemoryCache;J)V
 }
 
@@ -380,6 +385,7 @@ public final class com/skydoves/landscapist/core/cache/TwoTierMemoryCache : com/
 	public fun get (Lcom/skydoves/landscapist/core/cache/CacheKey;)Lcom/skydoves/landscapist/core/cache/CachedImage;
 	public fun getCount ()I
 	public fun getIgnoringSize (Lcom/skydoves/landscapist/core/cache/CacheKey;)Lcom/skydoves/landscapist/core/cache/CachedImage;
+	public fun getMatching (Lcom/skydoves/landscapist/core/cache/CacheKey;Lkotlin/jvm/functions/Function2;)Lcom/skydoves/landscapist/core/cache/CachedImage;
 	public fun getMaxSize ()J
 	public fun getSize ()J
 	public final fun getStrongCacheCount ()I

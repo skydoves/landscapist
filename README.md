@@ -91,12 +91,12 @@ Landscapist Core is **exceptionally lightweight** compared to other image loadin
 
 | Library | Module | Release AAR | vs landscapist-core |
 |---------|--------|-------------|---------------------|
-| **landscapist-core** | `landscapist-core` | **313 KiB** | baseline |
-| Coil3 | `coil-core` 3.5.0 | 468 KiB | +50% |
-| Glide | `glide` 5.0.7 | 693 KiB | +121% |
-| Fresco | core pipeline artifacts | ~1.0 MiB | roughly 3.3x |
+| **landscapist-core** | `landscapist-core` | **371 KiB** | baseline |
+| Coil3 | `coil-core` 3.6.2 | 469 KiB | +26% |
+| Glide | `glide` 5.0.9 | 701 KiB | +89% |
+| Fresco | core pipeline artifacts | 1.11 MiB | 3.06x |
 
-Reproduce with `./gradlew :landscapist-core:assembleRelease && ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar` (320,771 bytes = 313 KiB). This is a single module's AAR, not the full transitive footprint.
+Reproduce with `./gradlew :landscapist-core:assembleRelease && ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar` (379,990 bytes = 371 KiB). This is a single module's AAR, not the full transitive footprint.
 
 Load-time and memory numbers are not published here because they depend on device, OS, and network. Run the included benchmarks (`ImageLibraryBenchmark` instrumentation test and the `:benchmark-landscapist` macrobenchmark) on your own hardware. See the [performance comparison](https://skydoves.github.io/landscapist/landscapist/performance-comparison/) for methodology.
 
@@ -237,6 +237,19 @@ val landscapist = Landscapist.builder(context)
     )
     .build()
 ```
+
+Leaving the disk cache unset falls through to the default one on disk. Use `noDiskCache()` for a
+loader that writes nothing to disk, and reads nothing back from it:
+
+```kotlin
+val landscapist = Landscapist.builder(context)
+    .noDiskCache()
+    .build()
+```
+
+The disk cache is keyed by the URL, so one download answers every size an image is drawn at. Any
+headers the request carries scope both that key and the memory key, so two requests for one URL with
+different headers do not share an entry.
 
 <div class="header">
   <h1>Landscapist Image</h1>
@@ -383,6 +396,31 @@ when (currentState) {
 }
 ```
 
+### Drawing the image yourself
+
+A `LandscapistImage` with no slot and no plugin is a single layout node, which draws the image
+itself. Add a `loading`, `success` or `failure` slot or an `ImagePlugin` and it becomes a container,
+and it composes a child inside that container when something actually has to go there. A
+`CrossfadePlugin` does not, since the fade happens inside the painter, and neither does a
+`PainterPlugin` such as `BlurTransformationPlugin`, since the container draws through it.
+
+When all you want is the image, `rememberImagePainter` gives you the painter on its own
+and you keep the node:
+
+```kotlin
+import com.skydoves.landscapist.image.rememberImagePainter
+
+Image(
+    painter = rememberImagePainter(model = "https://example.com/image.jpg"),
+    contentDescription = null,
+    modifier = Modifier.size(120.dp)
+)
+```
+
+It reads the memory cache while it composes, so an already loaded image is drawn in the first frame,
+and it takes the size to decode at from the first draw. There are no loading or failure slots here,
+no `ImagePlugin` and no crossfade, since each of those needs something composed around the image.
+
 ### Supported Image Sources
 
 `LandscapistImage` supports various image sources including network URLs, local files, drawable resources, and more. See the [Landscapist Image documentation](https://skydoves.github.io/landscapist/landscapist-image/#supported-image-sources) for a complete list of supported image sources per platform.
@@ -413,7 +451,7 @@ dependencies {
 }
 ```
 
-> **Note**: `Landscapist-Glide` includes version `4.16.0` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
+> **Note**: `Landscapist-Glide` includes version `5.0.9` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### GlideImage
 You can load images simply by using `GlideImage` composable function as the following example below:
@@ -877,6 +915,7 @@ You can compose supported image plugins by Landscapist or you can create your ow
 - **LoadingStatePlugin**: A pluggable state plugin that will be composed while the state is `ImageLoadState.Loading`.
 - **SuccessStatePlugin**: A pluggable state plugin that will be composed when the state is `ImageLoadState.Success`.
 - **FailureStatePlugin**: A pluggable state plugin that will be composed when the state is `ImageLoadState.Failure`.
+- **ComposablePlugin**: A plugin that wraps the image in composable content of its own, such as `ZoomablePlugin`.
 
 For example, you can implement your own `LoadingStatePlugin` that will be composed while loading an image like the below:
 
@@ -902,6 +941,11 @@ data class LoadingPlugin(val source: Any?) : ImagePlugin.LoadingStatePlugin {
   }
 }
 ```
+
+Note the `data class`. A plugin set is compared to decide whether the component an image was handed
+has changed, and images skip when it has not, so a plugin the runtime cannot compare is a new value
+on every composition and costs every image carrying it its skipping. Make a custom plugin a data
+class, or give it `equals` and `hashCode` over whatever configures it.
 
 Next, you can compose plugins by adding them in the `rememberImageComponent` like the below:
 

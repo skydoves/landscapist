@@ -127,6 +127,13 @@ public class ThumbHashPlugin(
       return output.copyOf(outputIndex)
     }
   }
+
+  // contentEquals, because the hash is the whole of this plugin's configuration and two callers
+  // holding the same hash hold equal arrays rather than the same one.
+  override fun equals(other: Any?): Boolean =
+    this === other || (other is ThumbHashPlugin && thumbHash.contentEquals(other.thumbHash))
+
+  override fun hashCode(): Int = thumbHash.contentHashCode()
 }
 
 /**

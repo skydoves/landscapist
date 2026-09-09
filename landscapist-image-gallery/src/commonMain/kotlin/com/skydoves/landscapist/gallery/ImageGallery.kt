@@ -108,7 +108,7 @@ public fun ImageGallery(
   ),
   aspectRatio: Float = ImageGalleryDefaults.AspectRatio,
   component: ImageComponent = rememberImageComponent {},
-  imageOptions: ImageOptions = ImageOptions(),
+  imageOptions: ImageOptions = ImageOptions.Default,
   onImageClick: ((index: Int, imageModel: Any) -> Unit)? = null,
   onImageLongClick: ((index: Int, imageModel: Any) -> Unit)? = null,
   selectable: Boolean = false,

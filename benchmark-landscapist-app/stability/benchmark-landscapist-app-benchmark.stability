@@ -5,34 +5,66 @@
 //   ./gradlew :benchmark-landscapist-app:stabilityDump
 
 @Composable
-public fun com.skydoves.benchmark.landscapist.app.Coil3ImageList(urls: kotlin.collections.List<kotlin.String>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun com.skydoves.benchmark.landscapist.app.BenchmarkList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction2<@[ParameterName(name = \): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - urls: RUNTIME (requires runtime check)
+    - tag: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - content: STABLE (composable function type)
+
+@Composable
+internal fun com.skydoves.benchmark.landscapist.app.CoilAsyncImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - urls: RUNTIME (requires runtime check)
+    - tag: STABLE (String is immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun com.skydoves.benchmark.landscapist.app.FrescoImageList(urls: kotlin.collections.List<kotlin.String>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun com.skydoves.benchmark.landscapist.app.CoilWrapperImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - urls: RUNTIME (requires runtime check)
+    - tag: STABLE (String is immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun com.skydoves.benchmark.landscapist.app.GlideImageList(urls: kotlin.collections.List<kotlin.String>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun com.skydoves.benchmark.landscapist.app.FrescoWrapperImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - urls: RUNTIME (requires runtime check)
+    - tag: STABLE (String is immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun com.skydoves.benchmark.landscapist.app.LandscapistImageList(urls: kotlin.collections.List<kotlin.String>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun com.skydoves.benchmark.landscapist.app.GlideWrapperImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - urls: RUNTIME (requires runtime check)
+    - tag: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.skydoves.benchmark.landscapist.app.LandscapistImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - urls: RUNTIME (requires runtime check)
+    - tag: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.skydoves.benchmark.landscapist.app.LandscapistPluginImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - urls: RUNTIME (requires runtime check)
+    - tag: STABLE (String is immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
 

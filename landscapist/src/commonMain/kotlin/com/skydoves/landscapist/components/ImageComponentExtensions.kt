@@ -16,6 +16,7 @@
 package com.skydoves.landscapist.components
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntSize
@@ -42,8 +43,20 @@ public fun ImageComponent.ComposeLoadingStatePlugins(
   imageOptions: ImageOptions,
   executor: @Composable (IntSize) -> Unit,
 ) {
-  imagePlugins.filterIsInstance<ImagePlugin.LoadingStatePlugin>().forEach { plugin ->
-    plugin.compose(modifier = modifier, imageOptions = imageOptions, executor = executor)
+  val plugins = imagePlugins
+  var seen = 0
+  for (index in plugins.indices) {
+    val plugin = plugins[index]
+    if (plugin is ImagePlugin.LoadingStatePlugin) {
+      // Keyed on the plugin's kind and on how many plugins ran before it. The instance itself
+      // would do, except that a plugin with no value equality is a new object on every composition
+      // and keying on it would throw away whatever it remembered each time. Drop one of two
+      // plugins of the same kind and the other takes over its group, and with it whatever it had
+      // remembered, which is the price of a key that does not follow the instance.
+      key(plugin::class, seen++) {
+        plugin.compose(modifier = modifier, imageOptions = imageOptions, executor = executor)
+      }
+    }
   }
 }
 
@@ -56,13 +69,20 @@ public fun ImageComponent.ComposeSuccessStatePlugins(
   imageOptions: ImageOptions,
   imageBitmap: ImageBitmap?,
 ) {
-  imagePlugins.filterIsInstance<ImagePlugin.SuccessStatePlugin>().forEach { plugin ->
-    plugin.compose(
-      modifier = modifier,
-      imageModel = imageModel,
-      imageOptions = imageOptions,
-      imageBitmap = imageBitmap,
-    )
+  val plugins = imagePlugins
+  var seen = 0
+  for (index in plugins.indices) {
+    val plugin = plugins[index]
+    if (plugin is ImagePlugin.SuccessStatePlugin) {
+      key(plugin::class, seen++) {
+        plugin.compose(
+          modifier = modifier,
+          imageModel = imageModel,
+          imageOptions = imageOptions,
+          imageBitmap = imageBitmap,
+        )
+      }
+    }
   }
 }
 
@@ -74,8 +94,16 @@ public fun ImageComponent.ComposeFailureStatePlugins(
   imageOptions: ImageOptions,
   reason: Throwable?,
 ) {
-  imagePlugins.filterIsInstance<ImagePlugin.FailureStatePlugin>().forEach { plugin ->
-    plugin.compose(modifier = modifier, imageOptions = imageOptions, reason = reason)
+  val plugins = imagePlugins
+  var seen = 0
+  for (index in plugins.indices) {
+    val plugin = plugins[index]
+    if (plugin is ImagePlugin.FailureStatePlugin) {
+      // Keyed the same way as the loading plugins, with the same limit on two of a kind.
+      key(plugin::class, seen++) {
+        plugin.compose(modifier = modifier, imageOptions = imageOptions, reason = reason)
+      }
+    }
   }
 }
 
@@ -90,14 +118,27 @@ public fun ImageComponent.ComposeFailureStatePlugins(
 public fun ImageComponent.ComposeWithComposablePlugins(
   content: @Composable () -> Unit,
 ) {
-  val composablePlugins = imagePlugins.filterIsInstance<ImagePlugin.ComposablePlugin>()
-  if (composablePlugins.isEmpty()) {
+  val plugins = imagePlugins
+  // Built in one pass, and only when there is something to build: most components have no
+  // composable plugin at all, and scanning for one and then filtering for it did the work twice.
+  var wrappers: MutableList<ImagePlugin.ComposablePlugin>? = null
+  for (index in plugins.indices) {
+    val plugin = plugins[index]
+    if (plugin is ImagePlugin.ComposablePlugin) {
+      (wrappers ?: mutableListOf<ImagePlugin.ComposablePlugin>().also { wrappers = it }).add(plugin)
+    }
+  }
+  val composablePlugins = wrappers
+  if (composablePlugins == null) {
     content()
   } else {
-    // Wrap content with each plugin, innermost first
+    // Wrap content with each plugin, innermost first. Keyed the same way as the others: two
+    // wrappers of the same kind would otherwise share a key and neither would keep its state.
+    var wrapped = 0
     composablePlugins.fold(content) { acc, plugin ->
+      val ordinal = wrapped++
       {
-        plugin.compose(content = acc)
+        key(plugin::class, ordinal) { plugin.compose(content = acc) }
       }
     }.invoke()
   }

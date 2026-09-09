@@ -26,6 +26,7 @@ import com.bumptech.glide.request.FutureTarget
 import com.skydoves.landscapist.core.ImageRequest
 import com.skydoves.landscapist.core.Landscapist
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,6 +46,9 @@ import kotlin.system.measureTimeMillis
 class UnitPerformanceTest {
 
   companion object {
+    /** Long enough for a cold fetch on an emulator. */
+    private const val FRESCO_TIMEOUT_MS = 30_000L
+
     // Using the same GitHub-hosted test image (large JPEG)
     private const val TEST_IMAGE = "https://user-images.githubusercontent.com/24237865/" +
       "75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg"
@@ -77,6 +81,7 @@ class UnitPerformanceTest {
       val startMemory = getUsedMemoryKb()
       var bitmap: Bitmap? = null
       var success = false
+      var error: String? = null
 
       val loadTime = measureTimeMillis {
         try {
@@ -92,14 +97,15 @@ class UnitPerformanceTest {
 
           Glide.with(context).clear(futureTarget)
         } catch (e: Exception) {
-          println("  ✗ Round ${round + 1} Error: ${e.message}")
+          error = e.message ?: e::class.java.simpleName
+          println("  ✗ Round ${round + 1} Error: $error")
         }
       }
 
       val endMemory = getUsedMemoryKb()
       val memoryUsed = (endMemory - startMemory).coerceAtLeast(0)
 
-      results.add(TestResult(loadTime, memoryUsed, success))
+      results.add(TestResult(loadTime, memoryUsed, success, error))
       println("  Round ${round + 1}: ${loadTime}ms, ${memoryUsed}KB, Success: $success")
 
       bitmap?.recycle()
@@ -107,6 +113,7 @@ class UnitPerformanceTest {
     }
 
     printResults("Glide", results)
+    assertEveryRoundLoaded("Glide", results)
   }
 
   @Test
@@ -122,6 +129,7 @@ class UnitPerformanceTest {
       val startMemory = getUsedMemoryKb()
       var image: coil3.Image? = null
       var success = false
+      var error: String? = null
 
       val loadTime = measureTimeMillis {
         try {
@@ -139,22 +147,25 @@ class UnitPerformanceTest {
             val result = imageLoader.execute(request)
             success = result is coil3.request.SuccessResult
             image = (result as? coil3.request.SuccessResult)?.image
+            if (!success) error = "coil returned $result"
           }
         } catch (e: Exception) {
-          println("  ✗ Round ${round + 1} Error: ${e.message}")
+          error = e.message ?: e::class.java.simpleName
+          println("  ✗ Round ${round + 1} Error: $error")
         }
       }
 
       val endMemory = getUsedMemoryKb()
       val memoryUsed = (endMemory - startMemory).coerceAtLeast(0)
 
-      results.add(TestResult(loadTime, memoryUsed, success))
+      results.add(TestResult(loadTime, memoryUsed, success, error))
       println("  Round ${round + 1}: ${loadTime}ms, ${memoryUsed}KB, Success: $success")
 
       Thread.sleep(500)
     }
 
     printResults("Coil3", results)
+    assertEveryRoundLoaded("Coil3", results)
   }
 
   @Test
@@ -169,6 +180,7 @@ class UnitPerformanceTest {
 
       val startMemory = getUsedMemoryKb()
       var success = false
+      var error: String? = null
 
       val loadTime = measureTimeMillis {
         try {
@@ -185,27 +197,36 @@ class UnitPerformanceTest {
               .build()
 
             val dataSource = imagePipeline.fetchDecodedImage(imageRequest, context)
+            // fetchDecodedImage is asynchronous, so reading `result` straight away always saw
+            // null: this measured how long it took to start a load, not to finish one.
+            val deadline = System.currentTimeMillis() + FRESCO_TIMEOUT_MS
+            while (!dataSource.isFinished && System.currentTimeMillis() < deadline) {
+              Thread.sleep(10)
+            }
             val result = dataSource.result
             success = result != null
+            if (!success) error = dataSource.failureCause?.message ?: "the load did not finish"
 
             result?.close()
             dataSource.close()
           }
         } catch (e: Exception) {
-          println("  ✗ Round ${round + 1} Error: ${e.message}")
+          error = e.message ?: e::class.java.simpleName
+          println("  ✗ Round ${round + 1} Error: $error")
         }
       }
 
       val endMemory = getUsedMemoryKb()
       val memoryUsed = (endMemory - startMemory).coerceAtLeast(0)
 
-      results.add(TestResult(loadTime, memoryUsed, success))
+      results.add(TestResult(loadTime, memoryUsed, success, error))
       println("  Round ${round + 1}: ${loadTime}ms, ${memoryUsed}KB, Success: $success")
 
       Thread.sleep(500)
     }
 
     printResults("Fresco", results)
+    assertEveryRoundLoaded("Fresco", results)
   }
 
   @Test
@@ -222,6 +243,7 @@ class UnitPerformanceTest {
       val startMemory = getUsedMemoryKb()
       var bitmap: Any? = null
       var success = false
+      var error: String? = null
 
       val loadTime = measureTimeMillis {
         try {
@@ -241,7 +263,8 @@ class UnitPerformanceTest {
                 }
 
                 is com.skydoves.landscapist.core.model.ImageResult.Failure -> {
-                  println("  ✗ Round ${round + 1} Error: ${result.throwable?.message}")
+                  error = result.throwable?.message ?: "a failure with no reason given"
+                  println("  ✗ Round ${round + 1} Error: $error")
                 }
 
                 else -> {}
@@ -249,26 +272,41 @@ class UnitPerformanceTest {
             }
           }
         } catch (e: Exception) {
-          println("  ✗ Round ${round + 1} Error: ${e.message}")
+          error = e.message ?: e::class.java.simpleName
+          println("  ✗ Round ${round + 1} Error: $error")
         }
       }
 
       val endMemory = getUsedMemoryKb()
       val memoryUsed = (endMemory - startMemory).coerceAtLeast(0)
 
-      results.add(TestResult(loadTime, memoryUsed, success))
+      results.add(TestResult(loadTime, memoryUsed, success, error))
       println("  Round ${round + 1}: ${loadTime}ms, ${memoryUsed}KB, Success: $success")
 
       Thread.sleep(500)
     }
 
     printResults("Landscapist", results)
+    assertEveryRoundLoaded("Landscapist", results)
+  }
+
+  /** The rounds are the whole measurement, so one that loaded nothing fails the test. */
+  private fun assertEveryRoundLoaded(library: String, results: List<TestResult>) {
+    val failed = results.withIndex().filterNot { it.value.success }
+    assertTrue(
+      "$library loaded the image in only ${results.size - failed.size} of $ROUNDS rounds: " +
+        failed.joinToString { "round ${it.index + 1}: ${it.value.error ?: "no image returned"}" },
+      failed.isEmpty(),
+    )
   }
 
   private fun clearAllCaches() {
     try {
-      // Clear Glide cache
-      Glide.get(context).clearMemory()
+      // On the main thread, which Glide requires, and before anything holds a bitmap from it:
+      // clearing it underneath a live one recycles a bitmap Glide then tries to reconfigure.
+      InstrumentationRegistry.getInstrumentation().runOnMainSync {
+        Glide.get(context).clearMemory()
+      }
 
       // Clear Landscapist cache
       Landscapist.getInstance().clearMemoryCache()
@@ -343,5 +381,6 @@ class UnitPerformanceTest {
     val loadTimeMs: Long,
     val memoryKb: Long,
     val success: Boolean,
+    val error: String? = null,
   )
 }

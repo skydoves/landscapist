@@ -2,7 +2,7 @@
 
 **Compose Multiplatform from day one.** The `landscapist-image` module provides a powerful, production-ready Compose Multiplatform UI component for loading and displaying images using the `landscapist-core` engine. Unlike platform-specific solutions like GlideImage (Android-only) or FrescoImage (Android-only), LandscapistImage is built from the ground up for Kotlin Multiplatform and Compose Multiplatform, enabling you to write your image loading code once and deploy it across Android, iOS, Desktop, and Web platforms.
 
-Built on top of the standalone `landscapist-core` image loading engine, LandscapistImage gives you complete control over the entire image loading pipeline—from network requests to caching strategies to image transformations—while maintaining seamless compatibility with all Landscapist plugins. This means you get the power and flexibility of a custom image loader combined with the convenience of a high-level Compose API.
+Built on top of the standalone `landscapist-core` image loading engine, LandscapistImage gives you complete control over the entire image loading pipeline, from network requests to caching strategies to image transformations, while maintaining seamless compatibility with all Landscapist plugins. This means you get the power and flexibility of a custom image loader combined with the convenience of a high-level Compose API.
 
 ## Installation
 
@@ -56,12 +56,15 @@ LandscapistImage(
 ```
 
 **What happens behind the scenes:**
-1. **Size Calculation**: The modifier's size constraints are measured during composition
-2. **Cache Check**: Memory cache is checked first for an existing bitmap at the requested size
-3. **Disk Cache**: If not in memory, disk cache is checked for the downloaded image data
+1. **Size Calculation**: The modifier's size constraints are read while the image is measured
+2. **Cache Check**: Memory cache is checked for a bitmap at the requested size, and then for an
+   already decoded variant of the same image that covers it
+3. **Disk Cache**: If not in memory, disk cache is checked for the downloaded image data, keyed by
+   the URL alone
 4. **Network Fetch**: If not cached, the image is downloaded via Ktor HTTP client
 5. **Decoding**: The image is decoded and downsampled to match the display size (reducing memory usage)
-6. **Caching**: The decoded bitmap is stored in memory cache, and raw data is stored in disk cache
+6. **Caching**: The decoded bitmap is stored in memory cache under its size, and the encoded bytes
+   are stored in disk cache under the URL
 7. **Display**: The image is rendered to the screen
 
 ### With ImageOptions
@@ -125,7 +128,7 @@ LandscapistImage(
 - Use brand colors for `baseColor` and `highlightColor` to match your app's theme
 - Reduce `durationMillis` (e.g., 350-400ms) for a snappier feel on fast networks
 - Increase `dropOff` (e.g., 0.8-0.9) for a more subtle, gentle shimmer
-- Adjust `tilt` (0°-45°) to change the shimmer's direction—0° is horizontal, 90° is vertical
+- Adjust `tilt` (0° to 45°) to change the shimmer's direction: 0° is horizontal, 90° is vertical
 
 ### Crossfade Animation
 
@@ -222,6 +225,49 @@ LandscapistImage(
     }
 )
 ```
+
+## How many layout nodes an image costs
+
+A `LandscapistImage` with no `loading`, `success` or `failure` slot and no `ImagePlugin` is a single
+layout node: it measures, draws and runs its own load. Give it any of those and it becomes a
+container, because a slot and a plugin both need somewhere to be composed.
+
+The container only composes a child when something actually has to go inside it. A `CrossfadePlugin`
+does not, since the fade happens inside the painter rather than by stacking two states, and neither
+does a `PainterPlugin` such as `BlurTransformationPlugin`, since the container draws through it. A
+slot, a state plugin or a `ComposablePlugin` does.
+
+That is visible to a screen reader and in tests. The container carries
+`ImageOptions.contentDescription`, and so does the default `Image` composed inside it. Since that
+child is now composed only when something needs it, a plain image, an image with only a crossfade
+and an image with only a painter plugin each expose one node with the content description where they
+used to expose two. A lookup that expected two nodes needs updating.
+
+## Drawing the image yourself
+
+When all you want is the image and none of the machinery, `rememberImagePainter` hands
+you the painter on its own and the caller owns the only node:
+
+```kotlin
+Image(
+  painter = rememberImagePainter(model = "https://example.com/image.jpg"),
+  contentDescription = null,
+  modifier = Modifier.size(120.dp),
+)
+```
+
+It reads the memory cache while it composes, so an image that is already loaded is drawn in the
+frame the composable appears in, and it takes the size to decode at from the first time it is drawn.
+Set a size through `requestBuilder` when the first draw is not the size the image ends up at. It
+also takes `landscapist`, to load through an instance other than the composition local, and
+`onImageStateChanged`, which reports the same `LandscapistImageState` values `LandscapistImage` does.
+
+There are no loading or failure slots here, no `ImagePlugin` and no crossfade: each of those needs
+something composed around the image, and a painter has nowhere to put it. Use `LandscapistImage`
+when you want any of them, and this when you do not. In the JVM benchmark in this repository, twenty
+images through this painter allocate 119 KiB on the first frame against 148 KiB for the same shape
+built on Coil 3.6.2 (`rememberAsyncImagePainter` in an `Image`), and 14 KiB against 72 KiB on a
+resize frame.
 
 ## Custom Loading States
 
@@ -424,6 +470,12 @@ LandscapistImage(
     }
 )
 ```
+
+Headers are part of what identifies a cache entry, in memory and on disk, so that two viewers with
+different credentials are never handed each other's images. The whole header map counts, which means
+a token that rotates re-keys every image behind it and leaves the entries under the old one to be
+evicted. Send a credential that changes on its own schedule through the network configuration rather
+than per request.
 
 ## Supported Image Sources
 

@@ -62,7 +62,9 @@ Landscapist.builder()
 
 The SVG is rasterized at the size the request asks for, which is the size the composable was
 measured at, so it is as sharp as the layout it lands in. Placing the same image somewhere larger
-re-renders it rather than upscaling, because the target size is part of the cache key.
+re-renders it rather than upscaling, because the target size is part of the memory cache key and a
+cached raster is only reused for a box it already covers. The disk cache is keyed by the URL alone
+and holds the markup, so a re-render does not go back to the network.
 
 When the layout gives no size, the `width` and `height` attributes are used, then the `viewBox`, then
 a 512 pixel square. Every size is clamped to `LandscapistConfig.maxBitmapSize`.

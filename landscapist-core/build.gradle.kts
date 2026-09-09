@@ -24,6 +24,19 @@ plugins {
 
 apply(from = "${rootDir}/scripts/publish-module.gradle.kts")
 
+/** Resolves the skiko native runtime classifier (e.g. "macos-arm64") for the running host. */
+fun skikoHostTarget(): String {
+  val os = System.getProperty("os.name").lowercase()
+  val arch = System.getProperty("os.arch").lowercase()
+  val osPart = when {
+    os.contains("mac") || os.contains("darwin") -> "macos"
+    os.contains("windows") -> "windows"
+    else -> "linux"
+  }
+  val archPart = if (arch.contains("aarch64") || arch.contains("arm64")) "arm64" else "x64"
+  return "$osPart-$archPart"
+}
+
 mavenPublishing {
   val artifactId = "landscapist-core"
   coordinates(
@@ -90,6 +103,23 @@ kotlin {
     desktopMain {
       dependencies {
         implementation(libs.ktor.engine.cio)
+
+        // ImageIO's JPEG reader cannot scale while it decodes, so a thumbnail costs a full decode.
+        // Skia can, and every Compose Multiplatform application already resolves skiko. compileOnly
+        // keeps it out of the published dependencies: a plain JVM consumer without it on the
+        // classpath falls back to ImageIO, which is what this module used to do everywhere.
+        compileOnly(libs.skiko)
+      }
+    }
+
+    val desktopTest by getting {
+      dependencies {
+        // The decoder tests have to exercise the Skia path, not just the ImageIO fallback, so the
+        // API jar and the host's native runtime both have to be on the test classpath.
+        implementation(libs.skiko)
+        runtimeOnly(
+          "org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skiko.get()}",
+        )
       }
     }
 
