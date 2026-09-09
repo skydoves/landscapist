@@ -98,6 +98,17 @@ public class Landscapist private constructor(
     var waiters: Int = 0
   }
 
+  // Coalesces the download alone, on the key the disk cache uses, which is the url and nothing
+  // else. The map above keys on the memory key, and that carries the size the memory cache needs
+  // and the network does not, so a screen showing one image as a thumbnail and again at full width
+  // downloaded it twice. The bytes are the same at every size; only the decode is not.
+  private val inFlightFetchLock = SynchronizedObject()
+  private val inFlightFetches = mutableMapOf<String, InFlightFetch>()
+
+  private class InFlightFetch(val deferred: Deferred<FetchResult>) {
+    var waiters: Int = 0
+  }
+
   init {
     // Register default memory pressure listener
     memoryPressureManager.addListener(DefaultMemoryPressureListener(memoryCache))
@@ -419,6 +430,47 @@ public class Landscapist private constructor(
   }
 
   /**
+   * Fetches the bytes for [request], sharing one trip with everyone asking for the same url.
+   *
+   * Keyed on the disk key, so two sizes of one image share a download and decode separately. A
+   * differing header set already keys apart, since headers are folded into the model the key is
+   * built from, so one viewer's bytes are never handed to another's request.
+   *
+   * The last caller to leave drops the entry, and cancels the work only if it has not finished,
+   * which is how [dedupedStandardTerminal] handles the same problem.
+   */
+  private suspend fun dedupedFetch(request: ImageRequest, cacheKey: CacheKey): FetchResult {
+    val key = cacheKey.diskKey
+    val entry = synchronized(inFlightFetchLock) {
+      val existing = inFlightFetches[key]
+      if (existing != null) {
+        existing.waiters++
+        existing
+      } else {
+        val created = InFlightFetch(scope.async { fetcher.fetch(request) })
+        created.waiters = 1
+        inFlightFetches[key] = created
+        created
+      }
+    }
+
+    try {
+      return entry.deferred.await()
+    } finally {
+      val abandoned = synchronized(inFlightFetchLock) {
+        entry.waiters--
+        if (entry.waiters == 0) {
+          if (inFlightFetches[key] === entry) inFlightFetches.remove(key)
+          entry.deferred.takeIf { !it.isCompleted }
+        } else {
+          null
+        }
+      }
+      abandoned?.cancel()
+    }
+  }
+
+  /**
    * Runs the standard pipeline (disk cache, then network, then decode) and returns the terminal
    * [ImageResult]. Never throws for expected failures; cancellation propagates.
    */
@@ -474,8 +526,8 @@ public class Landscapist private constructor(
         if (diskResult != null) return diskResult
       }
 
-      // Network fetch.
-      return when (val fetchResult = fetcher.fetch(request)) {
+      // Network fetch, shared with anyone else asking for the same url at another size.
+      return when (val fetchResult = dedupedFetch(request, cacheKey)) {
         is FetchResult.Success -> {
           // Write to the disk cache off the critical path so the decode starts immediately. The
           // disk path is deterministic, so it can be reported before the background write finishes.
