@@ -2,6 +2,11 @@
 
 One of the most versatile fatures of Landscapist is the `ImageComponent` and `ImagePlugin`:
 
+!!! tip "Try it in a browser"
+
+    The [playground](https://skydoves.github.io/landscapist/demo/) builds an `ImageComponent` from whichever plugins you switch
+    on, and shows you the `rememberImageComponent` block it built.
+
 - **ImageComponent**: The `ImageComponent` is a flexible interface that acts as a container for a collection of `ImagePlugins`.
 - **ImagePlugin**: The `ImagePlugin` is an executable and pluggable Compose interface, triggered based on specific image states.
 

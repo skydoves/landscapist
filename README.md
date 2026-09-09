@@ -18,9 +18,12 @@
 
 ## Try it in a browser
 
-The [playground](https://skydoves.github.io/landscapist/demo/) runs `landscapist-image` compiled to
-WebAssembly. Every image size, content scale and plugin combination is a switch, and the readout
-next to the image is what the loader reported.
+**[Open the playground](https://skydoves.github.io/landscapist/demo/)** to use Landscapist without
+installing anything. It is `landscapist-image` compiled to WebAssembly, running in the page.
+
+Every image size, content scale and plugin combination is a switch. The panel under the image is
+what the loader reported back, and the panel below that is the Kotlin for whatever you land on,
+with a button to copy it into your project.
 
 ## Who's using Landscapist?
 👉 [Check out who's using Landscapist](https://skydoves.github.io/landscapist/#whos-using-landscapist).

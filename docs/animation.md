@@ -2,6 +2,10 @@
 
 The landscapist-animation package offers a set of valuable image plugins related to animations, including crossfade and circular reveal animations. 
 
+!!! tip "Try it in a browser"
+
+    Both animations are switches in the [playground](https://skydoves.github.io/landscapist/demo/), on a real network load.
+
 To utilize these animation supports, simply add the following dependency:
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)<br>

@@ -6,6 +6,11 @@
 
 The `landscapist-zoomable` package provides a `ZoomablePlugin` that enables zoom and pan gestures for images. This plugin supports both Android and Kotlin Multiplatform (iOS, Desktop).
 
+!!! tip "Try it in a browser"
+
+    Zoomable is a switch in the [playground](https://skydoves.github.io/landscapist/demo/). Tiling is off there, because a
+    browser cannot decode a region, so it pans and zooms over the one decoded bitmap.
+
 To use zoomable supports, add the dependency below:
 
 ```kotlin

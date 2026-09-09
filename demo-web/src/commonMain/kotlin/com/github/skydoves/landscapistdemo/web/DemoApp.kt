@@ -34,9 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
-import coil3.ImageLoader
-import coil3.compose.setSingletonImageLoaderFactory
-import coil3.network.ktor3.KtorNetworkFetcherFactory
 import com.github.skydoves.landscapistdemo.web.design.DemoColors
 import com.github.skydoves.landscapistdemo.web.design.DemoType
 import com.github.skydoves.landscapistdemo.web.design.Divider
@@ -52,15 +49,6 @@ private const val TwoColumnWidthDp = 900
 
 @Composable
 internal fun DemoApp() {
-  // Coil has no network fetcher of its own on wasm, so the comparison column would report Error on
-  // every url without this. Landscapist needs no equivalent: landscapist-core carries the Ktor js
-  // engine for this target itself.
-  setSingletonImageLoaderFactory { context ->
-    ImageLoader.Builder(context)
-      .components { add(KtorNetworkFetcherFactory()) }
-      .build()
-  }
-
   val state = rememberPlaygroundState()
 
   Column(modifier = Modifier.fillMaxSize().background(DemoColors.Background)) {
@@ -93,8 +81,6 @@ internal fun DemoApp() {
             VSpace(12)
             CodePane(state)
           }
-          VSpace(20)
-          PlaygroundComparison(url = state.url, contentScale = state.contentScale)
           VSpace(28)
           Footer()
           VSpace(24)
