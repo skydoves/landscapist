@@ -141,11 +141,14 @@ class ThumbHashPluginTest {
     }
 
     composeTestRule.waitForIdle()
-    val covered = composeTestRule.readContentPixels().covered()
+    val pixels = composeTestRule.readContentPixels()
+    // The backdrop's own colour, so a mis-decode that fills the node white still fails here.
+    val painted = pixels.samples().notMatching(Backdrop)
 
     assertTrue(
-      "a hash with no image in it drew over ${(covered * 100).toInt()}% of the node",
-      covered < 0.01f,
+      "a hash with no image in it drew ${painted.size} of ${pixels.samples().size} pixels over " +
+        "the backdrop, the first was ${painted.firstOrNull()?.describe()}",
+      painted.isEmpty(),
     )
 
     gate.countDown()

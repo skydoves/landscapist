@@ -58,6 +58,50 @@ internal inline fun measure(
   return Samples(label, values)
 }
 
+/**
+ * Times two operations round by round, alternating which of the two goes first.
+ *
+ * Running one all the way through and then the other leaves whichever went second in a JVM the
+ * first one warmed, and no amount of settling in between undoes that: the JIT, the allocator and
+ * the collector are shared. Alternating puts any drift on both.
+ */
+internal inline fun measurePaired(
+  firstLabel: String,
+  secondLabel: String,
+  warmups: Int,
+  iterations: Int,
+  first: (Int) -> Unit,
+  second: (Int) -> Unit,
+): Pair<Samples, Samples> {
+  repeat(warmups) {
+    first(it)
+    second(it)
+  }
+  settle()
+
+  val firstValues = LongArray(iterations)
+  val secondValues = LongArray(iterations)
+  for (i in 0 until iterations) {
+    // Past the warmup's indices, so an index-derived input is not already cached.
+    val index = warmups + i
+    if (i % 2 == 0) {
+      firstValues[i] = timeOf { first(index) }
+      secondValues[i] = timeOf { second(index) }
+    } else {
+      secondValues[i] = timeOf { second(index) }
+      firstValues[i] = timeOf { first(index) }
+    }
+  }
+  return Samples(firstLabel, firstValues) to Samples(secondLabel, secondValues)
+}
+
+/** Nanoseconds [block] took. */
+internal inline fun timeOf(block: () -> Unit): Long {
+  val start = System.nanoTime()
+  block()
+  return System.nanoTime() - start
+}
+
 /** Gives the JIT and the collector a moment so a warmup's garbage is not billed to the run. */
 internal fun settle() {
   System.gc()

@@ -259,12 +259,16 @@ private fun placeholderCase() {
     )
   }
   // Both are meant to be showing something: one that never drew would read as the cheaper one.
+  // Checked rather than printed, because that is the condition the rows above depend on.
   for ((name, content) in cases.drop(1)) {
     val scene = benchmarkScene(TILE_SIZE, TILE_SIZE * TILE_COUNT, content)
     try {
       repeat(3) { scene.render(it * FRAME_NANOS).close() }
       val covered = scene.imagePixelFraction(3 * FRAME_NANOS)
       println("    ${name.padEnd(20)}is covering ${covered.asPercent()} of the frame")
+      check(covered > PLACEHOLDER_COVERAGE) {
+        "$name covered ${covered.asPercent()} of the frame, so its row above is mostly empty"
+      }
     } finally {
       scene.close()
     }
@@ -274,6 +278,9 @@ private fun placeholderCase() {
 
 private const val TILE_COUNT = 20
 private const val TILE_SIZE = 128
+
+/** A placeholder fills its tile, so anything under this is a row that drew almost nothing. */
+private const val PLACEHOLDER_COVERAGE = 0.9
 
 /** Allocation per rendered frame for a column parked in one state. */
 private fun stateFrames(content: @Composable () -> Unit): LongArray {

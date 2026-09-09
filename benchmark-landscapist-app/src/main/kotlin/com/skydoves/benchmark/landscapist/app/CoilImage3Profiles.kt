@@ -15,32 +15,35 @@
  */
 package com.skydoves.benchmark.landscapist.app
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import com.skydoves.landscapist.ImageOptions
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImage
 import com.skydoves.landscapist.coil3.CoilImage
-import com.skydoves.landscapist.components.LocalImageComponent
 
+/**
+ * Coil's own composable, so the row labelled Coil is Coil. It used to be [CoilWrapperImageList],
+ * which is this library built on `BoxWithConstraints`, so the row compared landscapist to itself.
+ *
+ * The content scale is stated rather than defaulted: `AsyncImage` defaults to `ContentScale.Fit`
+ * and `ImageOptions` to `Crop`, and a letterboxed row draws fewer pixels than a cropped one.
+ */
 @Composable
-fun Coil3ImageList(urls: List<String>, modifier: Modifier = Modifier) {
-  LazyColumn(modifier = modifier.fillMaxSize()) {
-    items(urls) { url ->
-      CoilImage(
-        modifier = Modifier
-          .fillMaxWidth()
-          .height(BenchmarkImages.ITEM_HEIGHT_DP.dp)
-          .testTag("CoilImage"),
-        imageModel = { url },
-        component = LocalImageComponent.current,
-        imageOptions = ImageOptions(tag = "CoilImage"),
-      )
-    }
+internal fun CoilAsyncImageList(urls: List<String>, tag: String, modifier: Modifier = Modifier) {
+  BenchmarkList(urls, tag, modifier) { url, itemModifier ->
+    AsyncImage(
+      model = url,
+      contentDescription = null,
+      contentScale = ContentScale.Crop,
+      modifier = itemModifier,
+    )
+  }
+}
+
+/** landscapist-coil3, which is this library's Compose layer over the same Coil engine. */
+@Composable
+internal fun CoilWrapperImageList(urls: List<String>, tag: String, modifier: Modifier = Modifier) {
+  BenchmarkList(urls, tag, modifier) { url, itemModifier ->
+    CoilImage(imageModel = { url }, modifier = itemModifier)
   }
 }

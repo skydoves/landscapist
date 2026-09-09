@@ -141,11 +141,14 @@ class BlurHashPluginTest {
     }
 
     composeTestRule.waitForIdle()
-    val covered = composeTestRule.readContentPixels().covered()
+    val pixels = composeTestRule.readContentPixels()
+    // The backdrop's own colour, so a mis-decode that fills the node white still fails here.
+    val painted = pixels.samples().notMatching(Backdrop)
 
     assertTrue(
-      "an undecodable hash drew over ${(covered * 100).toInt()}% of the node",
-      covered < 0.01f,
+      "an undecodable hash drew ${painted.size} of ${pixels.samples().size} pixels over the " +
+        "backdrop, the first was ${painted.firstOrNull()?.describe()}",
+      painted.isEmpty(),
     )
 
     gate.countDown()

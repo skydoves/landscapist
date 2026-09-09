@@ -292,13 +292,20 @@ public class Landscapist private constructor(
     return originalWidth > widthLimit || originalHeight > heightLimit
   }
 
-  /** Whether this entry came back no larger than the box it was decoded for. */
+  /**
+   * Whether the decoder took any notice of the box this entry was decoded for.
+   *
+   * Within a factor of two, because Android samples by powers of two and lands anywhere in that
+   * range. Further out than that means the target was ignored, and asking again will produce the
+   * same pixels: an image whose shape does not divide evenly, or a decoder that does not resize at
+   * all, which is what the Apple and wasm ones do.
+   */
   private fun CachedImage.wasDecodedToFit(cachedKey: CacheKey): Boolean {
     val decodedForWidth = cachedKey.width.asPixelBound()
     val decodedForHeight = cachedKey.height.asPixelBound()
     if (decodedForWidth == null && decodedForHeight == null) return false
-    if (decodedForWidth != null && originalWidth > decodedForWidth + 1) return false
-    if (decodedForHeight != null && originalHeight > decodedForHeight + 1) return false
+    if (decodedForWidth != null && originalWidth > decodedForWidth.toLong() * 2) return false
+    if (decodedForHeight != null && originalHeight > decodedForHeight.toLong() * 2) return false
     return true
   }
 

@@ -117,12 +117,12 @@ class CircularRevealPluginTest {
     assertTrue(
       "the reveal was already complete on the frame it started on, so it never animated: " +
         describe(first),
-      first.covered() < 0.5f,
+      first.coveredBy(BlueFixture) < 0.5f,
     )
     assertTrue(
       "the reveal never grew, so the painter's radius did not reach the drawing: " +
         "${describe(first)} then ${describe(middle)}",
-      middle.covered() > first.covered(),
+      middle.coveredBy(BlueFixture) > first.coveredBy(BlueFixture),
     )
     // A circle, not a rectangle fading up: the middle is revealed long before a corner.
     assertTrue(
@@ -136,7 +136,7 @@ class CircularRevealPluginTest {
     )
     assertTrue(
       "the reveal never finished, it ended ${describe(last)}",
-      last.covered() > 0.99f,
+      last.coveredBy(BlueFixture) > 0.99f,
     )
     val wrong = last.samples().notMatching(BlueFixture)
     assertTrue(
@@ -146,5 +146,7 @@ class CircularRevealPluginTest {
     )
   }
 
-  private fun describe(pixels: PixelMap): String = "${(pixels.covered() * 100).toInt()}% covered"
+  /** The image's own colour, so a node painted anything else does not read as revealed. */
+  private fun describe(pixels: PixelMap): String =
+    "${(pixels.coveredBy(BlueFixture) * 100).toInt()}% covered by the image"
 }

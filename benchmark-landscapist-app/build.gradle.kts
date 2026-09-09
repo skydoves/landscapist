@@ -55,6 +55,8 @@ dependencies {
   implementation(project(":glide"))
   implementation(project(":coil"))
   implementation(project(":coil3"))
+  // Coil's own Compose API, so the row labelled Coil is Coil and not a landscapist wrapper.
+  implementation(libs.coil3.compose)
   implementation(project(":fresco"))
   implementation(project(":fresco-websupport"))
 

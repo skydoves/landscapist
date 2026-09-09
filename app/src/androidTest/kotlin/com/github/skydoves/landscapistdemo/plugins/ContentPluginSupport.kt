@@ -89,6 +89,15 @@ internal fun ComposeTestRule.awaitUntil(
   }
 }
 
+/** Keeps the composition running for [ms], so a negative is not read the instant it is true. */
+internal fun ComposeTestRule.idleFor(ms: Long) {
+  val until = System.currentTimeMillis() + ms
+  while (System.currentTimeMillis() < until) {
+    Thread.sleep(10)
+    waitForIdle()
+  }
+}
+
 /** Every state an image reported, readable from the test thread while the device draws. */
 internal class StateRecorder {
 
@@ -145,7 +154,7 @@ internal fun PixelMap.at(x: Float, y: Float): Color {
   return this[column, row]
 }
 
-/** Read off red: two quadrants are green, so [covered] would read them as backdrop. */
+/** Read off red: a quadrant of the fixture is the backdrop's own green. */
 internal fun PixelMap.quadrantCoverage(): Float {
   val pixels = samples()
   return pixels.count { it.red > 0.3f }.toFloat() / pixels.size

@@ -145,18 +145,21 @@ internal fun composeComparison() {
   println("time added to a first frame of $ITEM_COUNT images, over the same scene with no images")
   // Fewer iterations, because each renders the scene twice. The pairing is what steadies it.
   val timedIterations = iterations / 4
-  for (index in 1 until variants.size) {
-    val variant = variants[index]
-    val deltas = LongArray(timedIterations)
-    repeat(timedIterations) { round ->
+  // Interleaved like the allocation loop above, and for the same reason: measuring one variant
+  // through to the end before starting the next puts every later variant in a warmer JVM.
+  val deltas = Array(variants.size) { LongArray(timedIterations) }
+  repeat(timedIterations) { round ->
+    for (index in 1 until variants.size) {
       val emptyStart = System.nanoTime()
       renderOnce { variants[0].second(ITEM_SIZE) }
       val emptyTime = System.nanoTime() - emptyStart
       val start = System.nanoTime()
-      renderOnce { variant.second(ITEM_SIZE) }
-      deltas[round] = System.nanoTime() - start - emptyTime
+      renderOnce { variants[index].second(ITEM_SIZE) }
+      deltas[index][round] = System.nanoTime() - start - emptyTime
     }
-    println("  ${variant.first.padEnd(22)}${deltas.median().formatNanos()}")
+  }
+  for (index in 1 until variants.size) {
+    println("  ${variants[index].first.padEnd(22)}${deltas[index].median().formatNanos()}")
   }
   println()
 

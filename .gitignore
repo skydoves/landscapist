@@ -62,5 +62,5 @@ google-services.json
 docs/api
 .hotswan/
 
-# Agent worktrees and scratch
-.claude/
+# Agent worktrees
+.claude/worktrees/

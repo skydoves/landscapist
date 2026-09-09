@@ -58,12 +58,15 @@ These observations come from our own engine-level runs on Android and will diffe
 
 The honest positioning, and it is worth being precise about which "footprint" is meant. The AAR is
 smaller; the runtime memory is not. landscapist-core keys its memory cache on the size an image is
-drawn at, so it holds one entry per distinct size where Coil holds one per image. Forty images each
-asked for at a thumbnail, a list row, a jittered grid and a detail size gives it three times the
-entries and 1.27 times the bytes; one image asked for at fifteen sizes between 352 and 366 px gives
-it eight entries against Coil's one, and 7.7 times the bytes. What it buys is that a 96 px slot is
-answered with 96 px, where Coil answers it with whatever it has, which can be the 720 px detail
-bitmap and 56 times the pixels to sample on every frame that draws it.
+drawn at, where Coil leaves the size out of the key and keeps one entry per image. A request with no
+entry of its own is served by an already decoded variant of the same image that covers it on both
+axes and is no more than twice its size, so sizes a pixel or two apart share one bitmap, but a
+thumbnail and a detail view are still two entries. Forty images each asked for at a thumbnail, a
+list row, a jittered grid and a detail size gives it three times the entries and 1.27 times the
+bytes; one image asked for at fifteen sizes between 352 and 366 px gives it eight entries against
+Coil's one, and 7.7 times the bytes. What it buys is that a 96 px slot is answered with 96 px, where
+Coil answers it with whatever it has, which can be the 720 px detail bitmap and 56 times the pixels
+to sample on every frame that draws it.
 
 The rows below are measured rather than qualitative, and you can reproduce them with
 `./gradlew :benchmark-engine:run`. They are one JVM on one machine against Coil 3.6.2 running in
@@ -80,12 +83,50 @@ It loses on a cold load, to a thread hop it takes deliberately so that blocking 
 the caller's thread. The size of that loss is not quoted here because the timing rows do not
 reproduce closely enough across JVM invocations to quote.
 
-**None of this is measured on Android**, which is the platform that ships, and the decoders there
-are different code on both sides.
+What the Compose layer allocates per frame, for twenty images, as medians above an empty scene.
+"Before" is the release before this one, on the same benchmark and the same machine.
+
+| KiB per frame | before | after | coil 3.6.2 |
+|---|---|---|---|
+| first frame | 353.5 | 76.2 | 109.5 |
+| resize frame | 34.7 | 5.5 | 5.7 |
+| first frame, crossfade | 402.6 | 126.5 | 109.5 |
+| first frame, success slot | 335.7 | 262.2 | 147.8 painter, 549.5 subcompose |
+| first frame, painter | new | 119.1 | 147.8 |
+| resize frame, painter | new | 13.7 | 72.2 |
+
+The first two rows are an image with no plugin and no slot, which is the one drawn by a single
+layout node. The last two are `rememberLandscapistImagePainter` against Coil's
+`rememberAsyncImagePainter`, both inside a plain `Image`.
+
+None of the rows above is measured on Android, and the decoders there are different code on both
+sides, so the section below is the one to read for the platform that ships.
+
+### On a device, against Coil 3.6.2
+
+Taken on an emulator, with a fresh process for each measured loader: whichever loader ran second in
+a process read as faster by more than the difference being measured, and warming both stacks first
+did not fix it. An emulator, so these are the shape of the difference rather than figures to quote.
+Each cell is the spread across the runs that were taken.
+
+| | landscapist | coil 3.6.2 |
+|---|---|---|
+| first image on screen, 20 composed at once | 197 to 365 ms | 154 to 267 ms |
+| until all 20 report success | 243 to 403 ms | 214 to 333 ms |
+| resident set above resting, 20 images | 51 to 60 MiB | 45.2 to 45.3 MiB |
+| decode 2000x1500 to 200x150, median of 8 | 34 to 35 ms | 24 to 25 ms |
+| the same decode, allocated | 5.4 MiB | 1.9 MiB |
+| scroll, 8 swipes over 60 rows, allocated | 2.8 to 3.3 MiB | 2.7 to 2.8 MiB |
+
+So: ahead on every JVM row above, behind on cold load, on decode and on resident memory here. The
+Android decode path is the same code it has been, so that row is not a regression, but it is the
+reverse of what the desktop numbers say and it is the platform that ships.
 
 ### 2. Macrobenchmark (frame timing and jank)
 
-`:benchmark-landscapist` is an AndroidX Macrobenchmark that scrolls a `LazyColumn` of many images per library and records `FrameTimingMetric`. This is the correct tool for scrolling-list jank and for memory pressure, which a single-image instrumentation test cannot measure reliably.
+`:benchmark-landscapist` is an AndroidX Macrobenchmark that scrolls a `LazyColumn` of many images per library and records `FrameTimingMetric`. That is the right tool for scrolling-list jank and for memory pressure, which a single-image instrumentation test cannot measure reliably.
+
+The comparison the module currently sets up does not measure two libraries against each other, so do not read a run of it as one. Its Coil tab runs `CoilImage`, this library's own wrapper, rather than Coil's `AsyncImage`. Its Landscapist tab installs eight plugins, which is the path where an image is composed rather than drawn by a single node, so the cheap path is never in the measurement. And the app opens on the Landscapist tab, so that tab composes and fetches inside every measured block, Coil's included. Fixing the app is what has to happen before a frame timing figure can be published.
 
 ```bash
 ./gradlew :benchmark-landscapist:pixel6api31BenchmarkAndroidTest
@@ -105,7 +146,7 @@ The core engines are in the same family. landscapist-core is a from-scratch Kotl
 | Disk cache | Yes (Okio based) | Yes |
 | Downsampling at decode (Android) | Yes (two-pass `inSampleSize`) | Yes |
 | Hardware bitmaps (Android) | Yes (opaque images, API 26+) | Yes |
-| Bitmap pooling / `inBitmap` reuse | Yes (Android) | Dropped (net negative in Coil's testing) |
+| Bitmap pooling / `inBitmap` reuse | No. `GlobalBitmapPool` exists and the Android decoders ask it for a bitmap, but nothing in the library ever puts one in | Dropped (net negative in Coil's testing) |
 | Kotlin Multiplatform (Android / iOS / Desktop / Web) | Yes | Yes |
 | Cancellation on composable dispose | Yes | Yes |
 

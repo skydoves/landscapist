@@ -170,9 +170,8 @@ class ZoomablePluginTest {
     }
 
     assertTrue(
-      "no frame was part way between the two images, so the zoomable plugin cost the " +
-        "crossfade: $frames",
-      frames.any { !it.matches(RedFixture) && !it.matches(BlueFixture) },
+      "no frame held both images at once, so the zoomable plugin cost the crossfade: $frames",
+      frames.any { it.isRedBlueDissolve() },
     )
     assertTrue(
       "the replacing image never arrived, the last frame was ${frames.last()}",

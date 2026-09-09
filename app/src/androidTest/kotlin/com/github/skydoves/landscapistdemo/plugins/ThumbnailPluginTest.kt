@@ -131,7 +131,9 @@ class ThumbnailPluginTest {
     }
 
     composeTestRule.awaitUntil("the image to be asked for") { fetcher.sizes.isNotEmpty() }
-    composeTestRule.waitForIdle()
+    // A thumbnail starts its own load right after the first request, so a count read the instant
+    // that request lands would hold whether or not a second one was ever started.
+    composeTestRule.idleFor(SecondLoadWindowMs)
     val covered = composeTestRule.readContentPixels().quadrantCoverage()
 
     assertFalse("the held image arrived anyway: $state", state.isSuccess)
@@ -143,5 +145,10 @@ class ThumbnailPluginTest {
       "a second load was started with no thumbnail plugin installed: ${fetcher.sizes}",
       fetcher.sizes.size == 1,
     )
+  }
+
+  private companion object {
+    /** The test above has both of its loads in hand well inside this. */
+    private const val SecondLoadWindowMs = 3_000L
   }
 }

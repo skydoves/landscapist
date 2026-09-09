@@ -239,9 +239,10 @@ class CachingDeviceTest {
   }
 
   @Test
-  fun anEntryOversizedOnOneAxisAloneIsNotReused() {
-    // A panorama cached for a wide slot is the height a narrow slot wants and eight times its
-    // width, so a rule that needed both axes oversized would keep it.
+  fun anEntryThePlatformCannotDecodeSmallerIsReusedRatherThanDecodedAgain() {
+    // A panorama the platform decoder cannot shrink: it samples by powers of two and only while
+    // both axes still cover the target, so 4000x500 comes back whole whatever is asked for.
+    // Refusing it would decode the same pixels again for nothing.
     server.serve(PANORAMA, ImageFixtures.solid(4000, 500, Color.GREEN))
     val url = server.url(PANORAMA)
     val loader = memoryOnlyLoader()
@@ -254,8 +255,35 @@ class CachingDeviceTest {
         "oversized on the width alone, so this proves nothing about the rule under test",
       wide.originalWidth > 360 * 2 && wide.originalHeight <= 360 * 2,
     )
-    assertEquals("the oversized panorama was reused for the narrow slot", 2, loader.decodes)
-    assertEquals("the narrow slot did not go back for the bytes", 2, server.hitCount(PANORAMA))
+    assertEquals(
+      "the panorama was decoded again although the platform cannot return anything smaller",
+      1,
+      loader.decodes,
+    )
+    assertEquals("the narrow slot went back for bytes it already had", 1, server.hitCount(PANORAMA))
+  }
+
+  @Test
+  fun anEntryThePlatformCanDecodeSmallerIsDecodedAgain() {
+    // The other side of the same rule: a square source does divide evenly, so asking for a smaller
+    // box really does come back smaller and keeping the large entry would waste the difference.
+    server.serve(SQUARE, largeSquare())
+    val url = server.url(SQUARE)
+    val loader = memoryOnlyLoader()
+
+    val wide = loader.load(url, 1080, 1080)
+    val narrow = loader.load(url, 200, 200)
+
+    assertTrue(
+      "the wide load came back at ${wide.originalWidth}px, which is not larger than twice the " +
+        "narrow slot, so this proves nothing about the rule under test",
+      wide.originalWidth > 200 * 2,
+    )
+    assertTrue(
+      "the narrow slot was served the ${narrow.originalWidth}px entry rather than a smaller one",
+      narrow.originalWidth < wide.originalWidth,
+    )
+    assertEquals("the narrow slot reused the oversized entry", 2, loader.decodes)
   }
 
   @Test

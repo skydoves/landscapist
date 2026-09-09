@@ -65,6 +65,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.math.abs
 
 /** The painter a caller draws in their own `Image`: no container, no slot, one layout node. */
 @LargeTest
@@ -139,16 +140,16 @@ class PainterDeviceTest {
 
   private fun pixels(): PixelMap = compose.onNodeWithTag(IMAGE).captureToImage().toPixelMap()
 
-  /** How much of the node the image covers, sampled inside the anti-aliased edge. */
-  private fun PixelMap.covered(): Float {
+  /** How much of the node the fixture's own colour covers, sampled inside the edge. */
+  private fun PixelMap.coveredByFixture(): Float {
     var painted = 0
     var total = 0
     var y = STEP
     while (y < height - STEP) {
       var x = STEP
       while (x < width - STEP) {
-        // The backdrop is the only green thing on screen.
-        if (this[x, y].green < 0.5f) painted++
+        // The fixture's colour, not merely "not the backdrop": black is not the image either.
+        if (this[x, y].isFixture()) painted++
         total++
         x += STEP
       }
@@ -156,6 +157,16 @@ class PainterDeviceTest {
     }
     return if (total == 0) 0f else painted.toFloat() / total
   }
+
+  private fun Color.isFixture(): Boolean =
+    abs(red - fixture.red) <= TOLERANCE &&
+      abs(green - fixture.green) <= TOLERANCE &&
+      abs(blue - fixture.blue) <= TOLERANCE
+
+  private fun PixelMap.centre(): Color = this[width / 2, height / 2]
+
+  private fun Color.describe(): String =
+    "rgb(${(red * 255).toInt()}, ${(green * 255).toInt()}, ${(blue * 255).toInt()})"
 
   /** Fails rather than hanging when the painter never resolves an image. */
   private fun awaitSuccess(states: List<LandscapistImageState>) {
@@ -193,10 +204,11 @@ class PainterDeviceTest {
       }
     }
 
-    val covered = pixels().covered()
+    val drawn = pixels()
+    val covered = drawn.coveredByFixture()
     assertTrue(
-      "the cached image was not drawn in the frame the painter first appeared in, it covered " +
-        "$covered of the node",
+      "the cached image was not drawn in the frame the painter first appeared in: its colour " +
+        "covered $covered of the node, whose centre was ${drawn.centre().describe()}",
       covered > COVERED,
     )
   }
@@ -221,9 +233,11 @@ class PainterDeviceTest {
     }
     awaitSuccess(states)
 
-    val covered = pixels().covered()
+    val drawn = pixels()
+    val covered = drawn.coveredByFixture()
     assertTrue(
-      "the loaded image was never drawn, it covered $covered of the node",
+      "the loaded image was never drawn: its colour covered $covered of the node, whose centre " +
+        "was ${drawn.centre().describe()}",
       covered > COVERED,
     )
   }
@@ -342,6 +356,7 @@ class PainterDeviceTest {
     const val IMAGE_DP = 96
     const val STEP = 4
     const val COVERED = 0.9f
+    const val TOLERANCE = 0.06f
     const val LOAD_TIMEOUT_MS = 20_000L
   }
 }

@@ -38,6 +38,7 @@ import com.skydoves.landscapist.glide.GlideImageState
 import com.skydoves.landscapist.image.LandscapistImage
 import com.skydoves.landscapist.image.LandscapistImageState
 import org.junit.AfterClass
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -139,6 +140,15 @@ class ImageLibraryBenchmark {
         allResults.add(Measurement(library, size, round, loadMs, success))
       }
     }
+
+    // A round that never loaded still contributes its timeout to the table below.
+    val failed = allResults.filter { it.library == library && !it.success }
+    assertTrue(
+      "$library never loaded ${failed.size} of its ${SIZES.size * ROUNDS} rounds, so its " +
+        "timings are not comparable: " +
+        failed.joinToString { "${it.sizeDp}dp round ${it.round + 1} after ${it.loadMs}ms" },
+      failed.isEmpty(),
+    )
   }
 
   @Test

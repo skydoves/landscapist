@@ -37,10 +37,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
 
 @LargeTest
@@ -81,13 +84,13 @@ class ScreenOfImagesTest {
     assertEquals("the loader alone did not resolve every url", 20, loaderOnly(20))
   }
 
-  private var succeeded = 0
+  /** Keyed by index, so one image reporting twice cannot stand in for one that never loaded. */
+  private val succeeded: MutableSet<Int> = ConcurrentHashMap.newKeySet()
 
-  /** Composes [count] images and reports how many reported success within the timeout. */
+  /** Composes [count] images and reports which of them reported success within the timeout. */
   private fun composed(count: Int): String {
-    val done = AtomicInteger()
     val failed = AtomicInteger()
-    val reasons = java.util.concurrent.CopyOnWriteArrayList<String>()
+    val reasons = CopyOnWriteArrayList<String>()
     val loader = Landscapist.builder().noDiskCache().build()
     compose.setContent {
       Column {
@@ -98,7 +101,7 @@ class ScreenOfImagesTest {
             modifier = Modifier.size(40.dp),
             requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
             onImageStateChanged = {
-              if (it is LandscapistImageState.Success) done.incrementAndGet()
+              if (it is LandscapistImageState.Success) succeeded += index
               if (it is LandscapistImageState.Failure) {
                 failed.incrementAndGet()
                 reasons += "index $index: " +
@@ -113,12 +116,11 @@ class ScreenOfImagesTest {
       }
     }
     val deadline = System.currentTimeMillis() + 20_000
-    while (System.currentTimeMillis() < deadline && done.get() < count) {
+    while (System.currentTimeMillis() < deadline && succeeded.size < count) {
       compose.mainClock.advanceTimeByFrame()
       Thread.sleep(20)
     }
-    succeeded = done.get()
-    return "${done.get()} succeeded, ${failed.get()} failed, of $count :: $reasons"
+    return "${succeeded.size} succeeded, ${failed.get()} failed, of $count :: $reasons"
   }
 
   @Test fun oneImageLoads() = assertAllLoad(1)
@@ -130,6 +132,7 @@ class ScreenOfImagesTest {
   private fun assertAllLoad(count: Int) {
     val outcome = composed(count)
     DeviceMeasure.report("composed, $count image(s)", outcome)
-    assertEquals("not every image loaded: $outcome", count, succeeded)
+    val missing = (0 until count).filterNot { it in succeeded }
+    assertTrue("the images at $missing never reported success: $outcome", missing.isEmpty())
   }
 }

@@ -41,12 +41,11 @@ fun main() {
     profileComposeOnly(it)
     return
   }
-  // A child of a spread run reports its recorded metrics instead of narrating.
+  // A child of a spread run reports its recorded metrics after running the whole sequence. It
+  // used to skip the rows above the ones it recorded, so the spread was not a bound on what was
+  // published: memory cache hit ran first in the child and second in the parent.
   if (Metrics.collecting) {
-    memoryCacheHit(quiet = true)
-    allocations(quiet = true)
-    composeComparison()
-    scrollComparison()
+    everyScenario()
     Metrics.emit()
     return
   }
@@ -58,18 +57,7 @@ fun main() {
   println("=".repeat(96))
   println()
 
-  coldLoad()
-  memoryCacheHit()
-  allocations()
-  coalescing()
-  nearIdenticalSizes()
-  occupancyComparison()
-  diskKeyComparison()
-  decodeComparison()
-  peakMemoryComparison()
-  composeComparison()
-  scrollComparison()
-  firstFrameComparison()
+  everyScenario()
 
   System.getenv("LANDSCAPIST_SPREAD_RUNS")?.toIntOrNull()?.let { runSpread(it) }
 
@@ -90,6 +78,22 @@ fun main() {
   }
 }
 
+/** Every published row, in the order they are taken. A spread child runs exactly this. */
+private fun everyScenario() {
+  coldLoad()
+  memoryCacheHit()
+  allocations()
+  coalescing()
+  nearIdenticalSizes()
+  occupancyComparison()
+  diskKeyComparison()
+  decodeComparison()
+  peakMemoryComparison()
+  composeComparison()
+  scrollComparison()
+  firstFrameComparison()
+}
+
 private fun coilVersion(): String = "3.6.2"
 
 /** Every load misses the cache: one request end to end with the fetch itself made free. */
@@ -102,25 +106,32 @@ private fun coldLoad() {
   val iterations = 2_000
   val warmups = 500
 
-  val landscapistSamples = measure("landscapist", warmups, iterations) { i ->
-    runBlocking {
-      landscapist.load(landscapistRequest("https://example.com/cold-$i.jpg"))
-        .first { it is ImageResult.Success }
-    }
-  }
-  settle()
-  val coilSamples = measure("coil", warmups, iterations) { i ->
-    runBlocking {
-      val result = coil.execute(coilRequest("https://example.com/cold-$i.jpg"))
-      check(result is SuccessResult) { "coil failed: $result" }
-    }
-  }
+  val (landscapistSamples, coilSamples) = measurePaired(
+    firstLabel = "landscapist",
+    secondLabel = "coil",
+    warmups = warmups,
+    iterations = iterations,
+    first = { i ->
+      runBlocking {
+        landscapist.load(landscapistRequest("https://example.com/cold-$i.jpg"))
+          .first { it is ImageResult.Success }
+      }
+    },
+    second = { i ->
+      runBlocking {
+        val result = coil.execute(coilRequest("https://example.com/cold-$i.jpg"))
+        check(result is SuccessResult) { "coil failed: $result" }
+      }
+    },
+  )
 
+  Metrics.record("engine.cold-load.landscapist.ns", landscapistSamples.p50)
+  Metrics.record("engine.cold-load.coil.ns", coilSamples.p50)
   report("cold load (unique model)", landscapistSamples, coilSamples)
 }
 
 /** The same model over and over, which is what a warmed up scrolling list mostly does. */
-private fun memoryCacheHit(quiet: Boolean = false) {
+private fun memoryCacheHit() {
   val landscapist = newLandscapist(FetchCounter())
   val coil = newCoil(FetchCounter())
   val model = "https://example.com/hot.jpg"
@@ -133,19 +144,25 @@ private fun memoryCacheHit(quiet: Boolean = false) {
   val iterations = 20_000
   val warmups = 5_000
 
-  val landscapistSamples = measure("landscapist", warmups, iterations) {
-    runBlocking {
-      val result = landscapist.load(landscapistRequest(model)).first { it is ImageResult.Success }
-      check((result as ImageResult.Success).dataSource == DataSource.MEMORY)
-    }
-  }
-  settle()
-  val coilSamples = measure("coil", warmups, iterations) {
-    runBlocking {
-      val result = coil.execute(coilRequest(model))
-      check(result is SuccessResult && result.dataSource == coil3.decode.DataSource.MEMORY_CACHE)
-    }
-  }
+  val (landscapistSamples, coilSamples) = measurePaired(
+    firstLabel = "landscapist",
+    secondLabel = "coil",
+    warmups = warmups,
+    iterations = iterations,
+    first = {
+      runBlocking {
+        val result = landscapist.load(landscapistRequest(model))
+          .first { it is ImageResult.Success }
+        check((result as ImageResult.Success).dataSource == DataSource.MEMORY)
+      }
+    },
+    second = {
+      runBlocking {
+        val result = coil.execute(coilRequest(model))
+        check(result is SuccessResult && result.dataSource == coil3.decode.DataSource.MEMORY_CACHE)
+      }
+    },
+  )
 
   Metrics.record("engine.memory-hit.landscapist.ns", landscapistSamples.p50)
   Metrics.record("engine.memory-hit.coil.ns", coilSamples.p50)
@@ -155,7 +172,6 @@ private fun memoryCacheHit(quiet: Boolean = false) {
     check(landscapist.peekMemoryCache(landscapistRequest(model)) != null)
   }
   Metrics.record("engine.peek.landscapist.ns", peek.p50)
-  if (quiet) return
 
   report("memory cache hit", landscapistSamples, coilSamples)
   println(
@@ -173,7 +189,7 @@ private fun memoryCacheHit(quiet: Boolean = false) {
 }
 
 /** Bytes allocated per operation, which is what drives GC pressure while a list is scrolling. */
-private fun allocations(quiet: Boolean = false) {
+private fun allocations() {
   val landscapist = newLandscapist(FetchCounter())
   val coil = newCoil(FetchCounter())
   val model = "https://example.com/alloc.jpg"
@@ -207,7 +223,6 @@ private fun allocations(quiet: Boolean = false) {
 
   Metrics.record("engine.memory-hit.landscapist.bytes", landscapistBytes / rounds)
   Metrics.record("engine.memory-hit.coil.bytes", coilBytes / rounds)
-  if (quiet) return
 
   println("allocation per memory cache hit")
   println("  landscapist    ${(landscapistBytes / rounds).formatBytes()}")

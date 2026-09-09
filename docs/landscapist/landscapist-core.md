@@ -301,6 +301,38 @@ val size = memoryCache.size
 val maxSize = memoryCache.maxSize
 ```
 
+An entry is keyed by the model, the transformations and the target size the request asked for, so
+the same image asked for at two sizes has two keys. Any headers the request carries are folded into
+that key as well: an `Authorization` or a `Cookie` header makes it a different viewer's image, and
+content negotiation makes it different bytes, so two requests for one URL with different headers no
+longer share an entry. A request with no headers keys exactly as it did before.
+
+#### Reusing a differently sized entry
+
+A layout rarely measures to the same pixel twice. A grid whose columns do not divide evenly asks for
+359, 360 and 361 wide, and keying strictly on the size would make those three entries and three
+decodes of one image. `MemoryCache.getMatching` is how the loader avoids that: it looks for the
+exact size first, then offers the other decoded sizes of the same image, most recently cached first,
+to a predicate that decides whether one will do.
+
+```kotlin
+public fun getMatching(
+  key: CacheKey,
+  isAcceptable: (CacheKey, CachedImage) -> Boolean,
+): CachedImage? = get(key)
+```
+
+The loader accepts a variant that was decoded for a box no smaller than the one being asked for, to
+within a pixel on each axis, and no more than twice it on either axis. Boxes are compared rather
+than pixel counts, because a decoder that fits an image inside its box and one that fills the box
+exactly produce different pixels for the same request. An entry that a variant is turned down for is
+not marked as recently used, so a lookup that finds nothing usable does not disturb the eviction
+order.
+
+Both caches that ship, `LruMemoryCache` and `TwoTierMemoryCache`, implement it. A custom
+`MemoryCache` that does not override it still works: the default implementation falls back to an
+exact `get`, and the loader decodes the same image once per distinct size.
+
 #### Reading the cache without suspending
 
 `load` resolves a memory hit through a flow and a dispatcher hop, which costs a frame or two of
@@ -325,10 +357,10 @@ the second time an image is shown, which in a list is most of the time.
 
 ### Disk Cache
 
-Persistent disk cache for offline access:
-
-The key is the URL, so one download answers every size the image is drawn at. Pass `noDiskCache()`
-to the builder for a loader that writes nothing to disk; leaving it unset gives you the default one.
+Persistent disk cache for offline access. The key is the URL alone, so one download answers every
+size the image is drawn at: the cache holds the encoded bytes, and every size is decoded from the
+same ones. Headers scope it the same way they scope the memory key, so a request that carries an
+`Authorization` header does not read or write the file a request without one uses.
 
 ```kotlin
 // Disk cache is managed automatically
@@ -338,6 +370,21 @@ to the builder for a loader that writes nothing to disk; leaving it unset gives 
 val diskCache = landscapist.config.diskCache
 diskCache?.clear()
 ```
+
+#### Building a loader with no disk cache
+
+Leaving the disk cache unset falls through to the default one on disk, so a loader always ends up
+owning one. `noDiskCache()` is how you say you want none: nothing is written to disk and nothing is
+read back from it, which is what you want for images that must not be persisted, or when you have
+your own caching in front of the fetcher.
+
+```kotlin
+val landscapist = Landscapist.builder(context)
+    .noDiskCache()
+    .build()
+```
+
+Calling `diskCache(cache)` afterwards puts one back.
 
 ### Cache Policies
 
@@ -543,7 +590,9 @@ landscapist.load(request).collect { result ->
 ### Desktop
 - Supports file paths and network URLs
 - Configure disk cache path manually
-- Uses Skia for image decoding
+- Decodes through Skia when skiko is on the classpath, which scales a JPEG while it decodes it, and
+  falls back to ImageIO subsampling otherwise. A Compose desktop application already has skiko, so
+  it takes the Skia path without adding anything
 
 ### Web (Wasm)
 - Network URLs only

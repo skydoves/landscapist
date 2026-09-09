@@ -128,10 +128,10 @@ class CrossfadePluginTest {
         "${frames.size} frames showed the backdrop, the first was ${transparent.firstOrNull()}",
       transparent.isEmpty(),
     )
-    // A frame that is neither colour is what only a dissolve produces.
+    // Both images at once, which a blank frame would otherwise pass for.
     assertTrue(
-      "no frame was part way between the two images, so nothing faded: $frames",
-      frames.any { !it.matches(RedFixture) && !it.matches(BlueFixture) },
+      "no frame held both images at once, so nothing dissolved: $frames",
+      frames.any { it.isRedBlueDissolve() },
     )
     assertTrue(
       "the replacing image never arrived, the last frame was ${frames.last()}",
@@ -176,9 +176,8 @@ class CrossfadePluginTest {
     val frames = replaceModelAndSampleTheFade(model)
 
     assertTrue(
-      "the image with a success slot did not fade, every frame was one colour or the other: " +
-        "$frames",
-      frames.any { !it.matches(RedFixture) && !it.matches(BlueFixture) },
+      "the image with a success slot did not fade, no frame held both images at once: $frames",
+      frames.any { it.isRedBlueDissolve() },
     )
     assertTrue(
       "the replacing image never arrived, the last frame was ${frames.last()}",

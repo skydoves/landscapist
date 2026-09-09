@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.PixelMap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -65,12 +66,15 @@ class BlurTransformationPluginTest {
 
   @Test
   fun aBlurredImageHasLessDetailThanTheImageItWasMadeFrom() {
-    val (plain, blurred) = detailOfPlainAndBlurred(server.url("/detail.png"))
+    val (plainPixels, blurredPixels) = plainAndBlurred(server.url("/detail.png"))
+    val plain = plainPixels.localContrast()
+    val blurred = blurredPixels.localContrast()
 
     assertTrue(
       "the unblurred image has no detail to lose, so nothing below could be shown: $plain",
       plain > 0.01f,
     )
+    assertTheBlurredImageIsOnScreen(blurredPixels, blurred)
     assertTrue(
       "the blur did not smooth the image: detail was $plain unblurred and $blurred blurred",
       blurred < plain * 0.6f,
@@ -79,12 +83,15 @@ class BlurTransformationPluginTest {
 
   @Test
   fun aJpegThatDecodedIntoAHardwareBitmapIsStillBlurred() {
-    val (plain, blurred) = detailOfPlainAndBlurred(server.url("/detail.jpg"))
+    val (plainPixels, blurredPixels) = plainAndBlurred(server.url("/detail.jpg"))
+    val plain = plainPixels.localContrast()
+    val blurred = blurredPixels.localContrast()
 
     assertTrue(
       "the JPEG never drew anything to blur: $plain",
       plain > 0.01f,
     )
+    assertTheBlurredImageIsOnScreen(blurredPixels, blurred)
     assertTrue(
       "a JPEG was not blurred, so the blur cannot read a hardware bitmap: detail was $plain " +
         "unblurred and $blurred blurred",
@@ -114,13 +121,15 @@ class BlurTransformationPluginTest {
     val gentle = composeTestRule.readContentPixels().localContrast()
     composeTestRule.runOnIdle { radius = 21 }
     composeTestRule.waitForIdle()
-    val heavy = composeTestRule.readContentPixels().localContrast()
+    val heavyPixels = composeTestRule.readContentPixels()
+    val heavy = heavyPixels.localContrast()
 
     assertTrue(
       "a radius of 1 already flattened the image, or the node is empty, so a larger radius " +
         "cannot be shown to do any more: detail was $gentle",
       gentle > 0.005f,
     )
+    assertTheBlurredImageIsOnScreen(heavyPixels, heavy)
     assertTrue(
       "the larger radius did not blur any further, so the first result was kept: detail was " +
         "$gentle at radius 1 and $heavy at radius 21",
@@ -191,6 +200,7 @@ class BlurTransformationPluginTest {
       "the placeholder is still on screen after the image arrived: ${settled.describe()}",
       !settled.matches(BlueFixture),
     )
+    assertTheBlurredImageIsOnScreen(blurredPixels, blurredDetail)
     assertTrue(
       "the blur stopped running once a loading plugin was installed beside it: detail was " +
         "$plainDetail unblurred and $blurredDetail blurred",
@@ -229,8 +239,18 @@ class BlurTransformationPluginTest {
     )
   }
 
+  /** An empty node has no detail either, so every ratio above needs this floor under it. */
+  private fun assertTheBlurredImageIsOnScreen(pixels: PixelMap, detail: Float) {
+    val coverage = pixels.quadrantCoverage()
+    assertTrue(
+      "the blurred node drew nothing, so its detail of $detail is an empty node's: the image " +
+        "covered ${(coverage * 100).toInt()}% of it",
+      coverage > 0.3f,
+    )
+  }
+
   /** The control carries a painter plugin too, so both are drawn by the same path. */
-  private fun detailOfPlainAndBlurred(url: String): Pair<Float, Float> {
+  private fun plainAndBlurred(url: String): Pair<PixelMap, PixelMap> {
     val loader = contentPluginLoader()
     loader.warm(url)
 
@@ -255,8 +275,8 @@ class BlurTransformationPluginTest {
       }
     }
 
-    return composeTestRule.readContentPixels(PlainTag).localContrast() to
-      composeTestRule.readContentPixels(BlurredTag).localContrast()
+    return composeTestRule.readContentPixels(PlainTag) to
+      composeTestRule.readContentPixels(BlurredTag)
   }
 
   private companion object {

@@ -23,6 +23,36 @@ object DeviceMeasure {
 
   private const val TAG = "MEASURE"
 
+  /** The memory cache every compared loader is given, so neither is measured with more room. */
+  const val MEMORY_CACHE_BYTES: Long = 32L * 1024 * 1024
+
+  /** What this process has already measured, if anything. */
+  @Volatile
+  private var measured: String? = null
+
+  /**
+   * Refuses to measure anything in a process that has already measured something.
+   *
+   * Whichever loader ran second read as faster by more than the difference being measured, and
+   * warming both stacks first did not fix it: the sockets, the thread pools and the JIT of
+   * everything under Compose are shared too. The label is per measurement rather than per library,
+   * because two measurements of the same library contaminate each other in the same way, and
+   * resident memory is exactly the number that notices. Held here rather than on a test class, so
+   * the scroll comparison cannot run both loaders in a process the load comparison already used.
+   *
+   * Run one measurement per instrumentation invocation, so each gets its own process:
+   *
+   * `-Pandroid.testInstrumentationRunnerArguments.class=...LibraryComparisonTest#coldLoadCoil`
+   */
+  fun claimTheProcess(label: String) {
+    val previous = measured
+    check(previous == null) {
+      "\"$previous\" was already measured in this process, so \"$label\" cannot be compared " +
+        "against it. Run one measurement per instrumentation invocation."
+    }
+    measured = label
+  }
+
   /** Bytes ART has allocated in this process since it started. */
   fun allocatedBytes(): Long =
     Debug.getRuntimeStat("art.gc.bytes-allocated")?.toLongOrNull() ?: -1L

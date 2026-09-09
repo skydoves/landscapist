@@ -35,14 +35,18 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.github.skydoves.landscapistdemo.harness.ImageFixtures
+import com.github.skydoves.landscapistdemo.harness.LocalImageServer
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.image.LandscapistImage
 import com.skydoves.landscapist.image.LandscapistImageState
+import org.junit.After
+import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -51,12 +55,25 @@ class LandscapistImageTest {
   @get:Rule
   val composeTestRule = createComposeRule()
 
+  private lateinit var server: LocalImageServer
+
+  @Before
+  fun startServer() {
+    // Local bytes rather than the internet, so a network hiccup is not read as a broken image.
+    server = LocalImageServer()
+    server.serve(IMAGE_PATH, ImageFixtures.photo(480, 712))
+  }
+
+  @After
+  fun stopServer() = server.close()
+
+  private fun imageUrl(): String = server.url(IMAGE_PATH)
+
   companion object {
     private const val TAG_IMAGE = "LandscapistImageTag"
     private const val TAG_LOADING = "LoadingTag"
     private const val TAG_FAILURE = "FailureTag"
-    private const val IMAGE_URL = "https://user-images.githubusercontent.com/" +
-      "24237865/75087936-5c1d9f80-553e-11ea-81d3-a912634dd8f7.jpg"
+    private const val IMAGE_PATH = "/landscapist-image-test.jpg"
   }
 
   @Test
@@ -93,23 +110,29 @@ class LandscapistImageTest {
     }
 
     // Wait for image to load (max 5 seconds - should be fast for local resource)
-    val loaded = latch.await(5, TimeUnit.SECONDS)
-    assert(loaded) {
+    val loaded = runCatching {
+      // waitUntil pumps the clock. Blocking this thread on the latch stops the compose
+      // rule producing frames, so the load it is waiting for can never finish.
+      composeTestRule.waitUntil(timeoutMillis = 5000L) { latch.count == 0L }
+    }.isSuccess
+    assertTrue(
       "Drawable resource failed to load within timeout. " +
         "State history: $stateHistory, Final state: ${imageState::class.simpleName}, " +
-        "Failure reason: ${failureReason?.message ?: "none"}"
-    }
+        "Failure reason: ${failureReason?.message ?: "none"}",
+      loaded,
+    )
 
     composeTestRule.onNodeWithTag(TAG_IMAGE)
       .assertIsDisplayed()
 
     composeTestRule.runOnIdle {
-      assert(imageState is LandscapistImageState.Success) {
+      assertTrue(
         "Expected Success state but got: ${imageState::class.simpleName}. " +
           "State history: $stateHistory, " +
           "Failure reason: ${failureReason?.message ?: "none"}, " +
-          "Stack trace: ${failureReason?.stackTraceToString() ?: "none"}"
-      }
+          "Stack trace: ${failureReason?.stackTraceToString() ?: "none"}",
+        imageState is LandscapistImageState.Success,
+      )
     }
   }
 
@@ -148,16 +171,22 @@ class LandscapistImageTest {
       )
     }
 
-    val loaded = latch.await(5, TimeUnit.SECONDS)
-    assert(loaded) {
-      "Drawable resource (Int) failed to load. State history: $stateHistory"
-    }
+    val loaded = runCatching {
+      // waitUntil pumps the clock. Blocking this thread on the latch stops the compose
+      // rule producing frames, so the load it is waiting for can never finish.
+      composeTestRule.waitUntil(timeoutMillis = 5000L) { latch.count == 0L }
+    }.isSuccess
+    assertTrue(
+      "Drawable resource (Int) failed to load. State history: $stateHistory",
+      loaded,
+    )
 
     composeTestRule.runOnIdle {
-      assert(imageState is LandscapistImageState.Success) {
+      assertTrue(
         "Expected Success but got ${imageState::class.simpleName}. " +
-          "History: $stateHistory, Error: ${failureReason?.stackTraceToString()}"
-      }
+          "History: $stateHistory, Error: ${failureReason?.stackTraceToString()}",
+        imageState is LandscapistImageState.Success,
+      )
     }
   }
 
@@ -169,7 +198,7 @@ class LandscapistImageTest {
 
     composeTestRule.setContent {
       LandscapistImage(
-        imageModel = { IMAGE_URL },
+        imageModel = { imageUrl() },
         modifier = Modifier
           .size(128.dp)
           .testTag(TAG_IMAGE),
@@ -188,11 +217,16 @@ class LandscapistImageTest {
     }
 
     // Wait for image to load (max 10 seconds)
-    val loaded = latch.await(10, TimeUnit.SECONDS)
-    assert(loaded) {
+    val loaded = runCatching {
+      // waitUntil pumps the clock. Blocking this thread on the latch stops the compose
+      // rule producing frames, so the load it is waiting for can never finish.
+      composeTestRule.waitUntil(timeoutMillis = 10000L) { latch.count == 0L }
+    }.isSuccess
+    assertTrue(
       "Image failed to load within timeout. " +
-        "State history: $stateHistory, Final state: ${imageState::class.simpleName}"
-    }
+        "State history: $stateHistory, Final state: ${imageState::class.simpleName}",
+      loaded,
+    )
 
     composeTestRule.onNodeWithTag(TAG_IMAGE)
       .assertIsDisplayed()
@@ -200,9 +234,10 @@ class LandscapistImageTest {
       .assertHeightIsAtLeast(128.dp)
 
     composeTestRule.runOnIdle {
-      assert(imageState is LandscapistImageState.Success) {
-        "Expected Success state but got: $imageState"
-      }
+      assertTrue(
+        "Expected Success state but got: $imageState",
+        imageState is LandscapistImageState.Success,
+      )
     }
   }
 
@@ -216,7 +251,7 @@ class LandscapistImageTest {
         modifier = Modifier.verticalScroll(rememberScrollState()),
       ) {
         LandscapistImage(
-          imageModel = { IMAGE_URL },
+          imageModel = { imageUrl() },
           modifier = Modifier
             .fillMaxWidth()
             .testTag(TAG_IMAGE),
@@ -235,16 +270,21 @@ class LandscapistImageTest {
     }
 
     // Wait for image to load (max 10 seconds)
-    val loaded = latch.await(10, TimeUnit.SECONDS)
-    assert(loaded) { "Image failed to load within timeout - this indicates ANR or freeze!" }
+    val loaded = runCatching {
+      // waitUntil pumps the clock. Blocking this thread on the latch stops the compose
+      // rule producing frames, so the load it is waiting for can never finish.
+      composeTestRule.waitUntil(timeoutMillis = 10000L) { latch.count == 0L }
+    }.isSuccess
+    assertTrue("Image failed to load within timeout - this indicates ANR or freeze!", loaded)
 
     composeTestRule.onNodeWithTag(TAG_IMAGE)
       .assertIsDisplayed()
 
     composeTestRule.runOnIdle {
-      assert(imageState is LandscapistImageState.Success) {
-        "Expected Success state but got: $imageState"
-      }
+      assertTrue(
+        "Expected Success state but got: $imageState",
+        imageState is LandscapistImageState.Success,
+      )
     }
   }
 }

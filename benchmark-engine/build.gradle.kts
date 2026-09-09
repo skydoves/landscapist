@@ -70,8 +70,10 @@ tasks.named("distZip") { enabled = false }
 // tracked down: `./gradlew :benchmark-engine:run -Pjfr=/path/rec.jfr -Pprofile=landscapist-resize`.
 // Without -Pjfr the benchmark runs normally.
 tasks.named<JavaExec>("run") {
-  // `-Pspread=5` re-runs the contested rows in five more JVMs and prints the spread, so a number
-  // can be told apart from the machine it was measured on. Off by default: it costs five more runs.
+  // `-Pspread=5` re-runs the whole benchmark in five more JVMs and prints the spread, so a number
+  // can be told apart from the machine it was measured on, and says which gaps are inside it. The
+  // child used to run only the rows it recorded, so the spread bounded a different measurement from
+  // the published one. Off by default: each run is a full benchmark, child JVMs and all.
   providers.gradleProperty("spread").orNull?.let { environment("LANDSCAPIST_SPREAD_RUNS", it) }
   val recording = providers.gradleProperty("jfr").orNull
   if (recording != null) {

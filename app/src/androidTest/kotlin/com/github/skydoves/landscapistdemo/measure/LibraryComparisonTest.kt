@@ -34,6 +34,7 @@ import com.github.skydoves.landscapistdemo.measure.DeviceMeasure.formatNanos
 import com.github.skydoves.landscapistdemo.measure.DeviceMeasure.median
 import com.skydoves.landscapist.core.ImageRequest
 import com.skydoves.landscapist.core.Landscapist
+import com.skydoves.landscapist.core.LandscapistConfig
 import com.skydoves.landscapist.core.model.CachePolicy
 import com.skydoves.landscapist.core.model.ImageResult
 import com.skydoves.landscapist.image.LandscapistImage
@@ -49,7 +50,14 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import coil3.request.ImageRequest as CoilRequest
 
-/** Numbers land in logcat under MEASURE; a timing threshold on an emulator is a flaky test. */
+/**
+ * Numbers land in logcat under MEASURE; a timing threshold on an emulator is a flaky test.
+ *
+ * Every test here claims the process before it measures anything, and only one measurement fits in
+ * a process. See [DeviceMeasure.claimTheProcess]: the guard used to cover four of these six, and to
+ * allow two tests with the same label to share a process, which is how a resident set measurement
+ * ended up following a cold load measurement of the same library.
+ */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class LibraryComparisonTest {
@@ -67,32 +75,7 @@ class LibraryComparisonTest {
     repeat(images) { index ->
       server.serve("/image-$index.jpg", ImageFixtures.photo(360, 360))
     }
-    warmBothStacks()
-  }
-
-  /**
-   * Loads one image through each library, so neither pays for the other's class loading.
-   *
-   * Not enough on its own to make two loaders comparable in one process. See [claimTheProcess].
-   */
-  private fun warmBothStacks() {
-    val context = InstrumentationRegistry.getInstrumentation().targetContext
     server.serve("/warm.jpg", ImageFixtures.photo(360, 360))
-    val url = server.url("/warm.jpg")
-    runBlocking {
-      Landscapist.builder().noDiskCache().build().load(
-        ImageRequest.builder()
-          .model(url)
-          .diskCachePolicy(CachePolicy.DISABLED)
-          .size(side, side)
-          .build(),
-      ).first { it is ImageResult.Success || it is ImageResult.Failure }
-      ImageLoader.Builder(context).memoryCache(null).diskCache(null).build().execute(
-        CoilRequest.Builder(context).data(url).size(side, side).build(),
-      )
-    }
-    server.resetCounts()
-    DeviceMeasure.settle()
   }
 
   @After
@@ -101,46 +84,76 @@ class LibraryComparisonTest {
   private fun urls() = List(images) { server.url("/image-$it.jpg") }
 
   /**
-   * Refuses to measure a second loader in a process that has already measured one.
+   * Loads one image through the stack about to be measured, so it pays for no class loading.
    *
-   * Whichever ran second read as faster by more than the difference being measured, and warming
-   * both stacks first did not fix it: the sockets, the thread pools and the JIT of everything under
-   * Compose are shared too. Run one test per instrumentation invocation, so each gets its own
-   * process:
-   *
-   * `-Pandroid.testInstrumentationRunnerArguments.class=...LibraryComparisonTest#coldLoadCoil`
+   * Only that one stack: a process measures a single loader now, and warming the other one first
+   * put its class loading, its sockets and its thread pools into every measurement, always in the
+   * same order, which is a thumb on the scale rather than a control for one.
    */
-  private fun claimTheProcess(label: String) {
-    val previous = measuredInThisProcess
-    check(previous == null || previous == label) {
-      "$previous was already measured in this process, so $label cannot be compared against it. " +
-        "Run one measurement per instrumentation invocation."
+  private fun warmLandscapist() {
+    val url = server.url("/warm.jpg")
+    runBlocking {
+      newLandscapist().load(
+        ImageRequest.builder()
+          .model(url)
+          .diskCachePolicy(CachePolicy.DISABLED)
+          .size(side, side)
+          .build(),
+      ).first { it is ImageResult.Success || it is ImageResult.Failure }
     }
-    measuredInThisProcess = label
+    server.resetCounts()
+    DeviceMeasure.settle()
   }
 
-  private fun newLandscapist(): Landscapist = Landscapist.builder().noDiskCache().build()
+  private fun warmCoil() {
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val url = server.url("/warm.jpg")
+    runBlocking {
+      newCoil().execute(CoilRequest.Builder(context).data(url).size(side, side).build())
+    }
+    server.resetCounts()
+    DeviceMeasure.settle()
+  }
+
+  // Both loaders get the same memory cache. Landscapist used to take the 64 MiB default while
+  // Coil was handed 32 MiB, so the two rows were not budgeted alike.
+  private fun newLandscapist(): Landscapist = Landscapist.builder()
+    .config(LandscapistConfig(memoryCacheSize = DeviceMeasure.MEMORY_CACHE_BYTES))
+    .noDiskCache()
+    .build()
 
   private fun newCoil(): ImageLoader {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     return ImageLoader.Builder(context)
-      .memoryCache { MemoryCache.Builder().maxSizeBytes(32L * 1024 * 1024).build() }
+      .memoryCache {
+        MemoryCache.Builder().maxSizeBytes(DeviceMeasure.MEMORY_CACHE_BYTES).build()
+      }
       .diskCache(null)
       .build()
   }
+
+  private val sharedLandscapist by lazy { newLandscapist() }
+  private val sharedCoil by lazy { newCoil() }
 
   // One test each: a compose rule accepts setContent once, and whichever library went second
   // would find the server warm.
   @Test
   fun coldLoadLandscapist() {
-    claimTheProcess("landscapist")
-    val elapsed = measureFirstSuccess("landscapist") { url, done ->
+    DeviceMeasure.claimTheProcess("landscapist cold load")
+    warmLandscapist()
+    val elapsed = measureFirstSuccess("landscapist") { url, success, failure ->
       LandscapistImage(
         imageModel = { url },
-        landscapist = newLandscapistShared,
+        landscapist = sharedLandscapist,
         modifier = Modifier.size(side.dp),
         requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
-        onImageStateChanged = { if (it is LandscapistImageState.Success) done() },
+        onImageStateChanged = { state ->
+          when (state) {
+            is LandscapistImageState.Success -> success()
+            is LandscapistImageState.Failure -> failure()
+            else -> Unit
+          }
+        },
       )
     }
     DeviceMeasure.report(
@@ -151,16 +164,22 @@ class LibraryComparisonTest {
 
   @Test
   fun coldLoadCoil() {
-    claimTheProcess("coil")
-    val elapsed = measureFirstSuccess("coil") { url, done ->
+    DeviceMeasure.claimTheProcess("coil cold load")
+    warmCoil()
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val elapsed = measureFirstSuccess("coil") { url, success, failure ->
       AsyncImage(
-        model = CoilRequest.Builder(InstrumentationRegistry.getInstrumentation().targetContext)
-          .data(url)
-          .build(),
+        model = CoilRequest.Builder(context).data(url).build(),
         imageLoader = sharedCoil,
         contentDescription = null,
         modifier = Modifier.size(side.dp),
-        onState = { if (it is AsyncImagePainter.State.Success) done() },
+        onState = { state ->
+          when (state) {
+            is AsyncImagePainter.State.Success -> success()
+            is AsyncImagePainter.State.Error -> failure()
+            else -> Unit
+          }
+        },
       )
     }
     DeviceMeasure.report(
@@ -169,44 +188,55 @@ class LibraryComparisonTest {
     )
   }
 
-  private val newLandscapistShared by lazy { newLandscapist() }
-  private val sharedCoil by lazy { newCoil() }
-
   /** Composes every url at once and returns how long until all of them reported success. */
   private fun measureFirstSuccess(
     label: String,
-    content: @Composable (String, () -> Unit) -> Unit,
+    content: @Composable (String, () -> Unit, () -> Unit) -> Unit,
   ): Long {
     val urls = urls()
     val done = AtomicInteger()
+    val failed = AtomicInteger()
     val firstAt = AtomicLong()
     val start = System.nanoTime()
     compose.setContent {
       for (url in urls) {
-        content(url) {
-          firstAt.compareAndSet(0, System.nanoTime() - start)
-          done.incrementAndGet()
-        }
+        content(
+          url,
+          {
+            firstAt.compareAndSet(0, System.nanoTime() - start)
+            done.incrementAndGet()
+          },
+          { failed.incrementAndGet() },
+        )
       }
     }
-    compose.waitUntil(timeoutMillis = 30_000) { done.get() >= urls.size }
+    compose.waitUntil(timeoutMillis = TIMEOUT_MS) { done.get() + failed.get() >= urls.size }
     val elapsed = System.nanoTime() - start
-    check(done.get() >= urls.size) { "$label loaded only ${done.get()} of ${urls.size}" }
+    // A failure ends the wait as a success does, so this can fire. The check it replaces sat
+    // behind a waitUntil that throws on its own and could not.
+    check(failed.get() == 0) { "$label failed to load ${failed.get()} of ${urls.size} images" }
     DeviceMeasure.report("first image on screen, $label", firstAt.get().formatNanos())
     return elapsed
   }
 
   @Test
   fun residentMemoryForAScreenOfImages() {
-    claimTheProcess("landscapist")
+    DeviceMeasure.claimTheProcess("landscapist resident set")
+    warmLandscapist()
     // The only number that sees native bitmaps, which the allocation counter cannot.
-    val landscapist = residentCostOf { url, done ->
+    val landscapist = residentCostOf("landscapist") { url, success, failure ->
       LandscapistImage(
         imageModel = { url },
-        landscapist = newLandscapistShared,
+        landscapist = sharedLandscapist,
         modifier = Modifier.size(side.dp),
         requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
-        onImageStateChanged = { if (it is LandscapistImageState.Success) done() },
+        onImageStateChanged = { state ->
+          when (state) {
+            is LandscapistImageState.Success -> success()
+            is LandscapistImageState.Failure -> failure()
+            else -> Unit
+          }
+        },
       )
     }
     DeviceMeasure.report(
@@ -217,15 +247,22 @@ class LibraryComparisonTest {
 
   @Test
   fun residentMemoryForAScreenOfImagesCoil() {
-    claimTheProcess("coil")
+    DeviceMeasure.claimTheProcess("coil resident set")
+    warmCoil()
     val context = InstrumentationRegistry.getInstrumentation().targetContext
-    val coil = residentCostOf { url, done ->
+    val coil = residentCostOf("coil") { url, success, failure ->
       AsyncImage(
         model = CoilRequest.Builder(context).data(url).build(),
         imageLoader = sharedCoil,
         contentDescription = null,
         modifier = Modifier.size(side.dp),
-        onState = { if (it is AsyncImagePainter.State.Success) done() },
+        onState = { state ->
+          when (state) {
+            is AsyncImagePainter.State.Success -> success()
+            is AsyncImagePainter.State.Error -> failure()
+            else -> Unit
+          }
+        },
       )
     }
     DeviceMeasure.report(
@@ -235,21 +272,31 @@ class LibraryComparisonTest {
   }
 
   /** Kilobytes of resident set the process grew by while holding [images] on screen. */
-  private fun residentCostOf(content: @Composable (String, () -> Unit) -> Unit): Long {
+  private fun residentCostOf(
+    label: String,
+    content: @Composable (String, () -> Unit, () -> Unit) -> Unit,
+  ): Long {
     val urls = urls()
     val done = AtomicInteger()
+    val failed = AtomicInteger()
     DeviceMeasure.settle()
     val resting = DeviceMeasure.residentKb()
     compose.setContent {
-      for (url in urls) content(url) { done.incrementAndGet() }
+      for (url in urls) {
+        content(url, { done.incrementAndGet() }, { failed.incrementAndGet() })
+      }
     }
-    compose.waitUntil(timeoutMillis = 30_000) { done.get() >= urls.size }
+    compose.waitUntil(timeoutMillis = TIMEOUT_MS) { done.get() + failed.get() >= urls.size }
+    // An image that failed holds no bitmap, so a failure would read as a smaller resident set.
+    check(failed.get() == 0) { "$label failed to load ${failed.get()} of ${urls.size} images" }
     DeviceMeasure.settle()
     return DeviceMeasure.residentKb() - resting
   }
 
   @Test
   fun decodeALargePhotoDownToAThumbnail() {
+    DeviceMeasure.claimTheProcess("landscapist decode")
+    warmLandscapist()
     val photo = ImageFixtures.photo(2000, 1500)
     server.serve("/large.jpg", photo)
     val landscapist = newLandscapist()
@@ -290,6 +337,8 @@ class LibraryComparisonTest {
 
   @Test
   fun coilDecodesTheSamePhoto() {
+    DeviceMeasure.claimTheProcess("coil decode")
+    warmCoil()
     // The same bytes and target through Coil's own pipeline, with both caches off.
     val photo = ImageFixtures.photo(2000, 1500)
     server.serve("/large-coil.jpg", photo)
@@ -318,7 +367,6 @@ class LibraryComparisonTest {
   }
 
   private companion object {
-    /** Which loader this process has already measured, if any. */
-    var measuredInThisProcess: String? = null
+    const val TIMEOUT_MS = 30_000L
   }
 }

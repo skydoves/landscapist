@@ -147,12 +147,18 @@ internal fun PixelMap.centre(): Color = this[width / 2, height / 2]
 /** Near the top left, which a centred reveal reaches last. */
 internal fun PixelMap.corner(): Color = this[4, 4]
 
-internal fun Color.isBackdrop(): Boolean = green > 0.5f
+/** The backdrop's own colour, so a node painted anything else is not read as unpainted. */
+internal fun Color.isBackdrop(): Boolean = matches(Backdrop)
 
-internal fun PixelMap.covered(): Float {
+/** The fraction of the node painted [colour], not merely painted something. */
+internal fun PixelMap.coveredBy(colour: Color, tolerance: Float = 0.06f): Float {
   val pixels = samples()
-  return pixels.count { !it.isBackdrop() }.toFloat() / pixels.size
+  return pixels.count { it.matches(colour, tolerance) }.toFloat() / pixels.size
 }
+
+/** Part way between the red and the blue fixture: a blank frame carries neither colour. */
+internal fun Color.isRedBlueDissolve(): Boolean =
+  !matches(RedFixture) && !matches(BlueFixture) && red > 0.15f && blue > 0.15f
 
 internal fun Color.matches(other: Color, tolerance: Float = 0.06f): Boolean =
   abs(red - other.red) <= tolerance &&

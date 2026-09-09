@@ -92,7 +92,7 @@ Landscapist Core is **exceptionally lightweight** compared to other image loadin
 | Library | Module | Release AAR | vs landscapist-core |
 |---------|--------|-------------|---------------------|
 | **landscapist-core** | `landscapist-core` | **313 KiB** | baseline |
-| Coil3 | `coil-core` 3.5.0 | 468 KiB | +50% |
+| Coil3 | `coil-core` 3.6.2 | 468 KiB | +50% |
 | Glide | `glide` 5.0.7 | 693 KiB | +121% |
 | Fresco | core pipeline artifacts | ~1.0 MiB | roughly 3.3x |
 
@@ -237,6 +237,19 @@ val landscapist = Landscapist.builder(context)
     )
     .build()
 ```
+
+Leaving the disk cache unset falls through to the default one on disk. Use `noDiskCache()` for a
+loader that writes nothing to disk, and reads nothing back from it:
+
+```kotlin
+val landscapist = Landscapist.builder(context)
+    .noDiskCache()
+    .build()
+```
+
+The disk cache is keyed by the URL, so one download answers every size an image is drawn at. Any
+headers the request carries scope both that key and the memory key, so two requests for one URL with
+different headers do not share an entry.
 
 <div class="header">
   <h1>Landscapist Image</h1>
@@ -383,6 +396,31 @@ when (currentState) {
 }
 ```
 
+### Drawing the image yourself
+
+A `LandscapistImage` with no slot and no plugin is a single layout node, which draws the image
+itself. Add a `loading`, `success` or `failure` slot or an `ImagePlugin` and it becomes a container,
+and it composes a child inside that container when something actually has to go there. A
+`CrossfadePlugin` does not, since the fade happens inside the painter, and neither does a
+`PainterPlugin` such as `BlurTransformationPlugin`, since the container draws through it.
+
+When all you want is the image, `rememberLandscapistImagePainter` gives you the painter on its own
+and you keep the node:
+
+```kotlin
+import com.skydoves.landscapist.image.rememberLandscapistImagePainter
+
+Image(
+    painter = rememberLandscapistImagePainter(model = "https://example.com/image.jpg"),
+    contentDescription = null,
+    modifier = Modifier.size(120.dp)
+)
+```
+
+It reads the memory cache while it composes, so an already loaded image is drawn in the first frame,
+and it takes the size to decode at from the first draw. There are no loading or failure slots here,
+no `ImagePlugin` and no crossfade, since each of those needs something composed around the image.
+
 ### Supported Image Sources
 
 `LandscapistImage` supports various image sources including network URLs, local files, drawable resources, and more. See the [Landscapist Image documentation](https://skydoves.github.io/landscapist/landscapist-image/#supported-image-sources) for a complete list of supported image sources per platform.
@@ -413,7 +451,7 @@ dependencies {
 }
 ```
 
-> **Note**: `Landscapist-Glide` includes version `4.16.0` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
+> **Note**: `Landscapist-Glide` includes version `5.0.9` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### GlideImage
 You can load images simply by using `GlideImage` composable function as the following example below:

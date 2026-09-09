@@ -80,12 +80,24 @@ internal fun scrollComparison() {
   // essentially all image. Much under that means a variant is drawing empty boxes.
   val blank = painted.filterKeys { it != "empty list" }.filterValues { it <= 0.85 }.keys
   check(blank.isEmpty()) { "$blank drew nothing mid scroll, so the rows below are not comparable" }
-  // A scroll is supposed to fetch, unlike the first frame rows: both sides should fetch the same
-  // amount, and a gap is a cache not reusing what it has rather than a cheaper Compose layer.
+  // A scroll is supposed to fetch, unlike the first frame rows. Checked rather than printed and
+  // moved on from: the two plain loaders warm two variants each over the same frames, so a gap
+  // between them is a cache not reusing what it has, and every row below would then be comparing
+  // that rather than a Compose layer.
+  val landscapistFetches = landscapistCounter.count.get()
+  val coilFetches = coilCounter.count.get()
+  val fadingFetches = fadingCounter.count.get()
   println(
-    "  fetches so far, per loader: landscapist ${landscapistCounter.count.get()}, " +
-      "coil ${coilCounter.count.get()}, coil crossfade ${fadingCounter.count.get()}",
+    "  fetches so far, per loader: landscapist $landscapistFetches, coil $coilFetches, " +
+      "coil crossfade $fadingFetches",
   )
+  check(fadingFetches > 0) { "the crossfading loader never fetched, so its rows are empty frames" }
+  val most = maxOf(landscapistFetches, coilFetches)
+  val least = minOf(landscapistFetches, coilFetches)
+  check(least > 0 && most <= least * FETCH_TOLERANCE) {
+    "landscapist fetched $landscapistFetches times and coil $coilFetches over the same warm up, " +
+      "so the rows below are not comparing the same work"
+  }
   println()
 
   println(
@@ -217,6 +229,9 @@ private const val ITEM_HEIGHT = 180
 private const val SCROLL_STEP = 16f
 private const val FLING_STEP = 120f
 private const val SCROLL_FRAMES = 400
+
+/** How far apart the two loaders' fetch counts may drift before the rows stop being comparable. */
+private const val FETCH_TOLERANCE = 2
 
 /** Long enough for the reference processor to clear what the collection above made unreachable. */
 private const val GC_SETTLE_MS = 50L

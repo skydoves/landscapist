@@ -114,7 +114,10 @@ class NetworkDeviceTest {
     server.serve(TRUNCATED, ImageFixtures.truncatedJpeg(64, 64))
 
     when (val result = load(server.url(TRUNCATED))) {
-      is ImageResult.Failure -> Unit
+      is ImageResult.Failure -> assertTrue(
+        "a truncated body failed with nothing to say why: $result",
+        result.throwable != null || result.message != null,
+      )
       is ImageResult.Success -> assertEquals(
         "a partial decode was reported at a width the 64px source never had",
         64,
@@ -160,7 +163,7 @@ class NetworkDeviceTest {
     )
     assertTrue("a stalled response did not fail the load: $result", result is ImageResult.Failure)
     assertTrue(
-      "the load failed after ${elapsedMs}ms, far past the " +
+      "the load failed after ${elapsedMs}ms, past the ${TIMEOUT_SLACK_MS}ms this allows for the " +
         "${READ_TIMEOUT.inWholeMilliseconds}ms read timeout it was built with",
       elapsedMs < TIMEOUT_SLACK_MS,
     )
@@ -236,9 +239,11 @@ class NetworkDeviceTest {
     const val TARGET = "/target.jpg"
     const val SLOW = "/slow.jpg"
     const val STALLED = "/stalled.jpg"
-    const val TIMEOUT_SLACK_MS = 10_000L
     const val LOAD_TIMEOUT_MS = 20_000L
     val READ_TIMEOUT = 1.seconds
+
+    /** Room for a cold client, and no room for a longer timeout than the one under test. */
+    val TIMEOUT_SLACK_MS = READ_TIMEOUT.inWholeMilliseconds * 4
   }
 
   @Test
