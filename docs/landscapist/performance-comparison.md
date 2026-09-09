@@ -12,19 +12,19 @@ Artifact size is the one comparison that is stable and reproducible, because it 
 
 | Library | Module measured | Release AAR | vs landscapist-core |
 |---------|-----------------|-------------|---------------------|
-| **landscapist-core** | `landscapist-core` | **313 KiB** | baseline |
-| Coil3 | `coil-core` 3.6.2 | 468 KiB | +50% |
-| Glide | `glide` 5.0.7 | 693 KiB | +121% |
-| Fresco | core pipeline artifacts | ~1.0 MiB | roughly 3.3x |
+| **landscapist-core** | `landscapist-core` | **371 KiB** | baseline |
+| Coil3 | `coil-core` 3.6.2 | 469 KiB | +26% |
+| Glide | `glide` 5.0.9 | 701 KiB | +89% |
+| Fresco | core pipeline artifacts | 1.11 MiB | 3.06x |
 
 Reproduce the landscapist-core number (byte size, so it does not vary by filesystem):
 
 ```bash
 ./gradlew :landscapist-core:assembleRelease
-ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar   # 320,771 bytes = 313 KiB
+ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar   # 379,990 bytes = 371 KiB
 ```
 
-The competitor numbers are the cached release AARs under `~/.gradle/caches/modules-2/files-2.1/`. The Fresco figure sums the required network-pipeline artifacts (`imagepipeline`, `fbcore`, `imagepipeline-base`, `ui-common`, `middleware`, `soloader`), which total about 1.0 MiB; a full Fresco setup with native transcoding and animation pulls in more.
+The competitor numbers are the cached release AARs under `~/.gradle/caches/modules-2/files-2.1/`, at the versions this repository pins. The Fresco figure sums the required network-pipeline artifacts (`imagepipeline`, `fbcore`, `imagepipeline-base`, `ui-common`, `middleware`, `soloader`), which total 1,163,224 bytes; a full Fresco setup with native transcoding and animation pulls in more.
 
 Caveats, so the table is not misread:
 
@@ -99,9 +99,17 @@ The first two rows are an image with no plugin and no slot, which is the one dra
 layout node. The rows named painter are `rememberLandscapistImagePainter` against Coil's
 `rememberAsyncImagePainter`, both inside a plain `Image`.
 
-Read the crossfade row carefully, because it is not a fade against a fade. Both sides are warm
-there, and Coil returns `Transition.Factory.NONE` when `result.dataSource == DataSource.MEMORY_CACHE`,
-so its column is what it costs to decide not to fade. Landscapist reads the cache while it composes,
+Two of those rows are not comparisons. `resize frame, painter` is one: the Coil arm keys its
+request on a size that changes every frame, so it rebuilds the request and restarts the load on each
+of them, and the benchmark prints as much next to the number ("that is the row's cost, not the
+painter's"). `AsyncImage` does not work that way, and the row should not be read as a painter
+against a painter.
+
+The other is the crossfade row, and it is not a fade against a fade. Both sides are warm
+there, and Coil declines to fade when `result.dataSource == DataSource.MEMORY_CACHE`, so its column
+is what it costs to decide not to fade. That check sits in `CrossfadeTransition.Factory` on
+Android and in `AsyncImagePainter.nonAndroid` on the platform this benchmark runs on, with the
+same comment above it in both. Landscapist reads the cache while it composes,
 so it has no loading state to fade out of either and does not run one. What the row compares is what
 each library pays to have a crossfade installed that neither runs, and 49.5 KiB of that is
 landscapist's.

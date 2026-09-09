@@ -471,6 +471,12 @@ LandscapistImage(
 )
 ```
 
+Headers are part of what identifies a cache entry, in memory and on disk, so that two viewers with
+different credentials are never handed each other's images. The whole header map counts, which means
+a token that rotates re-keys every image behind it and leaves the entries under the old one to be
+evicted. Send a credential that changes on its own schedule through the network configuration rather
+than per request.
+
 ## Supported Image Sources
 
 ### Android

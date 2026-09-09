@@ -8,10 +8,10 @@ Landscapist Core is **exceptionally lightweight** compared to other image loadin
 
 | Library | Module | Release AAR | vs landscapist-core |
 |---------|--------|-------------|---------------------|
-| **landscapist-core** | `landscapist-core` | **313 KiB** | baseline |
-| Coil3 | `coil-core` 3.6.2 | 468 KiB | +50% |
-| Glide | `glide` 5.0.7 | 693 KiB | +121% |
-| Fresco | core pipeline artifacts | ~1.0 MiB | roughly 3.3x |
+| **landscapist-core** | `landscapist-core` | **371 KiB** | baseline |
+| Coil3 | `coil-core` 3.6.2 | 469 KiB | +26% |
+| Glide | `glide` 5.0.9 | 701 KiB | +89% |
+| Fresco | core pipeline artifacts | 1.11 MiB | 3.06x |
 
 Reproduce with `./gradlew :landscapist-core:assembleRelease`. This measures a single module's AAR, not the full transitive footprint (landscapist-core also pulls in Ktor, Okio, coroutines, and atomicfu). What ends up in your APK depends on R8 shrinking and the features you use.
 

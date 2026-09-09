@@ -10,13 +10,13 @@ The Compose layer and the loader underneath it were both rebuilt for what they c
 
 ## Read this before upgrading
 
-**Every image is downloaded once more on the first launch after upgrading.** The disk cache key used to be the URL, and then the target size and the transformation keys folded in on top when a request had either. It is the URL alone now, so one download answers every size an image is drawn at instead of one file per size. An image loaded through a composable is always sized, so its old entry sat under a key nothing looks for any more: the first launch refetches it, and the file 2.12.1 wrote stays on disk until the cache passes its size limit and evicts it. There is no migration, the entries are orphaned rather than renamed. Call `landscapist.config.diskCache?.clear()` once on upgrade if you would rather reclaim the space immediately than wait for eviction. A request that carried no target size and no transformations keys as it did before, and its entry is still found.
+**Every image is downloaded once more on the first launch after upgrading.** The disk cache key used to be the URL, and then the target size and the transformation keys folded in on top when a request had either. It is the URL alone now, so one download answers every size an image is drawn at instead of one file per size. An image loaded through a composable is always sized, so its old entry sat under a key nothing looks for any more: the first launch refetches it, and the file 2.12.1 wrote stays on disk until the cache passes its size limit and evicts it. There is no migration, the entries are orphaned rather than renamed. Call `landscapist.clearDiskCache()`, which suspends, once on upgrade if you would rather reclaim the space immediately than wait for eviction. `config.diskCache` is not it: that is the cache a caller supplied, and it is null for a loader that built its own. A request that carried no target size and no transformations keys as it did before, and its entry is still found.
 
 **Requests that carry headers now key separately from requests that do not.** An `Authorization` or `Cookie` header makes it a different viewer's image and content negotiation makes it different bytes, so headers are folded into both the memory key and the disk key. Two requests for one URL with different headers no longer share an entry, which is the point, but an app that sets a per-request header and expected to share a cache entry with an unauthenticated request will see one fetch per distinct header set. A request with no headers keys exactly as it did in 2.12.1.
 
 **A `MemoryCache` you wrote yourself keeps working, but decodes more than it needs to.** The loader now asks the cache for an already decoded variant through the new `MemoryCache.getMatching`. The default implementation falls back to an exact `get`, so a custom cache that does not override it is correct but loses the reuse: a layout that measures to 359, 360 and 361 decodes the same image three times. `LruMemoryCache` and `TwoTierMemoryCache` both implement it.
 
-**An image usually exposes one node with its content description now, where it used to expose two.** An image was a container plus a child `Image` composed inside it, and both carried `ImageOptions.contentDescription`. The child is composed only when something actually has to go inside the container: a `loading`, `success` or `failure` slot, a state plugin or a `ComposablePlugin`. A plain image, an image with only a `CrossfadePlugin` and an image with only a `PainterPlugin` such as `BlurTransformationPlugin` are all drawn without one. A UI test that looked the image up by content description and expected two nodes, or that reached for the child of the container, needs updating.
+**An image usually exposes one node with its content description now, where it used to expose two.** An image was a container plus a child `Image` composed inside it, and both carried `ImageOptions.contentDescription`. The child is composed only when something has to go inside the container while the image is on screen: a `success` slot, a `SuccessStatePlugin`, or a `ComposablePlugin` such as `ZoomablePlugin`. A plain image, an image with only a `CrossfadePlugin`, one with only a `PainterPlugin` such as `BlurTransformationPlugin`, and one with only a `loading` or `failure` slot or a `LoadingStatePlugin` are all drawn without a child once loaded, since nothing of theirs is on screen then. A UI test that looked the image up by content description and expected two nodes, or that reached for the child of the container, needs updating.
 
 **`rememberImageComponent` follows a plugin set that changes.** It was a `remember` with no keys, so a plugin set computed from state was frozen at whatever it was on the first composition and a toggle never reached the image. The remember is keyed on the plugins now, so the component keeps its identity while they are unchanged and is replaced when they are not. Updating it in place, which is what the first attempt did, kept the identity and so kept the change from ever reaching an image: images are skippable and take the component as a stable parameter.
 
@@ -37,7 +37,7 @@ Twenty images, medians, allocation above an empty scene, from `./gradlew :benchm
 | first frame, painter | new | **118.2** | 147.8 |
 | resize frame, painter | new | **13.8** | 72.2 |
 
-The crossfade row is not a fade against a fade. Both sides are warm, and Coil returns `Transition.Factory.NONE` when the result came from the memory cache, so its column is what it costs to decide not to fade. Landscapist reads the cache while it composes and has no loading state to fade out of either. The row is what each library pays to have a crossfade installed that neither runs.
+Two rows here are not comparisons. `resize frame, painter` is one: the Coil arm keys its request on a size that changes every frame, so it rebuilds the request and restarts the load each time, which the benchmark itself prints as "the row's cost, not the painter's". `AsyncImage` does not work that way. The other is the crossfade row, and it is not a fade against a fade. Both sides are warm, and Coil declines to fade when the result came from the memory cache, on this platform and on Android alike, so its column is what it costs to decide not to fade. Landscapist reads the cache while it composes and has no loading state to fade out of either. The row is what each library pays to have a crossfade installed that neither runs.
 
 Frame timing is a tie: medians within a tenth of a millisecond over five iterations and three runs, with upper percentiles swinging both ways between them. Nothing is claimed from it in either direction. The benchmark app it comes from used to compare this library to itself, and its driver waited on a selector that never matched; that is fixed, and the driver now also waits for a marker the app publishes only once rows report a loaded image.
 
@@ -59,7 +59,7 @@ It reads the memory cache while it composes, so an image that is already loaded 
 
 Desktop decode read the whole raster and shrank it afterwards, so a 400x300 thumbnail of a 4000x3000 photo materialised 48 MB of pixels first. ImageIO's `setSourceSubsampling` never reaches libjpeg's own scaling, so asking for one pixel in eight still ran the full inverse DCT.
 
-It decodes through Skia when skiko is on the classpath, which scales during the inverse DCT, and falls back to ImageIO subsampling otherwise. A Compose desktop application already has skiko. Decoding a 4000x3000 JPEG down to 400x300 goes from 486.8 ms to 41.7 ms, the Java heap for one decode from 344.85 MiB to 953.7 KiB, and peak heap above resting from 144.99 MiB to zero, on the same JVM benchmark as above.
+It decodes through Skia when skiko is on the classpath, which scales during the inverse DCT, and falls back to ImageIO subsampling otherwise. A Compose desktop application already has skiko. Decoding a 4000x3000 JPEG down to 400x300 allocates 953.7 KiB of Java heap, against 344.85 MiB for the same ImageIO stack with the subsampling taken out, and peak heap above resting goes from 144.99 MiB on that path to zero on this one. Both comparisons are against a model of the path this release stopped taking, measured in this tree, not against a run of 2.12.1.
 
 Two things fell out of that work. Skia's eighths scaling never engaged, because libjpeg rounds up and the request rounded down. And Skia's four argument `ImageInfo` leaves the colour space null, so an ICC tagged photograph came back oversaturated.
 
@@ -95,12 +95,17 @@ Measured on an emulator, with a fresh process for each measured loader, because 
 
 | | landscapist | coil 3.6.2 |
 |---|---|---|
-| first image on screen, 20 composed at once | 197 to 365 ms | **154 to 267 ms** |
-| until all 20 report success | 243 to 403 ms | **214 to 333 ms** |
-| resident set above resting, 20 images | 51 to 60 MiB | **45.2 to 45.3 MiB** |
-| decode 2000x1500 to 200x150, median of 8 | 34 to 35 ms | **24 to 25 ms** |
-| the same decode, allocated | 5.4 MiB | **1.9 MiB** |
-| scroll, 8 swipes over 60 rows, allocated | 2.8 to 3.3 MiB | 2.7 to 2.8 MiB |
+| first image on screen, 20 composed at once | 138, 124 ms | **99, 98 ms** |
+| until all 20 report success | 241, 246 ms | **166, 174 ms** |
+| resident set above resting, 20 images | 59.4, 59.5 MiB | **45.5, 33.0 MiB** |
+| decode 2000x1500 to 200x150, median of 8 | 34.0, 35.7, 36.5, 34.4 ms | **22.4, 24.9, 23.9, 23.1 ms** |
+| the same decode, allocated | 5.45 MiB | **1.84 MiB** |
+| scroll, 8 swipes over 240 rows, allocated | 44.9, 44.8, 45.3 MiB | **18.5, 18.6, 18.7 MiB** |
+
+The scroll row counts the rows the server answered during the measured pass, and those counts say
+something the allocation does not: over the same list with the same 32 MiB cache, landscapist
+re-fetches 136 of 240 rows and Coil 78, repeating exactly across runs. It decodes 74 percent more
+images per pass, so its 2.4x is not a per row overhead.
 
 So: ahead on every JVM row, behind on cold load, on decode and on resident memory on the device. The Android decode path is untouched by this work, so that row is not a regression, but it is the reverse of what the desktop numbers say and it is the platform that ships.
 

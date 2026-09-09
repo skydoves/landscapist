@@ -329,9 +329,16 @@ exactly produce different pixels for the same request. An entry that a variant i
 not marked as recently used, so a lookup that finds nothing usable does not disturb the eviction
 order.
 
+Three things are never answered from a variant. A request carrying transformations, since the size
+recorded for an entry is the decoder's output rather than what the transformation left behind. A
+request that names no size at all, since the layout has not measured yet and the variant on hand
+could be a thumbnail. And on Apple and wasm the opposite holds: those decoders keep the encoded
+bytes and let Skia decode at draw size, so the entry is the whole source and serves any box.
+
 Both caches that ship, `LruMemoryCache` and `TwoTierMemoryCache`, implement it. A custom
-`MemoryCache` that does not override it still works: the default implementation falls back to an
-exact `get`, and the loader decodes the same image once per distinct size.
+`MemoryCache` that does not override it still works: the default returns an exact `get`, and the
+loader decodes the same image once per distinct size. The default cannot do better, because only the
+cache knows the box each variant it holds was decoded for.
 
 #### Reading the cache without suspending
 
@@ -384,7 +391,7 @@ val landscapist = Landscapist.builder(context)
     .build()
 ```
 
-Calling `diskCache(cache)` afterwards puts one back.
+`Landscapist.builder(context)` returns an `AndroidBuilder`, whose surface is `config`, `noDiskCache` and `build`. To supply a disk cache of your own, build the configuration and pass it through `config(...)`.
 
 ### Cache Policies
 

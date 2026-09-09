@@ -91,12 +91,12 @@ Landscapist Core is **exceptionally lightweight** compared to other image loadin
 
 | Library | Module | Release AAR | vs landscapist-core |
 |---------|--------|-------------|---------------------|
-| **landscapist-core** | `landscapist-core` | **313 KiB** | baseline |
-| Coil3 | `coil-core` 3.6.2 | 468 KiB | +50% |
-| Glide | `glide` 5.0.7 | 693 KiB | +121% |
-| Fresco | core pipeline artifacts | ~1.0 MiB | roughly 3.3x |
+| **landscapist-core** | `landscapist-core` | **371 KiB** | baseline |
+| Coil3 | `coil-core` 3.6.2 | 469 KiB | +26% |
+| Glide | `glide` 5.0.9 | 701 KiB | +89% |
+| Fresco | core pipeline artifacts | 1.11 MiB | 3.06x |
 
-Reproduce with `./gradlew :landscapist-core:assembleRelease && ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar` (320,771 bytes = 313 KiB). This is a single module's AAR, not the full transitive footprint.
+Reproduce with `./gradlew :landscapist-core:assembleRelease && ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar` (379,990 bytes = 371 KiB). This is a single module's AAR, not the full transitive footprint.
 
 Load-time and memory numbers are not published here because they depend on device, OS, and network. Run the included benchmarks (`ImageLibraryBenchmark` instrumentation test and the `:benchmark-landscapist` macrobenchmark) on your own hardware. See the [performance comparison](https://skydoves.github.io/landscapist/landscapist/performance-comparison/) for methodology.
 
@@ -915,6 +915,7 @@ You can compose supported image plugins by Landscapist or you can create your ow
 - **LoadingStatePlugin**: A pluggable state plugin that will be composed while the state is `ImageLoadState.Loading`.
 - **SuccessStatePlugin**: A pluggable state plugin that will be composed when the state is `ImageLoadState.Success`.
 - **FailureStatePlugin**: A pluggable state plugin that will be composed when the state is `ImageLoadState.Failure`.
+- **ComposablePlugin**: A plugin that wraps the image in composable content of its own, such as `ZoomablePlugin`.
 
 For example, you can implement your own `LoadingStatePlugin` that will be composed while loading an image like the below:
 

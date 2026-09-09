@@ -11,6 +11,7 @@ With Landscapist, you have the flexibility to compose supported image plugins, o
 - **LoadingStatePlugin**: A pluggable state plugin that will be composed while the state is `ImageLoadState.Loading`.
 - **SuccessStatePlugin**: A pluggable state plugin that will be composed when the state is `ImageLoadState.Success`.
 - **FailureStatePlugin**: A pluggable state plugin that will be composed when the state is `ImageLoadState.Failure`.
+- **ComposablePlugin**: A plugin that wraps the image in composable content of its own, such as `ZoomablePlugin`.
 
 Whether you choose from the existing plugins or create your own, Landscapist offers a seamless and customizable image loading experience for your app.
 

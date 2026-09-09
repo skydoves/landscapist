@@ -8,16 +8,16 @@ Release AAR size of each library's core engine module, for the versions this rep
 
 | Library | Module | Release AAR | vs landscapist-core |
 |---------|--------|-------------|---------------------|
-| **landscapist-core** | `landscapist-core` | **313 KiB** | baseline |
-| Coil3 | `coil-core` 3.5.0 | 468 KiB | +50% |
-| Glide | `glide` 5.0.7 | 693 KiB | +121% |
-| Fresco | core pipeline artifacts | ~1.0 MiB | roughly 3.3x |
+| **landscapist-core** | `landscapist-core` | **371 KiB** | baseline |
+| Coil3 | `coil-core` 3.6.2 | 469 KiB | +26% |
+| Glide | `glide` 5.0.9 | 701 KiB | +89% |
+| Fresco | core pipeline artifacts | 1.11 MiB | 3.06x |
 
 Reproduce:
 
 ```bash
 ./gradlew :landscapist-core:assembleRelease
-ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar   # 320,771 bytes = 313 KiB
+ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar   # 379,990 bytes = 371 KiB
 ```
 
 Note: this is a single module's AAR, not the full transitive footprint. See [docs/landscapist/performance-comparison.md](../docs/landscapist/performance-comparison.md) for the caveats.
