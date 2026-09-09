@@ -40,7 +40,7 @@ import com.skydoves.landscapist.core.Landscapist
 import com.skydoves.landscapist.core.model.ImageResult
 import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.image.LandscapistImage
-import com.skydoves.landscapist.image.rememberLandscapistImagePainter
+import com.skydoves.landscapist.image.rememberImagePainter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -439,7 +439,7 @@ private fun LandscapistPainterList(
   Column {
     for (model in models) {
       Image(
-        painter = rememberLandscapistImagePainter(model = model, landscapist = landscapist),
+        painter = rememberImagePainter(model = model, landscapist = landscapist),
         contentDescription = null,
         modifier = Modifier.size(itemSize.dp),
       )

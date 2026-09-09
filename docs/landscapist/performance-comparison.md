@@ -96,7 +96,7 @@ What the Compose layer allocates per frame, for twenty images, as medians above 
 | resize frame, painter | new | 13.8 | 72.2 |
 
 The first two rows are an image with no plugin and no slot, which is the one drawn by a single
-layout node. The rows named painter are `rememberLandscapistImagePainter` against Coil's
+layout node. The rows named painter are `rememberImagePainter` against Coil's
 `rememberAsyncImagePainter`, both inside a plain `Image`.
 
 Two of those rows are not comparisons. `resize frame, painter` is one: the Coil arm keys its

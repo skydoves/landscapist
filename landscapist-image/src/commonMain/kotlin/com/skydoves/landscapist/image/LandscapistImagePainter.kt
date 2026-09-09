@@ -64,7 +64,7 @@ import kotlin.math.roundToInt
  * @param onImageStateChanged Callback invoked when the image state changes.
  */
 @Composable
-public fun rememberLandscapistImagePainter(
+public fun rememberImagePainter(
   model: Any?,
   landscapist: Landscapist = getLandscapist(),
   requestBuilder: (ImageRequest.Builder.() -> Unit)? = null,

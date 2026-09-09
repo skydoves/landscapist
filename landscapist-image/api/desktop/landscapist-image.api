@@ -17,7 +17,7 @@ public final class com/skydoves/landscapist/image/LandscapistImageKt {
 }
 
 public final class com/skydoves/landscapist/image/LandscapistImagePainterKt {
-	public static final fun rememberLandscapistImagePainter (Ljava/lang/Object;Lcom/skydoves/landscapist/core/Landscapist;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)Landroidx/compose/ui/graphics/painter/Painter;
+	public static final fun rememberImagePainter (Ljava/lang/Object;Lcom/skydoves/landscapist/core/Landscapist;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)Landroidx/compose/ui/graphics/painter/Painter;
 }
 
 public abstract class com/skydoves/landscapist/image/LandscapistImageState : com/skydoves/landscapist/ImageState {

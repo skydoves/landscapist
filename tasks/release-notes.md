@@ -43,13 +43,13 @@ Two rows here are not comparisons. `resize frame, painter` is one: the Coil arm 
 
 Frame timing is a tie: medians within a tenth of a millisecond over five iterations and three runs, with upper percentiles swinging both ways between them. Nothing is claimed from it in either direction. The benchmark app it comes from used to compare this library to itself, and its driver waited on a selector that never matched; that is fixed, and the driver now also waits for a marker the app publishes only once rows report a loaded image.
 
-## `rememberLandscapistImagePainter`
+## `rememberImagePainter`
 
 The painter on its own, for a caller who wants a plain `Image` and one layout node.
 
 ```kotlin
 Image(
-  painter = rememberLandscapistImagePainter(model = "https://example.com/image.jpg"),
+  painter = rememberImagePainter(model = "https://example.com/image.jpg"),
   contentDescription = null,
   modifier = Modifier.size(120.dp),
 )
@@ -132,7 +132,7 @@ So: ahead on every JVM row, behind on cold load, on decode and on resident memor
 
 Additive. Seven new declarations, nothing removed or changed.
 
-* `rememberLandscapistImagePainter` in `landscapist-image`.
+* `rememberImagePainter` in `landscapist-image`.
 * `Landscapist.Builder.noDiskCache`, for a loader that writes nothing to disk. Leaving the disk cache unset falls through to the default one, so there was no way to say you wanted none.
 * `MemoryCache.getMatching`, with a default implementation that falls back to an exact `get`.
 * `ImageOptions.Default` and the companion object that holds it, so a composable that is passed no options does not allocate a fresh `ImageOptions` per frame.

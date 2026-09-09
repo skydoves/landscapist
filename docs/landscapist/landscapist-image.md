@@ -245,12 +245,12 @@ used to expose two. A lookup that expected two nodes needs updating.
 
 ## Drawing the image yourself
 
-When all you want is the image and none of the machinery, `rememberLandscapistImagePainter` hands
+When all you want is the image and none of the machinery, `rememberImagePainter` hands
 you the painter on its own and the caller owns the only node:
 
 ```kotlin
 Image(
-  painter = rememberLandscapistImagePainter(model = "https://example.com/image.jpg"),
+  painter = rememberImagePainter(model = "https://example.com/image.jpg"),
   contentDescription = null,
   modifier = Modifier.size(120.dp),
 )

@@ -53,7 +53,7 @@ import com.skydoves.landscapist.core.network.FetchResult
 import com.skydoves.landscapist.core.network.ImageFetcher
 import com.skydoves.landscapist.core.network.KtorImageFetcher
 import com.skydoves.landscapist.image.LandscapistImageState
-import com.skydoves.landscapist.image.rememberLandscapistImagePainter
+import com.skydoves.landscapist.image.rememberImagePainter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -193,7 +193,7 @@ class PainterDeviceTest {
     compose.setContent {
       OnBackdrop {
         Image(
-          painter = rememberLandscapistImagePainter(
+          painter = rememberImagePainter(
             model = url(),
             landscapist = loader,
             requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
@@ -220,7 +220,7 @@ class PainterDeviceTest {
     compose.setContent {
       OnBackdrop {
         Image(
-          painter = rememberLandscapistImagePainter(
+          painter = rememberImagePainter(
             model = url(),
             landscapist = loader,
             requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
@@ -252,7 +252,7 @@ class PainterDeviceTest {
     compose.setContent {
       OnBackdrop {
         Image(
-          painter = rememberLandscapistImagePainter(
+          painter = rememberImagePainter(
             model = url(),
             landscapist = recording,
             requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
@@ -287,7 +287,7 @@ class PainterDeviceTest {
 
     compose.setContent {
       OnBackdrop {
-        val painter = rememberLandscapistImagePainter(
+        val painter = rememberImagePainter(
           model = url(),
           landscapist = loader,
           requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
@@ -324,7 +324,7 @@ class PainterDeviceTest {
       // Width from the parent, height from the image, so with no image it is zero high.
       Column(Modifier.verticalScroll(rememberScrollState())) {
         Image(
-          painter = rememberLandscapistImagePainter(
+          painter = rememberImagePainter(
             model = url(),
             landscapist = recording,
             requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },

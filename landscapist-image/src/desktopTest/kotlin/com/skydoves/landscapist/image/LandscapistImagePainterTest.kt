@@ -157,7 +157,7 @@ class LandscapistImagePainterTest {
 
     val pixels = render {
       Image(
-        painter = rememberLandscapistImagePainter(
+        painter = rememberImagePainter(
           model = url,
           landscapist = loader,
           requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
@@ -177,7 +177,7 @@ class LandscapistImagePainterTest {
     // The first frame gives the painter its size, so the image can only be in the frame after.
     val pixels = render(frames = 2, done = { it.coverage() > 0.9 }) {
       Image(
-        painter = rememberLandscapistImagePainter(
+        painter = rememberImagePainter(
           model = url,
           landscapist = loader,
           requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
@@ -196,7 +196,7 @@ class LandscapistImagePainterTest {
 
     render(frames = 2, done = { requested.isNotEmpty() }) {
       Image(
-        painter = rememberLandscapistImagePainter(
+        painter = rememberImagePainter(
           model = url,
           landscapist = loader,
           requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
@@ -217,7 +217,7 @@ class LandscapistImagePainterTest {
     val states = mutableListOf<LandscapistImageState>()
 
     render(frames = 2, done = { states.any { state -> state is LandscapistImageState.Success } }) {
-      val painter = rememberLandscapistImagePainter(
+      val painter = rememberImagePainter(
         model = url,
         landscapist = loader,
         requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },
@@ -257,7 +257,7 @@ class LandscapistImagePainterTest {
         // Width from the parent, height from the image, so with no image it is zero high.
         Column(Modifier.verticalScroll(rememberScrollState())) {
           Image(
-            painter = rememberLandscapistImagePainter(
+            painter = rememberImagePainter(
               model = url,
               landscapist = loader,
               onImageStateChanged = { states += it },
@@ -302,7 +302,7 @@ class LandscapistImagePainterTest {
       content = {
         Column(Modifier.verticalScroll(rememberScrollState())) {
           Image(
-            painter = rememberLandscapistImagePainter(
+            painter = rememberImagePainter(
               model = url,
               landscapist = loader,
               requestBuilder = { diskCachePolicy(CachePolicy.DISABLED) },

@@ -404,14 +404,14 @@ and it composes a child inside that container when something actually has to go 
 `CrossfadePlugin` does not, since the fade happens inside the painter, and neither does a
 `PainterPlugin` such as `BlurTransformationPlugin`, since the container draws through it.
 
-When all you want is the image, `rememberLandscapistImagePainter` gives you the painter on its own
+When all you want is the image, `rememberImagePainter` gives you the painter on its own
 and you keep the node:
 
 ```kotlin
-import com.skydoves.landscapist.image.rememberLandscapistImagePainter
+import com.skydoves.landscapist.image.rememberImagePainter
 
 Image(
-    painter = rememberLandscapistImagePainter(model = "https://example.com/image.jpg"),
+    painter = rememberImagePainter(model = "https://example.com/image.jpg"),
     contentDescription = null,
     modifier = Modifier.size(120.dp)
 )
