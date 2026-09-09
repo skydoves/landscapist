@@ -30,14 +30,16 @@ Twenty images, medians, allocation above an empty scene, from `./gradlew :benchm
 
 | KiB per frame | 2.12.1 | 2.13.0 | coil 3.6.2 |
 |---|---|---|---|
-| first frame | 353.5 | **76.2** | 109.5 |
-| resize frame | 34.7 | **5.5** | 5.7 |
+| first frame | 353.5 | **77.0** | 109.5 |
+| resize frame | 34.7 | **5.5** | 5.8 |
 | first frame, crossfade | 402.6 | **126.5** | 109.5 |
-| first frame, success slot | 335.7 | **262.2** | 147.8 painter, 549.5 subcompose |
-| first frame, painter | new | **119.1** | 147.8 |
-| resize frame, painter | new | **13.7** | 72.2 |
+| first frame, success slot | 335.7 | **262.5** | 147.8 painter, 548.7 subcompose |
+| first frame, painter | new | **118.2** | 147.8 |
+| resize frame, painter | new | **13.8** | 72.2 |
 
-There is no frame timing row. The macrobenchmark module in this repository can produce one, but the comparison it sets up does not measure two libraries against each other: its Coil tab runs `CoilImage`, this library's own wrapper, rather than Coil's `AsyncImage`; its Landscapist tab installs eight plugins, so the single node path is never in the measurement; and the app opens on the Landscapist tab, which composes and fetches inside every measured block including Coil's. The benchmark app needs fixing before a frame timing figure can be published.
+The crossfade row is not a fade against a fade. Both sides are warm, and Coil returns `Transition.Factory.NONE` when the result came from the memory cache, so its column is what it costs to decide not to fade. Landscapist reads the cache while it composes and has no loading state to fade out of either. The row is what each library pays to have a crossfade installed that neither runs.
+
+Frame timing is a tie: medians within a tenth of a millisecond over five iterations and three runs, with upper percentiles swinging both ways between them. Nothing is claimed from it in either direction. The benchmark app it comes from used to compare this library to itself, and its driver waited on a selector that never matched; that is fixed, and the driver now also waits for a marker the app publishes only once rows report a loaded image.
 
 ## `rememberLandscapistImagePainter`
 

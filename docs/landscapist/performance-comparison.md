@@ -88,16 +88,23 @@ What the Compose layer allocates per frame, for twenty images, as medians above 
 
 | KiB per frame | before | after | coil 3.6.2 |
 |---|---|---|---|
-| first frame | 353.5 | 76.2 | 109.5 |
-| resize frame | 34.7 | 5.5 | 5.7 |
+| first frame | 353.5 | 77.0 | 109.5 |
+| resize frame | 34.7 | 5.5 | 5.8 |
 | first frame, crossfade | 402.6 | 126.5 | 109.5 |
-| first frame, success slot | 335.7 | 262.2 | 147.8 painter, 549.5 subcompose |
-| first frame, painter | new | 119.1 | 147.8 |
-| resize frame, painter | new | 13.7 | 72.2 |
+| first frame, success slot | 335.7 | 262.5 | 147.8 painter, 548.7 subcompose |
+| first frame, painter | new | 118.2 | 147.8 |
+| resize frame, painter | new | 13.8 | 72.2 |
 
 The first two rows are an image with no plugin and no slot, which is the one drawn by a single
-layout node. The last two are `rememberLandscapistImagePainter` against Coil's
+layout node. The rows named painter are `rememberLandscapistImagePainter` against Coil's
 `rememberAsyncImagePainter`, both inside a plain `Image`.
+
+Read the crossfade row carefully, because it is not a fade against a fade. Both sides are warm
+there, and Coil returns `Transition.Factory.NONE` when `result.dataSource == DataSource.MEMORY_CACHE`,
+so its column is what it costs to decide not to fade. Landscapist reads the cache while it composes,
+so it has no loading state to fade out of either and does not run one. What the row compares is what
+each library pays to have a crossfade installed that neither runs, and 49.5 KiB of that is
+landscapist's.
 
 None of the rows above is measured on Android, and the decoders there are different code on both
 sides, so the section below is the one to read for the platform that ships.
@@ -111,12 +118,19 @@ Each cell is the spread across the runs that were taken.
 
 | | landscapist | coil 3.6.2 |
 |---|---|---|
-| first image on screen, 20 composed at once | 197 to 365 ms | 154 to 267 ms |
-| until all 20 report success | 243 to 403 ms | 214 to 333 ms |
-| resident set above resting, 20 images | 51 to 60 MiB | 45.2 to 45.3 MiB |
-| decode 2000x1500 to 200x150, median of 8 | 34 to 35 ms | 24 to 25 ms |
-| the same decode, allocated | 5.4 MiB | 1.9 MiB |
-| scroll, 8 swipes over 60 rows, allocated | 2.8 to 3.3 MiB | 2.7 to 2.8 MiB |
+| first image on screen, 20 composed at once | 138, 124 ms | 99, 98 ms |
+| until all 20 report success | 241, 246 ms | 166, 174 ms |
+| resident set above resting, 20 images | 59.4, 59.5 MiB | 45.5, 33.0 MiB |
+| decode 2000x1500 to 200x150, median of 8 | 34.0, 35.7, 36.5, 34.4 ms | 22.4, 24.9, 23.9, 23.1 ms |
+| the same decode, allocated | 5.45 MiB | 1.84 MiB |
+| scroll, 8 swipes over 240 rows, allocated | 44.9, 44.8, 45.3 MiB | 18.5, 18.6, 18.7 MiB |
+
+The scroll row used to run 60 rows, where both caches held everything and it measured nothing. At
+240 the caches evict, and the harness counts how many rows the server actually answered during the
+measured pass, since a row that never loaded would have reported the allocation of scrolling empty
+rows. Those counts say something the allocation figures do not: over the same list with the same 32
+MiB cache, landscapist re-fetches 136 rows and Coil 78, repeating exactly across runs. Landscapist
+decodes 74 percent more images per pass, so do not read its 2.4x as a per row overhead.
 
 So: ahead on every JVM row above, behind on cold load, on decode and on resident memory here. The
 Android decode path is the same code it has been, so that row is not a regression, but it is the
