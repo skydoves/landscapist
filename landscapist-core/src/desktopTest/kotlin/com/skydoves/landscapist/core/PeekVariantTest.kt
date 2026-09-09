@@ -122,6 +122,52 @@ class PeekVariantTest {
   }
 
   @Test
+  fun `a transformed slot is judged on the axis it is short of`() {
+    // Every other case here is square, so a peek that compared width against height would answer
+    // the same. A wide entry does not cover a tall box.
+    val loader = loader()
+    runBlocking {
+      loader.load(
+        ImageRequest.builder()
+          .model(url)
+          .diskCachePolicy(CachePolicy.DISABLED)
+          .size(1080, 200)
+          .transformations(listOf(Marker()))
+          .build(),
+      ).first { it is ImageResult.Success }
+    }
+
+    assertNull(
+      loader.peekMemoryCache(
+        ImageRequest.builder()
+          .model(url)
+          .diskCachePolicy(CachePolicy.DISABLED)
+          .size(200, 1080)
+          .transformations(listOf(Marker()))
+          .build(),
+      ),
+      "an entry 1080 wide and 200 tall was accepted for a box 200 wide and 1080 tall",
+    )
+  }
+
+  @Test
+  fun `a slot is judged on the axis it is short of`() {
+    val loader = loader()
+    runBlocking { loader.load(request(1080)).first { it is ImageResult.Success } }
+
+    assertNull(
+      loader.peekMemoryCache(
+        ImageRequest.builder()
+          .model(url)
+          .diskCachePolicy(CachePolicy.DISABLED)
+          .size(200, 4000)
+          .build(),
+      ),
+      "a 1080 square entry was accepted for a box 4000 tall",
+    )
+  }
+
+  @Test
   fun `a transformed slot does not peek a thumbnail`() {
     val loader = loader()
     runBlocking { loader.load(transformedRequest(50)).first { it is ImageResult.Success } }

@@ -179,3 +179,26 @@ gap and some of the resident set gap. That is the next thing worth working on.
       image, on both platforms; pinned by a test. The disagreement that remains is a complete
       response carrying corrupt bytes, where Android returns the rows it read and desktop throws.
       Neither is wrong and the dangerous path is covered.
+
+## Left for a later release, each measured rather than assumed
+
+- [ ] The open width branch of the shared sizing rule is redundant. Disabling it leaves the whole
+      desktop suite and the 112 device tests green, and for a fixed height the generic fallback
+      computes the same answer through `constrainHeight` and `scaledSize`. Removing it is a
+      considered change, not a cleanup.
+- [ ] `ZoomableContent.skia.kt` carries the tile threshold by hand alongside the Android actual,
+      and nothing exercises it: dropping the zoom check there leaves the gate green. iOS, macOS
+      and desktop take it on compilation alone.
+- [ ] Apple and wasm have no test source sets. `coversRequestedSize` returns early for
+      `RawImageData`, which is exactly their representation, so the sized peek this release adds
+      behaves differently there and nothing demonstrates the result.
+- [ ] `connectedDebugAndroidTest` is not deterministic. `ImageLibraryBenchmark.fresco` failed once
+      in four runs with `CalledFromWrongThreadException` from Fresco's own decode executor, and
+      `EngineSpeedBenchmark` reaches picsum.photos over the real network. Neither runs in CI, which
+      has no emulator job, so this costs a local run rather than a build.
+- [ ] Under `enableSubSampling`, the caller's content stays composed for the life of the image
+      rather than being dropped when the tiles take over. That is what keeps an animation from
+      restarting on a pinch, and it holds the full decode and every tile at once.
+- [ ] The tiles are drawn fitted inside the box while the content fills it, so the one handover
+      still moves the picture. Making them agree means telling sub-sampling which content scale
+      the caller asked for.

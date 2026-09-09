@@ -42,12 +42,12 @@ Twenty images, medians, allocation above an empty scene, from `./gradlew :benchm
 
 | KiB per frame | 2.12.1 | 2.13.0 | coil 3.6.2 |
 |---|---|---|---|
-| first frame | 353.5 | **77.0** | 109.5 |
+| first frame | 353.5 | **86.7** | 109.5 |
 | resize frame | 34.7 | **5.5** | 5.8 |
-| first frame, crossfade | 402.6 | 126.5 | **109.5** |
-| first frame, success slot | 335.7 | 262.5 | **147.8** painter, 548.7 subcompose |
+| first frame, crossfade | 402.6 | 130.2 | **109.5** |
+| first frame, success slot | 335.7 | 266.7 | **147.8** painter, 548.8 subcompose |
 | first frame, painter | new | **118.2** | 147.8 |
-| resize frame, painter | new | **13.8** | 72.2 |
+| resize frame, painter | new | **13.7** | 72.2 |
 
 Two rows here are not comparisons. `resize frame, painter` is one: the Coil arm keys its request on a size that changes every frame, so it rebuilds the request and restarts the load each time, which the benchmark itself prints as "the row's cost, not the painter's". `AsyncImage` does not work that way. The other is the crossfade row, and it is not a fade against a fade. Both sides are warm, and Coil declines to fade when the result came from the memory cache, on this platform and on Android alike, so its column is what it costs to decide not to fade. Landscapist reads the cache while it composes and has no loading state to fade out of either. The row is what each library pays to have a crossfade installed that neither runs.
 

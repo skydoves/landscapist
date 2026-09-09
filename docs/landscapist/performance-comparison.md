@@ -88,12 +88,12 @@ What the Compose layer allocates per frame, for twenty images, as medians above 
 
 | KiB per frame | before | after | coil 3.6.2 |
 |---|---|---|---|
-| first frame | 353.5 | 77.0 | 109.5 |
+| first frame | 353.5 | 86.7 | 109.5 |
 | resize frame | 34.7 | 5.5 | 5.8 |
-| first frame, crossfade | 402.6 | 126.5 | 109.5 |
-| first frame, success slot | 335.7 | 262.5 | 147.8 painter, 548.7 subcompose |
+| first frame, crossfade | 402.6 | 130.2 | 109.5 |
+| first frame, success slot | 335.7 | 266.7 | 147.8 painter, 548.8 subcompose |
 | first frame, painter | new | 118.2 | 147.8 |
-| resize frame, painter | new | 13.8 | 72.2 |
+| resize frame, painter | new | 13.7 | 72.2 |
 
 The first two rows are an image with no plugin and no slot, which is the one drawn by a single
 layout node. The rows named painter are `rememberImagePainter` against Coil's

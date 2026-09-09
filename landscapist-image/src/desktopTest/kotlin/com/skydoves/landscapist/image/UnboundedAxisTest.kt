@@ -202,8 +202,13 @@ class UnboundedAxisTest {
   }
 
   /** Measures the image in a 200 tall row that scrolls, so its width is its own to choose. */
-  private fun widthInScrollingRow(withPlugin: Boolean): IntSize {
-    val loader = loaderFor(80, 40)
+  private fun widthInScrollingRow(
+    withPlugin: Boolean,
+    imageWidth: Int = 80,
+    imageHeight: Int = 40,
+    scale: ContentScale = ContentScale.Crop,
+  ): IntSize {
+    val loader = loaderFor(imageWidth, imageHeight)
     var size: IntSize? = null
     runComposeUiTest {
       setContent {
@@ -212,6 +217,7 @@ class UnboundedAxisTest {
             imageModel = { url },
             landscapist = loader,
             modifier = Modifier.fillMaxHeight().onGloballyPositioned { size = it.size },
+            imageOptions = ImageOptions(contentScale = scale),
             component = if (withPlugin) {
               rememberImageComponent { +CrossfadePlugin(duration = 50) }
             } else {
@@ -234,6 +240,44 @@ class UnboundedAxisTest {
   @Test
   fun `an unbounded width follows the image aspect ratio with a plugin`() {
     assertEquals(IntSize(400, 200), widthInScrollingRow(withPlugin = true))
+  }
+
+  @Test
+  fun `on an open width a scale that does not upscale takes the width the image has`() {
+    // The mirror of the column case, and the half nothing covered: with Crop the generic fallback
+    // happens to answer the same, so only a scale that refuses to upscale tells the two apart.
+    for (scale in listOf(ContentScale.None, ContentScale.Inside)) {
+      assertEquals(
+        IntSize(80, 200),
+        widthInScrollingRow(withPlugin = false, scale = scale),
+        "wrong for $scale",
+      )
+    }
+  }
+
+  @Test
+  fun `on an open width Inside still shrinks an image too large for the row`() {
+    assertEquals(
+      IntSize(400, 200),
+      widthInScrollingRow(
+        withPlugin = false,
+        imageWidth = 800,
+        imageHeight = 400,
+        scale = ContentScale.Inside,
+      ),
+    )
+  }
+
+  @Test
+  fun `a hairline wide image does not bring the layout down`() {
+    val size = widthInScrollingRow(
+      withPlugin = false,
+      imageWidth = 20_000,
+      imageHeight = 1,
+      scale = ContentScale.Crop,
+    )
+    assertEquals(200, size.height)
+    assertTrue(size.width > 0, "the image was given no width at all")
   }
 
   /**

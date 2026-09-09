@@ -56,6 +56,7 @@ import com.skydoves.landscapist.zoomable.ZoomablePlugin
 import com.skydoves.landscapist.zoomable.rememberZoomableState
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -99,6 +100,9 @@ class SelectedPosterReloadTest {
   fun stop() = server.close()
 
   /** The demo screen: a scrolling column, a row of thumbnails of the same posters, the poster. */
+  /** Bumped after the image settles, so the screen composes again for a reason of its own. */
+  private val tick = androidx.compose.runtime.mutableIntStateOf(0)
+
   @Composable
   private fun Screen(url: String, landscapist: Landscapist, plugins: Set<String>) {
     var palette by rememberPaletteState()
@@ -134,6 +138,10 @@ class SelectedPosterReloadTest {
     plugins: Set<String>,
     onPaletteUpdated: (Palette) -> Unit,
   ) {
+    // Read here rather than in the screen above: this composable is skippable and takes nothing
+    // that changes, so a tick outside it would be skipped and nothing about rebuilding measured.
+    val unrelated = tick.intValue
+    check(unrelated >= 0)
     val zoomableState = rememberZoomableState(
       config = ZoomableConfig(enableSubSampling = true, maxZoom = 40f, doubleTapZoom = 20f),
       resetKey = url,
@@ -193,8 +201,13 @@ class SelectedPosterReloadTest {
     val landscapist = Landscapist.Companion.builder(context).build()
     kotlinx.coroutines.runBlocking { landscapist.clearCaches() }
 
+    tick.intValue = 0
     compose.setContent { Screen(url, landscapist, plugins) }
     compose.waitUntil(10_000) { successes.get() > 0 }
+    compose.waitForIdle()
+    // A recomposition the plugins had no part in, which is what a palette landing or a sibling
+    // changing does on the real screen.
+    compose.runOnUiThread { tick.intValue = 1 }
     compose.waitForIdle()
 
     return "components=${components.size} distinct=${components.distinct().size} " +
@@ -225,6 +238,12 @@ class SelectedPosterReloadTest {
   private fun report(label: String, plugins: Set<String>) {
     val line = run(plugins)
     println("SELECTEDPOSTER $label -> $line")
+    // Without this the check below is a tautology: one composition gives one component, and one
+    // component is always one distinct component however the plugins compare.
+    assertTrue(
+      "$label: the screen composed once, so nothing about rebuilding was measured [$line]",
+      components.size > 1,
+    )
     assertEquals(
       "$label: the component was rebuilt, so the image restarted [$line]",
       1,
