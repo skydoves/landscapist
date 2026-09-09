@@ -42,6 +42,11 @@ data class LoadingPlugin(val source: Any?) : ImagePlugin.LoadingStatePlugin {
 }
 ```
 
+Note the `data class`. A plugin set is compared to decide whether the component an image was handed
+has changed, and images skip when it has not, so a plugin the runtime cannot compare is a new value
+on every composition and costs every image carrying it its skipping. Make a custom plugin a data
+class, or give it `equals` and `hashCode` over whatever configures it.
+
 By creating a custom `LoadingStatePlugin`, you can define unique behavior tailored to the loading state of the image. This gives you the freedom to handle loading scenarios in a way that best suits your application's requirements.
 
 Now you can add your own image plugin into the image component like so:

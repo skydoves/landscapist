@@ -942,6 +942,11 @@ data class LoadingPlugin(val source: Any?) : ImagePlugin.LoadingStatePlugin {
 }
 ```
 
+Note the `data class`. A plugin set is compared to decide whether the component an image was handed
+has changed, and images skip when it has not, so a plugin the runtime cannot compare is a new value
+on every composition and costs every image carrying it its skipping. Make a custom plugin a data
+class, or give it `equals` and `hashCode` over whatever configures it.
+
 Next, you can compose plugins by adding them in the `rememberImageComponent` like the below:
 
 ```kotlin
