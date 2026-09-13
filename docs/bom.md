@@ -55,3 +55,42 @@ The Landscapist Bill of Materials (BOM) simplifies the management of all Landsca
     ```
 
 This ensures a streamlined and efficient development process, as you can easily keep track of library versions and ensure compatibility across your Landscapist dependencies. 
+## Version catalog
+
+The BOM settles versions. It does not save you from writing each coordinate out, and it gives you
+nothing to discover the modules from. `landscapist-version-catalog` is the other half: a published
+[Gradle version catalog](https://docs.gradle.org/current/userguide/version_catalogs.html) of every
+Landscapist artifact, so they arrive as aliases with completion in the IDE.
+
+Import it once in `settings.gradle.kts`:
+
+```kotlin
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("landscapistLibs") {
+            from("com.github.skydoves:landscapist-version-catalog:$version")
+        }
+    }
+}
+```
+
+Then declare dependencies by alias, with no version and no coordinate string:
+
+```kotlin
+dependencies {
+    implementation(landscapistLibs.landscapist.glide)
+    implementation(landscapistLibs.landscapist.coil3)
+    implementation(landscapistLibs.landscapist.image)
+    implementation(landscapistLibs.landscapist.placeholder)
+}
+```
+
+Every module on this page has an alias, and so does the BOM itself, as
+`landscapistLibs.landscapist.bom`.
+
+!!! note "Which one do I want?"
+
+    They are not alternatives. The catalog carries the coordinates and a version for the lines you
+    write yourself. The BOM constrains versions across the whole resolution, including a Landscapist
+    module that arrives through some other library rather than through your build file. Taking both
+    is reasonable: the aliases for what you declare, the BOM for what you do not.

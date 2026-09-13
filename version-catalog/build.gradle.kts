@@ -16,31 +16,46 @@
 
 import com.github.skydoves.landscapist.Configuration
 import com.github.skydoves.landscapist.PublishedModules
+import com.vanniktech.maven.publish.VersionCatalog
 
 plugins {
-  kotlin("jvm")
+  `version-catalog`
   id(libs.plugins.nexus.plugin.get().pluginId)
 }
 
 apply(from = "${rootDir}/scripts/publish-module.gradle.kts")
 
+val libVersion = rootProject.extra.get("libVersion").toString()
+
+// Coordinates rather than version alignment, which is what the BOM is for. A consumer who wants
+// both takes the alias from here and keeps the BOM for the alignment it does on modules that
+// arrive transitively.
+catalog {
+  versionCatalog {
+    val landscapist = version("landscapist", libVersion)
+
+    PublishedModules.all.forEach { module ->
+      library(module.alias, Configuration.artifactGroup, module.artifactId)
+        .versionRef(landscapist)
+    }
+
+    // The BOM is in here too, so a consumer can take the alignment without hand writing the one
+    // coordinate the catalog was meant to save them from writing.
+    library("landscapist-bom", Configuration.artifactGroup, "landscapist-bom")
+      .versionRef(landscapist)
+  }
+}
+
 mavenPublishing {
-  val artifactId = "landscapist-bom"
+  val artifactId = "landscapist-version-catalog"
+  configure(VersionCatalog())
   coordinates(
     Configuration.artifactGroup,
     artifactId,
-    rootProject.extra.get("libVersion").toString()
+    libVersion
   )
 
   pom {
     name.set(artifactId)
-  }
-}
-
-dependencies {
-  constraints {
-    // The same list the version catalog publishes, so a module cannot reach one and miss the
-    // other. See PublishedModules in buildSrc.
-    PublishedModules.all.forEach { api(project(it.path)) }
   }
 }

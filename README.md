@@ -1503,6 +1503,34 @@ dependencies {
 }
  ```
 
+
+### Version catalog
+
+The BOM settles versions; it does not save you from writing each coordinate out.
+`landscapist-version-catalog` publishes every Landscapist artifact as a Gradle version catalog, so
+they arrive as aliases with completion in the IDE.
+
+```kotlin
+// settings.gradle.kts
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("landscapistLibs") {
+            from("com.github.skydoves:landscapist-version-catalog:$version")
+        }
+    }
+}
+
+// build.gradle.kts
+dependencies {
+    implementation(landscapistLibs.landscapist.glide)
+    implementation(landscapistLibs.landscapist.placeholder)
+}
+```
+
+The two are not alternatives. The catalog carries coordinates for the lines you write; the BOM
+constrains versions across the whole resolution, including a module that arrives through another
+library. See the [documentation](https://skydoves.github.io/landscapist/bom/) for the full list.
+
  ## Taking Snapshot Images With Paparazzi
 
 [Paparazzi](https://github.com/cashapp/paparazzi) allows you to take snapshot images of your Composable functions without running them on physical devices. You can take proper snapshots images about your images with Paparazzi like the below:
