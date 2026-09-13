@@ -141,28 +141,59 @@ private fun Masthead() {
   )
 }
 
+/**
+ * Narrower than this and the footer stacks its blurb above the links.
+ *
+ * Below it the blurb alone wants most of the row, and a `Row` hands an unweighted child the width
+ * it asks for before the next child is measured, so the links were left a few pixels and rendered
+ * one character per line on top of each other.
+ */
+private const val FooterStackWidthDp = 620
+
 @Composable
 private fun Footer() {
-  val uriHandler = LocalUriHandler.current
   Divider()
   VSpace(14)
-  Row(
-    modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text(
-      text = "Built from the :demo-web module, a port of the Android sample's playground.",
-      style = DemoType.Hint,
-      color = DemoColors.TextFaint,
-    )
-    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-      LinkText("Documentation", onClick = { uriHandler.openUri(DOCUMENTATION_URL) })
-      LinkText(
-        label = "github.com/skydoves/landscapist",
-        color = DemoColors.Accent,
-        onClick = { uriHandler.openUri(REPOSITORY_URL) },
-      )
+  BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+    if (maxWidth < FooterStackWidthDp.dp) {
+      Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        FooterBlurb()
+        FooterLinks()
+      }
+    } else {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
+        verticalAlignment = Alignment.Top,
+      ) {
+        // Weighted, so the blurb takes what is left rather than everything. Without it the links
+        // are measured against whatever the sentence did not want.
+        FooterBlurb(modifier = Modifier.weight(1f))
+        FooterLinks()
+      }
     }
+  }
+}
+
+@Composable
+private fun FooterBlurb(modifier: Modifier = Modifier) {
+  Text(
+    text = "Built from the :demo-web module, a port of the Android sample's playground.",
+    style = DemoType.Hint,
+    color = DemoColors.TextFaint,
+    modifier = modifier,
+  )
+}
+
+@Composable
+private fun FooterLinks() {
+  val uriHandler = LocalUriHandler.current
+  Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+    LinkText("Documentation", onClick = { uriHandler.openUri(DOCUMENTATION_URL) })
+    LinkText(
+      label = "github.com/skydoves/landscapist",
+      color = DemoColors.Accent,
+      onClick = { uriHandler.openUri(REPOSITORY_URL) },
+    )
   }
 }
