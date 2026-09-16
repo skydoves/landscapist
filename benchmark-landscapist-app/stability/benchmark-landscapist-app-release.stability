@@ -5,8 +5,8 @@
 //   ./gradlew :benchmark-landscapist-app:stabilityDump
 
 @Composable
-internal fun com.skydoves.benchmark.landscapist.app.BenchmarkList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction2<@[ParameterName(name = \): kotlin.Unit
-  skippable: false
+internal fun com.skydoves.benchmark.landscapist.app.BenchmarkList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction3<@[ParameterName(name = \): kotlin.Unit
+  skippable: true
   restartable: true
   params:
     - urls: RUNTIME (requires runtime check)
@@ -16,7 +16,7 @@ internal fun com.skydoves.benchmark.landscapist.app.BenchmarkList(urls: kotlin.c
 
 @Composable
 internal fun com.skydoves.benchmark.landscapist.app.CoilAsyncImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - urls: RUNTIME (requires runtime check)
@@ -25,7 +25,7 @@ internal fun com.skydoves.benchmark.landscapist.app.CoilAsyncImageList(urls: kot
 
 @Composable
 internal fun com.skydoves.benchmark.landscapist.app.CoilWrapperImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - urls: RUNTIME (requires runtime check)
@@ -34,7 +34,7 @@ internal fun com.skydoves.benchmark.landscapist.app.CoilWrapperImageList(urls: k
 
 @Composable
 internal fun com.skydoves.benchmark.landscapist.app.FrescoWrapperImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - urls: RUNTIME (requires runtime check)
@@ -43,7 +43,7 @@ internal fun com.skydoves.benchmark.landscapist.app.FrescoWrapperImageList(urls:
 
 @Composable
 internal fun com.skydoves.benchmark.landscapist.app.GlideWrapperImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - urls: RUNTIME (requires runtime check)
@@ -52,7 +52,7 @@ internal fun com.skydoves.benchmark.landscapist.app.GlideWrapperImageList(urls: 
 
 @Composable
 internal fun com.skydoves.benchmark.landscapist.app.LandscapistImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - urls: RUNTIME (requires runtime check)
@@ -61,7 +61,7 @@ internal fun com.skydoves.benchmark.landscapist.app.LandscapistImageList(urls: k
 
 @Composable
 internal fun com.skydoves.benchmark.landscapist.app.LandscapistPluginImageList(urls: kotlin.collections.List<kotlin.String>, tag: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - urls: RUNTIME (requires runtime check)

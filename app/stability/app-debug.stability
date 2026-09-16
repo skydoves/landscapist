@@ -14,14 +14,14 @@ public fun com.github.skydoves.landscapistdemo.theme.DisneyComposeTheme(darkThem
 
 @Composable
 private fun com.github.skydoves.landscapistdemo.ui.ColorPalettes(palette: com.kmpalette.palette.graphics.Palette): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - palette: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
 public fun com.github.skydoves.landscapistdemo.ui.DisneyPosters(posters: kotlin.collections.List<com.github.skydoves.landscapistdemo.model.Poster>, paddingValues: androidx.compose.foundation.layout.PaddingValues, vm: com.github.skydoves.landscapistdemo.ui.MainViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - posters: RUNTIME (requires runtime check)
@@ -43,7 +43,7 @@ private fun com.github.skydoves.landscapistdemo.ui.PosterAppBar(): kotlin.Unit
 
 @Composable
 private fun com.github.skydoves.landscapistdemo.ui.PosterInformation(poster: com.github.skydoves.landscapistdemo.model.Poster, palette: com.kmpalette.palette.graphics.Palette): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - poster: STABLE (marked @Stable or @Immutable)
@@ -67,14 +67,14 @@ private fun com.github.skydoves.landscapistdemo.ui.SelectedPoster(poster: com.gi
 
 @Composable
 internal fun com.github.skydoves.landscapistdemo.ui.playground.ActionRow(actions: kotlin.collections.List<kotlin.Pair<kotlin.String, kotlin.Function0<kotlin.Unit>>>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - actions: RUNTIME (requires runtime check)
 
 @Composable
 internal fun com.github.skydoves.landscapistdemo.ui.playground.ChoiceRow(options: kotlin.collections.List<T of com.github.skydoves.landscapistdemo.ui.playground.ChoiceRow>, selected: T of com.github.skydoves.landscapistdemo.ui.playground.ChoiceRow, label: kotlin.Function1<T of com.github.skydoves.landscapistdemo.ui.playground.ChoiceRow, kotlin.String>, onSelected: kotlin.Function1<T of com.github.skydoves.landscapistdemo.ui.playground.ChoiceRow, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - options: RUNTIME (requires runtime check)
@@ -101,7 +101,7 @@ internal fun com.github.skydoves.landscapistdemo.ui.playground.HintText(text: ko
 
 @Composable
 internal fun com.github.skydoves.landscapistdemo.ui.playground.PaletteStrip(colors: kotlin.collections.List<kotlin.Int>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - colors: RUNTIME (requires runtime check)
