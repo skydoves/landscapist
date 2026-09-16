@@ -6,7 +6,7 @@
 
 @Composable
 public fun com.skydoves.landscapist.fresco.FrescoImage(imageUrl: kotlin.String?, modifier: androidx.compose.ui.Modifier, imageRequest: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<com.facebook.imagepipeline.request.ImageRequestBuilder>, component: com.skydoves.landscapist.components.ImageComponent, imageOptions: com.skydoves.landscapist.ImageOptions, onImageStateChanged: kotlin.Function1<com.skydoves.landscapist.fresco.FrescoImageState, kotlin.Unit>, previewPlaceholder: androidx.compose.ui.graphics.painter.Painter?, loading: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, success: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction3<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, failure: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - imageUrl: STABLE (class with no mutable properties)

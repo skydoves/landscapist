@@ -6,7 +6,7 @@
 
 @Composable
 public fun com.skydoves.landscapist.glide.GlideImage(imageModel: kotlin.Function0<kotlin.Any?>, modifier: androidx.compose.ui.Modifier, glideRequestType: com.skydoves.landscapist.glide.GlideRequestType, requestBuilder: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<com.bumptech.glide.RequestBuilder<*>>, requestOptions: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<com.bumptech.glide.request.RequestOptions>, requestListener: kotlin.Function0<com.bumptech.glide.request.RequestListener<kotlin.Any>>?, component: com.skydoves.landscapist.components.ImageComponent, imageOptions: com.skydoves.landscapist.ImageOptions, clearTarget: kotlin.Boolean, onImageStateChanged: kotlin.Function1<com.skydoves.landscapist.glide.GlideImageState, kotlin.Unit>, previewPlaceholder: androidx.compose.ui.graphics.painter.Painter?, loading: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, success: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction3<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, failure: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - imageModel: STABLE (function type)
@@ -88,7 +88,7 @@ internal fun com.skydoves.landscapist.glide.rememberTarget(target: com.skydoves.
   skippable: false
   restartable: false
   params:
-    - target: UNSTABLE (has mutable properties or unstable members)
+    - target: STABLE (marked @Stable or @Immutable)
     - imageOptions: STABLE (marked @Stable or @Immutable)
     - clearTarget: STABLE (primitive type)
 

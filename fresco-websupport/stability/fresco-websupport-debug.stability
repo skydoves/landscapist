@@ -6,7 +6,7 @@
 
 @Composable
 public fun com.skydoves.landscapist.fresco.websupport.FrescoWebImage(controllerBuilder: kotlin.Function0<com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder>, modifier: androidx.compose.ui.Modifier, contentDescription: kotlin.String?, alignment: androidx.compose.ui.Alignment, contentScale: androidx.compose.ui.layout.ContentScale, alpha: kotlin.Float, colorFilter: androidx.compose.ui.graphics.ColorFilter?, previewPlaceholder: androidx.compose.ui.graphics.painter.Painter?): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - controllerBuilder: STABLE (function type)
