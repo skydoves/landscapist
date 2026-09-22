@@ -19,7 +19,7 @@ androidxProfileinstaller = "1.4.1"
 androidxUiAutomator = "2.4.0"
 composeStabilityAnalyzer = "0.14.0"
 kotlinxSerializationJson = "1.11.0"
-jetbrains-compose = "1.12.0"
+jetbrains-compose = "1.12.1"
 # Skia bindings, used directly for SVG rasterizing and for the desktop test runtime. This is a
 # floor: jetbrains-compose contributes a stricter constraint, so resolution lands on its version.
 skiko = "0.150.1"
