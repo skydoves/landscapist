@@ -64,6 +64,11 @@ public class DiskLruCache(
         if (initialized.value) return@synchronized
 
         try {
+          // Each scan starts from nothing it counted before, so a second pass cannot add the same
+          // file sizes onto the total a second time and evict far more than it should.
+          entries.clear()
+          currentSize.value = 0
+
           fileSystem.createDirectories(directory)
 
           // Scan existing files
@@ -87,9 +92,17 @@ public class DiskLruCache(
           evictIfNeeded()
         } catch (_: IOException) {
           // Directory creation failed, cache will be disabled
+        } catch (_: Exception) {
+          // A cache is allowed to be empty or partial. It is not allowed to be one that throws on
+          // every call: `Landscapist.load` reads the disk cache before it reaches the fetcher, so
+          // a throw that escapes here stops the request being made at all and no image loads for
+          // the rest of the process.
+        } finally {
+          // Whatever the scan did, this cache is initialized. Leaving the flag false sends every
+          // later call back through the scan, which is what turned one failure into a permanent
+          // one.
+          initialized.value = true
         }
-
-        initialized.value = true
       }
     }
   }
@@ -207,18 +220,23 @@ public class DiskLruCache(
     }
   }
 
+  /**
+   * Trims the oldest entries until the cache is back under [maxSize].
+   *
+   * Key first, then remove by key, and only what `remove` hands back is read. A `Map.Entry` taken
+   * from an iterator stops being readable on Kotlin Native the moment the map is modified, so
+   * reading `eldest.value` after `iterator.remove()` threw `ConcurrentModificationException`
+   * there while being perfectly fine on the JVM. Same shape the memory caches were given in #870.
+   */
   private fun evictIfNeeded() {
     while (currentSize.value > maxSize && entries.isNotEmpty()) {
-      val iterator = entries.entries.iterator()
-      if (iterator.hasNext()) {
-        val eldest = iterator.next()
-        iterator.remove()
-        currentSize.addAndGet(-eldest.value.size)
-        try {
-          fileSystem.delete(directory / eldest.key)
-        } catch (_: IOException) {
-          // Ignore
-        }
+      val eldestKey = entries.keys.firstOrNull() ?: break
+      val eldest = entries.remove(eldestKey) ?: break
+      currentSize.addAndGet(-eldest.size)
+      try {
+        fileSystem.delete(directory / eldestKey)
+      } catch (_: IOException) {
+        // Ignore
       }
     }
   }
@@ -263,16 +281,24 @@ public class DiskLruCache(
 
     override suspend fun commit() {
       if (committed || aborted) return
-      committed = true
 
       try {
-        // Move temp file to final location
-        if (fileSystem.exists(tempPath)) {
-          fileSystem.delete(finalPath)
-          fileSystem.atomicMove(tempPath, finalPath)
-          val size = fileSystem.metadata(finalPath).size ?: 0L
-          onCommit(size)
+        // Nothing was written, so there is nothing to publish. Aborting rather than returning
+        // releases the key, which is otherwise held for editing for the life of the cache.
+        if (!fileSystem.exists(tempPath)) {
+          abort()
+          return
         }
+
+        // Move temp file to final location
+        fileSystem.delete(finalPath)
+        fileSystem.atomicMove(tempPath, finalPath)
+        val size = fileSystem.metadata(finalPath).size ?: 0L
+
+        // Only now is the entry really in the cache. Setting this before the move made the abort
+        // below a no-op, so a move that failed left the temp file on disk and the key locked.
+        committed = true
+        onCommit(size)
       } catch (_: IOException) {
         abort()
       }
