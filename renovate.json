@@ -33,6 +33,11 @@
       "description": "Exclude Maven Plugin",
       "matchPackagePrefixes": ["com.vanniktech.maven.publish"],
       "enabled": false
+    },
+    {
+      "description": "Exclude skiko, which has to match the version jetbrains-compose is built against and moves with it",
+      "matchPackagePrefixes": ["org.jetbrains.skiko"],
+      "enabled": false
     }
   ]
 }
