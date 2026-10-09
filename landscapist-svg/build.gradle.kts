@@ -81,7 +81,8 @@ kotlin {
     val skiaMain by getting {
       dependencies {
         // Skia renders SVG natively. Every Compose Multiplatform app already resolves skiko, so
-        // this only pins a floor.
+        // this only pins a floor, but one that is published: a version newer than the app's
+        // Compose was built against upgrades its skiko and breaks Compose at runtime.
         implementation(libs.skiko)
       }
     }

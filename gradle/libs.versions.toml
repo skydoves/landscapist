@@ -20,9 +20,11 @@ androidxUiAutomator = "2.4.0"
 composeStabilityAnalyzer = "0.15.0"
 kotlinxSerializationJson = "1.11.0"
 jetbrains-compose = "1.12.1"
-# Skia bindings, used directly for SVG rasterizing and for the desktop test runtime. This is a
-# floor: jetbrains-compose contributes a stricter constraint, so resolution lands on its version.
-skiko = "0.153.0"
+# Skia bindings, used directly for SVG rasterizing and for the desktop test runtime. Must equal the
+# skiko version jetbrains-compose is built against. Compose only requires its version, so a newer
+# one here wins resolution and Compose calls skiko methods that no longer exist (0.153.0 removed
+# the RenderNodeContext(Boolean) constructor 1.12.1 calls). Renovate leaves this to Compose bumps.
+skiko = "0.150.1"
 # SVG rasterizer for Android, which has no built-in SVG support. Skia targets use skiko instead.
 androidsvg = "1.4"
 glide = "5.0.9"

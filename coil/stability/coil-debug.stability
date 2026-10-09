@@ -70,16 +70,16 @@ public fun com.skydoves.landscapist.coil.rememberCoilImageState(initialState: co
   restartable: false
   params:
     - initialState: STABLE (marked @Stable or @Immutable)
-    - key: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - key: UNSTABLE (cross-module type without @Stable/@Immutable)
 
 @Composable
 internal fun com.skydoves.landscapist.coil.rememberImageSourceFile(context: android.content.Context, imageLoader: coil.ImageLoader, imageModel: kotlin.Any?, dataSource: com.skydoves.landscapist.DataSource?): androidx.compose.runtime.State<java.io.File?>
   skippable: false
   restartable: false
   params:
-    - context: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - context: UNSTABLE (Java class; stability cannot be inferred)
     - imageLoader: UNKNOWN (interface or non-final class; concrete implementation unknown)
-    - imageModel: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - imageModel: UNSTABLE (cross-module type without @Stable/@Immutable)
     - dataSource: STABLE (class with no mutable properties)
 
 @Composable
