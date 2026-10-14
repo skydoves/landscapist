@@ -20,7 +20,7 @@ jobs:
       # `mkdocs gh-deploy --force` replaces that branch with a commit whose tree is exactly `site/`,
       # so anything a second job pushed there would be gone on the next push to main.
       - name: Set up JDK
-        uses: actions/setup-java@v6.0.1
+        uses: actions/setup-java@v6.1.0
         with:
           distribution: 'zulu'
           java-version: 21
