@@ -55,7 +55,7 @@ For more details of the history, performance, customizability, and how to load n
 
 <a href="https://devtoolsacademy.link/Jaewoong" target="_blank"> <picture><source media="(prefers-color-scheme: dark)" srcset="art/logo-switch-dark.svg"><img width="300" alt="switch" src="art/logo-switch.svg" /></picture></a>
 
-<a href="https://coderabbit.link/Jaewoong" target="_blank"> <img width="300" alt="coderabbit" src="https://github.com/user-attachments/assets/9823e1d3-8467-4d4d-8a53-94b3c0adc630" /></a>
+<a href="https://coderabbit.link/Jaewoong" target="_blank"> <picture><source media="(prefers-color-scheme: dark)" srcset="art/logo-coderabbit-dark.png"><img width="300" alt="coderabbit" src="art/logo-coderabbit.png" /></picture></a>
 
 <a href="https://getstream.io/chat/sdk/android/?utm_source=github&utm_medium=referral&utm_content=&utm_campaign=Jaewoong_github_2025" target="_blank"> <img width="260" alt="stream" src="https://github.com/user-attachments/assets/87a69228-4fef-4f48-ad98-1e2c606c5b7e" /></a>
 
