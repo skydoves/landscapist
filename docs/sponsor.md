@@ -22,7 +22,7 @@ These are the sponsors who have supported Landscapist.
 
 ### 🚀 Rocket Sponsor
 
-<a href="https://www.coderabbit.ai/?utm_source=github&utm_medium=referral&utm_content=&utm_campaign=Jaewoong_github_2025" target="_blank"> <img width="300" alt="coderabbit" src="https://www.coderabbit.ai/_next/image?url=https%3A%2F%2Fvictorious-bubble-f69a016683.media.strapiapp.com%2FCr_logo_dark_f656abe8e3.png&w=384&q=75" /></a>
+<a href="https://www.coderabbit.ai/?utm_source=github&utm_medium=referral&utm_content=&utm_campaign=Jaewoong_github_2025" target="_blank"> <img width="300" alt="coderabbit" src="https://github.com/skydoves/landscapist/raw/main/art/logo-coderabbit-dark.png" /></a>
 
 <a href="https://getstream.io/chat/sdk/android/?utm_source=github&utm_medium=referral&utm_content=&utm_campaign=Jaewoong_github_2025" target="_blank"> <img width="260" alt="stream" src="https://github.com/user-attachments/assets/87a69228-4fef-4f48-ad98-1e2c606c5b7e" /></a>
 
