@@ -57,6 +57,8 @@ For more details of the history, performance, customizability, and how to load n
 
 <a href="https://getstream.io/chat/sdk/android/?utm_source=github&utm_medium=referral&utm_content=&utm_campaign=Jaewoong_github_2025" target="_blank"> <img width="260" alt="stream" src="https://github.com/user-attachments/assets/87a69228-4fef-4f48-ad98-1e2c606c5b7e" /></a>
 
+<a href="https://devtoolsacademy.link/Jaewoong" target="_blank"> <picture><source media="(prefers-color-scheme: dark)" srcset="art/logo-switch-dark.svg"><img width="300" alt="switch" src="art/logo-switch.svg" /></picture></a>
+
 ## Demo projects
 You can see the use cases of this library in the repositories below:
 - [google/modernstorage](https://github.com/google/modernstorage/tree/e62cda539ca75884dd49df3bcf8629751f0a91e6/sample): ModernStorage is a group of libraries that provide an abstraction layer over storage on Android to simplify its interactions.
