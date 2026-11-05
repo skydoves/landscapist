@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.4.0"
-dokka = "2.2.0"
+dokka = "2.3.0"
 jvmTarget = "17"
 nexusPlugin = "0.36.0"
 kotlinxCoroutines = "1.11.0"
