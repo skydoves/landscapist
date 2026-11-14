@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landscapist playground</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #2B292B;
+            color: #FFFFFF;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+        }
+
+        #loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+            padding: 0 24px;
+        }
+
+        #loading small {
+            color: #9E9E9E;
+            max-width: 32rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+<!--
+  ComposeViewport clears the body before it attaches its canvas, so this disappears on its own once
+  the demo is running, and stays put on a browser that cannot run it.
+-->
+<div id="loading">
+    <div>Loading the playground</div>
+    <small>
+        Compose for Web needs a browser with WebAssembly garbage collection: Chrome 119, Firefox
+        120, Safari 18.2 or newer. The first load fetches a few megabytes of Skia.
+    </small>
+</div>
+<script src="demo.js"></script>
+</body>
+</html>
