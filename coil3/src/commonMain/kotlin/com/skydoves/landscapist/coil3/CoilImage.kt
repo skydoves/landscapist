@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.IntSize
 import coil3.ImageLoader
 import coil3.request.ImageRequest
 import coil3.request.ImageResult
+import coil3.size.Scale
 import coil3.size.SizeResolver
 import com.skydoves.landscapist.DataSource
 import com.skydoves.landscapist.ImageLoad
@@ -403,23 +404,43 @@ internal fun rememberRequestWithConstraints(
   request: ImageRequest,
   imageOptions: ImageOptions,
 ): ImageRequest {
-  return remember(request, imageOptions) {
-    if (request.defined.sizeResolver == null) {
-      val sizeResolver = if (imageOptions.isValidSize) {
-        SizeResolver(
-          coil3.size.Size(
-            width = imageOptions.requestSize.width,
-            height = imageOptions.requestSize.height,
-          ),
-        )
-      } else if (imageOptions.contentScale == ContentScale.None) {
-        SizeResolver(coil3.size.Size.ORIGINAL)
-      } else {
-        ConstraintsSizeResolver()
-      }
-      request.newBuilder().size(sizeResolver).build()
-    } else {
-      request
-    }
-  }
+  return remember(request, imageOptions) { request.withConstraints(imageOptions) }
+}
+
+/**
+ * Fills in what the request leaves undefined from [imageOptions]: the size resolver and the
+ * [Scale] Coil decodes with.
+ *
+ * Without a scale, Coil decodes with [Scale.FIT]: an image shown with [ContentScale.Crop] would be
+ * decoded to fit inside the bounds and then upscaled to fill them, which is blurry whenever its
+ * aspect ratio differs from the bounds. Coil's own `AsyncImage` derives the scale the same way.
+ */
+internal fun ImageRequest.withConstraints(imageOptions: ImageOptions): ImageRequest {
+  val needsSize = defined.sizeResolver == null
+  val needsScale = defined.scale == null
+  if (!needsSize && !needsScale) return this
+  return newBuilder().apply {
+    if (needsSize) size(imageOptions.toSizeResolver())
+    if (needsScale) scale(imageOptions.contentScale.toCoilScale())
+  }.build()
+}
+
+private fun ImageOptions.toSizeResolver(): SizeResolver = when {
+  isValidSize -> SizeResolver(
+    coil3.size.Size(
+      width = requestSize.width,
+      height = requestSize.height,
+    ),
+  )
+  contentScale == ContentScale.None -> SizeResolver(coil3.size.Size.ORIGINAL)
+  else -> ConstraintsSizeResolver()
+}
+
+/**
+ * The [Scale] Coil should decode with for a [ContentScale], mirroring Coil's `AsyncImage`:
+ * [ContentScale.Fit] and [ContentScale.Inside] decode to fit inside the bounds, the rest to fill them.
+ */
+internal fun ContentScale.toCoilScale(): Scale = when (this) {
+  ContentScale.Fit, ContentScale.Inside -> Scale.FIT
+  else -> Scale.FILL
 }
