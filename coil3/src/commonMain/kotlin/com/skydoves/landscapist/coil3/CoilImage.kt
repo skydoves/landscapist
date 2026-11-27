@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.IntSize
 import coil3.ImageLoader
 import coil3.request.ImageRequest
 import coil3.request.ImageResult
+import coil3.size.Scale
 import coil3.size.SizeResolver
 import com.skydoves.landscapist.DataSource
 import com.skydoves.landscapist.ImageLoad
@@ -404,22 +405,36 @@ internal fun rememberRequestWithConstraints(
   imageOptions: ImageOptions,
 ): ImageRequest {
   return remember(request, imageOptions) {
-    if (request.defined.sizeResolver == null) {
-      val sizeResolver = if (imageOptions.isValidSize) {
-        SizeResolver(
-          coil3.size.Size(
-            width = imageOptions.requestSize.width,
-            height = imageOptions.requestSize.height,
-          ),
-        )
-      } else if (imageOptions.contentScale == ContentScale.None) {
-        SizeResolver(coil3.size.Size.ORIGINAL)
-      } else {
-        ConstraintsSizeResolver()
-      }
-      request.newBuilder().size(sizeResolver).build()
-    } else {
+    val needsSizeResolver = request.defined.sizeResolver == null
+    val needsScale = request.defined.scale == null
+    if (!needsSizeResolver && !needsScale) {
       request
+    } else {
+      request.newBuilder().apply {
+        if (needsSizeResolver) {
+          val sizeResolver = if (imageOptions.isValidSize) {
+            SizeResolver(
+              coil3.size.Size(
+                width = imageOptions.requestSize.width,
+                height = imageOptions.requestSize.height,
+              ),
+            )
+          } else if (imageOptions.contentScale == ContentScale.None) {
+            SizeResolver(coil3.size.Size.ORIGINAL)
+          } else {
+            ConstraintsSizeResolver()
+          }
+          size(sizeResolver)
+        }
+        if (needsScale) {
+          scale(imageOptions.contentScale.toScale())
+        }
+      }.build()
     }
   }
+}
+
+private fun ContentScale.toScale(): Scale = when (this) {
+  ContentScale.Fit, ContentScale.Inside -> Scale.FIT
+  else -> Scale.FILL
 }
