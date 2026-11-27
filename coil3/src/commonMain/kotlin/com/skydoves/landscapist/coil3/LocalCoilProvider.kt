@@ -31,20 +31,15 @@ public val LocalCoilImageLoader: ProvidableCompositionLocal<ImageLoader?> =
 /** A provider for taking the local instances related to the `CoilImage`. */
 internal object LocalCoilProvider {
 
-  /** Returns the current or default [ImageLoader] for the `ColiImage` parameter. */
+  /**
+   * Returns the current or default [ImageLoader] for the `CoilImage` parameter.
+   *
+   * The default is Coil's singleton, so an [ImageLoader] or factory the app registered with
+   * [SingletonImageLoader] is honoured. Coil registers its network fetchers on every platform
+   * through its service loader, so no extra component is needed here.
+   */
   @Composable
   fun getCoilImageLoader(): ImageLoader {
-    return LocalCoilImageLoader.current ?: let {
-      if (getPlatform() == Platform.NonAndroid) {
-        val defaultImageLoader = ImageLoader.Builder(platformContext)
-          .components {
-            add(networkFetcherFactory)
-          }
-          .build()
-        SingletonImageLoader.setSafe { defaultImageLoader }
-      }
-
-      platformImageLoader
-    }
+    return LocalCoilImageLoader.current ?: platformImageLoader
   }
 }
