@@ -21,15 +21,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import coil3.Image
 import coil3.ImageLoader
 import coil3.PlatformContext
-import coil3.network.NetworkFetcher
 import coil3.request.ImageRequest
 import com.skydoves.landscapist.plugins.ImagePlugin
-
-internal enum class Platform {
-  Android, NonAndroid
-}
-
-internal expect fun getPlatform(): Platform
 
 /** Transforms coil's [Image] to Compose [ImageBitmap]. */
 @Composable
@@ -50,5 +43,3 @@ internal expect fun buildImageRequest(
 
 @Composable
 internal expect fun rememberImagePainter(image: Image, imagePlugins: List<ImagePlugin>): Painter
-
-internal expect val networkFetcherFactory: NetworkFetcher.Factory
