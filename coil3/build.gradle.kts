@@ -17,6 +17,19 @@ import com.github.skydoves.landscapist.Configuration
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
+/** Resolves the skiko native runtime classifier (e.g. "macos-arm64") for the running host. */
+fun skikoHostTarget(): String {
+  val os = System.getProperty("os.name").lowercase()
+  val arch = System.getProperty("os.arch").lowercase()
+  val osPart = when {
+    os.contains("mac") || os.contains("darwin") -> "macos"
+    os.contains("windows") -> "windows"
+    else -> "linux"
+  }
+  val archPart = if (arch.contains("aarch64") || arch.contains("arm64")) "arm64" else "x64"
+  return "$osPart-$archPart"
+}
+
 plugins {
   id("landscapist.library.compose.multiplatformWasm")
   id("landscapist.spotless")
@@ -90,6 +103,16 @@ kotlin {
     named("wasmJsMain") {
       dependencies {
         api(libs.coil3.network.ktor3)
+      }
+    }
+
+    val desktopTest by getting {
+      dependencies {
+        implementation(kotlin("test"))
+        implementation(libs.jetbrains.compose.ui.test.junit4)
+        // Skiko native runtime for the host OS, required to decode images and render off-screen
+        // during the desktop tests. The classifier is resolved from the running host.
+        runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skiko.get()}")
       }
     }
   }
